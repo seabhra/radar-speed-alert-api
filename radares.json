@@ -1,0 +1,86 @@
+{
+  "fields": [
+    {"id":"_id","type":"int"},
+    {"id":"ID_FISCALIZACAO_ELETRONICA","type":"text"},
+    {"id":"DESC_LOC_CONTROLADOR_TRANSITO","type":"text"},
+    {"id":"DESC_TIPO_CONTROLADOR_TRANSITO","type":"text"},
+    {"id":"VELOCIDADE_REGULAMENTAR","type":"text"},
+    {"id":"SENTIDO","type":"text"},
+    {"id":"SENTIDO_FISCALIZADO","type":"text"},
+    {"id":"NUM_SERIE_ATUAL","type":"text"},
+    {"id":"COD_SECUNDARIA","type":"text"},
+    {"id":"GEOMETRIA","type":"text"}
+  ],
+  "records": [
+    {
+      "fields": [
+        {
+          "id": "_id",
+          "type": "int"
+        },
+        {
+          "id": "ID_FISCALIZACAO_ELETRONICA",
+          "type": "text"
+        },
+        {
+          "id": "DESC_LOC_CONTROLADOR_TRANSITO",
+          "type": "text"
+        },
+        {
+          "id": "DESC_TIPO_CONTROLADOR_TRANSITO",
+          "type": "text"
+        },
+        {
+          "id": "VELOCIDADE_REGULAMENTAR",
+          "type": "text"
+        },
+        {
+          "id": "SENTIDO",
+          "type": "text"
+        },
+        {
+          "id": "SENTIDO_FISCALIZADO",
+          "type": "text"
+        },
+        {
+          "id": "NUM_SERIE_ATUAL",
+          "type": "text"
+        },
+        {
+          "id": "COD_SECUNDARIA",
+          "type": "text"
+        },
+        {
+          "id": "GEOMETRIA",
+          "type": "text"
+        }
+      ],
+      "records": [
+        [
+          1,
+          "48",
+          "Av. do Contorno, 629",
+          "Controlador Eletrônico de Velocidade",
+          "60",
+          "Praça da Estação-Rodoviária",
+          "Único",
+          "3300",
+          null,
+          "-19.916667, -43.934444"
+        ],
+        [
+          2,
+          "49",
+          "Av. do Contorno, 4045 e oposto ao 4045",
+          "Controlador Eletrônico de Velocidade",
+          "60",
+          "Savassi-Santa Efigênia e Santa Efigênia-Savassi",
+          "Ambos",
+          "3301",
+          null,
+          "-19.929444, -43.923611"
+        ]
+      ]
+    }
+  ]
+}
