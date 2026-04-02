@@ -1,0 +1,9 @@
+{
+  "name": "radar-x9-html",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "echo Build concluído. Nenhum build necessário para HTML puro.",
+    "vercel-build": "echo Vercel Build concluído."
+  }
+}
