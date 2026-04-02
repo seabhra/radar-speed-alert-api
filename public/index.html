@@ -47,7 +47,7 @@
     }
 
     .header-left { display: flex; align-items: center; gap: 10px; }
-    .app-icon { width: 40px; height: 40px; border-radius: 8px; }
+    .app-icon { width: 45px; height: 40px; border-radius: 8px; }
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
     h1 span { color: var(--accent-color); }
 
@@ -101,16 +101,15 @@
       background-color: #0a0a0a;
     }
 
-    /* NOVO: Widget de Velocidade (Canto Inferior Esquerdo) */
+    /* NOVO: Widget de Velocidade Maior e Centralizado */
     .speed-widget {
       position: absolute;
-      bottom: 140px; /* Mesma altura dos botões da direita */
+      bottom: 130px; /* Alinhado à altura dos botões da direita */
       left: 15px;
-      width: 90px;
-      height: 90px;
+      width: 120px; /* Aumentado de 90 para 120 */
+      height: 120px; /* Aumentado de 90 para 120 */
       z-index: 500;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
     }
@@ -121,28 +120,18 @@
       left: 0;
       width: 100%;
       height: 100%;
-      object-fit: contain; /* Garante que a imagem não distorça */
+      object-fit: contain; 
       pointer-events: none;
     }
 
     .speed-value {
       position: relative;
       z-index: 1;
-      font-size: 32px;
+      font-size: 48px; /* Fonte grande para preencher o círculo */
       font-weight: 800;
-      color: #000000; /* Cor do texto dentro da placa (geralmente preto no fundo branco) */
+      color: #ff0000; /* Vermelho puro solicitado */
       line-height: 1;
-      margin-top: 5px; /* Desce um pouco para ficar no centro do espaço em branco da placa */
-      text-shadow: 0 0 2px rgba(255,255,255,0.5);
-    }
-
-    .speed-unit {
-      position: relative;
-      z-index: 1;
-      font-size: 10px;
-      font-weight: 600;
-      color: #000000;
-      margin-top: -2px;
+      margin-top: 8px; /* Desce levemente para se alojar no centro exato do círculo branco */
     }
 
     /* Map Controls Flutuantes */
@@ -223,7 +212,7 @@
 </head>
 <body>
 
-  <!-- HEADER SEM A IMAGEM DE VELOCIDADE -->
+  <!-- HEADER LIMPO -->
   <header>
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" alt="App Icon" class="app-icon">
@@ -240,11 +229,10 @@
     <!-- Mapa OSM -->
     <div id="map"></div>
 
-    <!-- NOVO WIDGET DE VELOCIDADE AQUI -->
+    <!-- WIDGET DE VELOCIDADE (Somente o número agora) -->
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
-      <div class="speed-unit">km/h</div>
     </div>
 
     <!-- Controles do Mapa -->
@@ -252,15 +240,16 @@
       <button class="map-btn" id="btn-center" title="Minha Localização">
         <img src="/imagens_app/ic_recentralizar.png" alt="Centro">
       </button>
+        <button class="map-btn" id="btn-refresh" title="Atualizar Radares">
+        <img src="/imagens_app/ic_refresh_button.png" alt="Refresh">
+      </button>
       <button class="map-btn" id="btn-zoom-in" title="Zoom In">
         <img src="/imagens_app/ic_zoom_in.png" alt="Zoom In">
       </button>
       <button class="map-btn" id="btn-zoom-out" title="Zoom Out">
         <img src="/imagens_app/ic_zoom_out.png" alt="Zoom Out">
       </button>
-      <button class="map-btn" id="btn-refresh" title="Atualizar Radares">
-        <img src="/imagens_app/ic_refresh_button.png" alt="Refresh">
-      </button>
+    
     </div>
 
     <!-- Caixa de Alerta -->
@@ -301,7 +290,6 @@
     let prevLng = null;
     let prevTime = null;
 
-    // Mapeamento dos tipos de radar para os ícones fornecidos
     const iconMap = {
       'cem': '/imagens_app/ic_radar_cem.png',
       'cev': '/imagens_app/ic_radar_cev.png',
@@ -321,7 +309,6 @@
       return iconMap[tipoLimpo] || iconMap['default'];
     }
 
-    // Fórmula de Haversine
     function calcularDistancia(lat1, lon1, lat2, lon2) {
       const R = 6371e3; 
       const p1 = lat1 * Math.PI / 180;
@@ -373,7 +360,7 @@
       const newLng = position.coords.longitude;
       const userPosition = [newLat, newLng];
 
-      // --- LÓGICA DE CÁLCULO DE VELOCIDADE ---
+      // Cálculo de Velocidade
       let speedKmh = 0;
       const currentTime = Date.now();
 
@@ -381,26 +368,20 @@
         const distanceMeters = calcularDistancia(prevLat, prevLng, newLat, newLng);
         const timeSeconds = (currentTime - prevTime) / 1000;
 
-        // Só calcula se o tempo for maior que 0 para evitar divisão por zero
         if (timeSeconds > 0) {
-          // m/s para km/h é multiplicar por 3.6
           speedKmh = Math.round((distanceMeters / timeSeconds) * 3.6); 
         }
       }
 
-      // Evita que erros de GPS mostrem velocidades irreais (ex: 500km/h)
       if (speedKmh > 250) {
         speedKmh = 0;
       }
 
-      // Atualiza o texto na tela
       $("#speed-display").text(speedKmh);
 
-      // Salva dados para o próximo cálculo
       prevLat = newLat;
       prevLng = newLng;
       prevTime = currentTime;
-      // ----------------------------------------
 
       userLat = newLat;
       userLng = newLng;
