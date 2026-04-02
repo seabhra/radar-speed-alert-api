@@ -1,4 +1,4 @@
-const CACHE_NAME = 'allora-cache-v10';
+const CACHE_NAME = 'radar-cache-v10';
 
 // Lista de URLs para cache
 const urlsToCache = [
