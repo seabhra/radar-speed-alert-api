@@ -47,7 +47,7 @@
     }
 
     .header-left { display: flex; align-items: center; gap: 10px; }
-    .app-icon { width: 45px; height: 40px; border-radius: 8px; }
+    .app-icon { width: 40px; height: 40px; border-radius: 8px; }
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
     h1 span { color: var(--accent-color); }
 
@@ -101,13 +101,13 @@
       background-color: #0a0a0a;
     }
 
-    /* NOVO: Widget de Velocidade Maior e Centralizado */
+    /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */
     .speed-widget {
       position: absolute;
-      bottom: 130px; /* Alinhado à altura dos botões da direita */
+      bottom: 30px; /* DESCIDO PARA O CANTO INFERIOR */
       left: 15px;
-      width: 120px; /* Aumentado de 90 para 120 */
-      height: 120px; /* Aumentado de 90 para 120 */
+      width: 120px; 
+      height: 120px; 
       z-index: 500;
       display: flex;
       align-items: center;
@@ -127,26 +127,27 @@
     .speed-value {
       position: relative;
       z-index: 1;
-      font-size: 48px; /* Fonte grande para preencher o círculo */
+      font-size: 52px; /* Tamanho do número */
       font-weight: 800;
-      color: #ff0000; /* Vermelho puro solicitado */
+      color: #000000; /* COR PRETA */
       line-height: 1;
-      margin-top: 8px; /* Desce levemente para se alojar no centro exato do círculo branco */
+      margin-top: 0; /* Centralizado perfeitamente */
     }
 
-    /* Map Controls Flutuantes */
+    /* NOVO: Botões do Mapa Maiores */
     .map-controls {
       position: absolute;
       right: 15px;
-      bottom: 140px; 
+      bottom: 40px; /* Alinhado à altura da placa de velocidade */
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px; /* Mais espaço entre eles */
       z-index: 500;
     }
 
     .map-btn {
-      width: 45px; height: 45px;
+      width: 60px; /* AUMENTADO (era 45) */
+      height: 60px; /* AUMENTADO (era 45) */
       background-color: rgba(26, 29, 36, 0.9);
       border: 1px solid #333;
       border-radius: 50%;
@@ -159,7 +160,11 @@
     }
 
     .map-btn:hover { border-color: var(--accent-color); background-color: rgba(26, 29, 36, 1); }
-    .map-btn img { width: 24px; height: 24px; pointer-events: none; }
+    .map-btn img { 
+      width: 36px; /* ÍCONES AUMENTADOS (era 24) */
+      height: 36px; /* ÍCONES AUMENTADOS (era 24) */
+      pointer-events: none; 
+    }
 
     /* Alert Bar (Bottom) */
     #alert-container {
@@ -229,19 +234,16 @@
     <!-- Mapa OSM -->
     <div id="map"></div>
 
-    <!-- WIDGET DE VELOCIDADE (Somente o número agora) -->
+    <!-- WIDGET DE VELOCIDADE -->
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
-    <!-- Controles do Mapa -->
+    <!-- Controles do Mapa (Maiores) -->
     <div class="map-controls">
       <button class="map-btn" id="btn-center" title="Minha Localização">
         <img src="/imagens_app/ic_recentralizar.png" alt="Centro">
-      </button>
-        <button class="map-btn" id="btn-refresh" title="Atualizar Radares">
-        <img src="/imagens_app/ic_refresh_button.png" alt="Refresh">
       </button>
       <button class="map-btn" id="btn-zoom-in" title="Zoom In">
         <img src="/imagens_app/ic_zoom_in.png" alt="Zoom In">
@@ -249,7 +251,9 @@
       <button class="map-btn" id="btn-zoom-out" title="Zoom Out">
         <img src="/imagens_app/ic_zoom_out.png" alt="Zoom Out">
       </button>
-    
+      <button class="map-btn" id="btn-refresh" title="Atualizar Radares">
+        <img src="/imagens_app/ic_refresh_button.png" alt="Refresh">
+      </button>
     </div>
 
     <!-- Caixa de Alerta -->
