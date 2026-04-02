@@ -75,7 +75,7 @@
 
     .btn-search {
       background-image: url('/imagens_app/ic_radar_busca.png');
-      background-size: 20px 20px;
+      background-size: 40px 40px;
       background-repeat: no-repeat;
       background-position: center;
       width: 45px; height: 45px;
@@ -98,7 +98,7 @@
     #map {
       width: 100%;
       height: 100%;
-      background-color: #0a0a0a;
+      background-color: #bbb7b7;
     }
 
     /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */
@@ -106,8 +106,8 @@
       position: absolute;
       bottom: 30px; /* DESCIDO PARA O CANTO INFERIOR */
       left: 15px;
-      width: 120px; 
-      height: 120px; 
+      width: 125px; 
+      height: 125px; 
       z-index: 500;
       display: flex;
       align-items: center;
@@ -127,7 +127,7 @@
     .speed-value {
       position: relative;
       z-index: 1;
-      font-size: 52px; /* Tamanho do número */
+      font-size: 48px; /* Tamanho do número */
       font-weight: 800;
       color: #000000; /* COR PRETA */
       line-height: 1;
@@ -245,15 +245,16 @@
       <button class="map-btn" id="btn-center" title="Minha Localização">
         <img src="/imagens_app/ic_recentralizar.png" alt="Centro">
       </button>
+      <button class="map-btn" id="btn-refresh" title="Atualizar Radares">
+        <img src="/imagens_app/ic_refresh_button.png" alt="Refresh">
+      </button>
       <button class="map-btn" id="btn-zoom-in" title="Zoom In">
         <img src="/imagens_app/ic_zoom_in.png" alt="Zoom In">
       </button>
       <button class="map-btn" id="btn-zoom-out" title="Zoom Out">
         <img src="/imagens_app/ic_zoom_out.png" alt="Zoom Out">
       </button>
-      <button class="map-btn" id="btn-refresh" title="Atualizar Radares">
-        <img src="/imagens_app/ic_refresh_button.png" alt="Refresh">
-      </button>
+      
     </div>
 
     <!-- Caixa de Alerta -->
