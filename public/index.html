@@ -43,7 +43,7 @@
       justify-content: space-between;
       border-bottom: 2px solid var(--accent-color);
       box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
-      z-index: 1000; /* Acima do mapa */
+      z-index: 1000;
     }
 
     .header-left { display: flex; align-items: center; gap: 10px; }
@@ -101,15 +101,59 @@
       background-color: #0a0a0a;
     }
 
+    /* NOVO: Widget de Velocidade (Canto Inferior Esquerdo) */
+    .speed-widget {
+      position: absolute;
+      bottom: 140px; /* Mesma altura dos botões da direita */
+      left: 15px;
+      width: 90px;
+      height: 90px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .speed-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Garante que a imagem não distorça */
+      pointer-events: none;
+    }
+
+    .speed-value {
+      position: relative;
+      z-index: 1;
+      font-size: 32px;
+      font-weight: 800;
+      color: #000000; /* Cor do texto dentro da placa (geralmente preto no fundo branco) */
+      line-height: 1;
+      margin-top: 5px; /* Desce um pouco para ficar no centro do espaço em branco da placa */
+      text-shadow: 0 0 2px rgba(255,255,255,0.5);
+    }
+
+    .speed-unit {
+      position: relative;
+      z-index: 1;
+      font-size: 10px;
+      font-weight: 600;
+      color: #000000;
+      margin-top: -2px;
+    }
+
     /* Map Controls Flutuantes */
     .map-controls {
       position: absolute;
       right: 15px;
-      bottom: 130px; 
+      bottom: 140px; 
       display: flex;
       flex-direction: column;
       gap: 10px;
-      z-index: 500; /* Acima do mapa Leaflet (z-index 400) */
+      z-index: 500;
     }
 
     .map-btn {
@@ -179,12 +223,12 @@
 </head>
 <body>
 
+  <!-- HEADER SEM A IMAGEM DE VELOCIDADE -->
   <header>
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" alt="App Icon" class="app-icon">
       <h1>RADAR <span>X9</span> BH</h1>
     </div>
-    <img src="/imagens_app/ic_speed_limit.png" alt="Limite" style="width:30px; height:30px; opacity: 0.7;">
   </header>
 
   <div class="search-container">
@@ -195,6 +239,13 @@
   <div class="map-wrapper">
     <!-- Mapa OSM -->
     <div id="map"></div>
+
+    <!-- NOVO WIDGET DE VELOCIDADE AQUI -->
+    <div class="speed-widget">
+      <img src="/imagens_app/ic_speed_limit.png" alt="Velocidade" class="speed-bg">
+      <div class="speed-value" id="speed-display">0</div>
+      <div class="speed-unit">km/h</div>
+    </div>
 
     <!-- Controles do Mapa -->
     <div class="map-controls">
@@ -245,6 +296,11 @@
     let userLat = -19.9167;
     let userLng = -43.9345;
 
+    // Variáveis para cálculo de velocidade
+    let prevLat = null;
+    let prevLng = null;
+    let prevTime = null;
+
     // Mapeamento dos tipos de radar para os ícones fornecidos
     const iconMap = {
       'cem': '/imagens_app/ic_radar_cem.png',
@@ -265,9 +321,9 @@
       return iconMap[tipoLimpo] || iconMap['default'];
     }
 
-    // Fórmula de Haversine para calcular distância entre dois pontos (substitui a API do Google)
+    // Fórmula de Haversine
     function calcularDistancia(lat1, lon1, lat2, lon2) {
-      const R = 6371e3; // Raio da Terra em metros
+      const R = 6371e3; 
       const p1 = lat1 * Math.PI / 180;
       const p2 = lat2 * Math.PI / 180;
       const dp = (lat2 - lat1) * Math.PI / 180;
@@ -276,39 +332,33 @@
                 Math.cos(p1) * Math.cos(p2) *
                 Math.sin(dl / 2) * Math.sin(dl / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c; // Distância em metros
+      return R * c; 
     }
 
     function initMap() {
-      // Inicializa o Leaflet
       map = L.map('map', {
         center: [userLat, userLng],
         zoom: 14,
-        zoomControl: false // Desativado para usar os botões personalizados
+        zoomControl: false
       });
 
-      // Adiciona o mapa escuro do OpenStreetMap (CartoDB Dark Matter)
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 19
       }).addTo(map);
 
-      // Eventos dos Botões
       $("#btn-search").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
       
       $("#btn-center").click(() => {
-        if (userMarker) {
-          map.setView(userMarker.getLatLng(), map.getZoom());
-        }
+        if (userMarker) map.setView(userMarker.getLatLng(), map.getZoom());
       });
       
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => carregarRadares());
 
-      // Inicia Geolocalização
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 });
       } else {
@@ -319,11 +369,42 @@
     }
 
     function updateUserLocation(position) {
-      userLat = position.coords.latitude;
-      userLng = position.coords.longitude;
-      const userPosition = [userLat, userLng];
+      const newLat = position.coords.latitude;
+      const newLng = position.coords.longitude;
+      const userPosition = [newLat, newLng];
 
-      // Cria ou atualiza o marcador do usuário
+      // --- LÓGICA DE CÁLCULO DE VELOCIDADE ---
+      let speedKmh = 0;
+      const currentTime = Date.now();
+
+      if (prevLat !== null && prevTime !== null) {
+        const distanceMeters = calcularDistancia(prevLat, prevLng, newLat, newLng);
+        const timeSeconds = (currentTime - prevTime) / 1000;
+
+        // Só calcula se o tempo for maior que 0 para evitar divisão por zero
+        if (timeSeconds > 0) {
+          // m/s para km/h é multiplicar por 3.6
+          speedKmh = Math.round((distanceMeters / timeSeconds) * 3.6); 
+        }
+      }
+
+      // Evita que erros de GPS mostrem velocidades irreais (ex: 500km/h)
+      if (speedKmh > 250) {
+        speedKmh = 0;
+      }
+
+      // Atualiza o texto na tela
+      $("#speed-display").text(speedKmh);
+
+      // Salva dados para o próximo cálculo
+      prevLat = newLat;
+      prevLng = newLng;
+      prevTime = currentTime;
+      // ----------------------------------------
+
+      userLat = newLat;
+      userLng = newLng;
+
       const userIcon = L.icon({
         iconUrl: '/imagens_app/ic_gps_marker.png',
         iconSize: [40, 40],
@@ -332,7 +413,7 @@
 
       if (!userMarker) {
         userMarker = L.marker(userPosition, { icon: userIcon }).addTo(map);
-        map.setView(userPosition, 15); // Centraliza na primeira vez com zoom legal
+        map.setView(userPosition, 15);
       } else {
         userMarker.setLatLng(userPosition);
       }
@@ -350,8 +431,6 @@
         })
         .then(data => {
           radaresData = data;
-
-          // Limpa marcadores antigos do mapa
           radarMarkers.forEach(marker => map.removeLayer(marker));
           radarMarkers = [];
 
@@ -369,7 +448,6 @@
 
             const radarMarker = L.marker([lat, lng], { icon: iconeRadar }).addTo(map);
             
-            // Texto do popup
             const popupContent = `
               <div style="color:#000; font-family:Inter; text-align:center;">
                 <b>${radar.tipo.toUpperCase()}</b><br>
@@ -378,8 +456,6 @@
               </div>
             `;
             radarMarker.bindPopup(popupContent);
-
-            // Anexa os dados do radar ao marcador
             radarMarker.radarData = radar;
             radarMarkers.push(radarMarker);
           });
@@ -402,23 +478,19 @@
         const rLat = parseFloat(dados.latitude);
         const rLng = parseFloat(dados.longitude);
 
-        // Usa a nossa função de distância ao invés da API do Google
         const distance = calcularDistancia(uLat, uLng, rLat, rLng);
 
-        if (distance < 300) { // 300 metros de alerta
+        if (distance < 300) { 
           alertTriggered = true;
           const iconeTipo = getIconUrl(dados.tipo);
 
-          // Atualiza a UI do Alerta
           $("#alert-icon").attr("src", iconeTipo);
           $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
 
-          // Toca o áudio
           const sound = document.getElementById('alert-sound');
           sound.currentTime = 0;
           sound.play().catch(e => console.log("Erro ao tocar áudio:", e));
 
-          // Mostra a barra
           $("#alert-container").fadeIn(200);
 
           clearTimeout(alertTimeout);
@@ -433,7 +505,7 @@
       if (!query || query.length < 3) return;
 
       let encontrou = false;
-      const boundsGroup = L.featureGroup(); // Agrupa marcadores para ajustar o zoom
+      const boundsGroup = L.featureGroup(); 
 
       radarMarkers.forEach(marker => {
         const titulo = `${marker.radarData.tipo} - ${marker.radarData.endereco}`.toLowerCase();
@@ -441,12 +513,12 @@
         if (titulo.includes(query.toLowerCase())) {
           encontrou = true;
           boundsGroup.addLayer(marker);
-          marker.openPopup(); // Abre o balão de informação do radar encontrado
+          marker.openPopup(); 
         }
       });
 
       if (encontrou) {
-        map.fitBounds(boundsGroup.getBounds().pad(0.5)); // Ajusta o mapa para mostrar os resultados
+        map.fitBounds(boundsGroup.getBounds().pad(0.5)); 
       } else {
         alert("Nenhum radar encontrado para essa busca.");
       }
@@ -457,6 +529,7 @@
       $("#loading").html("<div style='color: orange'>Ative seu GPS para usar o app.</div>");
     }
 
+    
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
