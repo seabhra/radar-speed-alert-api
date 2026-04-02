@@ -457,6 +457,13 @@
       $("#loading").html("<div style='color: orange'>Ative seu GPS para usar o app.</div>");
     }
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('SW OK'))
+      .catch(err => console.log('SW Fail', err));
+  });
+}
     window.onload = initMap;
   </script>
 </body>
