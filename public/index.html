@@ -107,7 +107,7 @@
     .speed-widget {
       position: absolute;
       bottom: 30px; 
-      left: -30px; /* ALTERADO AQUI: Movido mais para a esquerda */
+      left: -30px; 
       width: 150px; 
       height: 150px; 
       z-index: 500;
@@ -139,7 +139,7 @@
 
     /* ajuste só para o zero */
     .speed-value.zero {
-      transform: translate(-5%, 30%); /* ALTERADO AQUI: Zero um pouco mais para esquerda */
+      transform: translate(-5%, 30%); 
     }  
 
     /* Botões do Mapa */
@@ -221,7 +221,7 @@
 
     /* Esconde os controles padrão de zoom e a marcação do mapa */
     .leaflet-control-zoom { display: none !important; }
-    .leaflet-control-attribution { display: none !important; } /* ALTERADO AQUI: Remove marca de água */
+    .leaflet-control-attribution { display: none !important; } 
   </style>
 </head>
 <body>
@@ -298,19 +298,19 @@
     // Define o sistema de coordenadas UTM da sua base (SIRGAS 2000, Zona 23S - BH)
     proj4.defs("EPSG:31983", "+proj=utm +zone=23 +south +ellps=grs80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 
+    /* >>>>>>>>> CORREÇÃO 1: Adicionadas as vírgulas faltantes e atualizado com os NOMES EXATOS do seu JSON <<<<<<<<<< */
     const iconMap = {
-      'radar misto (velocidade e semáforo)': '/imagens_app/ic_radar_cem.png',
-      'radar de avanço de semáforo': '/imagens_app/ic_radar_das.png',
-      'radar de trânsito em local proibido': '/imagens_app/ic_radar_ditlp.png',
-      'radar de invasão de faixa de exclusiva - move': '/imagens_app/ic_radar_dife.png',
-      'radar de parada sobre faixa de pedestres': '/imagens_app/ic_radar_dtfp.png',
-      'radar de conversão-retorno em local proibido': '/imagens_app/ic_radar_rcp.png',
-      'radar de redução de velocidade': '/imagens_app/ic_radar_rev.png',
-      'leitor inteligente de placas (OCR)': '/imagens_app/ic_radar_ocr.png'
-      'radar de uso de celular': '/imagens_app/ic_radar_duc.png'
-      'radar de velocidade': '/imagens_app/ic_radar_cev.png'
+      'controlador eletrônico de velocidade': '/imagens_app/ic_radar_cev.png',
+      'detector de avanço de semáforo': '/imagens_app/ic_radar_das.png',
+      'detector de trânsito em local proibido': '/imagens_app/ic_radar_dife.png',
+      'detector de invasão de faixa de exclusiva - move': '/imagens_app/ic_radar_dfpr.png',
+      'detector de parada sobre faixa de pedestres': '/imagens_app/ic_radar_dtlp.png',
+      'detector de conversão-retorno em local proibido': '/imagens_app/ic_radar_duc.png',
+      'conjugado cev-dif': '/imagens_app/ic_radar_rev.png',
+      'leitor inteligente de placas (ocr)': '/imagens_app/ic_radar_ocr.png',
+      'radar de uso de celular': '/imagens_app/ic_radar_rcp.png',
+      'default': '/imagens_app/ic_radar_cem.png' // Mantido um fallback genérico
     };
-
 
     function getIconUrl(tipo) {
       const tipoLimpo = String(tipo).toLowerCase().trim();
@@ -343,7 +343,7 @@
         tileLayer.setUrl(urlAtual);
       } else {
         tileLayer = L.tileLayer(urlAtual, {
-          attribution: '', // ALTERADO AQUI: Marca removida
+          attribution: '', 
           subdomains: 'abcd',
           maxZoom: 19
         }).addTo(map);
@@ -353,7 +353,7 @@
     function initMap() {
       map = L.map('map', {
         center: [userLat, userLng],
-        zoom: 16, // ALTERADO AQUI: Zoom inicial maior
+        zoom: 16, 
         zoomControl: false
       });
 
@@ -424,7 +424,7 @@
       if (!userMarker) {
         userMarker = L.marker(userPosition, { icon: userIcon }).addTo(map);
         userMarker.bindTooltip("📍 Local do Usuário", { permanent: true, direction: "top", offset: [0, -30] });
-        map.setView(userPosition, 16); // Ajustado para 16
+        map.setView(userPosition, 16); 
       } else {
         userMarker.setLatLng(userPosition);
       }
@@ -445,20 +445,10 @@
           radarMarkers.forEach(marker => map.removeLayer(marker));
           radarMarkers = [];
 
-          // ADAPTADO AQUI: Pega o array 'records' do formato da sua base de dados
+          // Pega o array 'records' do formato da sua base de dados
           const records = data.records || [];
           
           records.forEach(record => {
-            /* 
-               Mapeamento dos índices do seu array baseado no 'fields':
-               [0] _id
-               [1] ID_FISCALIZACAO
-               [2] ENDEREÇO
-               [3] TIPO CONTROLADOR
-               [4] VELOCIDADE
-               [5] SENTIDO
-               [9] GEOMETRIA (POINT X Y)
-            */
             const endereco = record[2] || "Endereço não informado";
             const tipo = record[3] || "Não Identificado";
             const velocidade = record[4] || "0";
@@ -503,7 +493,6 @@
             `;
             
             radarMarker.bindPopup(popupContent);
-            // Guarda os dados formatados no marcador pra usar na busca e no alerta
             radarMarker.radarData = { 
               latitude: lat, 
               longitude: lng, 
