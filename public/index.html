@@ -103,7 +103,6 @@
 
     /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */
     
-    /* Widget */
 .speed-widget {
   position: absolute;
   bottom: 50px;
@@ -121,25 +120,27 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transform: translate(-50%, -50%);
+
+  transform: translate(-50%, -45%); /* antes -50%, agora desce a imagem */
   pointer-events: none;
 }
 
 /* Número centralizado REAL */
+
 .speed-value {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* garante centro perfeito */
-  
+  transform: translate(-50%, -45%); /* antes -50%, agora desce um pouco */
+
   font-size: 35px;
   font-weight: 800;
   color: #000;
   line-height: 1;
-
   text-align: center;
-  min-width: 2ch; /* evita "pulo" ao trocar 1 → 2 → 3 dígitos */
-}
+  min-width: 2ch;
+}    
+
     /* NOVO: Botões do Mapa Maiores */
     .map-controls {
       position: absolute;
@@ -341,7 +342,7 @@
       });
 
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+        attribution: '; <a href="https://www.openstreetmap.org/copyright"></a>; <a href="https://carto.com/"></a>',
         subdomains: 'abcd',
         maxZoom: 19
       }).addTo(map);
@@ -402,6 +403,14 @@
         iconSize: [40, 40],
         iconAnchor: [20, 40]
       });
+
+  const userMarker = L.marker([lat, lng], { icon: userIcon })
+  .addTo(map)
+  .bindTooltip("📍 Local do Usuário", {
+    permanent: true,
+    direction: "top",
+    offset: [0, -30]
+  });
 
       if (!userMarker) {
         userMarker = L.marker(userPosition, { icon: userIcon }).addTo(map);
