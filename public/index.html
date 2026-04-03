@@ -47,7 +47,7 @@
     }
 
     .header-left { display: flex; align-items: center; gap: 10px; }
-    .app-icon { width: 40px; height: 40px; border-radius: 8px; }
+    .app-icon { width: 50px; height: 40px; border-radius: 8px; }
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
     h1 span { color: var(--accent-color); }
 
@@ -104,9 +104,9 @@
     /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */
     .speed-widget {
       position: absolute;
-      bottom: 30px; /* DESCIDO PARA O CANTO INFERIOR */
-      left: 15px;
-      width: 125px; 
+      bottom: 40px; /* DESCIDO PARA O CANTO INFERIOR */
+      left: 10px;
+      width: 140px; 
       height: 125px; 
       z-index: 500;
       display: flex;
@@ -127,7 +127,7 @@
     .speed-value {
       position: relative;
       z-index: 1;
-      font-size: 48px; /* Tamanho do número */
+      font-size: 40px; /* Tamanho do número */
       font-weight: 800;
       color: #000000; /* COR PRETA */
       line-height: 1;
@@ -161,8 +161,8 @@
 
     .map-btn:hover { border-color: var(--accent-color); background-color: rgba(26, 29, 36, 1); }
     .map-btn img { 
-      width: 36px; /* ÍCONES AUMENTADOS (era 24) */
-      height: 36px; /* ÍCONES AUMENTADOS (era 24) */
+      width: 40px; /* ÍCONES AUMENTADOS (era 24) */
+      height: 40px; /* ÍCONES AUMENTADOS (era 24) */
       pointer-events: none; 
     }
 
@@ -243,7 +243,7 @@
     <!-- Controles do Mapa (Maiores) -->
     <div class="map-controls">
       <button class="map-btn" id="btn-center" title="Minha Localização">
-        <img src="/imagens_app/ic_recentralizar.png" alt="Centro">
+        <img src="/imagens_app/ic_location_button.png" alt="Centro">
       </button>
       <button class="map-btn" id="btn-refresh" title="Atualizar Radares">
         <img src="/imagens_app/ic_refresh_button.png" alt="Refresh">
