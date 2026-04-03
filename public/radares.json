@@ -5556,19 +5556,43 @@
       "Rua Conde Pereira Carneiro, Esquina Av. Amazonas",
       "'Detector de Uso de Celular'",
       "NA",
-      "Gameleira/ Centro",
+      "Gameleira/Centro",
       "Único",
       "SBR",
       null,
       null
     ],
-    [
-    942,
+[
+942,
      "SBR",
       " Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos",
       "'Detector de Uso de Celular'",
       "NA",
-      "São Francisco/ Centro",
+      "São Francisco/Centro",
+      "Único",
+      "SBR",
+      null,
+      null
+    ],
+[
+943,
+     "SBR",
+      " Rod. Camilo Teixeira da Costa, 210 - Tupi ",
+      "'Detector de Redução de Velocidade'",
+      "NA",
+      "Belo Horizonte/Tupi",
+      "Único",
+      "SBR",
+      null,
+      null
+    ],
+[
+944,
+     "SBR",
+      " Rod. Camilo Teixeira da Costa, 210 - Tupi",
+      "'Detector de Redução de Velocidade'",
+      "NA",
+      "Tupi/Belo Horizonte",
       "Único",
       "SBR",
       null,
@@ -5576,5 +5600,7 @@
     ]
 
 
+
   ]
 }
+
