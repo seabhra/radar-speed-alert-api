@@ -299,15 +299,18 @@
     proj4.defs("EPSG:31983", "+proj=utm +zone=23 +south +ellps=grs80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
 
     const iconMap = {
-      'controlador eletrônico de velocidade': '/imagens_app/ic_radar_cem.png',
-      'detector de avanço de semáforo': '/imagens_app/ic_radar_das.png',
-      'detector de trânsito em local proibido': '/imagens_app/ic_radar_dife.png',
-      'detector de invasão de faixa de exclusiva - move': '/imagens_app/ic_radar_dfpr.png',
-      'detector de parada sobre faixa de pedestres': '/imagens_app/ic_radar_dtlp.png',
-      'detector de conversão-retorno em local proibido': '/imagens_app/ic_radar_duc.png',
-      'conjugado cev-dif': '/imagens_app/ic_radar_rev.png',
-      'default': '/imagens_app/ic_radar_cem.png'
+      'radar misto (velocidade e semáforo)': '/imagens_app/ic_radar_cem.png',
+      'radar de avanço de semáforo': '/imagens_app/ic_radar_das.png',
+      'radar de trânsito em local proibido': '/imagens_app/ic_radar_ditlp.png',
+      'radar de invasão de faixa de exclusiva - move': '/imagens_app/ic_radar_dife.png',
+      'radar de parada sobre faixa de pedestres': '/imagens_app/ic_radar_dtfp.png',
+      'radar de conversão-retorno em local proibido': '/imagens_app/ic_radar_rcp.png',
+      'radar de redução de velocidade': '/imagens_app/ic_radar_rev.png',
+      'leitor inteligente de placas (OCR)': '/imagens_app/ic_radar_ocr.png'
+      'radar de uso de celular': '/imagens_app/ic_radar_duc.png'
+      'radar de velocidade': '/imagens_app/ic_radar_cev.png'
     };
+
 
     function getIconUrl(tipo) {
       const tipoLimpo = String(tipo).toLowerCase().trim();
