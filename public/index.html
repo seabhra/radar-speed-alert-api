@@ -11,6 +11,8 @@
   <!-- Fontes -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Biblioteca para converter coordenadas UTM para Lat/Lng -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.2/proj4.js"></script>
 
   <style>
     :root {
@@ -101,62 +103,59 @@
       background-color: #bbb7b7;
     }
 
- /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */ 
-.speed-widget {
-  position: absolute;
-  bottom: 30px; /* ALTERADO AQUI: de 50px para 30px (desce todo o conjunto) */
-  left: -10px; /* ALTERADO AQUI: de 5px para -10px (move todo o conjunto para a esquerda) */
-  width: 150px; 
-  height: 150px; 
-  z-index: 500;
-}
+    /* NOVO: Widget de Velocidade */
+    .speed-widget {
+      position: absolute;
+      bottom: 30px; 
+      left: -30px; /* ALTERADO AQUI: Movido mais para a esquerda */
+      width: 150px; 
+      height: 150px; 
+      z-index: 500;
+    }
 
-/* Imagem de fundo */
-.speed-bg {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+    .speed-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transform: translate(-30%, -30%);
+      pointer-events: none;
+    }
 
-  transform: translate(-30%, -30%); /* antes -50%, agora desce a imagem */
-  pointer-events: none;
-}
+    .speed-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(10%, 20%); 
+      font-size: 30px;
+      font-weight: 800;
+      color: #000;
+      line-height: 1;
+      text-align: center;
+      min-width: 2ch;
+    }
 
-/* Número centralizado REAL */
-.speed-value {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(10%, 20%); 
-  font-size: 30px;
-  font-weight: 800;
-  color: #000;
-  line-height: 1;
-  text-align: center;
-  min-width: 2ch;
-}
+    /* ajuste só para o zero */
+    .speed-value.zero {
+      transform: translate(-5%, 30%); /* ALTERADO AQUI: Zero um pouco mais para esquerda */
+    }  
 
-/* ajuste só para o zero */
-.speed-value.zero {
-  transform: translate(5%, 40%); /* ALTERADO AQUI: X de 20% para 5% (move o zero um pouco mais para a esquerda) */
-}  
-
-    /* NOVO: Botões do Mapa Maiores */
+    /* Botões do Mapa */
     .map-controls {
       position: absolute;
       right: 15px;
-      bottom: 40px; /* Alinhado à altura da placa de velocidade */
+      bottom: 40px;
       display: flex;
       flex-direction: column;
-      gap: 12px; /* Mais espaço entre eles */
+      gap: 12px;
       z-index: 500;
     }
 
     .map-btn {
-      width: 60px; /* AUMENTADO (era 45) */
-      height: 60px; /* AUMENTADO (era 45) */
+      width: 60px;
+      height: 60px;
       background-color: rgba(26, 29, 36, 0.9);
       border: 1px solid #333;
       border-radius: 50%;
@@ -170,8 +169,8 @@
 
     .map-btn:hover { border-color: var(--accent-color); background-color: rgba(26, 29, 36, 1); }
     .map-btn img { 
-      width: 40px; /* ÍCONES AUMENTADOS (era 24) */
-      height: 40px; /* ÍCONES AUMENTADOS (era 24) */
+      width: 40px;
+      height: 40px;
       pointer-events: none; 
     }
 
@@ -220,13 +219,13 @@
     .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* Esconde os controles padrão de zoom do Leaflet */
+    /* Esconde os controles padrão de zoom e a marcação do mapa */
     .leaflet-control-zoom { display: none !important; }
+    .leaflet-control-attribution { display: none !important; } /* ALTERADO AQUI: Remove marca de água */
   </style>
 </head>
 <body>
 
-  <!-- HEADER LIMPO -->
   <header>
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" alt="App Icon" class="app-icon">
@@ -240,16 +239,13 @@
   </div>
 
   <div class="map-wrapper">
-    <!-- Mapa OSM -->
     <div id="map"></div>
 
-    <!-- WIDGET DE VELOCIDADE -->
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
-    <!-- Controles do Mapa (Maiores) -->
     <div class="map-controls">
       <button class="map-btn" id="btn-center" title="Minha Localização">
         <img src="/imagens_app/ic_location_button.png" alt="Centro">
@@ -263,10 +259,8 @@
       <button class="map-btn" id="btn-zoom-out" title="Zoom Out">
         <img src="/imagens_app/ic_zoom_out.png" alt="Zoom Out">
       </button>
-      
     </div>
 
-    <!-- Caixa de Alerta -->
     <div id="alert-container">
       <div class="alert-bar">
         <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Tipo Radar">
@@ -277,17 +271,14 @@
       </div>
     </div>
 
-    <!-- Loading -->
     <div class="loading-overlay" id="loading">
       <div class="loading-spinner"></div>
       <div>Carregando Radares...</div>
     </div>
   </div>
 
-  <!-- Áudio de Alerta -->
   <audio id="alert-sound" src="alerta.mp3" preload="auto"></audio>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
@@ -298,23 +289,23 @@
     let radaresData = [];
     let userLat = -19.9167;
     let userLng = -43.9345;
+    let tileLayer;
 
-    // Variáveis para cálculo de velocidade
     let prevLat = null;
     let prevLng = null;
     let prevTime = null;
 
+    // Define o sistema de coordenadas UTM da sua base (SIRGAS 2000, Zona 23S - BH)
+    proj4.defs("EPSG:31983", "+proj=utm +zone=23 +south +ellps=grs80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+
     const iconMap = {
-      'cem': '/imagens_app/ic_radar_cem.png',
-      'cev': '/imagens_app/ic_radar_cev.png',
-      'das': '/imagens_app/ic_radar_das.png',
-      'dife': '/imagens_app/ic_radar_dife.png',
-      'dfpr': '/imagens_app/ic_radar_dfpr.png',
-      'dtlp': '/imagens_app/ic_radar_dtlp.png',
-      'duc': '/imagens_app/ic_radar_duc.png',
-      'ocr': '/imagens_app/ic_radar_ocr.png',
-      'rcp': '/imagens_app/ic_radar_rcp.png',
-      'rev': '/imagens_app/ic_radar_rev.png',
+      'controlador eletrônico de velocidade': '/imagens_app/ic_radar_cem.png',
+      'detector de avanço de semáforo': '/imagens_app/ic_radar_das.png',
+      'detector de trânsito em local proibido': '/imagens_app/ic_radar_dife.png',
+      'detector de invasão de faixa de exclusiva - move': '/imagens_app/ic_radar_dfpr.png',
+      'detector de parada sobre faixa de pedestres': '/imagens_app/ic_radar_dtlp.png',
+      'detector de conversão-retorno em local proibido': '/imagens_app/ic_radar_duc.png',
+      'conjugado cev-dif': '/imagens_app/ic_radar_rev.png',
       'default': '/imagens_app/ic_radar_cem.png'
     };
 
@@ -336,19 +327,37 @@
       return R * c; 
     }
 
+    // Função para alternar mapa entre Dia e Noite
+    function aplicarTemaMapa() {
+      const hora = new Date().getHours();
+      const urlDia = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      const urlNoite = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+      
+      // Define noite entre 19h e 6h
+      const urlAtual = (hora >= 19 || hora < 6) ? urlNoite : urlDia;
+
+      if (tileLayer) {
+        tileLayer.setUrl(urlAtual);
+      } else {
+        tileLayer = L.tileLayer(urlAtual, {
+          attribution: '', // ALTERADO AQUI: Marca removida
+          subdomains: 'abcd',
+          maxZoom: 19
+        }).addTo(map);
+      }
+    }
+
     function initMap() {
       map = L.map('map', {
         center: [userLat, userLng],
-        zoom: 14,
+        zoom: 16, // ALTERADO AQUI: Zoom inicial maior
         zoomControl: false
       });
 
-  
-      L.tileLayer('', {
-        attribution: '',
-        subdomains: 'abcd',
-        maxZoom: 19
-      }).addTo(map);
+      aplicarTemaMapa();
+
+      // Verifica a cada 5 minutos se clareou ou escureceu para mudar o tema automaticamente
+      setInterval(aplicarTemaMapa, 300000);
 
       $("#btn-search").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
@@ -375,7 +384,6 @@
       const newLng = position.coords.longitude;
       const userPosition = [newLat, newLng];
 
-      // Cálculo de Velocidade
       let speedKmh = 0;
       const currentTime = Date.now();
 
@@ -388,11 +396,14 @@
         }
       }
 
-      if (speedKmh > 250) {
-        speedKmh = 0;
-      }
+      if (speedKmh > 250) speedKmh = 0;
 
-      $("#speed-display").text(speedKmh);
+      const $display = $("#speed-display");
+      $display.text(speedKmh);
+      
+      // Adiciona classe pra ajustar o zero
+      if (speedKmh === 0) { $display.addClass('zero'); } 
+      else { $display.removeClass('zero'); }
 
       prevLat = newLat;
       prevLng = newLng;
@@ -407,15 +418,10 @@
         iconAnchor: [20, 40]
       });
 
-      /* >>>>>>>>> CORREÇÃO 2: Removida a declaração duplicada "const userMarker" e variáveis fantasma "lat, lng" <<<<<<<<<< */
       if (!userMarker) {
         userMarker = L.marker(userPosition, { icon: userIcon }).addTo(map);
-        userMarker.bindTooltip("📍 Local do Usuário", {
-          permanent: true,
-          direction: "top",
-          offset: [0, -30]
-        });
-        map.setView(userPosition, 15);
+        userMarker.bindTooltip("📍 Local do Usuário", { permanent: true, direction: "top", offset: [0, -30] });
+        map.setView(userPosition, 16); // Ajustado para 16
       } else {
         userMarker.setLatLng(userPosition);
       }
@@ -432,19 +438,52 @@
           return response.json();
         })
         .then(data => {
-          /* >>>>>>>>> CORREÇÃO 3 (OPCIONAL MAS RECOMENDADA): Verifica se o JSON é uma lista direta ou se está dentro de uma propriedade <<<<<<<<<< */
-          radaresData = Array.isArray(data) ? data : (data.radares || []);
-          
+          // Limpa mapa
           radarMarkers.forEach(marker => map.removeLayer(marker));
           radarMarkers = [];
 
-          radaresData.forEach(radar => {
-            const lat = parseFloat(radar.latitude);
-            const lng = parseFloat(radar.longitude);
+          // ADAPTADO AQUI: Pega o array 'records' do formato da sua base de dados
+          const records = data.records || [];
+          
+          records.forEach(record => {
+            /* 
+               Mapeamento dos índices do seu array baseado no 'fields':
+               [0] _id
+               [1] ID_FISCALIZACAO
+               [2] ENDEREÇO
+               [3] TIPO CONTROLADOR
+               [4] VELOCIDADE
+               [5] SENTIDO
+               [9] GEOMETRIA (POINT X Y)
+            */
+            const endereco = record[2] || "Endereço não informado";
+            const tipo = record[3] || "Não Identificado";
+            const velocidade = record[4] || "0";
+            const geometryStr = record[9] || "";
+
+            // Extrai os números do texto "POINT (611314.17 7797658.78)"
+            const match = geometryStr.match(/POINT \(([\d\.]+) ([\d\.]+)\)/);
+            if (!match) return; // Pula se não tiver coordenada válida
+
+            const utmX = parseFloat(match[1]);
+            const utmY = parseFloat(match[2]);
+
+            // Converte UTM (EPSG:31983) para Latitude e Longitude (EPSG:4326)
+            let lat = null;
+            let lng = null;
+            try {
+              const coords = proj4("EPSG:31983", "EPSG:4326", [utmX, utmY]);
+              lng = coords[0];
+              lat = coords[1];
+            } catch (e) {
+              console.error("Erro de conversão UTM:", e);
+              return;
+            }
+
             if (isNaN(lat) || isNaN(lng)) return;
 
             const iconeRadar = L.icon({
-              iconUrl: getIconUrl(radar.tipo),
+              iconUrl: getIconUrl(tipo),
               iconSize: [40, 40],
               iconAnchor: [20, 40],
               popupAnchor: [0, -40]
@@ -453,14 +492,23 @@
             const radarMarker = L.marker([lat, lng], { icon: iconeRadar }).addTo(map);
             
             const popupContent = `
-              <div style="color:#000; font-family:Inter; text-align:center;">
-                <b>${radar.tipo.toUpperCase()}</b><br>
-                ${radar.endereco}<br>
-                <span style="color:red; font-weight:bold;">Máx: ${radar.velocidade_maxima} km/h</span>
+              <div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">
+                <b>${tipo.toUpperCase()}</b><br>
+                ${endereco}<br>
+                <span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span>
               </div>
             `;
+            
             radarMarker.bindPopup(popupContent);
-            radarMarker.radarData = radar;
+            // Guarda os dados formatados no marcador pra usar na busca e no alerta
+            radarMarker.radarData = { 
+              latitude: lat, 
+              longitude: lng, 
+              endereco: endereco, 
+              velocidade_maxima: velocidade, 
+              tipo: tipo 
+            };
+            
             radarMarkers.push(radarMarker);
           });
 
@@ -479,10 +527,7 @@
         if (alertTriggered) return;
 
         const dados = marker.radarData;
-        const rLat = parseFloat(dados.latitude);
-        const rLng = parseFloat(dados.longitude);
-
-        const distance = calcularDistancia(uLat, uLng, rLat, rLng);
+        const distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
 
         if (distance < 300) { 
           alertTriggered = true;
@@ -533,14 +578,14 @@
       $("#loading").html("<div style='color: orange'>Ative seu GPS para usar o app.</div>");
     }
 
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log('SW OK'))
+          .catch(err => console.log('SW Fail', err));
+      });
+    }
     
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-      .then(() => console.log('SW OK'))
-      .catch(err => console.log('SW Fail', err));
-  });
-}
     window.onload = initMap;
   </script>
 </body>
