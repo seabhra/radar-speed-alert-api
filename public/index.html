@@ -130,15 +130,19 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(10%, -4%); /* antes -50%, agora desce um pouco */
-
-  font-size: 35px;
+  transform: translate(10%, -4%);
+  font-size: 30px;
   font-weight: 800;
   color: #000;
   line-height: 1;
   text-align: center;
   min-width: 2ch;
-}    
+}
+
+/* ajuste só para o zero */
+.speed-value.zero {
+  transform: translate(10%, 2%); /* desce apenas o 0 */
+}  
 
     /* NOVO: Botões do Mapa Maiores */
     .map-controls {
