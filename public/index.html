@@ -102,12 +102,11 @@
     }
 
  /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */ 
-
 /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */ 
 .speed-widget {
   position: absolute;
-  bottom: 50px;
-  left: 5px;
+  bottom: 30px; /* ALTERADO AQUI: de 50px para 30px (desce todo o conjunto) */
+  left: -10px; /* ALTERADO AQUI: de 5px para -10px (move todo o conjunto para a esquerda) */
   width: 150px; 
   height: 150px; 
   z-index: 500;
@@ -131,7 +130,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(10%, 20%); /* Aumentado o Y de -4% para 20% para descer */
+  transform: translate(10%, 20%); 
   font-size: 30px;
   font-weight: 800;
   color: #000;
@@ -142,7 +141,7 @@
 
 /* ajuste só para o zero */
 .speed-value.zero {
-  transform: translate(20%, 30%); /* desce apenas o 0 (ajustado junto) */
+  transform: translate(5%, 30%); /* ALTERADO AQUI: X de 20% para 5% (move o zero um pouco mais para a esquerda) */
 }  
 
     /* NOVO: Botões do Mapa Maiores */
