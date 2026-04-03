@@ -140,7 +140,7 @@
 
 /* ajuste só para o zero */
 .speed-value.zero {
-  transform: translate(5%, 30%); /* ALTERADO AQUI: X de 20% para 5% (move o zero um pouco mais para a esquerda) */
+  transform: translate(5%, 40%); /* ALTERADO AQUI: X de 20% para 5% (move o zero um pouco mais para a esquerda) */
 }  
 
     /* NOVO: Botões do Mapa Maiores */
@@ -343,9 +343,9 @@
         zoomControl: false
       });
 
-      /* >>>>>>>>> CORREÇÃO 1: Faltava uma aspa simples no início da URL do TileLayer <<<<<<<<<< */
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+  
+      L.tileLayer('', {
+        attribution: '',
         subdomains: 'abcd',
         maxZoom: 19
       }).addTo(map);
