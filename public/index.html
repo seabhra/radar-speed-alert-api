@@ -101,14 +101,13 @@
       background-color: #bbb7b7;
     }
 
-    /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */
-    
+ /* NOVO: Widget de Velocidade (Descido e Número Preto Centralizado) */ 
 .speed-widget {
   position: absolute;
   bottom: 50px;
   left: 5px;
-  width: 140px; 
-  height: 140px; 
+  width: 150px; 
+  height: 150px; 
   z-index: 500;
 }
 
@@ -121,7 +120,7 @@
   height: 100%;
   object-fit: contain;
 
-  transform: translate(-50%, -45%); /* antes -50%, agora desce a imagem */
+  transform: translate(-40%, -35%); /* antes -50%, agora desce a imagem */
   pointer-events: none;
 }
 
@@ -131,7 +130,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -45%); /* antes -50%, agora desce um pouco */
+  transform: translate(-40%, -33%); /* antes -50%, agora desce um pouco */
 
   font-size: 35px;
   font-weight: 800;
@@ -341,8 +340,8 @@
         zoomControl: false
       });
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '; <a href="https://www.openstreetmap.org/copyright"></a>; <a href="https://carto.com/"></a>',
+      L.tileLayer('', {
+        attribution: <a href="https://www.openstreetmap.org/copyright"></a> <a href="https://carto.com/"></a>',
         subdomains: 'abcd',
         maxZoom: 19
       }).addTo(map);
