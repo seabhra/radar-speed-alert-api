@@ -122,7 +122,7 @@
     .speed-widget {
       position: absolute;
       bottom: 30px; 
-      left: -30px; 
+      left: -25px; 
       width: 150px; 
       height: 150px; 
       z-index: 500;
@@ -189,62 +189,84 @@
     }
 
     /* --- 1. BOTÃO BUSCA DE RADAR --- */
-    #btn-search-bar {
-      background-color: rgba(76, 220, 205, 0.9); /* Ciano/Teal */
-    }
-    #btn-search-bar:hover {
-      background-color: rgba(76, 220, 205, 1);
-      border-color: #fff;
-    }
-    #btn-search-bar img {
-      width: 32px; height: 32px; /* Ex: Ícone um pouco maior */
-    }
+   /* ===============================
+   BASE GLOBAL DOS BOTÕES
+================================= */
+.control-btn img {
+  width: var(--icon-w, 28px);
+  height: var(--icon-h, 28px);
+}
 
-    /* --- 2. BOTÃO ROTA --- */
-    #btn-route-bar {
-      background-color: rgba(255, 165, 0, 0.9); /* Laranja */
-      border-color: rgba(255, 165, 0, 0.5);
-    }
-    #btn-route-bar:hover {
-      background-color: rgba(255, 165, 0, 1);
-      border-color: #fff;
-      transform: scale(1.05); /* Ex: Efeito de aumentar ao clicar */
-    }
+/* ===============================
+   1. BOTÃO BUSCA DE RADAR
+================================= */
+#btn-search-bar {
+  background-color: rgba(76, 220, 205, 0.9);
+  --icon-w: 32px;
+  --icon-h: 32px;
+}
+#btn-search-bar:hover {
+  background-color: rgba(76, 220, 205, 1);
+  border-color: #fff;
+}
 
-    /* --- 3. BOTÃO CENTRALIZAR (GPS) --- */
-    #btn-center {
-      background-color: rgba(0, 255, 136, 0.9); /* Verde Neon */
-      border: 2px solid rgba(0, 255, 136, 0.5); /* Ex: Borda mais grossa */
-    }
-    #btn-center:hover {
-      background-color: rgba(0, 255, 136, 1);
-      border-color: #fff;
-      box-shadow: 0 0 15px rgba(0, 255, 136, 0.6); /* Ex: Brilho externo */
-    }
+/* ===============================
+   2. BOTÃO ROTA
+================================= */
+#btn-route-bar {
+  background-color: rgba(255, 165, 0, 0.9);
+  border-color: rgba(255, 165, 0, 0.5);
+  --icon-w: 30px;
+  --icon-h: 30px;
+}
+#btn-route-bar:hover {
+  background-color: rgba(255, 165, 0, 1);
+  border-color: #fff;
+  transform: scale(1.05);
+}
 
-    /* --- 4. BOTÃO ATUALIZAR --- */
-    #btn-refresh {
-      background-color: rgba(100, 100, 255, 0.9); /* Azul Roxo */
-    }
-    #btn-refresh:hover {
-      background-color: rgba(100, 100, 255, 1);
-      border-color: #fff;
-    }
-    #btn-refresh img {
-      width: 28px; height: 28px; /* Ex: Ícone um pouco menor */
-    }
+/* ===============================
+   3. BOTÃO CENTRALIZAR (GPS)
+================================= */
+#btn-center {
+  background-color: rgba(0, 255, 136, 0.9);
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  --icon-w: 30px;
+  --icon-h: 34px; /* altura diferente (controle real) */
+}
+#btn-center:hover {
+  background-color: rgba(0, 255, 136, 1);
+  border-color: #fff;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+}
 
-    /* --- 5 e 6. BOTÕES DE ZOOM (Controle em grupo) --- */
-    #btn-zoom-in, #btn-zoom-out {
-      background-color: rgba(150, 150, 150, 0.8); /* Cinza discreto */
-    }
-    #btn-zoom-in:hover, #btn-zoom-out:hover {
-      background-color: rgba(255, 255, 255, 1); /* Fica branco ao passar o mouse */
-      border-color: #fff;
-    }
-    #btn-zoom-in img, #btn-zoom-out img {
-      width: 26px; height: 26px; /* Ícones menores para os de zoom */
-    }
+/* ===============================
+   4. BOTÃO ATUALIZAR
+================================= */
+#btn-refresh {
+  background-color: rgba(100, 100, 255, 0.9);
+  --icon-w: 28px;
+  --icon-h: 28px;
+}
+#btn-refresh:hover {
+  background-color: rgba(100, 100, 255, 1);
+  border-color: #fff;
+}
+
+/* ===============================
+   5. BOTÕES DE ZOOM
+================================= */
+#btn-zoom-in,
+#btn-zoom-out {
+  background-color: rgba(150, 150, 150, 0.8);
+  --icon-w: 26px;
+  --icon-h: 26px;
+}
+#btn-zoom-in:hover,
+#btn-zoom-out:hover {
+  background-color: rgba(255, 255, 255, 1);
+  border-color: #fff;
+}
 
 
     /* Alert Bar (Bottom) */
