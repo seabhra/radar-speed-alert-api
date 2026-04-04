@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width-width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- CORREÇÃO 1: era "width-width", o correto é "width=device-width" -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Radar X9 BH - Alerta Inteligente (OSM)</title>
   
   <!-- Leaflet CSS -->
@@ -14,7 +14,8 @@
   
   <!-- Fontes -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.6.0.0.min.js"></script>
+  <!-- CORREÇÃO 2: Versão do jQuery errada "3.6.0.0" -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <style>
     :root {
@@ -26,7 +27,8 @@
       --text-muted: #a0a0a0;
     }
 
-    * { box-sizing: border-gray; margin: 0; padding: 0; }
+    /* CORREÇÃO 3: "border-gray" não existe, o certo é "border-box" */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
       font-family: 'Inter', sans-serif;
@@ -55,21 +57,24 @@
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
     h1 span { color: var(--accent-color); }
 
-    /* Search Bar */
+    /* Search Bar - AGORA FLUTUANDO SOBRE O MAPA */
     .search-container {
-      background-color: var(--panel-color);
-      padding: 10px 15px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: rgba(26, 29, 36, 0.95); /* Leve transparência para sobrepor o mapa */
+      backdrop-filter: blur(5px);
       display: flex;
       gap: 10px;
       z-index: 1000;
-      /* Transição suave ao abrir/fechar */
-      max-height: 70px; /* Tamanho aproximado de uma barra aberta */
+      /* COMEÇA TOTALMENTE ZERO PARA NÃO OCUPAR ESPAÇO */
+      max-height: 0px; 
       overflow: hidden;
-      transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease, border 0.3s ease;
       opacity: 0;
-      padding-top: 0;
-      padding-bottom: 0;
+      padding: 0px 15px;
       border-bottom: 1px solid transparent;
+      transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease, border 0.3s ease;
     }
 
     /* Classe ativa quando o botão é clicado */
@@ -78,6 +83,7 @@
       opacity: 1;
       padding: 10px 15px;
       border-bottom: 1px solid #333;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
 
     .search-container input {
@@ -103,12 +109,12 @@
       border-radius: 50%;
       cursor: pointer;
       transition: 0.2s;
-      flex-shrink: 0; /* Impede que o botão encolha ao sumir */
+      flex-shrink: 0;
     }
     .btn-search:hover {
-  border-color: var(--primary-color, #00ffcc);
-  transform: scale(1.05);
-}
+      border-color: var(--accent-color);
+      transform: scale(1.05);
+    }
 
     /* Map Container */
     .map-wrapper {
@@ -146,24 +152,22 @@
     }
 
     .speed-value {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); 
-  font-size: 20px;
-  font-weight: 800;
-  color: #000;
-  line-height: 1;
-  text-align: center;
-  min-width: 2ch;
-  z-index: 2; /* 🔥 garante que fique acima da imagem */
-}
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); 
+      font-size: 20px;
+      font-weight: 800;
+      color: #000;
+      line-height: 1;
+      text-align: center;
+      min-width: 2ch;
+      z-index: 2;
+    }
 
-/* ajuste fino só para o zero */
-.speed-value.zero {
-  transform: translate(-40%, -40%); /* X para esquerda e Y para baixo */
-} 
-
+    .speed-value.zero {
+      transform: translate(-40%, -40%); 
+    } 
 
     /* Botões do Mapa */
     .map-controls {
@@ -224,9 +228,8 @@
     }
 
     .alert-bar img { width: 40px; height: 40px; }
-    .alert-info h3 {font-size: 1.1rem; margin-bottom: 3px;  text-transform: uppercase;  color: white;  font-weight: 800;
-}
-.alert-info p { font-size: 0.85rem; opacity: 0.9; }
+    .alert-info h3 { font-size: 1.1rem; margin-bottom: 3px; text-transform: uppercase; color: white; font-weight: 800; }
+    .alert-info p { font-size: 0.85rem; opacity: 0.9; }
 
     /* Loading State */
     .loading-overlay {
@@ -258,19 +261,19 @@
     </div>
   </header>
 
-  <!-- Barra 1: Busca de Radares (COMEÇA OCULTA) -->
-  <div class="search-container" id="search-bar-radares">
-    <input type="text" id="query" placeholder="Buscar radar (tipo ou endereço)...">
-    <button class="btn-search" id="btn-search" title="Buscar Radares" style="background-image: url('/imagens_app/ic_radar_busca.png');"></button>
-  </div>
-
-  <!-- Barra 2: Busca de Rotas (COMEÇA OCULTA) -->
-  <div class="search-container" id="search-bar-rota">
-    <input type="text" id="route-query" placeholder="Insira endereço de uma rota...">
-    <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-image: url('/imagens_app/ic_gps_busca.png');"></button>
-  </div>
-
+  <!-- SOLUÇÃO: As barras agora estão AQUI DENTRO do map-wrapper -->
   <div class="map-wrapper">
+    
+    <div class="search-container" id="search-bar-radares">
+      <input type="text" id="query" placeholder="Buscar radar (tipo ou endereço)...">
+      <button class="btn-search" id="btn-search" title="Buscar Radares" style="background-image: url('/imagens_app/ic_radar_busca.png');"></button>
+    </div>
+
+    <div class="search-container" id="search-bar-rota">
+      <input type="text" id="route-query" placeholder="Insira endereço de uma rota...">
+      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-image: url('/imagens_app/ic_gps_busca.png');"></button>
+    </div>
+
     <div id="map"></div>
 
     <div class="speed-widget">
@@ -278,8 +281,6 @@
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
- 
-        <!-- BOTÕES FLUTUANTES CORRIGIDOS -->
     <div class="map-controls">
       <button class="map-btn" id="btn-search-bar" title="Ativa e Focar Barra de Busca">
         <img src="/imagens_app/ic_radar_busca.png" alt="busca">
@@ -331,14 +332,13 @@
     let userLng = -43.9345;
     let tileLayer;
     let routingControl = null;
-    let searchActive = false; // Controla se a barra de busca está aberta
-    let routeActive = false; // Controla se a barra de rota está aberta
+    let searchActive = false; 
+    let routeActive = false; 
 
     let prevLat = null;
     let prevLng = null;
     let prevTime = null;
 
-    /* >>>>>>>>> NOVO ICONMAP: COM SIGLAS E MATCH EXATO <<<<<<<<<< */
     const iconMap = {
       'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
       'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
@@ -440,11 +440,9 @@
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
 
-      // Eventos da Barra 1 (Radares)
       $("#btn-search").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
 
-      // Eventos da Barra 2 (Rotas)
       $("#btn-calc-route").click(async () => {
         const endereco = $("#route-query").val().trim();
         if (endereco.length < 5) return alert("Digite um endereço mais completo.");
@@ -463,10 +461,6 @@
       });
       $("#route-query").keypress((e) => { if (e.which == 13) $("#btn-calc-route").click(); });
 
-
-      // ==========================================
-      // LÓGICA DE MOSTRAR / ESCONDER BARRAS FLUTUANTE
-      // ==========================================
       function fecharTodasBarras() {
         searchActive = false;
         routeActive = false;
@@ -475,26 +469,22 @@
       }
 
       $("#btn-search-bar").click(() => {
-        // Se já estiver aberta, fecha e recolhe
         if (searchActive) {
           fecharTodasBarras();
           return;
         }
-        // Fecha a de rota se estiver aberta e abre a de busca
         if (routeActive) routeActive = false;
         searchActive = true;
         
         $("#search-bar-radares").addClass('active');
-        setTimeout(() => $("#query").focus(), 300); // Pequeno delay para a animação ocorrer primeiro
+        setTimeout(() => $("#query").focus(), 300);
       });
 
       $("#btn-route-bar").click(() => {
-        // Se já estiver aberta, fecha e recolhe
         if (routeActive) {
           fecharTodasBarras();
           return;
         }
-        // Fecha a de busca se estiver aberta e abre a de rota
         if (searchActive) searchActive = false;
         routeActive = true;
         
@@ -502,18 +492,15 @@
         setTimeout(() => $("#route-query").focus(), 300);
       });
 
-      // Fechar as barras se clicar no botão de centralizar (GPS)
       $("#btn-center").click(() => {
         fecharTodasBarras();
-        if (userMarker) map.setView(userMarker.getledge(), map.getZoom());
+        // CORREÇÃO 4: O método correto do Leaflet é getLatLng() e não getledge()
+        if (userMarker) map.setView(userMarker.getLatLng(), map.getZoom());
       });
 
-      // Fechar barras ao clicar no próprio mapa
       map.on('click', () => {
         fecharTodasBarras();
       });
-      // ==========================================
-
 
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
