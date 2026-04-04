@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Radar X9 BH - Alerta Inteligente (OSM)</title>
   
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <!-- NOVO: CSS e JS do Módulo de Rotas -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
   
-  <!-- Fontes -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -37,7 +34,6 @@
       overflow: hidden;
     }
 
-    /* Header */
     header {
       background-color: var(--panel-color);
       padding: 15px;
@@ -54,7 +50,6 @@
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
     h1 span { color: var(--accent-color); }
 
-    /* Search Bar */
     .search-container {
       position: absolute;
       top: 0;
@@ -111,7 +106,6 @@
       transform: scale(1.05);
     }
 
-    /* Map Container */
     .map-wrapper {
       position: relative;
       flex: 1;
@@ -125,15 +119,13 @@
       background-color: #bbb7b7;
     }
 
-    /* NOVO: Widget de Velocidade (CENTRALIZAÇÃO PERFEITA COM GRID) */
     .speed-widget {
       position: absolute;
       bottom: 30px; 
-      left: -35px; 
+      left: -30px; 
       width: 150px; 
       height: 150px; 
       z-index: 500;
-      /* O Segredo: Habilita o Grid que centraliza perfeitamenteIndependente do tamanho do texto */
       display: grid;
       place-items: center;
     }
@@ -149,19 +141,19 @@
     }
 
     .speed-value {
-      /* Removido o position absolute antigo. 
-         Como o container é Grid com "place-items: center", ele já fica perfeitamente centralizado */
       font-size: 22px;
       font-weight: 800;
       color: #000;
       line-height: 1;
       text-align: center;
       z-index: 2;
-      /* Impede que o texto quebre de linha e bagunce a centralização */
       white-space: nowrap; 
     }
 
-    /* Botões do Mapa */
+    /* ==========================================
+       BOTÕES DO MAPA (CONTROLE INDIVIDUAL)
+       ========================================== */
+
     .map-controls {
       position: absolute;
       right: 15px;
@@ -172,10 +164,11 @@
       z-index: 500;
     }
 
+    /* ESTRUTURA BASE COMUM (Não mexer aqui) */
     .map-btn {
       width: 60px;
       height: 60px;
-       background-color: rgba(76, 220, 205, 0.9);
+      background-color: rgba(76, 220, 205, 0.9); /* Cor padrão que você enviou */
       border: 1px solid #333;
       border-radius: 50%;
       cursor: pointer;
@@ -186,16 +179,73 @@
       transition: 0.2s;
     }
 
-    .map-btn:hover { border-color: var(--accent-color); background-color: rgba(26, 29, 36, 1); }
-    
-    /* CONTROLE INDIVIDUAL DE ÍCONES DENTRO DOS BOTÕES */
+    /* PADRÃO DOS ÍCONES (Pode ser sobrescrito lá em baixo) */
     .map-btn img { 
-      /* Força todos os ícones a terem exatamente o mesmo tamanho visível */
-      width: 30px !important; 
-      height: 30px !important;
-      object-fit: contain; /* Garante que a imagem não distorça ao ser redimensionada */
+      width: 30px; 
+      height: 30px; 
+      object-fit: contain;
       pointer-events: none; 
+      transition: 0.2s;
     }
+
+    /* --- 1. BOTÃO BUSCA DE RADAR --- */
+    #btn-search-bar {
+      background-color: rgba(76, 220, 205, 0.9); /* Ciano/Teal */
+    }
+    #btn-search-bar:hover {
+      background-color: rgba(76, 220, 205, 1);
+      border-color: #fff;
+    }
+    #btn-search-bar img {
+      width: 32px; height: 32px; /* Ex: Ícone um pouco maior */
+    }
+
+    /* --- 2. BOTÃO ROTA --- */
+    #btn-route-bar {
+      background-color: rgba(255, 165, 0, 0.9); /* Laranja */
+      border-color: rgba(255, 165, 0, 0.5);
+    }
+    #btn-route-bar:hover {
+      background-color: rgba(255, 165, 0, 1);
+      border-color: #fff;
+      transform: scale(1.05); /* Ex: Efeito de aumentar ao clicar */
+    }
+
+    /* --- 3. BOTÃO CENTRALIZAR (GPS) --- */
+    #btn-center {
+      background-color: rgba(0, 255, 136, 0.9); /* Verde Neon */
+      border: 2px solid rgba(0, 255, 136, 0.5); /* Ex: Borda mais grossa */
+    }
+    #btn-center:hover {
+      background-color: rgba(0, 255, 136, 1);
+      border-color: #fff;
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.6); /* Ex: Brilho externo */
+    }
+
+    /* --- 4. BOTÃO ATUALIZAR --- */
+    #btn-refresh {
+      background-color: rgba(100, 100, 255, 0.9); /* Azul Roxo */
+    }
+    #btn-refresh:hover {
+      background-color: rgba(100, 100, 255, 1);
+      border-color: #fff;
+    }
+    #btn-refresh img {
+      width: 28px; height: 28px; /* Ex: Ícone um pouco menor */
+    }
+
+    /* --- 5 e 6. BOTÕES DE ZOOM (Controle em grupo) --- */
+    #btn-zoom-in, #btn-zoom-out {
+      background-color: rgba(150, 150, 150, 0.8); /* Cinza discreto */
+    }
+    #btn-zoom-in:hover, #btn-zoom-out:hover {
+      background-color: rgba(255, 255, 255, 1); /* Fica branco ao passar o mouse */
+      border-color: #fff;
+    }
+    #btn-zoom-in img, #btn-zoom-out img {
+      width: 26px; height: 26px; /* Ícones menores para os de zoom */
+    }
+
 
     /* Alert Bar (Bottom) */
     #alert-container {
@@ -227,7 +277,6 @@
     .alert-info h3 { font-size: 1.1rem; margin-bottom: 3px; text-transform: uppercase; color: white; font-weight: 800; }
     .alert-info p { font-size: 0.85rem; opacity: 0.9; }
 
-    /* Loading State */
     .loading-overlay {
       position: absolute;
       top: 50%; left: 50%;
@@ -242,7 +291,6 @@
     .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* Esconde os controles padrão */
     .leaflet-control-zoom { display: none !important; }
     .leaflet-control-attribution { display: none !important; } 
     .leaflet-routing-container { display: none !important; }
@@ -527,8 +575,6 @@
 
       const $display = $("#speed-display");
       $display.text(speedKmh);
-      
-      // Removido a lógica da classe ".zero", pois o CSS Grid já centraliza tudo perfeitamente sozinho!
 
       prevLat = newLat;
       prevLng = newLng;
