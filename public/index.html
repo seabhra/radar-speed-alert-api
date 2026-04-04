@@ -105,7 +105,10 @@
       transition: 0.2s;
       flex-shrink: 0; /* Impede que o botão encolha ao sumir */
     }
-    .btn-search:hover { border-color: var-color); transform: scale(1.05); }
+    .btn-search:hover {
+  border-color: var(--primary-color, #00ffcc);
+  transform: scale(1.05);
+}
 
     /* Map Container */
     .map-wrapper {
@@ -143,22 +146,24 @@
     }
 
     .speed-value {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(10%, 20%); 
-      font-size: 20px;
-      font-weight: 800;
-      color: # #000;
-      line-height: 1;
-      text-align: center;
-      min-width: 2ch;
-    }
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  font-size: 20px;
+  font-weight: 800;
+  color: #000;
+  line-height: 1;
+  text-align: center;
+  min-width: 2ch;
+  z-index: 2; /* 🔥 garante que fique acima da imagem */
+}
 
-    /* ajuste só para o zero */
-    .speed-value.zero {
-      transform: translate(-32%, 40%); 
-    }  
+/* ajuste fino só para o zero */
+.speed-value.zero {
+  transform: translate(-50%, -40%);
+} 
+
 
     /* Botões do Mapa */
     .map-controls {
@@ -219,8 +224,9 @@
     }
 
     .alert-bar img { width: 40px; height: 40px; }
-    .alert-info h3 { font-size: 1.1rem; margin-bottom: 3px; text-transform: uppercase; font-color: white; font-weight: 800; }
-    .alert-info p { font-size: 0.85rem; opacity: 0.9; }
+    .alert-info h3 {font-size: 1.1rem; margin-bottom: 3px;  text-transform: uppercase;  color: white;  font-weight: 800;
+}
+.alert-info p { font-size: 0.85rem; opacity: 0.9; }
 
     /* Loading State */
     .loading-overlay {
