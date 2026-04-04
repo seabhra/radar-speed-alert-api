@@ -11,8 +11,6 @@
   <!-- Fontes -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Biblioteca para converter coordenadas UTM para Lat/Lng -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.2/proj4.js"></script>
 
   <style>
     :root {
@@ -139,7 +137,7 @@
 
     /* ajuste só para o zero */
     .speed-value.zero {
-      transform: translate(-6%, 30%); 
+      transform: translate(-18%, 30%); 
     }  
 
     /* Botões do Mapa */
@@ -247,8 +245,9 @@
     </div>
 
     <div class="map-controls">
-       <button class="map-btn" id="btn-center" title="Rota GPS">
-        <img src="/imagens_app/ic_gps_busca.png" alt="Centro">
+       <!-- IDs Corrigidos aqui -->
+       <button class="map-btn" id="btn-route" title="Rota GPS">
+        <img src="/imagens_app/ic_gps_busca.png" alt="Rota">
       </button>
       <button class="map-btn" id="btn-center" title="Minha Localização">
         <img src="/imagens_app/ic_location_button.png" alt="Centro">
@@ -298,26 +297,28 @@
     let prevLng = null;
     let prevTime = null;
 
-    // Define o sistema de coordenadas UTM da sua base (SIRGAS 2000, Zona 23S - BH)
-    proj4.defs("EPSG:31983", "+proj=utm +zone=23 +south +ellps=grs80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
-
-    /* >>>>>>>>> CORREÇÃO 1: Adicionadas as vírgulas faltantes e atualizado com os NOMES EXATOS do seu JSON <<<<<<<<<< */
+    /* >>>>>>>>> NOVO ICONMAP: MATCH EXATO COM SEU JSON <<<<<<<<<< */
     const iconMap = {
-      'controlador eletrônico de velocidade': '/imagens_app/ic_radar_cev.png',
-      'detector de avanço de semáforo': '/imagens_app/ic_radar_das.png',
-      'detector de trânsito em local proibido': '/imagens_app/ic_radar_dife.png',
-      'detector de invasão de faixa de exclusiva - move': '/imagens_app/ic_radar_dfpr.png',
-      'detector de parada sobre faixa de pedestres': '/imagens_app/ic_radar_dtlp.png',
-      'detector de conversão-retorno em local proibido': '/imagens_app/ic_radar_duc.png',
-      'conjugado cev-dif': '/imagens_app/ic_radar_rev.png',
-      'leitor inteligente de placas (ocr)': '/imagens_app/ic_radar_ocr.png',
-      'radar de uso de celular': '/imagens_app/ic_radar_rcp.png',
-      'default': '/imagens_app/ic_radar_cem.png' // Mantido um fallback genérico
+      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
+      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
+      'Detector de Trânsito em Local Proibido': '/imagens_app/ic_radar_ditlp.png',
+      'Detector de Invasão de Faixa de Exclusiva - MOVE': '/imagens_app/ic_radar_dife.png',
+      'Detector de Parada Sobre Faixa de Pedestres': '/imagens_app/ic_radar_dtfp.png',
+      'Detector de Conversão em Local Proibido': '/imagens_app/ic_radar_rcp.png',
+      'Detector de Redução de Velocidade': '/imagens_app/ic_radar_rev.png',
+      'Detector de Uso de Celular': '/imagens_app/ic_radar_duc.png',
+      
+      // Casos mistos (se aparecerem no futuro)
+      'Controlador Eletrônico Misto - Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
+      'Controlador Eletrônico Misto - Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
+      'Controlador Eletrônico Misto - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
+      
+      'default': '/imagens_app/ic_radar_cem.png' 
     };
 
+    // Não usa mais toLowerCase() para não quebrar a busca exata
     function getIconUrl(tipo) {
-      const tipoLimpo = String(tipo).toLowerCase().trim();
-      return iconMap[tipoLimpo] || iconMap['default'];
+      return iconMap[tipo] || iconMap['default'];
     }
 
     function calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -370,6 +371,11 @@
       
       $("#btn-center").click(() => {
         if (userMarker) map.setView(userMarker.getLatLng(), map.getZoom());
+      });
+
+      $("#btn-route").click(() => {
+        // Função reservada para o botão de rotas futuras
+        alert("Função de Rota será implementada!");
       });
       
       $("#btn-zoom-in").click(() => map.zoomIn());
@@ -457,26 +463,15 @@
             const velocidade = record[4] || "0";
             const geometryStr = record[9] || "";
 
-            // Extrai os números do texto "POINT (611314.17 7797658.78)"
-            const match = geometryStr.match(/POINT \(([\d\.]+) ([\d\.]+)\)/);
-            if (!match) return; // Pula se não tiver coordenada válida
+            /* >>>>>>>>> CORREÇÃO AQUI: LEITURA SIMPLES DE LAT/LNG <<<<<<<<<< */
+            // Formato esperado no JSON: "-19.914223, -43.936486"
+            const coords = geometryStr.split(',').map(Number);
+            
+            // Se não tiver duas coordenadas numéricas válidas, pula
+            if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) return; 
 
-            const utmX = parseFloat(match[1]);
-            const utmY = parseFloat(match[2]);
-
-            // Converte UTM (EPSG:31983) para Latitude e Longitude (EPSG:4326)
-            let lat = null;
-            let lng = null;
-            try {
-              const coords = proj4("EPSG:31983", "EPSG:4326", [utmX, utmY]);
-              lng = coords[0];
-              lat = coords[1];
-            } catch (e) {
-              console.error("Erro de conversão UTM:", e);
-              return;
-            }
-
-            if (isNaN(lat) || isNaN(lng)) return;
+            const lat = coords[0];
+            const lng = coords[1];
 
             const iconeRadar = L.icon({
               iconUrl: getIconUrl(tipo),
@@ -585,3 +580,4 @@
   </script>
 </body>
 </html>
+
