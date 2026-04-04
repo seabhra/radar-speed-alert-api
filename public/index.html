@@ -7,6 +7,9 @@
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- NOVO: CSS e JS do Módulo de Rotas -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
   
   <!-- Fontes -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -74,7 +77,6 @@
     .search-container input:focus { border-color: var(--accent-color); }
 
     .btn-search {
-      background-image: url('/imagens_app/ic_radar_busca.png');
       background-size: 40px 40px;
       background-repeat: no-repeat;
       background-position: center;
@@ -217,9 +219,10 @@
     .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    /* Esconde os controles padrão de zoom e a marcação do mapa */
+    /* Esconde os controles padrão de zoom, marcação e INSTRUÇÕES DE ROTA */
     .leaflet-control-zoom { display: none !important; }
     .leaflet-control-attribution { display: none !important; } 
+    .leaflet-routing-container { display: none !important; } /* Esconde texto de "vire à direita" */
   </style>
 </head>
 <body>
@@ -231,9 +234,16 @@
     </div>
   </header>
 
+  <!-- Barra 1: Busca de Radares -->
   <div class="search-container">
-    <input type="text" id="query" placeholder="Rota, endereço ou tipo de radar...">
-    <button class="btn-search" id="btn-search" title="Buscar"></button>
+    <input type="text" id="query" placeholder="Buscar radar (tipo ou endereço)...">
+    <button class="btn-search" id="btn-search" title="Buscar Radares" style="background-image: url('/imagens_app/ic_radar_busca.png');"></button>
+  </div>
+
+  <!-- Barra 2: Busca de Rotas -->
+  <div class="search-container" style="border-bottom: 1px solid #333;">
+    <input type="text" id="route-query" placeholder="Ex: Av. Afonso Pena, 1000 - Centro">
+    <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-image: url('/imagens_app/ic_gps_busca.png');"></button>
   </div>
 
   <div class="map-wrapper">
@@ -245,8 +255,7 @@
     </div>
 
     <div class="map-controls">
-       <!-- IDs Corrigidos aqui -->
-       <button class="map-btn" id="btn-route" title="Rota GPS">
+       <button class="map-btn" id="btn-route" title="Focar Rota">
         <img src="/imagens_app/ic_gps_busca.png" alt="Rota">
       </button>
       <button class="map-btn" id="btn-center" title="Minha Localização">
@@ -292,12 +301,13 @@
     let userLat = -19.9167;
     let userLng = -43.9345;
     let tileLayer;
+    let routingControl = null; // Variável para controlar a rota no mapa
 
     let prevLat = null;
     let prevLng = null;
     let prevTime = null;
 
-    /* >>>>>>>>> NOVO ICONMAP: MATCH EXATO COM SEU JSON <<<<<<<<<< */
+    // Mapa de Ícones com correspondência EXATA do seu JSON
     const iconMap = {
       'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
       'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
@@ -307,16 +317,12 @@
       'Detector de Conversão em Local Proibido': '/imagens_app/ic_radar_rcp.png',
       'Detector de Redução de Velocidade': '/imagens_app/ic_radar_rev.png',
       'Detector de Uso de Celular': '/imagens_app/ic_radar_duc.png',
-      
-      // Casos mistos (se aparecerem no futuro)
       'Controlador Eletrônico Misto - Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto - Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
-      
       'default': '/imagens_app/ic_radar_cem.png' 
     };
 
-    // Não usa mais toLowerCase() para não quebrar a busca exata
     function getIconUrl(tipo) {
       return iconMap[tipo] || iconMap['default'];
     }
@@ -334,25 +340,64 @@
       return R * c; 
     }
 
-    // Função para alternar mapa entre Dia e Noite
     function aplicarTemaMapa() {
       const hora = new Date().getHours();
       const urlDia = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
       const urlNoite = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-      
-      // Define noite entre 19h e 6h
       const urlAtual = (hora >= 19 || hora < 6) ? urlNoite : urlDia;
 
       if (tileLayer) {
         tileLayer.setUrl(urlAtual);
       } else {
         tileLayer = L.tileLayer(urlAtual, {
-          attribution: '', 
-          subdomains: 'abcd',
-          maxZoom: 19
+          attribution: '', subdomains: 'abcd', maxZoom: 19
         }).addTo(map);
       }
     }
+
+    // ==========================================
+    // SISTEMA DE ROTAS (Nominatim + LRM)
+    // ==========================================
+    async function buscarCoordenadas(endereco) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&countrycodes=br&limit=1`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+        }
+        return null;
+      } catch (error) {
+        console.error("Erro ao buscar endereço:", error);
+        return null;
+      }
+    }
+
+    function calcularRota(destLat, destLng) {
+      if (routingControl) {
+        map.removeControl(routingControl);
+      }
+
+      routingControl = L.Routing.control({
+        waypoints: [
+          L.latLng(userLat, userLng), 
+          L.latLng(destLat, destLng)
+        ],
+        routeWhileDragging: false,
+        addWaypoints: false,
+        language: 'pt-BR',
+        show: false,
+        lineOptions: {
+          styles: [
+            { color: '#0044cc', opacity: 0.8, weight: 7 }, 
+            { color: '#33aaff', opacity: 1, weight: 4 }   
+          ]
+        },
+        createMarker: function() { return null; } // Esconde os marcadores "A" e "B" padrão
+      }).addTo(map);
+    }
+    // ==========================================
 
     function initMap() {
       map = L.map('map', {
@@ -362,22 +407,40 @@
       });
 
       aplicarTemaMapa();
-
-      // Verifica a cada 5 minutos se clareou ou escureceu para mudar o tema automaticamente
       setInterval(aplicarTemaMapa, 300000);
 
+      // Eventos da Barra 1 (Radares)
       $("#btn-search").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
-      
+
+      // Eventos da Barra 2 (Rotas)
+      $("#btn-calc-route").click(async () => {
+        const endereco = $("#route-query").val().trim();
+        if (endereco.length < 5) return alert("Digite um endereço mais completo.");
+        
+        $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
+        const coords = await buscarCoordenadas(endereco);
+        
+        if (coords) {
+          calcularRota(coords.lat, coords.lng);
+          map.setView([coords.lat, coords.lng], 16);
+          $("#loading").hide();
+        } else {
+          $("#loading").hide();
+          alert("Endereço não encontrado. Tente ser mais específico.");
+        }
+      });
+      $("#route-query").keypress((e) => { if (e.which == 13) $("#btn-calc-route").click(); });
+
+      // Botões Flutuantes
       $("#btn-center").click(() => {
         if (userMarker) map.setView(userMarker.getLatLng(), map.getZoom());
       });
-
-      $("#btn-route").click(() => {
-        // Função reservada para o botão de rotas futuras
-        alert("Função de Rota será implementada!");
-      });
       
+      $("#btn-route").click(() => {
+        $("#route-query").focus(); // Foca na barra de rota
+      });
+
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => carregarRadares());
@@ -402,10 +465,7 @@
       if (prevLat !== null && prevTime !== null) {
         const distanceMeters = calcularDistancia(prevLat, prevLng, newLat, newLng);
         const timeSeconds = (currentTime - prevTime) / 1000;
-
-        if (timeSeconds > 0) {
-          speedKmh = Math.round((distanceMeters / timeSeconds) * 3.6); 
-        }
+        if (timeSeconds > 0) speedKmh = Math.round((distanceMeters / timeSeconds) * 3.6); 
       }
 
       if (speedKmh > 250) speedKmh = 0;
@@ -413,7 +473,6 @@
       const $display = $("#speed-display");
       $display.text(speedKmh);
       
-      // Adiciona classe pra ajustar o zero
       if (speedKmh === 0) { $display.addClass('zero'); } 
       else { $display.removeClass('zero'); }
 
@@ -432,7 +491,7 @@
 
       if (!userMarker) {
         userMarker = L.marker(userPosition, { icon: userIcon }).addTo(map);
-        userMarker.bindTooltip("📍 Local do Usuário", { permanent: true, direction: "top", offset: [0, -30] });
+        userMarker.bindTooltip("📍 Você", { permanent: true, direction: "top", offset: [0, -30] });
         map.setView(userPosition, 16); 
       } else {
         userMarker.setLatLng(userPosition);
@@ -443,18 +502,15 @@
 
     function carregarRadares() {
       $("#loading").show();
-
       fetch("radares.json")
         .then(response => {
           if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
           return response.json();
         })
         .then(data => {
-          // Limpa mapa
           radarMarkers.forEach(marker => map.removeLayer(marker));
           radarMarkers = [];
 
-          // Pega o array 'records' do formato da sua base de dados
           const records = data.records || [];
           
           records.forEach(record => {
@@ -463,11 +519,8 @@
             const velocidade = record[4] || "0";
             const geometryStr = record[9] || "";
 
-            /* >>>>>>>>> CORREÇÃO AQUI: LEITURA SIMPLES DE LAT/LNG <<<<<<<<<< */
-            // Formato esperado no JSON: "-19.914223, -43.936486"
+            // Leitura simples de Lat/Lng: "-19.914223, -43.936486"
             const coords = geometryStr.split(',').map(Number);
-            
-            // Se não tiver duas coordenadas numéricas válidas, pula
             if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) return; 
 
             const lat = coords[0];
@@ -491,14 +544,7 @@
             `;
             
             radarMarker.bindPopup(popupContent);
-            radarMarker.radarData = { 
-              latitude: lat, 
-              longitude: lng, 
-              endereco: endereco, 
-              velocidade_maxima: velocidade, 
-              tipo: tipo 
-            };
-            
+            radarMarker.radarData = { latitude: lat, longitude: lng, endereco: endereco, velocidade_maxima: velocidade, tipo: tipo };
             radarMarkers.push(radarMarker);
           });
 
@@ -515,15 +561,12 @@
 
       radarMarkers.forEach(marker => {
         if (alertTriggered) return;
-
         const dados = marker.radarData;
         const distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
 
         if (distance < 300) { 
           alertTriggered = true;
-          const iconeTipo = getIconUrl(dados.tipo);
-
-          $("#alert-icon").attr("src", iconeTipo);
+          $("#alert-icon").attr("src", getIconUrl(dados.tipo));
           $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
 
           const sound = document.getElementById('alert-sound');
@@ -531,24 +574,19 @@
           sound.play().catch(e => console.log("Erro ao tocar áudio:", e));
 
           $("#alert-container").fadeIn(200);
-
           clearTimeout(alertTimeout);
-          alertTimeout = setTimeout(() => {
-            $("#alert-container").fadeOut(500);
-          }, 5000);
+          alertTimeout = setTimeout(() => { $("#alert-container").fadeOut(500); }, 5000);
         }
       });
     }
 
     function buscarRadares(query) {
       if (!query || query.length < 3) return;
-
       let encontrou = false;
       const boundsGroup = L.featureGroup(); 
 
       radarMarkers.forEach(marker => {
         const titulo = `${marker.radarData.tipo} - ${marker.radarData.endereco}`.toLowerCase();
-        
         if (titulo.includes(query.toLowerCase())) {
           encontrou = true;
           boundsGroup.addLayer(marker);
@@ -556,11 +594,8 @@
         }
       });
 
-      if (encontrou) {
-        map.fitBounds(boundsGroup.getBounds().pad(0.5)); 
-      } else {
-        alert("Nenhum radar encontrado para essa busca.");
-      }
+      if (encontrou) { map.fitBounds(boundsGroup.getBounds().pad(0.5)); } 
+      else { alert("Nenhum radar encontrado para essa busca."); }
     }
 
     function showError(error) {
@@ -570,9 +605,7 @@
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-          .then(() => console.log('SW OK'))
-          .catch(err => console.log('SW Fail', err));
+          navigator.serviceWorker.register('/sw.js').then(() => console.log('SW OK')).catch(err => console.log('SW Fail', err));
       });
     }
     
@@ -580,4 +613,3 @@
   </script>
 </body>
 </html>
-
