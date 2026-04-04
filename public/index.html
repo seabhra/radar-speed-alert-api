@@ -22,7 +22,7 @@
       --accent-color: #00ff88;
       --alert-color: #ff3333;
       --text-main: #ffffff;
-      --text-muted: #a0a0a0;
+      --text-muted: #a0a0a0a0;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -302,30 +302,40 @@
     let userLat = -19.9167;
     let userLng = -43.9345;
     let tileLayer;
-    let routingControl = null; // Variável para controlar a rota no mapa
+    let routingControl = null;
 
     let prevLat = null;
     let prevLng = null;
     let prevTime = null;
 
-    // Mapa de Ícones com correspondência EXATA do seu JSON
+    /* >>>>>>>>> NOVO ICONMAP: COM SIGLAS E MATCH EXATO <<<<<<<<<< */
     const iconMap = {
-      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
-      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
-      'Detector de Trânsito em Local Proibido': '/imagens_app/ic_radar_ditlp.png',
-      'Detector de Invasão de Faixa de Exclusiva - MOVE': '/imagens_app/ic_radar_dife.png',
-      'Detector de Parada Sobre Faixa de Pedestres': '/imagens_app/ic_radar_dpfp.png',
-      'Detector de Conversão em Local Proibido': '/imagens_app/ic_radar_rcp.png',
-      'Detector de Redução de Velocidade': '/imagens_app/ic_radar_rev.png',
-      'Detector de Uso de Celular': '/imagens_app/ic_radar_duc.png',
-      'Controlador Eletrônico Misto - Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
-      'Controlador Eletrônico Misto - Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
-      'Controlador Eletrônico Misto - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
-      'default': '/imagens_app/ic_radar_cem.png' 
+      'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
+      'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
+      'Detector de Trânsito em Local Proibido (DTLP)': '/imagens_app/ic_radar_ditlp.png',
+      'Detector de Invasão de Faixa de Exclusiva (DIF) - MOVE': '/imagens_app/ic_radar_dife.png',
+      'Detector de Parada Sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp.png',
+      'Detector de Conversão em Local Proibido (DCP)': '/imagens_app/ic_radar_rcp.png',
+      'Detector de Redução de Velocidade (DRV)': '/imagens_app/ic_radar_rev.png',
+      'Detector de Uso de Celular (DUC)': '/imagens_app/ic_radar_duc.png',
+      'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
+      'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
+      'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
+      'default': '/imagens_app/ic_radar_cev.png' 
+    };
+
+    // Dicionário para forçar o match exato entre o que vem do JSON e o que está no iconMap
+    const ajusteNomes = {
+      'Controlador Eletrônico de Velocidade': 'Controlador Eletrônico de Velocidade (CEV)',
+      'Detector de Avanço de Semáforo': 'Detector de Avanço de Semáforo (DAS)',
+      'Detector de Trânsito em Local Proibido': 'Detector de Trânsito em Local Proibido (DTLP)',
+      'Detector de Uso de Celular': 'Detector de Uso de Celular (DUC)',
+      'Detector de Redução de Velocidade': 'Detector de Redução de Velocidade (DRV)'
     };
 
     function getIconUrl(tipo) {
-      return iconMap[tipo] || iconMap['default'];
+      const tipoAjustado = ajusteNomes[tipo] || tipo;
+      return iconMap[tipoAjustado] || iconMap['default'];
     }
 
     function calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -395,7 +405,7 @@
             { color: '#33aaff', opacity: 1, weight: 4 }   
           ]
         },
-        createMarker: function() { return null; } // Esconde os marcadores "A" e "B" padrão
+        createMarker: function() { return null; }
       }).addTo(map);
     }
     // ==========================================
@@ -439,7 +449,7 @@
       });
       
       $("#btn-route").click(() => {
-        $("#route-query").focus(); // Foca na barra de rota
+        $("#route-query").focus();
       });
 
       $("#btn-zoom-in").click(() => map.zoomIn());
@@ -520,7 +530,6 @@
             const velocidade = record[4] || "0";
             const geometryStr = record[9] || "";
 
-            // Leitura simples de Lat/Lng: "-19.914223, -43.936486"
             const coords = geometryStr.split(',').map(Number);
             if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) return; 
 
@@ -536,16 +545,20 @@
 
             const radarMarker = L.marker([lat, lng], { icon: iconeRadar }).addTo(map);
             
+            // Puxa o nome bonito com a sigla para mostrar no Pop-up e na Busca
+            const tipoExibicao = ajusteNomes[tipo] || tipo;
+            
             const popupContent = `
               <div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">
-                <b>${tipo.toUpperCase()}</b><br>
+                <b>${tipoExibicao}</b><br>
                 ${endereco}<br>
                 <span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span>
               </div>
             `;
             
             radarMarker.bindPopup(popupContent);
-            radarMarker.radarData = { latitude: lat, longitude: lng, endereco: endereco, velocidade_maxima: velocidade, tipo: tipo };
+            // Salva o tipo original para buscar depois, e o tipo bonito para exibir
+            radarMarker.radarData = { latitude: lat, longitude: lng, endereco: endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao: tipoExibicao };
             radarMarkers.push(radarMarker);
           });
 
@@ -567,7 +580,7 @@
 
         if (distance < 300) { 
           alertTriggered = true;
-          $("#alert-icon").attr("src", getIconUrl(dados.tipo));
+          $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal));
           $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
 
           const sound = document.getElementById('alert-sound');
@@ -581,22 +594,33 @@
       });
     }
 
+    // ==========================================
+    // BUSCA INTELIGENTE (Fuzzy Search)
+    // ==========================================
     function buscarRadares(query) {
-      if (!query || query.length < 3) return;
+      if (!query || query.length < 2) return;
+      
       let encontrou = false;
       const boundsGroup = L.featureGroup(); 
+      const queryLower = query.toLowerCase();
 
       radarMarkers.forEach(marker => {
-        const titulo = `${marker.radarData.tipo} - ${marker.radarData.endereco}`.toLowerCase();
-        if (titulo.includes(query.toLowerCase())) {
+        const dados = marker.radarData;
+        // Busca no endereço, no tipo original ("Avanço") e no tipo de exibição ("DAS")
+        const textoParaBuscar = `${dados.endereco} ${dados.tipoOriginal} ${dados.tipoExibicao}`.toLowerCase();
+        
+        if (textoParaBuscar.includes(queryLower)) {
           encontrou = true;
           boundsGroup.addLayer(marker);
           marker.openPopup(); 
         }
       });
 
-      if (encontrou) { map.fitBounds(boundsGroup.getBounds().pad(0.5)); } 
-      else { alert("Nenhum radar encontrado para essa busca."); }
+      if (encontrou) { 
+        map.fitBounds(boundsGroup.getBounds().pad(0.5)); 
+      } else { 
+        alert("Nenhum radar encontrado para essa busca."); 
+      }
     }
 
     function showError(error) {
