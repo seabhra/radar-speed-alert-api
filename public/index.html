@@ -166,27 +166,25 @@
 
 
 /* ==========================================
-   SISTEMA GLOBAL UNIFICADO
+   SISTEMA GLOBAL UNIFICADO (CENTRALIZADO)
    ========================================== */
 
 .btn-search,
 .map-btn {
-  --btn-size: 45px;
-  --icon-scale: 0.85;
-  --icon-size: calc(var(--btn-size) * var(--icon-scale)); /* ← variável derivada */
-
-  width: var(--btn-size);
-  height: var(--btn-size);
-  min-width: var(--btn-size); /* evita encolher em flex */
-
-  /* centralização garantida */
+  /* Alinhamento de conteúdo interno (Centraliza os ícones/imagens) */
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: 0;
-  box-sizing: border-box;
-  overflow: hidden;
+  --btn-size: 45px;
+  --icon-scale: 0.85;
+
+  width: var(--btn-size);
+  height: var(--btn-size);
+
+  background-size: calc(var(--btn-size) * var(--icon-scale));
+  background-repeat: no-repeat;
+  background-position: center;
 
   background-color: var(--bg-color);
   border: 1px solid #333;
@@ -203,77 +201,71 @@
 }
 
 /* ==========================================
-   ÍCONES VIA <img> — usa --icon-size derivada
+   DESTAQUE: BOTÃO ROTA (AUMENTADO)
+   ========================================== */
+
+#btn-route-bar {
+  /* Aumentando o tamanho base em relação aos outros */
+  --btn-size: 60px; 
+  --icon-scale: 0.95; /* Ícone preenche mais o espaço */
+  
+  background-color: rgba(255, 165, 0, 0.9);
+  border: 2px solid rgba(255, 165, 0, 0.6);
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3); /* Glow suave para destaque */
+  z-index: 10; /* Garante que fique sobreposto se necessário */
+}
+
+/* ==========================================
+   MAPA - CONTROLES (ALINHAMENTO)
+   ========================================== */
+
+.map-controls {
+  position: absolute;
+  right: 15px;
+  bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  /* Centraliza botões de tamanhos diferentes no eixo vertical */
+  align-items: center; 
+  gap: 12px;
+  z-index: 500;
+}
+
+/* ==========================================
+   ÍCONES VIA IMG
    ========================================== */
 
 .map-btn img,
-.btn-search img {
-  width: var(--icon-size);
-  height: var(--icon-size);
+.control-btn img {
+  /* Garante que a imagem respeite o cálculo centralizado */
+  width: calc(var(--btn-size) * var(--icon-scale));
+  height: calc(var(--btn-size) * var(--icon-scale));
   object-fit: contain;
   pointer-events: none;
-  display: block;
-  flex-shrink: 0;
+  transition: 0.2s;
 }
 
 /* ==========================================
-   ÍCONES VIA background-image — usa --icon-size
-   ========================================== */
-
-.btn-search.bg-icon,
-.map-btn.bg-icon {
-  background-size: var(--icon-size);
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-/* ==========================================
-   BOTÃO TRAÇAR ROTA
-   ========================================== */
-
-#btn-calc-route {
-  --icon-scale: 0.9;
-  background-color: rgba(76, 220, 205, 0.15);
-  border-color: rgba(76, 220, 205, 0.6);
-}
-
-/* ==========================================
-   CONTEXTOS
-   ========================================== */
-
-.search-container #btn-calc-route { --btn-size: 55px; }
-.map-controls #btn-calc-route     { --btn-size: 70px; }
-
-/* ==========================================
-   BOTÕES ESPECÍFICOS
+   AJUSTES INDIVIDUAIS RESTANTES
    ========================================== */
 
 #btn-search-bar {
   background-color: rgba(76, 220, 205, 0.9);
-  --icon-scale: 0.85;
-}
-
-#btn-route-bar {
-  background-color: rgba(255, 165, 0, 0.9);
-  border-color: rgba(255, 165, 0, 0.5);
-  --icon-scale: 0.9;
 }
 
 #btn-center {
   background-color: rgba(0, 255, 136, 0.9);
   border: 2px solid rgba(0, 255, 136, 0.5);
-  --icon-scale: 0.8;
 }
 
 #btn-refresh {
   background-color: rgba(100, 100, 255, 0.9);
-  --icon-scale: 0.75;
 }
 
 #btn-zoom-in,
 #btn-zoom-out {
   background-color: rgba(150, 150, 150, 0.8);
-  --icon-scale: 0.7;
+  --icon-scale: 0.6; /* Ligeiramente menor para não poluir */
 }
     
     /* ===============================
