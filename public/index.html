@@ -87,8 +87,6 @@
       outline: none;
     }
 
-
- 
  /* ==========================================
        MAPA DO RADAR
   ========================================== */
@@ -139,27 +137,16 @@
   position: absolute;
   top: 50%;
   left: 50%;
-
-  /* DESCE UM POUCO NO EIXO Y */
-
   transform: translate(-50%, -48%);
-  
- /* FONTE MAIS VERTICAL (ZERO MAIS “ALTO”) */
   font-size: 28px;
   font-weight: 700;
   font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-  
-  /* COR E VISUAL */  
   color: #000;
   line-height: 1;
   text-align: center;
   z-index: 2;
-  /* ESTABILIDADE DE DÍGITOS */
-   
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  
-   /* AJUSTE FINO VISUAL */
   letter-spacing: -1px;
 }
     
@@ -168,7 +155,6 @@
    ========================================== */
 .btn-search,
 .map-btn {
-  /* Alinhamento de conteúdo interno (Centraliza os ícones/imagens) */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,13 +182,12 @@
    DESTAQUE: BOTÃO ROTA (AUMENTADO)
    ========================================== */
 #btn-route-bar {
-  /* Aumentando o tamanho base em relação aos outros */
   --btn-size: 50px;
-  --icon-scale: 0.95; /* Ícone preenche mais o espaço */
-    background-color: rgba(255, 165, 0, 0.9);
+  --icon-scale: 0.95;
+  background-color: rgba(255, 165, 0, 0.9);
   border: 2px solid rgba(255, 165, 0, 0.6);
-  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3); /* Glow suave para destaque */
-  z-index: 10; /* Garante que fique sobreposto se necessário */
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
+  z-index: 10;
 }
 
 /* ==========================================
@@ -215,7 +200,6 @@
   bottom: 40px;
   display: flex;
   flex-direction: column;
-  /* Centraliza botões de tamanhos diferentes no eixo vertical */
   align-items: center; 
   gap: 12px;
   z-index: 500;
@@ -227,7 +211,6 @@
 
 .map-btn img,
 .control-btn img {
-  /* Garante que a imagem respeite o cálculo centralizado */
   width: calc(var(--btn-size) * var(--icon-scale));
   height: calc(var(--btn-size) * var(--icon-scale));
   object-fit: contain;
@@ -255,13 +238,12 @@
 #btn-zoom-in,
 #btn-zoom-out {
   background-color: rgba(150, 150, 150, 0.8);
-  --icon-scale: 0.6; /* Ligeiramente menor para não poluir */
+  --icon-scale: 0.6;
 }
     
     /* ===============================
   ÁREA DE ALERTAS DE RADARES
 ================================= */
-    /* Alert Bar (Bottom) */
     #alert-container {
       position: absolute;
       bottom: 0;
@@ -308,9 +290,99 @@
     .leaflet-control-zoom { display: none !important; }
     .leaflet-control-attribution { display: none !important; } 
     .leaflet-routing-container { display: none !important; }
+
+    /* ==========================================
+       LOADING FULLSCREEN INICIAL
+       ========================================== */
+    .loading-fullscreen {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .loading-fullscreen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loading-fullscreen .spinner-ring {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .loading-fullscreen .spinner-ring::before,
+    .loading-fullscreen .spinner-ring::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 4px solid transparent;
+    }
+
+    .loading-fullscreen .spinner-ring::before {
+      border-top-color: var(--accent-color);
+      border-right-color: var(--accent-color);
+      animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
+    }
+
+    .loading-fullscreen .spinner-ring::after {
+      inset: 8px;
+      border-bottom-color: #ff3333;
+      border-left-color: #ff3333;
+      animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse;
+    }
+
+    @keyframes spinRing {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-fullscreen .loading-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .loading-fullscreen .loading-text span {
+      color: var(--accent-color);
+      font-weight: 800;
+    }
+
+    .loading-fullscreen .loading-sub {
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: #555;
+      animation: pulseText 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- LOADING FULLSCREEN INICIAL - aparece antes do mapa -->
+  <div class="loading-fullscreen" id="loading-fullscreen">
+    <div class="spinner-ring"></div>
+    <div class="loading-text">Carregando <span>radares</span> do mapa</div>
+    <div class="loading-sub">Aguarde um momento...</div>
+  </div>
 
   <header>
     <div class="header-left">
@@ -369,7 +441,7 @@
       </div>
     </div>
 
-    <div class="loading-overlay" id="loading">
+    <div class="loading-overlay" id="loading" style="display:none;">
       <div class="loading-spinner"></div>
       <div>Carregando Radares...</div>
     </div>
@@ -418,6 +490,15 @@
       'Detector de Uso de Celular': 'Detector de Uso de Celular (DUC)',
       'Detector de Redução de Velocidade': 'Detector de Redução de Velocidade (DRV)'
     };
+
+    /* Função para esconder o loading fullscreen com fade */
+    function hideFullscreenLoading() {
+      const el = document.getElementById('loading-fullscreen');
+      if (!el) return;
+      el.classList.add('fade-out');
+      /* Remove do DOM após a animação de fade completar */
+      setTimeout(() => { el.remove(); }, 600);
+    }
 
     function getIconUrl(tipo) {
       const tipoAjustado = ajusteNomes[tipo] || tipo;
@@ -565,7 +646,8 @@
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 });
       } else {
-        $("#loading").html("<div style='color: red'>GPS não suportado.</div>");
+        hideFullscreenLoading();
+        $("#loading").show().html("<div style='color: red'>GPS não suportado.</div>");
       }
 
       carregarRadares();
@@ -605,7 +687,7 @@
 
       if (!userMarker) {
         userMarker = L.marker(userPosition, { icon: userIcon }).addTo(map);
-        userMarker.bindTooltip("📍 Você", { permanent: true, direction: "top", offset: [0, -30] });
+        userMarker.bindTooltip("Você", { permanent: true, direction: "top", offset: [0, -30] });
         map.setView(userPosition, 16); 
       } else {
         userMarker.setLatLng(userPosition);
@@ -615,7 +697,6 @@
     }
 
     function carregarRadares() {
-      $("#loading").show();
       fetch("radares.json")
         .then(response => {
           if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
@@ -662,11 +743,14 @@
             radarMarkers.push(radarMarker);
           });
 
+          /* Esconde o loading fullscreen após os radares serem renderizados */
+          hideFullscreenLoading();
           $("#loading").hide();
         })
         .catch(error => {
           console.error("Erro ao carregar radares:", error);
-          $("#loading").html("<div style='color: red'>Falha ao carregar radares.json</div>");
+          hideFullscreenLoading();
+          $("#loading").show().html("<div style='color: red'>Falha ao carregar radares.json</div>");
         });
     }
 
@@ -720,7 +804,8 @@
 
     function showError(error) {
       console.warn(`Erro de GPS: ${error.message}`);
-      $("#loading").html("<div style='color: orange'>Ative seu GPS para usar o app.</div>");
+      hideFullscreenLoading();
+      $("#loading").show().html("<div style='color: orange'>Ative seu GPS para usar o app.</div>");
     }
 
     if ('serviceWorker' in navigator) {
@@ -733,3 +818,6 @@
   </script>
 </body>
 </html>
+
+
+
