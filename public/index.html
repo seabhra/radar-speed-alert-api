@@ -163,24 +163,30 @@
   letter-spacing: -1px;
 }
  
+
+
 /* ==========================================
-   SISTEMA GLOBAL UNIFICADO DE BOTÕES
+   SISTEMA GLOBAL UNIFICADO
    ========================================== */
 
 .btn-search,
 .map-btn {
-  /* TAMANHO DO BOTÃO */
   --btn-size: 45px;
-
-  /* CONTROLE REAL DO ÍCONE (AGORA EM %) */
-  --icon-scale: 0.85; /* 85% do botão - padrão harmonizado */
+  --icon-scale: 0.85;
+  --icon-size: calc(var(--btn-size) * var(--icon-scale)); /* ← variável derivada */
 
   width: var(--btn-size);
   height: var(--btn-size);
+  min-width: var(--btn-size); /* evita encolher em flex */
 
-  background-size: calc(var(--btn-size) * var(--icon-scale));
-  background-repeat: no-repeat;
-  background-position: center;
+  /* centralização garantida */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 
   background-color: var(--bg-color);
   border: 1px solid #333;
@@ -197,12 +203,36 @@
 }
 
 /* ==========================================
+   ÍCONES VIA <img> — usa --icon-size derivada
+   ========================================== */
+
+.map-btn img,
+.btn-search img {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  object-fit: contain;
+  pointer-events: none;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   ÍCONES VIA background-image — usa --icon-size
+   ========================================== */
+
+.btn-search.bg-icon,
+.map-btn.bg-icon {
+  background-size: var(--icon-size);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* ==========================================
    BOTÃO TRAÇAR ROTA
    ========================================== */
 
 #btn-calc-route {
-  --icon-scale: 0.9; /* ligeiramente maior → destaque */
-
+  --icon-scale: 0.9;
   background-color: rgba(76, 220, 205, 0.15);
   border-color: rgba(76, 220, 205, 0.6);
 }
@@ -211,72 +241,35 @@
    CONTEXTOS
    ========================================== */
 
-.search-container #btn-calc-route {
-  --btn-size: 55px;
-}
-
-.map-controls #btn-calc-route {
-  --btn-size: 70px;
-}
+.search-container #btn-calc-route { --btn-size: 55px; }
+.map-controls #btn-calc-route     { --btn-size: 70px; }
 
 /* ==========================================
-   MAPA - CONTROLES
+   BOTÕES ESPECÍFICOS
    ========================================== */
 
-.map-controls {
-  position: absolute;
-  right: 15px;
-  bottom: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 500;
-}
-
-/* ==========================================
-   ÍCONES VIA IMG (MAPA)
-   ========================================== */
-
-.map-btn img,
-.control-btn img {
-  width: calc(var(--btn-size) * var(--icon-scale));
-  height: calc(var(--btn-size) * var(--icon-scale));
-  object-fit: contain;
-  pointer-events: none;
-  transition: 0.2s;
-}
-
-/* ==========================================
-   BOTÕES ESPECÍFICOS (AGORA SÓ AJUSTAM ESCALA)
-   ========================================== */
-
-/* RADAR → padrão */
 #btn-search-bar {
   background-color: rgba(76, 220, 205, 0.9);
   --icon-scale: 0.85;
 }
 
-/* ROTA → mais destaque */
 #btn-route-bar {
   background-color: rgba(255, 165, 0, 0.9);
   border-color: rgba(255, 165, 0, 0.5);
   --icon-scale: 0.9;
 }
 
-/* GPS → ícone mais vertical */
 #btn-center {
   background-color: rgba(0, 255, 136, 0.9);
   border: 2px solid rgba(0, 255, 136, 0.5);
   --icon-scale: 0.8;
 }
 
-/* REFRESH */
 #btn-refresh {
   background-color: rgba(100, 100, 255, 0.9);
   --icon-scale: 0.75;
 }
 
-/* ZOOM */
 #btn-zoom-in,
 #btn-zoom-out {
   background-color: rgba(150, 150, 150, 0.8);
