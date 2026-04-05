@@ -226,6 +226,35 @@
     .alert-info h3 { font-size: 1.1rem; margin-bottom: 3px; text-transform: uppercase; color: white; font-weight: 800; }
     .alert-info p { font-size: 0.85rem; opacity: 0.9; }
 
+    /* ==========================================
+       NOVA NOTIFICAÇÃO VISUAL (SUBSTITUI O ALERT COM URL)
+       ========================================== */
+    .toast-notification {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background-color: var(--panel-color);
+      color: var(--text-main);
+      padding: 15px 25px;
+      border-radius: 30px;
+      border: 1px solid #555;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      z-index: 2000;
+      opacity: 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .toast-notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
     .loading-overlay {
       position: absolute;
       top: 50%; left: 50%;
@@ -354,6 +383,9 @@
 
     <div id="map"></div>
 
+    <!-- NOVA NOTIFICAÇÃO TOAST (SEM URL) -->
+    <div class="toast-notification" id="toast-msg"></div>
+
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
@@ -407,7 +439,7 @@
     let alertTimeout;
     let radaresData = [];
     
-    // CENTRALIZADO EXATAMENTE NO OBELISCO DA PRAÇA SETE DE BELO HORIZONTE
+    // CENTRALIZADO EXATAMENTE NO OBELISCO DA PRAÇA SETE
     let userLat = -19.91894; 
     let userLng = -43.93866;
     
@@ -421,8 +453,17 @@
     let prevTime = null;
 
     /* ==========================================================================
-       DICIONÁRIO DE ÍCONES UNIFICADO (Case-Sensitive exato para evitar erros)
+       SISTEMA DE NOTIFICAÇÃO VISUAL (SUBSTITUI O ALERT JAVASCRIPT)
        ========================================================================== */
+    function showNotification(message) {
+      const $toast = $("#toast-msg");
+      $toast.text(message).addClass("show");
+      
+      setTimeout(() => {
+        $toast.removeClass("show");
+      }, 3000);
+    }
+
     const iconMap = {
       'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
       'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
@@ -435,7 +476,6 @@
       'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
-      // PADRÕES DE INTELIGÊNCIA ARTIFICIAL
       'Leitor Inteligente de Placas (OCR)': '/imagens_app/ic_radar_ocr.png',
       'Leitor Inteligente Facil (FACIAL)': '/imagens_app/ic_radar_facial.png',
       'default': '/imagens_app/ic_radar_cev.png' 
@@ -450,14 +490,18 @@
     };
 
     /* ==========================================================================
-       RADARES DE INTELIGÊNCIA ARTIFICIAL REAIS (CORREÇÃO DE TIPO FORÇADA)
+       RADARES DE INTELIGÊNCIA ARTIFICIAL (PRAÇA SETE CORRIGIDA E CENTRALIZADA)
        ========================================================================== */
     function injetarRadaresIA() {
       const radaresOcultosBH = [
+        // EXATAMENTE NA PRAÇA SETE (OCR E FACIAL)
+        { lat: -19.91894, lng: -43.93866, end: "Praça Sete (Obelisco)", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
+        { lat: -19.91900, lng: -43.93860, end: "Praça Sete (Cruzamento)", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "60" },
+        
+        // OUTRAS REGIÕES
         { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
         { lat: -19.9190, lng: -43.9370, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "40" },
-        { lat: -19.91894, lng: -43.93866, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
-        { lat: -19.91880, lng: 43.93870, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "60" },
+        { lat: -19.91880, lng: -43.93870, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "60" },
         { lat: -19.9375, lng: -43.9360, end: "Av. do Contorno, Próx. ao Mercado Central", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
         { lat: -19.9405, lng: -43.9345, end: "Av. do Contorno, Próx. à Rodoviária", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
         { lat: -19.9335, lng: -43.9420, end: "R da Bahia, Próx. à Savassi", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "40" },
@@ -469,7 +513,7 @@
       return radaresOcultosBH.map(r => [
         null, null, 
         r.end, 
-        r.tipo, // O tipo agora é injetado já com a formatação EXATA do iconMap
+        r.tipo, 
         r.vel, 
         null, null, null, null, 
         `${r.lat},${r.lng}`
@@ -484,7 +528,6 @@
     }
 
     function getIconUrl(tipo) {
-      // Busca o tipo exato. Se não achar, busca o ajuste. Se não achar nenhum, vai para default.
       return iconMap[tipo] || iconMap[ajusteNomes[tipo]] || iconMap['default'];
     }
 
@@ -553,7 +596,7 @@
 
     function initMap() {
       map = L.map('map', {
-        center: [userLat, userLng], // Inicia na Praça Sete
+        center: [userLat, userLng], 
         zoom: 16, 
         zoomControl: false
       });
@@ -566,7 +609,10 @@
 
       $("#btn-calc-route").click(async () => {
         const endereco = $("#route-query").val().trim();
-        if (endereco.length < 5) return alert("Digite um endereço mais completo.");
+        if (endereco.length < 5) {
+          showNotification("Digite um endereço mais completo.");
+          return;
+        }
         
         $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
         const coords = await buscarCoordenadas(endereco);
@@ -577,7 +623,7 @@
           $("#loading").hide();
         } else {
           $("#loading").hide();
-          alert("Endereço não encontrado. Tente ser mais específico.");
+          showNotification("Endereço não encontrado. Tente ser mais específico.");
         }
       });
       
@@ -621,7 +667,7 @@
         navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 });
       } else {
         hideFullscreenLoading();
-        $("#loading").show().html("<div style='color: red'>GPS não suportado.</div>");
+        showNotification("GPS não suportado neste dispositivo.");
       }
 
       carregarRadares();
@@ -681,7 +727,6 @@
 
           let records = data.records || [];
           
-          // INTEGRAÇÃO COM IA
           const radaresIA = injetarRadaresIA();
           const todosOsRadares = [...records, ...radaresIA];
           
@@ -698,7 +743,7 @@
             const lng = coords[1];
 
             const iconeRadar = L.icon({
-              iconUrl: getIconUrl(tipo), // Função getIconUrl agora à prova de falhas
+              iconUrl: getIconUrl(tipo), 
               iconSize: [40, 40],
               iconAnchor: [20, 40],
               popupAnchor: [0, -40]
@@ -733,13 +778,16 @@
             radarMarkers.push(radarMarker);
           });
 
+          // FORÇA O MAPA A FICAR CENTRALIZADO NA PRAÇA SETE APÓS CARREGAR TUDO
+          map.setView([userLat, userLng], 16);
+          
           hideFullscreenLoading();
           $("#loading").hide();
         })
         .catch(error => {
           console.error("Erro ao carregar radares:", error);
           hideFullscreenLoading();
-          $("#loading").show().html("<div style='color: red'>Falha ao carregar radares.json</div>");
+          showNotification("Falha ao conectar com o banco de radares.");
         });
     }
 
@@ -793,14 +841,15 @@
       if (encontrou) { 
         map.fitBounds(boundsGroup.getBounds().pad(0.5)); 
       } else { 
-        alert("Nenhum radar encontrado para essa busca."); 
+        // SUBSTITUÍDO O "alert()" POR NOTIFICAÇÃO VISUAL LIMPA
+        showNotification("Nenhum radar encontrado para essa busca."); 
       }
     }
 
     function showError(error) {
       console.warn(`Erro de GPS: ${error.message}`);
       hideFullscreenLoading();
-      $("#loading").show().html("<div style='color: orange'>Ative seu GPS para usar o app.</div>");
+      showNotification("Ative seu GPS para usar o app.");
     }
 
     if ('serviceWorker' in navigator) {
