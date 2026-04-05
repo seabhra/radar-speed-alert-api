@@ -164,36 +164,50 @@
 }
  
 
-
 /* ==========================================
    SISTEMA GLOBAL UNIFICADO (CENTRALIZADO)
    ========================================== */
-
 .btn-search,
 .map-btn {
-  /* Centralização Total do Conteúdo */
+  /* Alinhamento de conteúdo interno (Centraliza os ícones/imagens) */
   display: flex;
   align-items: center;
   justify-content: center;
-
-  --btn-size: 48px; /* Aumentei levemente o padrão para equilíbrio */
-  --icon-scale: 0.75; 
-
+  --btn-size: 45px;
+  --icon-scale: 0.85;
   width: var(--btn-size);
   height: var(--btn-size);
-  
+  background-size: calc(var(--btn-size) * var(--icon-scale));
+  background-repeat: no-repeat;
+  background-position: center;
   background-color: var(--bg-color);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #333;
   border-radius: 50%;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* Mantém o círculo perfeito mesmo com flex */
+  transition: 0.2s;
   flex-shrink: 0;
+}
+.btn-search:hover,
+.map-btn:hover {
+  border-color: var(--accent-color);
+  transform: scale(1.05);
 }
 
 /* ==========================================
-   CONTAINER (O segredo da harmonia)
+   DESTAQUE: BOTÃO ROTA (AUMENTADO)
+   ========================================== */
+#btn-route-bar {
+  /* Aumentando o tamanho base em relação aos outros */
+  --btn-size: 45px;
+  --icon-scale: 0.85; /* Ícone preenche mais o espaço */
+    background-color: rgba(255, 165, 0, 0.9);
+  border: 2px solid rgba(255, 165, 0, 0.6);
+  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3); /* Glow suave para destaque */
+  z-index: 10; /* Garante que fique sobreposto se necessário */
+}
+
+/* ==========================================
+   MAPA - CONTROLES (ALINHAMENTO)
    ========================================== */
 
 .map-controls {
@@ -202,57 +216,47 @@
   bottom: 40px;
   display: flex;
   flex-direction: column;
-  
-  /* Alinha todos os círculos pelo CENTRO vertical */
+  /* Centraliza botões de tamanhos diferentes no eixo vertical */
   align-items: center; 
-  
   gap: 12px;
   z-index: 500;
 }
 
 /* ==========================================
-   BOTÃO ROTA - DESTAQUE HARMONIZADO
+   ÍCONES VIA IMG
    ========================================== */
 
-#btn-route-bar {
-  /* Tamanho ligeiramente maior, mas proporcional */
-  --btn-size: 62px; 
-  --icon-scale: 0.8;
-  
-  background-color: rgba(255, 165, 0, 0.95);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  
-  /* Sombra suave para dar profundidade sem "sujar" o design */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 
-              0 0 0 4px rgba(255, 165, 0, 0.2);
-}
-
-#btn-route-bar:hover {
-  transform: scale(1.1);
-  background-color: rgba(255, 165, 0, 1);
-}
-
-/* ==========================================
-   AJUSTES DE ÍCONES (IMG)
-   ========================================== */
-
-.map-btn img {
+.map-btn img,
+.control-btn img {
+  /* Garante que a imagem respeite o cálculo centralizado */
   width: calc(var(--btn-size) * var(--icon-scale));
   height: calc(var(--btn-size) * var(--icon-scale));
   object-fit: contain;
-  /* Evita que o filtro do hover distorça a centralização */
-  display: block; 
+  pointer-events: none;
+  transition: 0.2s;
 }
 
 /* ==========================================
-   OUTROS BOTÕES (CORES)
+   AJUSTES INDIVIDUAIS RESTANTES
    ========================================== */
 
-#btn-center { background-color: rgba(0, 255, 136, 0.85); }
-#btn-refresh { background-color: rgba(100, 100, 255, 0.85); }
-#btn-zoom-in, #btn-zoom-out { 
-  background-color: rgba(60, 60, 60, 0.85); 
-  --btn-size: 42px; /* Zooms um pouco menores para hierarquia secundária */
+#btn-search-bar {
+  background-color: rgba(76, 220, 205, 0.9);
+}
+
+#btn-center {
+  background-color: rgba(0, 255, 136, 0.9);
+  border: 2px solid rgba(0, 255, 136, 0.5);
+}
+
+#btn-refresh {
+  background-color: rgba(100, 100, 255, 0.9);
+}
+
+#btn-zoom-in,
+#btn-zoom-out {
+  background-color: rgba(150, 150, 150, 0.8);
+  --icon-scale: 0.6; /* Ligeiramente menor para não poluir */
 }
     
     /* ===============================
