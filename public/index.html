@@ -87,25 +87,71 @@
       outline: none;
     }
 
-    .search-container input:focus { border-color: var(--accent-color); }
 
-    .btn-search {
-      background-size: 40px 40px;
-      background-repeat: no-repeat;
-      background-position: center;
-      width: 45px; height: 45px;
-      background-color: var(--bg-color);
-      border: 1px solid #333;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: 0.2s;
-      flex-shrink: 0;
-    }
-    .btn-search:hover {
-      border-color: var(--accent-color);
-      transform: scale(1.05);
-    }
+    /* ==========================================
+   CONTAINER DE SEARCH E BOTÕES DE BUSCA E ROTA
+   ========================================== */    
 
+.search-container input:focus { 
+  border-color: var(--accent-color); 
+}
+
+/* BOTÃO PADRÃO */
+.btn-search {
+  background-size: 40px 40px;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  width: 45px; 
+  height: 45px;
+
+  background-color: var(--bg-color);
+  border: 1px solid #333;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-search:hover {
+  border-color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+/* ==========================================
+   BOTÃO TRAÇAR ROTA (CUSTOMIZADO)
+   ========================================== */
+
+#btn-calc-route {
+  /* cor levemente diferenciada pra dar hierarquia */
+  background-color: rgba(76, 220, 205, 0.15);
+  border-color: rgba(76, 220, 205, 0.6);
+
+  /* controle independente do ícone */
+  background-size: 28px 28px; /* ajuste fino aqui */
+  background-position: center;
+}
+
+/* efeito mais "vivo" no hover */
+#btn-calc-route:hover {
+  background-color: rgba(76, 220, 205, 0.3);
+  border-color: var(--accent-color);
+  transform: scale(1.08) rotate(3deg); /* leve rotação dá sensação de ação */
+}
+
+/* feedback de clique */
+#btn-calc-route:active {
+  transform: scale(0.95);
+}
+
+/* opcional: estado ativo (ex: rota já traçada) */
+#btn-calc-route.active {
+  background-color: rgba(76, 220, 205, 0.6);
+  border-color: #fff;
+}
+    /* ==========================================
+       MAPA DO RADAR
+       ========================================== */
     .map-wrapper {
       position: relative;
       flex: 1;
@@ -119,9 +165,12 @@
       background-color: #bbb7b7;
     }
 
+    /* ==========================================
+       SPEED DE VELOCIDADE
+       ========================================== */
     .speed-widget {
       position: absolute;
-      bottom: 30px; 
+      bottom: 32px; 
       left: -25px; 
       width: 150px; 
       height: 150px; 
@@ -198,7 +247,7 @@
 }
 
 /* ===============================
-   1. BOTÃO BUSCA DE RADAR
+   1. BOTÃO BUSCA DE RADAR MAPA
 ================================= */
 #btn-search-bar {
   background-color: rgba(76, 220, 205, 0.9);
@@ -211,13 +260,13 @@
 }
 
 /* ===============================
-   2. BOTÃO ROTA
+   2. BOTÃO ROTA MAPAA
 ================================= */
 #btn-route-bar {
   background-color: rgba(255, 165, 0, 0.9);
   border-color: rgba(255, 165, 0, 0.5);
-  --icon-w: 40px;
-  --icon-h: 40px;
+  --icon-w: 45px;
+  --icon-h: 35px;
 }
 #btn-route-bar:hover {
   background-color: rgba(255, 165, 0, 1);
@@ -226,7 +275,7 @@
 }
 
 /* ===============================
-   3. BOTÃO CENTRALIZAR (GPS)
+   3. BOTÃO CENTRALIZAR (GPS) MAPA
 ================================= */
 #btn-center {
   background-color: rgba(0, 255, 136, 0.9);
@@ -241,7 +290,7 @@
 }
 
 /* ===============================
-   4. BOTÃO ATUALIZAR
+   4. BOTÃO ATUALIZAR MAPA
 ================================= */
 #btn-refresh {
   background-color: rgba(100, 100, 255, 0.9);
@@ -254,7 +303,7 @@
 }
 
 /* ===============================
-   5. BOTÕES DE ZOOM
+   5. BOTÕES DE ZOOM MAPA
 ================================= */
 #btn-zoom-in,
 #btn-zoom-out {
