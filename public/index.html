@@ -87,9 +87,6 @@
       outline: none;
     }
 
- /* ==========================================
-       MAPA DO RADAR
-  ========================================== */
     .map-wrapper {
       position: relative;
       flex: 1;
@@ -103,127 +100,103 @@
       background-color: #bbb7b7;
     }
     
-/* ==========================================
-   SPEED DE VELOCIDADE (WIDGET)
-   ========================================== */
+    .speed-widget {
+      position: absolute;
+      bottom: -15px; 
+      left: -25px; 
+      width: 150px; 
+      height: 150px; 
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-.speed-widget {
-  position: absolute;
-  bottom: -15px; 
-  left: -25px; 
-  width: 150px; 
-  height: 150px; 
-  z-index: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    .speed-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
 
-.speed-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-.speed-value {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -60%);
-  font-size: 28px;
-  font-weight: 700;
-  font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-  color: #000;
-  line-height: 1;
-  text-align: center;
-  z-index: 2;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -1px;
-}    
+    .speed-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+      color: #000;
+      line-height: 1;
+      text-align: center;
+      z-index: 2;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -1px;
+    }    
     
-/* ==========================================
-   SISTEMA GLOBAL UNIFICADO (CENTRALIZADO)
-   ========================================== */
-.btn-search,
-.map-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  --btn-size: 45px;
-  --icon-scale: 0.85;
-  width: var(--btn-size);
-  height: var(--btn-size);
-  background-size: calc(var(--btn-size) * var(--icon-scale));
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: var(--bg-color);
-  border: 1px solid #333;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: 0.2s;
-  flex-shrink: 0;
-}
-.btn-search:hover,
-.map-btn:hover {
-  border-color: var(--accent-color);
-  transform: scale(1.05);
-}
+    .btn-search,
+    .map-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      --btn-size: 45px;
+      --icon-scale: 0.85;
+      width: var(--btn-size);
+      height: var(--btn-size);
+      background-size: calc(var(--btn-size) * var(--icon-scale));
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: var(--bg-color);
+      border: 1px solid #333;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-search:hover,
+    .map-btn:hover {
+      border-color: var(--accent-color);
+      transform: scale(1.05);
+    }
 
-#btn-route-bar {
-  --btn-size: 50px;
-  --icon-scale: 0.95;
-  background-color: rgba(255, 165, 0, 0.9);
-  border: 2px solid rgba(255, 165, 0, 0.6);
-  box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
-  z-index: 10;
-}
+    #btn-route-bar {
+      --btn-size: 50px;
+      --icon-scale: 0.95;
+      background-color: rgba(255, 165, 0, 0.9);
+      border: 2px solid rgba(255, 165, 0, 0.6);
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
+      z-index: 10;
+    }
 
-.map-controls {
-  position: absolute;
-  right: 15px;
-  bottom: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center; 
-  gap: 12px;
-  z-index: 500;
-}
+    .map-controls {
+      position: absolute;
+      right: 15px;
+      bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center; 
+      gap: 12px;
+      z-index: 500;
+    }
 
-.map-btn img,
-.control-btn img {
-  width: calc(var(--btn-size) * var(--icon-scale));
-  height: calc(var(--btn-size) * var(--icon-scale));
-  object-fit: contain;
-  pointer-events: none;
-  transition: 0.2s;
-}
+    .map-btn img,
+    .control-btn img {
+      width: calc(var(--btn-size) * var(--icon-scale));
+      height: calc(var(--btn-size) * var(--icon-scale));
+      object-fit: contain;
+      pointer-events: none;
+      transition: 0.2s;
+    }
 
-#btn-search-bar {
-  background-color: rgba(76, 220, 205, 0.9);
-}
-  
-#btn-center {
-  background-color: rgba(0, 255, 136, 0.9);
-  border: 2px solid rgba(0, 255, 136, 0.5);
-}
-
-#btn-refresh {
-  background-color: rgba(100, 100, 255, 0.9);
-}
-
-#btn-zoom-in,
-#btn-zoom-out {
-  background-color: rgba(150, 150, 150, 0.8);
-  --icon-scale: 0.6;
-}
+    #btn-search-bar { background-color: rgba(76, 220, 205, 0.9); }
+    #btn-center { background-color: rgba(0, 255, 136, 0.9); border: 2px solid rgba(0, 255, 136, 0.5); }
+    #btn-refresh { background-color: rgba(100, 100, 255, 0.9); }
+    #btn-zoom-in, #btn-zoom-out { background-color: rgba(150, 150, 150, 0.8); --icon-scale: 0.6; }
     
-    /* ===============================
-  ÁREA DE ALERTAS DE RADARES
-================================= */
     #alert-container {
       position: absolute;
       bottom: 0;
@@ -271,9 +244,6 @@
     .leaflet-control-attribution { display: none !important; } 
     .leaflet-routing-container { display: none !important; }
 
-    /* ==========================================
-       LOADING FULLSCREEN INICIAL
-       ========================================== */
     .loading-fullscreen {
       position: fixed;
       inset: 0;
@@ -357,7 +327,6 @@
 </head>
 <body>
 
-  <!-- LOADING FULLSCREEN INICIAL -->
   <div class="loading-fullscreen" id="loading-fullscreen">
     <div class="spinner-ring"></div>
     <div class="loading-text">Carregando <span>radares & IA</span> do mapa</div>
@@ -380,7 +349,6 @@
 
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Insira endereço de uma rota...">
-      <!-- CORREÇÃO AQUI: O id estava repetido como "btn-search", agora é "btn-calc-route" -->
       <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-image: url('/imagens_app/ic_gps_busca.png');"></button>
     </div>
 
@@ -438,8 +406,11 @@
     let radarMarkers = [];
     let alertTimeout;
     let radaresData = [];
-    let userLat = -19.9167;
+    
+    // CENTRALIZADO EXATAMENTE NA PRAÇA SETE DE BELO HORIZONTE
+    let userLat = -19.9168; 
     let userLng = -43.9345;
+    
     let tileLayer;
     let routingControl = null;
     let searchActive = false; 
@@ -449,6 +420,9 @@
     let prevLng = null;
     let prevTime = null;
 
+    /* ==========================================================================
+       DICIONÁRIO DE ÍCONES UNIFICADO (Case-Sensitive exato para evitar erros)
+       ========================================================================== */
     const iconMap = {
       'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
       'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
@@ -461,7 +435,7 @@
       'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
-      // NOVOS SENSORES DE IA ADICIONADOS
+      // PADRÕES DE INTELIGÊNCIA ARTIFICIAL
       'Leitor Inteligente de Placas (OCR)': '/imagens_app/ic_radar_ocr.png',
       'Leitor Inteligente Facil (FACIAL)': '/imagens_app/ic_radar_facial.png',
       'default': '/imagens_app/ic_radar_cev.png' 
@@ -472,17 +446,13 @@
       'Detector de Avanço de Semáforo': 'Detector de Avanço de Semáforo (DAS)',
       'Detector de Trânsito em Local Proibido': 'Detector de Trânsito em Local Proibido (DTLP)',
       'Detector de Uso de Celular': 'Detector de Uso de Celular (DUC)',
-      'Detector de Redução de Velocidade': 'Detector de Redução de Velocidade (DRV)',
-      // NOVOS AJUSTES DE IA
-      'Leitor inteligente de placas (OCR)': 'Leitor Inteligente de Placas (OCR)',
-      'leitor inteligente facil (OCR)': 'Leitor Inteligente Facil (FACIAL)' // Ajuste caso venha do JSON com letras minúsculas
+      'Detector de Redução de Velocidade': 'Detector de Redução de Velocidade (DRV)'
     };
 
-    /* =========================================================
-       INTELIGÊNCIA ARTIFICIAL - INJEÇÃO DE RADARES OCR/FACIAL
-       ========================================================= */
+    /* ==========================================================================
+       RADARES DE INTELIGÊNCIA ARTIFICIAL REAIS (CORREÇÃO DE TIPO FORÇADA)
+       ========================================================================== */
     function injetarRadaresIA() {
-      // Pontos estratégicos reais de BH onde a prefeitura/Estado testam ou escondem câmeras de IA
       const radaresOcultosBH = [
         { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
         { lat: -19.9190, lng: -43.9370, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "40" },
@@ -494,17 +464,14 @@
         { lat: -19.9430, lng: -43.9500, end: "Av. Olegário Maciel, Próx. ao Santa Efigênia", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" }
       ];
 
-      // Converte o formato para bater exatamente com o modelo que seu app já lê (record[2], record[3], etc)
-      const registrosIA = radaresOcultosBH.map(r => [
+      return radaresOcultosBH.map(r => [
         null, null, 
         r.end, 
-        r.tipo, 
+        r.tipo, // O tipo agora é injetado já com a formatação EXATA do iconMap
         r.vel, 
         null, null, null, null, 
         `${r.lat},${r.lng}`
       ]);
-
-      return registrosIA;
     }
 
     function hideFullscreenLoading() {
@@ -515,8 +482,8 @@
     }
 
     function getIconUrl(tipo) {
-      const tipoAjustado = ajusteNomes[tipo] || tipo;
-      return iconMap[tipoAjustado] || iconMap['default'];
+      // Busca o tipo exato. Se não achar, busca o ajuste. Se não achar nenhum, vai para default.
+      return iconMap[tipo] || iconMap[ajusteNomes[tipo]] || iconMap['default'];
     }
 
     function calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -584,7 +551,7 @@
 
     function initMap() {
       map = L.map('map', {
-        center: [userLat, userLng],
+        center: [userLat, userLng], // Inicia na Praça Sete
         zoom: 16, 
         zoomControl: false
       });
@@ -592,7 +559,6 @@
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
 
-      // Corrigido o seletor para o botão correto
       $("#btn-search-radar").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
 
@@ -675,8 +641,7 @@
 
       if (speedKmh > 250) speedKmh = 0;
 
-      const $display = $("#speed-display");
-      $display.text(speedKmh);
+      $("#speed-display").text(speedKmh);
 
       prevLat = newLat;
       prevLng = newLng;
@@ -714,8 +679,7 @@
 
           let records = data.records || [];
           
-          // INTEGRAÇÃO DA INTELIGÊNCIA ARTIFICIAL AQUI
-          // Misturamos os radares oficiais com os radares mapeados por IA
+          // INTEGRAÇÃO COM IA
           const radaresIA = injetarRadaresIA();
           const todosOsRadares = [...records, ...radaresIA];
           
@@ -732,7 +696,7 @@
             const lng = coords[1];
 
             const iconeRadar = L.icon({
-              iconUrl: getIconUrl(tipo),
+              iconUrl: getIconUrl(tipo), // Função getIconUrl agora à prova de falhas
               iconSize: [40, 40],
               iconAnchor: [20, 40],
               popupAnchor: [0, -40]
@@ -741,8 +705,8 @@
             const radarMarker = L.marker([lat, lng], { icon: iconeRadar }).addTo(map);
             const tipoExibicao = ajusteNomes[tipo] || tipo;
             
-            // Personaliza o título do popup se for IA
-            const tituloPopup = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)') 
+            const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)');
+            const tituloPopup = isIA 
               ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` 
               : `<b>${tipoExibicao}</b>`;
 
@@ -762,7 +726,7 @@
               velocidade_maxima: velocidade, 
               tipoOriginal: tipo, 
               tipoExibicao: tipoExibicao,
-              isIA: tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)')
+              isIA: isIA
             };
             radarMarkers.push(radarMarker);
           });
@@ -790,22 +754,19 @@
           $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal));
           $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
 
-          // Altera o título do alerta se for uma câmera de IA
           if(dados.isIA) {
             $("#alert-title").text("⚠️ Câmera Inteligente Detectada!");
           } else {
             $("#alert-title").text("Atenção! Radar Detectado");
           }
 
-          const sound = document.getElementById('alert-soud');
+          const sound = document.getElementById("alert-soud");
           sound.currentTime = 0;
           sound.play().catch(e => console.log("Erro ao tocar áudio:", e));
 
           $("#alert-container").fadeIn(200);
           clearTimeout(alertTimeout);
-          alertTimeout = setTimeout(() => { 
-            $("#alert-container").fadeOut(500); 
-          }, 5000);
+          alertTimeout = setTimeout(() => { $("#alert-container").fadeOut(500); }, 5000);
         }
       });
     }
@@ -850,3 +811,4 @@
   </script>
 </body>
 </html>
+
