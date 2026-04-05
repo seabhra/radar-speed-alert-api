@@ -476,8 +476,8 @@
       'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
-      'Leitor Inteligente de Placas (OCR)': '/imagens_app/ic_radar_ocr.png',
-      'Leitor Inteligente Facil (FACIAL)': '/imagens_app/ic_radar_facial.png',
+      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr.png',
+      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial.png',
       'default': '/imagens_app/ic_radar_cev.png' 
     };
 
@@ -486,7 +486,9 @@
       'Detector de Avanço de Semáforo': 'Detector de Avanço de Semáforo (DAS)',
       'Detector de Trânsito em Local Proibido': 'Detector de Trânsito em Local Proibido (DTLP)',
       'Detector de Uso de Celular': 'Detector de Uso de Celular (DUC)',
-      'Detector de Redução de Velocidade': 'Detector de Redução de Velocidade (DRV)'
+      'Detector de Redução de Velocidade': 'Detector de Redução de Velocidade (DRV)',
+      'Leitor Inteligente de Placas': Leitor Inteligente de Placas (OCR-P)',
+      'Leitor de Reconhecimento Facial':Leitor de Reconhecimento Facial (OCR-F)
     };
 
     /* ==========================================================================
@@ -495,19 +497,19 @@
     function injetarRadaresIA() {
       const radaresOcultosBH = [
         // EXATAMENTE NA PRAÇA SETE (OCR E FACIAL)
-        { lat: -19.91894, lng: -43.93866, end: "Praça Sete (Obelisco)", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
-        { lat: -19.91900, lng: -43.93860, end: "Praça Sete (Cruzamento)", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "60" },
+        { lat: -19.91894, lng: -43.93866, end: "Praça Sete (Obelisco)", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+        { lat: -19.91900, lng: -43.93860, end: "Praça Sete (Cruzamento)", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
         
         // OUTRAS REGIÕES
-        { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
-        { lat: -19.9190, lng: -43.9370, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "40" },
-        { lat: -19.91880, lng: -43.93870, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "60" },
-        { lat: -19.9375, lng: -43.9360, end: "Av. do Contorno, Próx. ao Mercado Central", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
-        { lat: -19.9405, lng: -43.9345, end: "Av. do Contorno, Próx. à Rodoviária", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
-        { lat: -19.9335, lng: -43.9420, end: "R da Bahia, Próx. à Savassi", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "40" },
-        { lat: -19.9355, lng: -43.9280, end: "Av. Getúlio Vargas, Centro", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" },
-        { lat: -19.9160, lng: -43.9350, end: "Av. Augusto de Lima, Próx. à Praça da Liberdade", tipo: "Leitor Inteligente Facil (FACIAL)", vel: "40" },
-        { lat: -19.9430, lng: -43.9500, end: "Av. Olegário Maciel, Próx. ao Santa Efigênia", tipo: "Leitor Inteligente de Placas (OCR)", vel: "60" }
+        { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+        { lat: -19.9190, lng: -43.9370, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facial (OCR-F)", vel: "40" },
+        { lat: -19.91880, lng: -43.93870, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facial (OCR-F)", vel: "60" },
+        { lat: -19.9375, lng: -43.9360, end: "Av. do Contorno, Próx. ao Mercado Central", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+        { lat: -19.9405, lng: -43.9345, end: "Av. do Contorno, Próx. à Rodoviária", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+        { lat: -19.9335, lng: -43.9420, end: "R da Bahia, Próx. à Savassi", tipo: "Leitor Inteligente Facial (OCR-F)", vel: "40" },
+        { lat: -19.9355, lng: -43.9280, end: "Av. Getúlio Vargas, Centro", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+        { lat: -19.9160, lng: -43.9350, end: "Av. Augusto de Lima, Próx. à Praça da Liberdade", tipo: "Leitor Inteligente Facial (OCR-F)", vel: "40" },
+        { lat: -19.9430, lng: -43.9500, end: "Av. Olegário Maciel, Próx. ao Santa Efigênia", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" }
       ];
 
       return radaresOcultosBH.map(r => [
