@@ -109,7 +109,7 @@
 
 .speed-widget {
   position: absolute;
-  bottom: 35px; 
+  bottom: 15px; /* ↓ antes 35px — agora desce todo o conjunto */
   left: -25px; 
   width: 150px; 
   height: 150px; 
@@ -137,7 +137,10 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -48%);
+
+  /* mantém ajuste fino do número */
+  transform: translate(-50%, -35%);
+
   font-size: 28px;
   font-weight: 700;
   font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
@@ -148,8 +151,7 @@
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   letter-spacing: -1px;
-}
-    
+}    
 /* ==========================================
    SISTEMA GLOBAL UNIFICADO (CENTRALIZADO)
    ========================================== */
