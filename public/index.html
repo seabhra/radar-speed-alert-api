@@ -135,35 +135,33 @@
 /* ==========================================
    VALOR DA VELOCIDADE (CORRIGIDO)
    ========================================== */
-
 .speed-value {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
 
-  /* TAMANHO BASE */
+  /* DESCE UM POUCO NO EIXO Y */
+  transform: translate(-50%, -40%);
+  
+ /* FONTE MAIS VERTICAL (ZERO MAIS “ALTO”) */
   font-size: 28px;
   font-weight: 700;
-
-  /* FONTE MAIS VERTICAL (ZERO MAIS “ALTO”) */
   font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-
-  /* COR E VISUAL */
+  
+  /* COR E VISUAL */  
   color: #000;
   line-height: 1;
   text-align: center;
   z-index: 2;
-
   /* ESTABILIDADE DE DÍGITOS */
+   
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-
-  /* AJUSTE FINO VISUAL */
+  
+   /* AJUSTE FINO VISUAL */
   letter-spacing: -1px;
 }
- 
-
+    
 /* ==========================================
    SISTEMA GLOBAL UNIFICADO (CENTRALIZADO)
    ========================================== */
@@ -198,8 +196,8 @@
    ========================================== */
 #btn-route-bar {
   /* Aumentando o tamanho base em relação aos outros */
-  --btn-size: 45px;
-  --icon-scale: 0.85; /* Ícone preenche mais o espaço */
+  --btn-size: 50px;
+  --icon-scale: 0.95; /* Ícone preenche mais o espaço */
     background-color: rgba(255, 165, 0, 0.9);
   border: 2px solid rgba(255, 165, 0, 0.6);
   box-shadow: 0 0 15px rgba(255, 165, 0, 0.3); /* Glow suave para destaque */
