@@ -739,8 +739,9 @@
 
       verificarProximidade(userLat, userLng);
     }
+   
             /* ====================================================================
-                 FUNÇÃO CARREGAR RADARES (CORRIGIDA E OTIMIZADA)
+                 FUNÇÃO CARREGAR RADARES (SNAP MATEMÁTICO LOCAL - SEM DEPENDÊNCIA DE API)
                ==================================================================== */
         function carregarRadares() {
       fetch("radares.json")
@@ -759,30 +760,23 @@
           const todosOsRadares = [...records, ...radaresIA];
           
           /* ====================================================================
-             PASSO 0: PRÉ-CARREGAR AS GEOMETRIAS DAS RUAS DO MAPA ATUAL
-             Isso evita travar a internet e funciona 100% offline após carregado.
+             PASSO 0: CARREGAR AS RUAS LOCAIS (APENAS UMA REQUISIÇÃO LEVE)
              ==================================================================== */
-          let ruasCache = [];
+          let ruasLocais = [];
           try {
-             // Pegamos os limites visuais atuais do mapa
              const bounds = map.getBounds();
+             // Pega o bounding box e consulta as ruas uma única vez
              const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
-             
-             // Buscamos TODAS as ruas da tela de uma só vez
              const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];way["highway"](${bbox});out geom;`;
              const osmResponse = await fetch(overpassUrl);
              const osmData = await osmResponse.json();
              
-             // Transformamos as linhas das ruas em pontos matemáticos
              if (osmData.elements) {
-                 ruasCache = osmData.elements.map(rua => {
-                     if (!rua.geometry) return null;
-                     // Cria um array de [lat, lng] para cada trecho da rua
-                     return rua.geometry.map(p => [p.lat, p.lon]);
-                 }).filter(Boolean);
+                 // Extrai apenas as linhas geométricas das ruas
+                 ruasLocais = osmData.elements.map(rua => rua.geometry ? rua.geometry.map(p => [p.lat, p.lon]) : null).filter(Boolean);
              }
           } catch (e) {
-             console.warn("Não foi possível carregar o grid de ruas para ajuste fino.");
+             console.warn("Sem conexão com OSM, usando coordenadas puras.");
           }
 
           /* ====================================================================
@@ -797,63 +791,92 @@
 
             tipo = tipo.trim();
             
+            // Separa as coordenadas
             const rawCoords = geometryStr.replace(/\s+/g, '').split(',').map(Number);
             if (rawCoords.length !== 2 || isNaN(rawCoords[0]) || isNaN(rawCoords[1])) continue; 
 
             /* ====================================================================
-               1. CORREÇÃO SIRGAS 2000 -> WGS84 + INVERSÃO DE EIXO (X,Y para Lat,Lng)
-               Dados da Prefeitura de BH quase sempre vêm (Leste, Norte).
+               1. CONVERSÃO DE DATUM + INVERSÃO DE EIXO PADRÃO BELO HORIZONTE
+               Dados oficiais BH geralmente vem como X(Leste), Y(Norte)
                ==================================================================== */
-            // INVERTIDO AQUI: rawCoords[0] vira Lng, rawCoords[1] vira Lat
-            let lng = rawCoords[0]; 
-            let lat = rawCoords[1];
+            let xLeste = rawCoords[0]; 
+            let yNorte = rawCoords[1];
 
-            // Parâmetros IBGE SIRGAS 2000 -> WGS84
-            const a = 0.00155; 
-            const b = -0.00077;
-            const dx = -0.0015; 
-            const dy = 0.0024;
+            // Parâmetros Helmert SIRGAS 2000 -> WGS84
+            const a = 0.00155; b = -0.00077; const dx = -0.0015; const dy = 0.0024;
+            const phi = yNorte * Math.PI / 180;
+            
+            // Aplica correção e INVERTE para chegar no Lat (Y) e Lng (X)
+            let wgsLat = yNorte + dx + a * Math.cos(phi); // Vira Latitude
+            let wgsLng = xLeste + dy + b * Math.sin(phi);  // Vira Longitude
 
-            const phi = lat * Math.PI / 180;
-            let wgsLat = lat + dx + a * Math.cos(phi);
-            let wgsLng = lng + dy + b * Math.sin(phi);
-
-            /* ====================================================================
-               2. ALGORITMO DE SNAP GEOMÉTRICO LOCAL (Sem dependência de internet)
-               Ele analisa as ruas que já baixamos e encontra o ponto exato da linha.
-               ==================================================================== */
             let finalLat = wgsLat;
             let finalLng = wgsLng;
-            let menorDistancia = Infinity;
 
-            if (ruasCache.length > 0) {
-                for (let r = 0; r < ruasCache.length; r++) {
-                    const pontosRua = ruasCache[r];
-                    
-                    // Analisa de 5 em 5 metros da rua para ser rápido
-                    for (let p = 0; p < pontosRua.length; p++) {
-                        const pontoRua = pontosRua[p];
-                        // Distância euclidiana rápida (o suficiente para <50m)
-                        const distLat = wgsLat - pontoRua[0];
-                        const distLng = wgsLng - pontoRua[1];
-                        const dist = Math.sqrt((distLat * distLat) + (distLng * distLng)) * 111000; // *111000 converte graus pra metros aproximado
-                        
-                        if (dist < menorDistancia) {
-                            menorDistancia = dist;
-                            finalLat = pontoRua[0];
-                            finalLng = pontoRua[1];
+            /* ====================================================================
+               2. SNAPPING GEOMÉTRICO AVANÇADO (RODA 100% NO SEU CELULAR/PC)
+               Encontra o traçado exato da rua e projeta o ponto em cima da linha.
+               ==================================================================== */
+            let menorDistancia = Infinity;
+            let melhorPontoNaRua = null;
+
+            if (ruasLocais.length > 0) {
+                // Fator de conversão aproximada de graus para metros em BH (Latitude)
+                const metrosPorGrauLat = 111320;
+                // Fator de conversão aproximada de graus para metros em BH (Longitude)
+                const metrosPorGrauLng = 111320 * Math.cos(wgsLat * Math.PI / 180);
+
+                for (let r = 0; r < ruasLocais.length; r++) {
+                    const pontosRua = ruasLocais[r];
+                    if (pontosRua.length < 2) continue;
+
+                    // Analisa os segmentos (trechos retilíneos) de cada rua
+                    for (let p = 0; p < pontosRua.length - 1; p++) {
+                        const A = pontosRua[p];
+                        const B = pontosRua[p + 1];
+
+                        // Vetor da rua (A -> B)
+                        const vRx = B[1] - A[1]; // Diferença de Longitude
+                        const vRy = B[0] - A[0]; // Diferença de Latitude
+
+                        // Comprimento do trecho ao quadrado
+                        const comp2 = (vRx * vRx) + (vRy * vRy);
+                        if (comp2 === 0) continue;
+
+                        // Vetor do Ponto Inicial (A) até o nosso Radar
+                        const vPx = wgsLng - A[1];
+                        const vPy = wgsLat - A[0];
+
+                        // Calcula onde o radar "cai" na linha reta da rua (Projeção)
+                        let t = ((vPx * vRx) + (vPy * vRy)) / comp2;
+                        t = Math.max(0, Math.min(1, t)); // Limita ao trecho da rua
+
+                        // Ponto exato na rua
+                        const projLat = A[0] + (t * vRy);
+                        const projLng = A[1] + (t * vRx);
+
+                        // Calcula distância real em METROS entre o radar e este ponto na rua
+                        const dLatMetros = (wgsLat - projLat) * metrosPorGrauLat;
+                        const dLngMetros = (wgsLng - projLng) * metrosPorGrauLng;
+                        const distanciaMetros = Math.sqrt((dLatMetros * dLatMetros) + (dLngMetros * dLngMetros));
+
+                        // Se for o ponto mais perto encontrado até agora, salva
+                        if (distanciaMetros < menorDistancia) {
+                            menorDistancia = distanciaMetros;
+                            melhorPontoNaRua = { lat: projLat, lng: projLng };
                         }
                     }
                 }
-                // Se a rua mais próxima encontrada estiver a menos de 40 metros, ele "gruda"
-                if (menorDistancia > 40) {
-                    finalLat = wgsLat;
-                    finalLng = wgsLng;
+
+                // Se a rua mais próxima estiver a menos de 35 metros, ele "gruda" o ícone nela
+                if (melhorPontoNaRua && menorDistancia < 35) {
+                    finalLat = melhorPontoNaRua.lat;
+                    finalLng = melhorPontoNaRua.lng;
                 }
             }
 
             /* ====================================================================
-               3. CRIAÇÃO DO ÍCONE
+               3. CRIAÇÃO DO ÍCONE NO MAPA
                ==================================================================== */
             const iconeRadar = L.icon({
               iconUrl: getIconUrl(tipo), 
@@ -902,9 +925,9 @@
           showNotification("Falha ao conectar com o banco de radares.");
         });
     }
-
+    
       /* ====================================================================
-                 FUNLÇÃO VERIFICAR PROXIMIDADE
+                 FUNÇÃO VERIFICAR PROXIMIDADE
       ==================================================================== */
     function verificarProximidade(uLat, uLng) {
       let alertTriggered = false;
