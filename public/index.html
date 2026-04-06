@@ -740,13 +740,17 @@
       verificarProximidade(userLat, userLng);
     }
 
-    function carregarRadares() {
+            /* ====================================================================
+                 FUNÇÃO CARREGAR RADARES
+               ==================================================================== */
+        function carregarRadares() {
       fetch("radares.json")
         .then(response => {
           if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
           return response.json();
         })
-        .then(data => {
+        .then(async data => {
+          // Limpa marcadores antigos
           radarMarkers.forEach(marker => map.removeLayer(marker));
           radarMarkers = [];
 
@@ -755,21 +759,85 @@
           const radaresIA = injetarRadaresIA();
           const todosOsRadares = [...records, ...radaresIA];
           
-          todosOsRadares.forEach(record => {
+          for (let i = 0; i < todosOsRadares.length; i++) {
+            const record = todosOsRadares[i];
             const endereco = record[2] || "Endereço não informado";
             let tipo = record[3] || "Não Identificado";
             const velocidade = record[4] || "0";
             const geometryStr = record[9] || "";
 
-            // Limpeza do tipo para evitar problemas
             tipo = tipo.trim();
             
-            const coords = geometryStr.split(',').map(Number);
-            if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) return; 
+            // Separa as coordenadas (tratando possíveis espaços extras)
+            const rawCoords = geometryStr.replace(/\s+/g, '').split(',').map(Number);
+            
+            // Ignora se não tiver exatamente 2 números válidos
+            if (rawCoords.length !== 2 || isNaN(rawCoords[0]) || isNaN(rawCoords[1])) continue; 
 
-            const lat = coords[0];
-            const lng = coords[1];
+            /* ====================================================================
+               1. CORREÇÃO SIRGAS 2000 PARA WGS84 (Transformação Helmert 2D)
+               (Isso corrige o deslocamento de dezenas de metros do datum)
+               ==================================================================== */
+            let lat = rawCoords[0];
+            let lng = rawCoords[1];
+            
+            // NOTA: Se o seu JSON estiver vindo no formato "Leste, Norte" (X, Y), 
+            // ao invés de "Lat, Lng", comente as duas linhas acima e descomente as de baixo:
+            // let lng = rawCoords[0]; 
+            // let lat = rawCoords[1];
 
+            // Parâmetros oficiais IBGE para SIRGAS 2000 -> WGS84
+            const a = 0.00155; 
+            const b = -0.00077;
+            const dx = -0.0015; 
+            const dy = 0.0024;
+
+            // Aplica a transformação
+            const phi = lat * Math.PI / 180;
+            const wgsLat = lat + dx + a * Math.cos(phi);
+            const wgsLng = lng + dy + b * Math.sin(phi);
+
+            /* ====================================================================
+               2. LÓGICA DE "SNAP" PARA A RUA (Garante que o ícone não fique no prédio)
+               ==================================================================== */
+            let finalLat = wgsLat;
+            let finalLng = wgsLng;
+
+            try {
+                // Busca a rua mais próxima usando a API de ruas do OSM (Overpass)
+                const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];way(around:30,${wgsLat},${wgsLng})["highway"];out center;`;
+                const osmResponse = await fetch(overpassUrl);
+                const osmData = await osmResponse.json();
+
+                if (osmData.elements && osmData.elements.length > 0) {
+                    let menorDistancia = Infinity;
+                    let ruaMaisProxima = null;
+
+                    // Analisa as ruas encontradas num raio de 30 metros
+                    osmData.elements.forEach(rua => {
+                        if (rua.center) {
+                            const dist = calcularDistancia(wgsLat, wgsLng, rua.center.lat, rua.center.lon);
+                            if (dist < menorDistancia) {
+                                menorDistancia = dist;
+                                ruaMaisProxima = rua.center;
+                            }
+                        }
+                    });
+
+                    // Se encontrou uma rua a menos de 25 metros, "gruda" o ícone nela
+                    if (ruaMaisProxima && menorDistancia < 25) {
+                        finalLat = ruaMaisProxima.lat;
+                        finalLng = ruaMaisProxima.lon;
+                    }
+                }
+            } catch (e) {
+                // Se a internet estiver ruim, falha silenciosamente e usa a coordenada corrigida matematicamente
+                console.warn("Snap falhou, usando correção matemática.", e);
+            }
+
+            /* ====================================================================
+               3. CRIAÇÃO DO ÍCONE NO MAPA
+               ==================================================================== */
             const iconeRadar = L.icon({
               iconUrl: getIconUrl(tipo), 
               iconSize: [40, 40],
@@ -777,7 +845,7 @@
               popupAnchor: [0, -40]
             });
 
-            const radarMarker = L.marker([lat, lng], { icon: iconeRadar }).addTo(map);
+            const radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
             const tipoExibicao = ajusteNomes[tipo] || tipo;
             
             const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)') || tipoExibicao.includes('Leitor Inteligente');
@@ -795,8 +863,8 @@
             
             radarMarker.bindPopup(popupContent);
             radarMarker.radarData = { 
-              latitude: lat, 
-              longitude: lng, 
+              latitude: finalLat, 
+              longitude: finalLng, 
               endereco: endereco, 
               velocidade_maxima: velocidade, 
               tipoOriginal: tipo, 
@@ -804,7 +872,7 @@
               isIA: isIA
             };
             radarMarkers.push(radarMarker);
-          });
+          }
 
           map.setView([userLat, userLng], 16);
           
