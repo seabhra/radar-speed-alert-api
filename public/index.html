@@ -226,9 +226,6 @@
     .alert-info h3 { font-size: 1.1rem; margin-bottom: 3px; text-transform: uppercase; color: white; font-weight: 800; }
     .alert-info p { font-size: 0.85rem; opacity: 0.9; }
 
-    /* ==========================================
-       NOVA NOTIFICAÇÃO VISUAL (SUBSTITUI O ALERT COM URL)
-       ========================================== */
     .toast-notification {
       position: absolute;
       top: 20px;
@@ -383,7 +380,6 @@
 
     <div id="map"></div>
 
-    <!-- NOVA NOTIFICAÇÃO TOAST (SEM URL) -->
     <div class="toast-notification" id="toast-msg"></div>
 
     <div class="speed-widget">
@@ -439,7 +435,6 @@
     let alertTimeout;
     let radaresData = [];
     
-    // CENTRALIZADO EXATAMENTE NO OBELISCO DA PRAÇA SETE
     let userLat = -19.91894; 
     let userLng = -43.93866;
     
@@ -453,32 +448,33 @@
     let prevTime = null;
 
     /* ==========================================================================
-       SISTEMA DE NOTIFICAÇÃO VISUAL (SUBSTITUI O ALERT JAVASCRIPT)
+       ICON MAP CORRIGIDO - COMPATÍVEL COM O JSON
        ========================================================================== */
-    function showNotification(message) {
-      const $toast = $("#toast-msg");
-      $toast.text(message).addClass("show");
-      
-      setTimeout(() => {
-        $toast.removeClass("show");
-      }, 3000);
-    }
-
     const iconMap = {
-      'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
-      'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
-      'Detector de Trânsito em Local Proibido (DTLP)': '/imagens_app/ic_radar_dtlp.png',
-      'Detector de Invasão de Faixa de Exclusiva (DIF) - MOVE': '/imagens_app/ic_radar_dife.png',
-      'Detector de Parada Sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp.png',
-      'Detector de Conversão em Local Proibido (DCP)': '/imagens_app/ic_radar_rcp.png',
-      'Detector de Redução de Velocidade (DRV)': '/imagens_app/ic_radar_rev.png',
-      'Detector de Uso de Celular (DUC)': '/imagens_app/ic_radar_duc.png',
+      // Mapeamento direto dos tipos que vêm do seu JSON
+      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
+      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
+      'Detector de Conversão/Retorno em local Proibido': '/imagens_app/ic_radar_rcp.png',
+      'Detector de Invasão de Faixa de Exclusiva - MOVE': '/imagens_app/ic_radar_dife.png',
+      'Detector de Uso de Celular': '/imagens_app/ic_radar_duc.png',
+      'Detector de Redução de Velocidade': '/imagens_app/ic_radar_rev.png',
+      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr.png',
+      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial.png',
       'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
-      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr.png',
-      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial.png',
-      'default': '/imagens_app/ic_radar_cev.png' 
+      
+      // Versões com abreviações (para compatibilidade com outras fontes)
+      'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
+      'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
+      'Detector de Conversão em Local Proibido (DCP)': '/imagens_app/ic_radar_rcp.png',
+      'Detector de Trânsito em Local Proibido (DTLP)': '/imagens_app/ic_radar_dtlp.png',
+      'Detector de Parada Sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp.png',
+      'Detector de Invasão de Faixa de Exclusiva (DIF) - MOVE': '/imagens_app/ic_radar_dife.png',
+      'Detector de Uso de Celular (DUC)': '/imagens_app/ic_radar_duc.png',
+      'Detector de Redução de Velocidade (DRV)': '/imagens_app/ic_radar_rev.png',
+      
+      'default': '/imagens_app/ic_radar_cev.png'
     };
 
     const ajusteNomes = {
@@ -492,23 +488,54 @@
     };
 
     /* ==========================================================================
-       RADARES DE INTELIGÊNCIA ARTIFICIAL (PRAÇA SETE CORRIGIDA E CENTRALIZADA)
+       FUNÇÃO MELHORADA PARA BUSCAR ÍCONE
+       ========================================================================== */
+    function getIconUrl(tipo) {
+      // Tenta encontrar o ícone diretamente
+      if (iconMap[tipo]) return iconMap[tipo];
+      
+      // Tenta encontrar ignorando espaços e hífens
+      const tipoNormalizado = tipo.replace(/\s*-\s*/g, ' - ');
+      if (iconMap[tipoNormalizado]) return iconMap[tipoNormalizado];
+      
+      // Fallback baseado em palavras-chave
+      if (tipo.includes('Velocidade')) return iconMap['Controlador Eletrônico de Velocidade'];
+      if (tipo.includes('Semáforo')) return iconMap['Detector de Avanço de Semáforo'];
+      if (tipo.includes('Conversão') || tipo.includes('Retorno')) return iconMap['Detector de Conversão/Retorno em local Proibido'];
+      if (tipo.includes('Invasão')) return iconMap['Detector de Invasão de Faixa de Exclusiva - MOVE'];
+      if (tipo.includes('Celular')) return iconMap['Detector de Uso de Celular'];
+      if (tipo.includes('Redução')) return iconMap['Detector de Redução de Velocidade'];
+      if (tipo.includes('OCR')) return iconMap['Leitor Inteligente de Placas (OCR-P)'];
+      if (tipo.includes('Facial')) return iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
+      if (tipo.includes('Misto') || tipo.includes('CEM')) return iconMap['Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)'];
+      
+      return iconMap['default'];
+    }
+
+    function showNotification(message) {
+      const $toast = $("#toast-msg");
+      $toast.text(message).addClass("show");
+      
+      setTimeout(() => {
+        $toast.removeClass("show");
+      }, 3000);
+    }
+
+    /* ==========================================================================
+       RADARES DE INTELIGÊNCIA ARTIFICIAL
        ========================================================================== */
     function injetarRadaresIA() {
       const radaresOcultosBH = [
-        // EXATAMENTE NA PRAÇA SETE (OCR E FACIAL)
         { lat: -19.91894, lng: -43.93866, end: "Praça Sete (Obelisco)", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
         { lat: -19.91900, lng: -43.93860, end: "Praça Sete (Cruzamento)", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
-        
-        // OUTRAS REGIÕES
         { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.9190, lng: -43.9370, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facial (OCR-F)", vel: "40" },
-        { lat: -19.91880, lng: -43.93870, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor Inteligente Facial (OCR-F)", vel: "60" },
+        { lat: -19.9190, lng: -43.9370, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "40" },
+        { lat: -19.91880, lng: -43.93870, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
         { lat: -19.9375, lng: -43.9360, end: "Av. do Contorno, Próx. ao Mercado Central", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
         { lat: -19.9405, lng: -43.9345, end: "Av. do Contorno, Próx. à Rodoviária", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.9335, lng: -43.9420, end: "R da Bahia, Próx. à Savassi", tipo: "Leitor Inteligente Facial (OCR-F)", vel: "40" },
+        { lat: -19.9335, lng: -43.9420, end: "R da Bahia, Próx. à Savassi", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "40" },
         { lat: -19.9355, lng: -43.9280, end: "Av. Getúlio Vargas, Centro", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.9160, lng: -43.9350, end: "Av. Augusto de Lima, Próx. à Praça da Liberdade", tipo: "Leitor Inteligente Facial (OCR-F)", vel: "40" },
+        { lat: -19.9160, lng: -43.9350, end: "Av. Augusto de Lima, Próx. à Praça da Liberdade", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "40" },
         { lat: -19.9430, lng: -43.9500, end: "Av. Olegário Maciel, Próx. ao Santa Efigênia", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" }
       ];
 
@@ -527,10 +554,6 @@
       if (!el) return;
       el.classList.add('fade-out');
       setTimeout(() => { el.remove(); }, 600);
-    }
-
-    function getIconUrl(tipo) {
-      return iconMap[tipo] || iconMap[ajusteNomes[tipo]] || iconMap['default'];
     }
 
     function calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -734,10 +757,13 @@
           
           todosOsRadares.forEach(record => {
             const endereco = record[2] || "Endereço não informado";
-            const tipo = record[3] || "Não Identificado";
+            let tipo = record[3] || "Não Identificado";
             const velocidade = record[4] || "0";
             const geometryStr = record[9] || "";
 
+            // Limpeza do tipo para evitar problemas
+            tipo = tipo.trim();
+            
             const coords = geometryStr.split(',').map(Number);
             if (coords.length !== 2 || isNaN(coords[0]) || isNaN(coords[1])) return; 
 
@@ -754,7 +780,7 @@
             const radarMarker = L.marker([lat, lng], { icon: iconeRadar }).addTo(map);
             const tipoExibicao = ajusteNomes[tipo] || tipo;
             
-            const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)');
+            const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)') || tipoExibicao.includes('Leitor Inteligente');
             const tituloPopup = isIA 
               ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` 
               : `<b>${tipoExibicao}</b>`;
@@ -780,7 +806,6 @@
             radarMarkers.push(radarMarker);
           });
 
-          // FORÇA O MAPA A FICAR CENTRALIZADO NA PRAÇA SETE APÓS CARREGAR TUDO
           map.setView([userLat, userLng], 16);
           
           hideFullscreenLoading();
@@ -843,7 +868,6 @@
       if (encontrou) { 
         map.fitBounds(boundsGroup.getBounds().pad(0.5)); 
       } else { 
-        // SUBSTITUÍDO O "alert()" POR NOTIFICAÇÃO VISUAL LIMPA
         showNotification("Nenhum radar encontrado para essa busca."); 
       }
     }
