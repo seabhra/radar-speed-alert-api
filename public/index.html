@@ -426,30 +426,24 @@
 
   <audio id="alert-soud" src="alerta.mp3" preload="auto"></audio>
 
- <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
     let map;
     let userMarker;
     let radarMarkers = [];
     let alertTimeout;
-    let radaresData = [];
     
     let userLat = -19.91894; 
     let userLng = -43.93866;
-    
     let tileLayer;
     let routingControl = null;
     let searchActive = false; 
     let routeActive = false; 
-
     let prevLat = null;
     let prevLng = null;
     let prevTime = null;
 
-    /* ==========================================================================
-       ICON MAP CORRIGIDO - COMPATÍVEL COM O JSON
-       ========================================================================== */
     const iconMap = {
       'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
       'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
@@ -464,12 +458,6 @@
       'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
       'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
       'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
-      'Detector de Conversão em Local Proibido (DCP)': '/imagens_app/ic_radar_rcp.png',
-      'Detector de Trânsito em Local Proibido (DTLP)': '/imagens_app/ic_radar_dtlp.png',
-      'Detector de Parada Sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp.png',
-      'Detector de Invasão de Faixa de Exclusiva (DIF) - MOVE': '/imagens_app/ic_radar_dife.png',
-      'Detector de Uso de Celular (DUC)': '/imagens_app/ic_radar_duc.png',
-      'Detector de Redução de Velocidade (DRV)': '/imagens_app/ic_radar_rev.png',
       'default': '/imagens_app/ic_radar_cev.png'
     };
 
@@ -478,21 +466,17 @@
       'Detector de Avanço de Semáforo': 'Detector de Avanço de Semáforo (DAS)',
       'Detector de Trânsito em Local Proibido': 'Detector de Trânsito em Local Proibido (DTLP)',
       'Detector de Uso de Celular': 'Detector de Uso de Celular (DUC)',
-      'Detector de Redução de Velocidade': 'Detector de Redução de Velocidade (DRV)',
       'Leitor Inteligente de Placas': 'Leitor Inteligente de Placas (OCR-P)',
       'Leitor de Reconhecimento Facial': 'Leitor de Reconhecimento Facial (OCR-F)'
     };
 
     function getIconUrl(tipo) {
       if (iconMap[tipo]) return iconMap[tipo];
-      const tipoNormalizado = tipo.replace(/\s*-\s*/g, ' - ');
-      if (iconMap[tipoNormalizado]) return iconMap[tipoNormalizado];
       if (tipo.includes('Velocidade')) return iconMap['Controlador Eletrônico de Velocidade'];
       if (tipo.includes('Semáforo')) return iconMap['Detector de Avanço de Semáforo'];
       if (tipo.includes('Conversão') || tipo.includes('Retorno')) return iconMap['Detector de Conversão/Retorno em local Proibido'];
       if (tipo.includes('Invasão')) return iconMap['Detector de Invasão de Faixa de Exclusiva - MOVE'];
       if (tipo.includes('Celular')) return iconMap['Detector de Uso de Celular'];
-      if (tipo.includes('Redução')) return iconMap['Detector de Redução de Velocidade'];
       if (tipo.includes('OCR')) return iconMap['Leitor Inteligente de Placas (OCR-P)'];
       if (tipo.includes('Facial')) return iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
       if (tipo.includes('Misto') || tipo.includes('CEM')) return iconMap['Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)'];
@@ -500,57 +484,42 @@
     }
 
     function showNotification(message) {
-      const $toast = $("#toast-msg");
-      $toast.text(message).addClass("show");
+      const $toast = $("#toast-msg"); $toast.text(message).addClass("show");
       setTimeout(() => { $toast.removeClass("show"); }, 3000);
     }
 
     function injetarRadaresIA() {
-      const radaresOcultosBH = [
+      return [
         { lat: -19.91894, lng: -43.93866, end: "Praça Sete (Obelisco)", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
         { lat: -19.91900, lng: -43.93860, end: "Praça Sete (Cruzamento)", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
-        { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.9190, lng: -43.9370, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "40" },
-        { lat: -19.91880, lng: -43.93870, end: "Av. Afonso Pena em frente ao Cine Theatro Brasil", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
-        { lat: -19.9375, lng: -43.9360, end: "Av. do Contorno, Próx. ao Mercado Central", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.9405, lng: -43.9345, end: "Av. do Contorno, Próx. à Rodoviária", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.9335, lng: -43.9420, end: "R da Bahia, Próx. à Savassi", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "40" },
-        { lat: -19.9355, lng: -43.9280, end: "Av. Getúlio Vargas, Centro", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.9160, lng: -43.9350, end: "Av. Augusto de Lima, Próx. à Praça da Liberdade", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "40" },
-        { lat: -19.9430, lng: -43.9500, end: "Av. Olegário Maciel, Próx. ao Santa Efigênia", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" }
-      ];
-      return radaresOcultosBH.map(r => [null, null, r.end, r.tipo, r.vel, null, null, null, null, `${r.lat},${r.lng}`]);
+        { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" }
+      ].map(r => [null, null, r.end, r.tipo, r.vel, null, null, null, null, `${r.lat},${r.lng}`]);
     }
 
     function hideFullscreenLoading() {
       const el = document.getElementById('loading-fullscreen');
-      if (!el) return;
-      el.classList.add('fade-out');
-      setTimeout(() => { el.remove(); }, 600);
+      if (el) { el.classList.add('fade-out'); setTimeout(() => el.remove(), 600); }
     }
 
     function calcularDistancia(lat1, lon1, lat2, lon2) {
       const R = 6371e3; const p1 = lat1 * Math.PI / 180; const p2 = lat2 * Math.PI / 180;
       const dp = (lat2 - lat1) * Math.PI / 180; const dl = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dp / 2) * Math.sin(dp / 2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) * Math.sin(dl / 2);
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)); 
+      const a = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
     }
 
     function aplicarTemaMapa() {
       const hora = new Date().getHours();
-      const urlDia = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-      const urlNoite = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-      const urlAtual = (hora >= 19 || hora < 6) ? urlNoite : urlDia;
-      if (tileLayer) { tileLayer.setUrl(urlAtual); } 
-      else { tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map); }
+      const urlAtual = (hora >= 19 || hora < 6) ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      if (tileLayer) tileLayer.setUrl(urlAtual); 
+      else tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
     }
 
     async function buscarCoordenadas(endereco) {
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&countrycodes=br&limit=1`;
-        const response = await fetch(url); const data = await response.json();
-        return (data && data.length > 0) ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) } : null;
-      } catch (error) { return null; }
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&countrycodes=br&limit=1`);
+        const d = await r.json(); return (d && d.length > 0) ? { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) } : null;
+      } catch (e) { return null; }
     }
 
     function calcularRota(destLat, destLng) {
@@ -559,15 +528,15 @@
         waypoints: [ L.latLng(userLat, userLng), L.latLng(destLat, destLng) ],
         routeWhileDragging: false, addWaypoints: false, language: 'pt-BR', show: false,
         lineOptions: { styles: [{ color: '#0044cc', opacity: 0.8, weight: 7 }, { color: '#33aaff', opacity: 1, weight: 4 }] },
-        createMarker: function() { return null; }
+        createMarker: () => null
       }).addTo(map);
     }
 
     /* ==========================================================================
-       CONVERSOR EXATO OFICIAL PBH (UTM FUSO 23K SAD69 -> WGS84)
+       CONVERSÃO EXATA SIRGAS 2000 (O padrão atual usado pela PBH em 2024/2026)
        ========================================================================== */
-    function converterUTMparaWGS84(xLeste, yNorte) {
-      const a = 6378160.0; const f = 1 / 298.25; const k0 = 0.9996;
+    function converterSIRGAS2000paraWGS84(xLeste, yNorte) {
+      const a = 6378137.0; const f = 1 / 298.257222101; const k0 = 0.9996;
       const N0 = 10000000.0; const E0 = 500000.0;
       const e2 = 2*f - f*f; const ep2 = e2 / (1 - e2);
       const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
@@ -585,23 +554,67 @@
       let lat = phi1 - (N1 * Math.tan(phi1) / R1) * (D*D/2 - (5+3*T1+10*C1-4*C1*C1-9*ep2)*Math.pow(D,4)/24 + (61+90*T1+298*C1+45*T1*T1-252*ep2-3*C1*C1)*Math.pow(D,6)/720);
       let lng = (D - (1+2*T1+C1)*Math.pow(D,3)/6 + (5-2*C1+28*T1-3*C1*C1+8*ep2+24*T1*T1)*Math.pow(D,5)/120) / Math.cos(phi1);
       
-      lng = (lng * 180 / Math.PI) - 51; // Fuso 23 Central
+      lng = (lng * 180 / Math.PI) - 51; // Fuso 23
       lat = lat * 180 / Math.PI;
 
       return { lat: Math.round(lat * 1000000) / 1000000, lng: Math.round(lng * 1000000) / 1000000 };
     }
 
+    /* ==========================================================================
+       DETETIVE DE COORDENADAS (Resolve o problema dos ícones sumidos)
+       Ele vasculha a linha inteira do JSON até achar um par de coordenadas válido.
+       ========================================================================== */
+    function extrairCoordenadas(record) {
+        let coordenadasEncontradas = null;
+
+        // 1. Tenta achar no campo 9
+        if (record[9]) {
+            const parts = String(record[9]).replace(/\s+/g, '').split(',').map(Number);
+            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                coordenadasEncontradas = parts;
+            }
+        }
+
+        // 2. Se não achou, vasculha o array inteiro (resolve o problema de campos vazios)
+        if (!coordenadasEncontradas) {
+            for (let i = 0; i < record.length; i++) {
+                if (!record[i] || String(record[i]).length > 30) continue; // Ignora textos longos como endereços
+                const parts = String(record[i]).replace(/\s+/g, '').split(',').map(Number);
+                if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                    coordenadasEncontradas = parts;
+                    break;
+                }
+            }
+        }
+
+        if (!coordenadasEncontradas) return null; // Se não tem nº nenhum, ignora (ícone não aparece)
+
+        let v1 = coordenadasEncontradas[0];
+        let v2 = coordenadasEncontradas[1];
+
+        // 3. Se for UTM (números grandes em metros, ex: 611400)
+        if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) {
+            return converterSIRGAS2000paraWGS84(v1, v2);
+        }
+
+        // 4. Se for Lat/Lng (números pequenos, ex: -19.91), garante a ordem correta
+        let lat = v1, lng = v2;
+        if (lat < -30 && lat > -60 && lng < -14 && lng > -25) {
+            lat = v2; lng = v1; // Inverte se vier -43, -19
+        }
+
+        return { lat, lng };
+    }
+
     function initMap() {
       map = L.map('map', { center: [userLat, userLng], zoom: 16, zoomControl: false });
-      aplicarTemaMapa();
-      setInterval(aplicarTemaMapa, 300000);
+      aplicarTemaMapa(); setInterval(aplicarTemaMapa, 300000);
 
       $("#btn-search-radar").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
-
       $("#btn-calc-route").click(async () => {
         const endereco = $("#route-query").val().trim();
-        if (endereco.length < 5) { showNotification("Digite um endereço mais completo."); return; }
+        if (endereco.length < 5) { showNotification("Digite um endereço."); return; }
         $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
         const coords = await buscarCoordenadas(endereco);
         if (coords) { calcularRota(coords.lat, coords.lng); map.setView([coords.lat, coords.lng], 16); $("#loading").hide(); } 
@@ -613,13 +626,14 @@
       $("#btn-search-bar").click(() => { if (searchActive) { fecharTodasBarras(); return; } if (routeActive) routeActive = false; searchActive = true; $("#search-bar-radares").addClass('active'); setTimeout(() => $("#query").focus(), 300); });
       $("#btn-route-bar").click(() => { if (routeActive) { fecharTodasBarras(); return; } if (searchActive) searchActive = false; routeActive = true; $("#search-bar-rota").addClass('active'); setTimeout(() => $("#route-query").focus(), 300); });
       $("#btn-center").click(() => { fecharTodasBarras(); if (userMarker) map.setView(userMarker.getLatLng(), map.getZoom()); });
-      map.on('click', () => { fecharTodasBarras(); });
+      map.on('click', fecharTodasBarras);
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => carregarRadares());
 
-      if (navigator.geolocation) { navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 }); } 
+      if (navigator.geolocation) navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 });
       else { hideFullscreenLoading(); showNotification("GPS não suportado."); }
+      
       carregarRadares();
     }
 
@@ -627,9 +641,9 @@
       const newLat = position.coords.latitude; const newLng = position.coords.longitude;
       let speedKmh = 0; const currentTime = Date.now();
       if (prevLat !== null && prevTime !== null) {
-        const distanceMeters = calcularDistancia(prevLat, prevLng, newLat, newLng);
-        const timeSeconds = (currentTime - prevTime) / 1000;
-        if (timeSeconds > 0) speedKmh = Math.round((distanceMeters / timeSeconds) * 3.6); 
+        const dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
+        const time = (currentTime - prevTime) / 1000;
+        if (time > 0) speedKmh = Math.round((dist / time) * 3.6); 
       }
       if (speedKmh > 250) speedKmh = 0;
       $("#speed-display").text(speedKmh);
@@ -640,123 +654,45 @@
         userMarker = L.marker([newLat, newLng], { icon: userIcon }).addTo(map);
         userMarker.bindTooltip("Você", { permanent: true, direction: "top", offset: [0, -30] });
         map.setView([newLat, newLng], 16); 
-      } else { userMarker.setLatLng([newLat, newLng]); }
+      } else userMarker.setLatLng([newLat, newLng]);
+      
       verificarProximidade(userLat, userLng);
     }
    
     /* ====================================================================
-       FUNÇÃO CARREGAR RADARES (DETECTOR AUTOMÁTICO DE FORMATO + SNAP EXATO)
+       CARREGAMENTO ULTRA RÁPIDO E A PROVA DE FOGO
        ==================================================================== */
     function carregarRadares() {
       fetch("radares.json")
-        .then(response => { if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`); return response.json(); })
-        .then(async data => {
+        .then(response => { if (!response.ok) throw new Error(response.status); return response.json(); })
+        .then(data => {
           radarMarkers.forEach(marker => map.removeLayer(marker));
           radarMarkers = [];
 
-          let records = data.records || [];
-          const radaresIA = injetarRadaresIA();
-          const todosOsRadares = [...records, ...radaresIA];
-          
-          // Carrega as ruas do OSM (limitado a área visível para não travar)
-          let ruasLocais = [];
-          try {
-             const bounds = map.getBounds();
-             const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
-             // Puxa apenas rodovias e vias principais para ser mais rápido
-             const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];way["highway"~"primary|secondary|tertiary|trunk|motorway"](${bbox});out geom;`;
-             const osmResponse = await fetch(overpassUrl);
-             const osmData = await osmResponse.json();
-             if (osmData.elements) {
-                 ruasLocais = osmData.elements.map(rua => rua.geometry ? rua.geometry.map(p => [p.lat, p.lon]) : null).filter(Boolean);
-             }
-          } catch (e) { console.warn("Sem conexão extra com OSM."); }
+          const records = data.records || [];
+          const todosOsRadares = [...records, ...injetarRadaresIA()];
 
           for (let i = 0; i < todosOsRadares.length; i++) {
             const record = todosOsRadares[i];
             const endereco = record[2] || "Endereço não informado";
-            let tipo = record[3] || "Não Identificado";
+            let tipo = (record[3] || "Não Identificado").trim();
             const velocidade = record[4] || "0";
-            const geometryStr = record[9] || "";
-            tipo = tipo.trim();
+
+            // CHAMA O DETETIVE DE COORDENADAS
+            const coordsFinais = extrairCoordenadas(record);
             
-            const rawCoords = geometryStr.replace(/\s+/g, '').split(',').map(Number);
-            if (rawCoords.length !== 2 || isNaN(rawCoords[0]) || isNaN(rawCoords[1])) continue; 
-
-            let wgsLat, wgsLng;
-            const val1 = Math.abs(rawCoords[0]);
-            const val2 = Math.abs(rawCoords[1]);
-
-            /* ====================================================================
-               DETECTOR INTELIGENTE: UTM (METROS) vs WGS84 (GRAUS)
-               Se os números forem maiores que 1000, é UTM Fuso 23K da PBH.
-               Se forem menores (tipo -19.91), já é WGS84 direto.
-               ==================================================================== */
-            if (val1 > 1000 || val2 > 1000) {
-                const coordsConvertidas = converterUTMparaWGS84(rawCoords[0], rawCoords[1]);
-                wgsLat = coordsConvertidas.lat;
-                wgsLng = coordsConvertidas.lng;
-            } else {
-                wgsLat = rawCoords[0]; // Já é Latitude
-                wgsLng = rawCoords[1]; // Já é Longitude
-            }
-
-            let finalLat = wgsLat;
-            let finalLng = wgsLng;
-
-            /* ====================================================================
-               SNAPPING GEOMÉTRICO (Puxa o ponto para cima da linha da rua)
-               ==================================================================== */
-            let menorDistancia = Infinity;
-            let melhorPontoNaRua = null;
-
-            if (ruasLocais.length > 0) {
-                const metrosPorGrauLat = 111320;
-                const metrosPorGrauLng = 111320 * Math.cos(wgsLat * Math.PI / 180);
-
-                for (let r = 0; r < ruasLocais.length; r++) {
-                    const pontosRua = ruasLocais[r];
-                    if (pontosRua.length < 2) continue;
-
-                    for (let p = 0; p < pontosRua.length - 1; p++) {
-                        const A = pontosRua[p]; const B = pontosRua[p + 1];
-                        const vRx = B[1] - A[1]; const vRy = B[0] - A[0];
-                        const comp2 = (vRx * vRx) + (vRy * vRy);
-                        if (comp2 === 0) continue;
-
-                        const vPx = wgsLng - A[1]; const vPy = wgsLat - A[0];
-                        let t = ((vPx * vRx) + (vPy * vRy)) / comp2;
-                        t = Math.max(0, Math.min(1, t));
-
-                        const projLat = A[0] + (t * vRy);
-                        const projLng = A[1] + (t * vRx);
-
-                        const dLatMetros = (wgsLat - projLat) * metrosPorGrauLat;
-                        const dLngMetros = (wgsLng - projLng) * metrosPorGrauLng;
-                        const distanciaMetros = Math.sqrt((dLatMetros * dLatMetros) + (dLngMetros * dLngMetros));
-
-                        if (distanciaMetros < menorDistancia) {
-                            menorDistancia = distanciaMetros;
-                            melhorPontoNaRua = { lat: projLat, lng: projLng };
-                        }
-                    }
-                }
-                // Se a rua mais próxima estiver a menos de 40m, gruda o ícone nela
-                if (melhorPontoNaRua && menorDistancia < 40) {
-                    finalLat = melhorPontoNaRua.lat;
-                    finalLng = melhorPontoNaRua.lng;
-                }
-            }
+            // Se o detetive não achar coordenada nenhuma, ele pula o radar (evita sumir o mapa todo)
+            if (!coordsFinais) continue; 
 
             const iconeRadar = L.icon({ iconUrl: getIconUrl(tipo), iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
-            const radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
+            const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
+            
             const tipoExibicao = ajusteNomes[tipo] || tipo;
-            const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)') || tipoExibicao.includes('Leitor Inteligente');
-            
+            const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)');
             const tituloPopup = isIA ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` : `<b>${tipoExibicao}</b>`;
-            radarMarker.bindPopup(`<div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">${tituloPopup}<br>${endereco}<br><span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span></div>`);
             
-            radarMarker.radarData = { latitude: finalLat, longitude: finalLng, endereco: endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA };
+            radarMarker.bindPopup(`<div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">${tituloPopup}<br>${endereco}<br><span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span></div>`);
+            radarMarker.radarData = { latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao, isIA };
             radarMarkers.push(radarMarker);
           }
 
@@ -765,9 +701,9 @@
           $("#loading").hide();
         })
         .catch(error => {
-          console.error("Erro ao carregar radares:", error);
+          console.error("Erro JSON:", error);
           hideFullscreenLoading();
-          showNotification("Falha ao conectar com o banco de radares.");
+          showNotification("Erro ao ler a base de radares.");
         });
     }
     
@@ -784,30 +720,28 @@
           $("#alert-title").text(dados.isIA ? "⚠️ Câmera Inteligente Detectada!" : "Atenção! Radar Detectado");
           const sound = document.getElementById("alert-soud"); sound.currentTime = 0; sound.play().catch(e => {});
           $("#alert-container").fadeIn(200); clearTimeout(alertTimeout);
-          alertTimeout = setTimeout(() => { $("#alert-container").fadeOut(500); }, 5000);
+          alertTimeout = setTimeout(() => $("#alert-container").fadeOut(500), 5000);
         }
       });
     }
 
     function buscarRadares(query) {
       if (!query || query.length < 2) return;
-      let encontrou = false; const boundsGroup = L.featureGroup(); const queryLower = query.toLowerCase();
+      let encontrou = false; const boundsGroup = L.featureGroup(); const q = query.toLowerCase();
       radarMarkers.forEach(marker => {
-        const dados = marker.radarData;
-        if (`${dados.endereco} ${dados.tipoOriginal} ${dados.tipoExibicao} ia ocr facial`.toLowerCase().includes(queryLower)) {
+        const d = marker.radarData;
+        if (`${d.endereco} ${d.tipoOriginal} ${d.tipoExibicao}`.toLowerCase().includes(q)) {
           encontrou = true; boundsGroup.addLayer(marker); marker.openPopup(); 
         }
       });
-      if (encontrou) { map.fitBounds(boundsGroup.getBounds().pad(0.5)); } else { showNotification("Nenhum radar encontrado."); }
+      if (encontrou) map.fitBounds(boundsGroup.getBounds().pad(0.5)); 
+      else showNotification("Nenhum radar encontrado.");
     }
 
-    function showError(error) { console.warn(`Erro de GPS: ${error.message}`); hideFullscreenLoading(); showNotification("Ative seu GPS para usar o app."); }
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').then(() => console.log('SW OK')).catch(err => console.log('SW Fail', err)); });
-    }
-    
+    function showError(error) { hideFullscreenLoading(); showNotification("Ative seu GPS."); }
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
     window.onload = initMap;
   </script>
+
 </body>
 </html>
