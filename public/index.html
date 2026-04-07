@@ -488,20 +488,19 @@
       setTimeout(() => { $toast.removeClass("show"); }, 3000);
     }
 
-    function injetarRadaresIA() {
-      return [
-        { lat: -19.91894, lng: -43.93866, end: "Praça Sete (Obelisco)", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.91900, lng: -43.93860, end: "Praça Sete (Cruzamento)", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
-        { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.931347, lng: -43.985536, end: "Rua Conde Pereira Carneiro, sentido Gameleira/Centro, Esquina Av. Amazonas", tipo: "Detector de Uso de Celular (DUC)", vel:"60"},
-        { lat: -19.871740, lng: -43.955001, end: "Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos , São Francisco/ Centro", tipo: "Detector de Uso de Celular (DUC)", vel:"60"},
-        { lat: -19.835851 , lng: -43.907504, end: "Rod. Camilo Teixeira da Costa, 210 – Tupi/Centro", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60"},
-        { lat:  -19.835947, lng: -43.907236, end: "Rod. Camilo Teixeira da Costa, 210 – Centro/Tupi", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60"}
+function injetarRadaresIA() {
+  return [
+    { lat: -19.91894, lng: -43.93866, end: "Praça Sete (Obelisco)", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+    { lat: -19.91900, lng: -43.93860, end: "Praça Sete (Cruzamento)", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
+    { lat: -19.9255, lng: -43.9390, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+    { lat: -19.931347, lng: -43.985536, end: "Rua Conde Pereira Carneiro, sentido Gameleira/Centro, Esquina Av. Amazonas", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
+    { lat: -19.871740, lng: -43.955001, end: "Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos, São Francisco/Centro", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
+    { lat: -19.835851, lng: -43.907504, end: "Rod. Camilo Teixeira da Costa, 210 – Tupi/Centro", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" },
+    { lat: -19.835947, lng: -43.907236, end: "Rod. Camilo Teixeira da Costa, 210 – Centro/Tupi", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" }
+  ].map(r => [ null,  null, r.end,  r.tipo, r.vel, null, null, null, null,  `${r.lat},${r.lng}`
+  ]);
+}
 
-
-      
-      ].map(r => [null, null, r.end, r.tipo, r.vel, null, null, null, null, `${r.lat},${r.lng}`]);
-    }
 
     function hideFullscreenLoading() {
       const el = document.getElementById('loading-fullscreen');
