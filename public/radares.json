@@ -301,11 +301,11 @@
     [287,"1585","Av. Risoleta Neves, oposto ao 999","Controlador Eletrônico de Velocidade","60","Centro/Bairro","Único","5302","KBH5302","-19.908332, -43.925741"],
     [287,"1585","Av. Risoleta Neves, oposto ao 999","Controlador Eletrônico de Velocidade","60","Centro/Bairro","Único","5302","KBH5302","-19.908332, -43.925741"],
         
-    [288,"941","Rua Conde Pereira Carneiro, Esquina Av. Amazonas","Detector de Uso de Celular","60","Gameleira/ Centro","Único","SBR","-19.93130, -43.98558"],
-    [289,"942"," Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos","Detector de Uso de Celular","60","São Francisco/ Centro","Único","SBR","-19.93130, -43.98558"],
-    [290,"943"," Rod. Camilo Teixeira da Costa, 210 - Tupi ","Detector de Redução de Velocidade","60","Belo Horizonte/Tupi","Único","SBR","-19.83586, -43.90739"],
-    [291,"944"," Rod. Camilo Teixeira da Costa, 210 - Tupi","Detector de Redução de Velocidade","60","Tupi/Belo Horizonte","Único","SBR","-19.83586, -43.90739"]
-  
+    [288,"941","Rua Conde Pereira Carneiro, Esquina Av. Amazonas","Detector de Uso de Celular","60","Gameleira/ Centro","Único","SBR","-19.931347, -43.985536"],
+    [289,"942"," Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos","Detector de Uso de Celular","60","São Francisco/ Centro","Único","SBR","-19.871740, -43.955001"],
+    [290,"943"," Rod. Camilo Teixeira da Costa, 210 - Tupi ","Detector de Redução de Velocidade","60","Belo Horizonte/Tupi","Único","SBR","-19.835851, -43.907504"],
+    [291,"944"," Rod. Camilo Teixeira da Costa, 210 - Tupi","Detector de Redução de Velocidade","60","Tupi/Belo Horizonte","Único","SBR","-19.835947, -43.907236"]
+    
         
     ]
 }
