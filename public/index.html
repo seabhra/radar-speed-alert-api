@@ -422,10 +422,8 @@
     </div>
   </div>
 
-  <!-- CORREÇÃO 2: Removido o atributo "let" que foi digitado por engano no lugar de preload -->
   <audio id="alert-soud" src="alerta.mp3" preload="auto"></audio>
 
-  <!-- CORREÇÃO 4: Scripts organizados na ordem correta de dependência -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -490,15 +488,11 @@
       setTimeout(() => { $toast.removeClass("show"); }, 3000);
     }
 
-    // CORREÇÃO 1: Sintaxe do Array e do Map corrigida (Faltou fechar o parenteses do map antes do colchete)
     function injetarRadaresIA() {
       return [
         { lat: -19.919007, lng:-43.938792, end: "Av. Afonso Pena, Próx. à Praça Sete/Sentido Savassi", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        
         { lat: -19.919115, lng: -43.938580, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
-        
         { lat:-19.919191, lng:-43.938468, end: "Av. Afonso Pena, Próx. à Praça Sete/sentido Rodoviária", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        
         { lat: -19.931347, lng: -43.985536, end: "Rua Conde Pereira Carneiro, sentido Gameleira/Centro, Esquina Av. Amazonas", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
         { lat: -19.871740, lng: -43.955001, end: "Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos, São Francisco/Centro", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
         { lat: -19.835851, lng: -43.907504, end: "Rod. Camilo Teixeira da Costa, 210 – Tupi/Centro", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" },
@@ -593,13 +587,10 @@
         let v1 = coordenadasEncontradas[0];
         let v2 = coordenadasEncontradas[1];
 
-        // 3. Se for UTM (números grandes em metros, ex: 611400)
         if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) {
             return converterSIRGAS2000paraWGS84(v1, v2);
         }
 
-        // CORREÇÃO 3: Lógica de inversão de Latitude/Longitude consertada
-        // Se v1 for Longitude (valores perto de -43 em BH) e v2 for Latitude (valores perto de -19 em BH)
         if (v1 < -30 && v2 > -30) { 
             return { lat: v2, lng: v1 }; 
         }
@@ -624,13 +615,35 @@
       $("#route-query").keypress((e) => { if (e.which == 13) $("#btn-calc-route").click(); });
 
       function fecharTodasBarras() { searchActive = false; routeActive = false; $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").removeClass('active'); }
+      
       $("#btn-search-bar").click(() => { if (searchActive) { fecharTodasBarras(); return; } if (routeActive) routeActive = false; searchActive = true; $("#search-bar-radares").addClass('active'); setTimeout(() => $("#query").focus(), 300); });
       $("#btn-route-bar").click(() => { if (routeActive) { fecharTodasBarras(); return; } if (searchActive) searchActive = false; routeActive = true; $("#search-bar-rota").addClass('active'); setTimeout(() => $("#route-query").focus(), 300); });
-      $("#btn-center").click(() => { fecharTodasBarras(); if (userMarker) map.setView(userMarker.getLatLng(), map.getZoom()); });
+      
+      // CORREÇÃO 2: Botão de centralizar agora força uma requisição ativa ao GPS se o marcador ainda não existir
+      $("#btn-center").click(() => { 
+        fecharTodasBarras(); 
+        if (userMarker) { 
+          map.setView(userMarker.getLatLng(), map.getZoom()); 
+        } else if (navigator.geolocation) {
+          showNotification("Buscando sinal GPS...");
+          navigator.geolocation.getCurrentPosition(updateUserLocation, 
+            (err) => showNotification("Erro de GPS. Verifique as permissões."), 
+            { enableHighAccuracy: true, timeout: 10000 }
+          );
+        } else {
+          showNotification("GPS não disponível neste dispositivo.");
+        }
+      });
+
       map.on('click', fecharTodasBarras);
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
-      $("#btn-refresh").click(() => carregarRadares());
+      
+      // CORREÇÃO 1: Adicionado toast de feedback visual ao atualizar
+      $("#btn-refresh").click(() => {
+        showNotification("Atualizando base de radares...");
+        carregarRadares();
+      });
 
       if (navigator.geolocation) navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 });
       else { hideFullscreenLoading(); showNotification("GPS não suportado."); }
@@ -661,8 +674,12 @@
     }
    
     function carregarRadares() {
-      fetch("radares.json")
-        .then(response => { if (!response.ok) throw new Error(response.status); return response.json(); })
+      // CORREÇÃO 1 PRINCIPAL: Adicionado timestamp (?v=...) para quebrar o CACHE do navegador e do Service Worker
+      fetch("radares.json?v=" + Date.now())
+        .then(response => { 
+          if (!response.ok) throw new Error(response.status); 
+          return response.json(); 
+        })
         .then(data => {
           radarMarkers.forEach(marker => map.removeLayer(marker));
           radarMarkers = [];
@@ -699,6 +716,7 @@
         .catch(error => {
           console.error("Erro JSON:", error);
           hideFullscreenLoading();
+          $("#loading").hide();
           showNotification("Erro ao ler a base de radares.");
         });
     }
@@ -734,7 +752,12 @@
       else showNotification("Nenhum radar encontrado.");
     }
 
-    function showError(error) { hideFullscreenLoading(); showNotification("Ative seu GPS."); }
+    function showError(error) { 
+      hideFullscreenLoading(); 
+      if(error.code === 1) showNotification("Permissão de GPS negada. Ative nas configurações.");
+      else showNotification("Ative seu GPS."); 
+    }
+    
     if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
     window.onload = initMap;
   </script>
