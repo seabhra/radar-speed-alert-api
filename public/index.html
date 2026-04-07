@@ -7,7 +7,6 @@
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-  
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
   <style>
@@ -19,9 +18,7 @@
       --text-main: #ffffff;
       --text-muted: #a0a0a0;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    
     body {
       font-family: 'Inter', sans-serif;
       background-color: var(--bg-color);
@@ -31,7 +28,6 @@
       flex-direction: column;
       overflow: hidden;
     }
-
     header {
       background-color: var(--panel-color);
       padding: 15px;
@@ -42,319 +38,115 @@
       box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
       z-index: 1000;
     }
-
     .header-left { display: flex; align-items: center; gap: 10px; }
     .app-icon { width: 50px; height: 40px; border-radius: 8px; }
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
     h1 span { color: var(--accent-color); }
-
     .search-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background-color: rgba(26, 29, 36, 0.95);
-      backdrop-filter: blur(5px);
-      display: flex;
-      gap: 10px;
-      z-index: 1000;
-      max-height: 0px; 
-      overflow: hidden;
-      opacity: 0;
-      padding: 0px 15px;
+      position: absolute; top: 0; left: 0; width: 100%;
+      background-color: rgba(26, 29, 36, 0.95); backdrop-filter: blur(5px);
+      display: flex; gap: 10px; z-index: 1000;
+      max-height: 0px; overflow: hidden; opacity: 0; padding: 0px 15px;
       border-bottom: 1px solid transparent;
       transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease, border 0.3s ease;
     }
-
     .search-container.active {
-      max-height: 70px;
-      opacity: 1;
-      padding: 10px 15px;
-      border-bottom: 1px solid #333;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      max-height: 70px; opacity: 1; padding: 10px 15px;
+      border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-
     .search-container input {
-      flex: 1;
-      padding: 12px 15px;
-      border-radius: 30px;
-      border: 1px solid #333;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      font-size: 0.9rem;
-      outline: none;
+      flex: 1; padding: 12px 15px; border-radius: 30px; border: 1px solid #333;
+      background-color: var(--bg-color); color: var(--text-main); font-size: 0.9rem; outline: none;
     }
-
-    .map-wrapper {
-      position: relative;
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-
-    #map {
-      width: 100%;
-      height: 100%;
-      background-color: #bbb7b7;
-    }
-    
+    .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; }
+    #map { width: 100%; height: 100%; background-color: #bbb7b7; }
     .speed-widget {
-      position: absolute;
-      bottom: -15px; 
-      left: -25px; 
-      width: 150px; 
-      height: 150px; 
-      z-index: 500;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500;
+      display: flex; align-items: center; justify-content: center;
     }
-
-    .speed-bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-    }
-
+    .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
     .speed-value {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -60%);
-      font-size: 28px;
-      font-weight: 700;
-      font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-      color: #000;
-      line-height: 1;
-      text-align: center;
-      z-index: 2;
-      white-space: nowrap;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -1px;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
+      font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+      color: #000; line-height: 1; text-align: center; z-index: 2; white-space: nowrap;
+      font-variant-numeric: tabular-nums; letter-spacing: -1px;
     }    
-    
-    .btn-search,
-    .map-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      --btn-size: 45px;
-      --icon-scale: 0.85;
-      width: var(--btn-size);
-      height: var(--btn-size);
-      background-size: calc(var(--btn-size) * var(--icon-scale));
-      background-repeat: no-repeat;
-      background-position: center;
-      background-color: var(--bg-color);
-      border: 1px solid #333;
-      border-radius: 50%;
-      cursor: pointer;
-      transition: 0.2s;
-      flex-shrink: 0;
+    .btn-search, .map-btn {
+      display: flex; align-items: center; justify-content: center;
+      --btn-size: 45px; --icon-scale: 0.85; width: var(--btn-size); height: var(--btn-size);
+      background-size: calc(var(--btn-size) * var(--icon-scale)); background-repeat: no-repeat;
+      background-position: center; background-color: var(--bg-color); border: 1px solid #333;
+      border-radius: 50%; cursor: pointer; transition: 0.2s; flex-shrink: 0;
     }
-    .btn-search:hover,
-    .map-btn:hover {
-      border-color: var(--accent-color);
-      transform: scale(1.05);
-    }
-
+    .btn-search:hover, .map-btn:hover { border-color: var(--accent-color); transform: scale(1.05); }
     #btn-route-bar {
-      --btn-size: 50px;
-      --icon-scale: 0.95;
-      background-color: rgba(255, 165, 0, 0.9);
-      border: 2px solid rgba(255, 165, 0, 0.6);
-      box-shadow: 0 0 15px rgba(255, 165, 0, 0.3);
-      z-index: 10;
+      --btn-size: 50px; --icon-scale: 0.95;
+      background-color: rgba(255, 165, 0, 0.9); border: 2px solid rgba(255, 165, 0, 0.6);
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.3); z-index: 10;
     }
-
     .map-controls {
-      position: absolute;
-      right: 15px;
-      bottom: 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center; 
-      gap: 12px;
-      z-index: 500;
+      position: absolute; right: 15px; bottom: 40px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 500;
     }
-
-    .map-btn img,
-    .control-btn img {
-      width: calc(var(--btn-size) * var(--icon-scale));
-      height: calc(var(--btn-size) * var(--icon-scale));
-      object-fit: contain;
-      pointer-events: none;
-      transition: 0.2s;
+    .map-btn img, .control-btn img {
+      width: calc(var(--btn-size) * var(--icon-scale)); height: calc(var(--btn-size) * var(--icon-scale));
+      object-fit: contain; pointer-events: none; transition: 0.2s;
     }
-
     #btn-search-bar { background-color: rgba(76, 220, 205, 0.9); }
     #btn-center { background-color: rgba(0, 255, 136, 0.9); border: 2px solid rgba(0, 255, 136, 0.5); }
     #btn-refresh { background-color: rgba(100, 100, 255, 0.9); }
     #btn-zoom-in, #btn-zoom-out { background-color: rgba(150, 150, 150, 0.8); --icon-scale: 0.6; }
-    
     #alert-container {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-      display: none;
-      animation: slideUp 0.3s ease-out;
+      position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000;
+      display: none; animation: slideUp 0.3s ease-out;
     }
-
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     .alert-bar {
-      background-color: var(--alert-color);
-      color: white;
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
+      background-color: var(--alert-color); color: white; padding: 15px;
+      display: flex; align-items: center; gap: 15px; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
     }
-
     .alert-bar img { width: 40px; height: 40px; }
     .alert-info h3 { font-size: 1.1rem; margin-bottom: 3px; text-transform: uppercase; color: white; font-weight: 800; }
     .alert-info p { font-size: 0.85rem; opacity: 0.9; }
-
     .toast-notification {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background-color: var(--panel-color);
-      color: var(--text-main);
-      padding: 15px 25px;
-      border-radius: 30px;
-      border: 1px solid #555;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-      z-index: 2000;
-      opacity: 0;
-      font-size: 0.9rem;
-      font-weight: 600;
-      text-align: center;
-      pointer-events: none;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      white-space: nowrap;
+      position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+      background-color: var(--panel-color); color: var(--text-main); padding: 15px 25px;
+      border-radius: 30px; border: 1px solid #555; box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      z-index: 2000; opacity: 0; font-size: 0.9rem; font-weight: 600; text-align: center;
+      pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; white-space: nowrap;
     }
-
-    .toast-notification.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
+    .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .loading-overlay {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--panel-color);
-      padding: 20px 30px;
-      border-radius: 10px;
-      border: 1px solid var(--accent-color);
-      text-align: center;
-      z-index: 1001;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: var(--panel-color); padding: 20px 30px; border-radius: 10px;
+      border: 1px solid var(--accent-color); text-align: center; z-index: 1001;
     }
     .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    .leaflet-control-zoom { display: none !important; }
-    .leaflet-control-attribution { display: none !important; } 
-    .leaflet-routing-container { display: none !important; }
-
+    .leaflet-control-zoom, .leaflet-control-attribution, .leaflet-routing-container { display: none !important; }
     .loading-fullscreen {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      background-color: var(--bg-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      position: fixed; inset: 0; width: 100%; height: 100%; background-color: var(--bg-color);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease;
     }
-
-    .loading-fullscreen.fade-out {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    .loading-fullscreen .spinner-ring {
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      position: relative;
-      margin-bottom: 24px;
-    }
-
-    .loading-fullscreen .spinner-ring::before,
-    .loading-fullscreen .spinner-ring::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-      border: 4px solid transparent;
-    }
-
-    .loading-fullscreen .spinner-ring::before {
-      border-top-color: var(--accent-color);
-      border-right-color: var(--accent-color);
-      animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
-    }
-
-    .loading-fullscreen .spinner-ring::after {
-      inset: 8px;
-      border-bottom-color: #ff3333;
-      border-left-color: #ff3333;
-      animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse;
-    }
-
-    @keyframes spinRing {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .loading-fullscreen .loading-text {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      text-align: center;
-      padding: 0 20px;
-    }
-
-    .loading-fullscreen .loading-text span {
-      color: var(--accent-color);
-      font-weight: 800;
-    }
-
-    .loading-fullscreen .loading-sub {
-      margin-top: 8px;
-      font-size: 0.75rem;
-      color: #555;
-      animation: pulseText 1.8s ease-in-out infinite;
-    }
-
-    @keyframes pulseText {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 1; }
-    }
+    .loading-fullscreen.fade-out { opacity: 0; visibility: hidden; }
+    .loading-fullscreen .spinner-ring { width: 70px; height: 70px; border-radius: 50%; position: relative; margin-bottom: 24px; }
+    .loading-fullscreen .spinner-ring::before, .loading-fullscreen .spinner-ring::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent; }
+    .loading-fullscreen .spinner-ring::before { border-top-color: var(--accent-color); border-right-color: var(--accent-color); animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite; }
+    .loading-fullscreen .spinner-ring::after { inset: 8px; border-bottom-color: #ff3333; border-left-color: #ff3333; animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse; }
+    @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-fullscreen .loading-text { font-size: 1rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; text-align: center; padding: 0 20px; }
+    .loading-fullscreen .loading-text span { color: var(--accent-color); font-weight: 800; }
+    .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.75rem; color: #555; animation: pulseText 1.8s ease-in-out infinite; }
+    @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
   </style>
 </head>
 <body>
 
   <div class="loading-fullscreen" id="loading-fullscreen">
     <div class="spinner-ring"></div>
-    <div class="loading-text">Carregando <span>radares & IA</span> do mapa</div>
-    <div class="loading-sub">Mapeamento avançado em andamento...</div>
+    <div class="loading-text">Conectando à <span>API da PBH</span></div>
+    <div class="loading-sub">Buscando dados oficiais de fiscalização...</div>
   </div>
 
   <header>
@@ -365,19 +157,16 @@
   </header>
 
   <div class="map-wrapper">
-    
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar ou IA (tipo ou endereço)...">
       <button class="btn-search" id="btn-search-radar" title="Buscar Radares" style="background-image: url('/imagens_app/ic_radar_busca.png');"></button>
     </div>
-
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Insira endereço de uma rota...">
       <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-image: url('/imagens_app/ic_gps_busca.png');"></button>
     </div>
 
     <div id="map"></div>
-
     <div class="toast-notification" id="toast-msg"></div>
 
     <div class="speed-widget">
@@ -386,24 +175,12 @@
     </div>
 
     <div class="map-controls">
-      <button class="map-btn" id="btn-search-bar" title="Ativa e Focar Barra de Busca">
-        <img src="/imagens_app/ic_radar_busca.png" alt="busca">
-      </button>
-      <button class="map-btn" id="btn-route-bar" title="Ativa e Focar Barra de Rota">
-        <img src="/imagens_app/ic_gps_busca.png" alt="Rota">
-      </button>
-      <button class="map-btn" id="btn-center" title="Minha Localização">
-        <img src="/imagens_app/ic_location_button.png" alt="Centro">
-      </button>
-      <button class="map-btn" id="btn-refresh" title="Atualizar Radares">
-        <img src="/imagens_app/ic_refresh_button.png" alt="Refresh">
-      </button>
-      <button class="map-btn" id="btn-zoom-in" title="Zoom In">
-        <img src="/imagens_app/ic_zoom_in.png" alt="Zoom In">
-      </button>
-      <button class="map-btn" id="btn-zoom-out" title="Zoom Out">
-        <img src="/imagens_app/ic_zoom_out.png" alt="Zoom Out">
-      </button>
+      <button class="map-btn" id="btn-search-bar" title="Ativa e Focar Barra de Busca"><img src="/imagens_app/ic_radar_busca.png" alt="busca"></button>
+      <button class="map-btn" id="btn-route-bar" title="Ativa e Focar Barra de Rota"><img src="/imagens_app/ic_gps_busca.png" alt="Rota"></button>
+      <button class="map-btn" id="btn-center" title="Minha Localização"><img src="/imagens_app/ic_location_button.png" alt="Centro"></button>
+      <button class="map-btn" id="btn-refresh" title="Atualizar Radares"><img src="/imagens_app/ic_refresh_button.png" alt="Refresh"></button>
+      <button class="map-btn" id="btn-zoom-in" title="Zoom In"><img src="/imagens_app/ic_zoom_in.png" alt="Zoom In"></button>
+      <button class="map-btn" id="btn-zoom-out" title="Zoom Out"><img src="/imagens_app/ic_zoom_out.png" alt="Zoom Out"></button>
     </div>
 
     <div id="alert-container">
@@ -418,7 +195,7 @@
 
     <div class="loading-overlay" id="loading" style="display:none;">
       <div class="loading-spinner"></div>
-      <div>Carregando Radares...</div>
+      <div>Buscando dados na PBH...</div>
     </div>
   </div>
 
@@ -429,21 +206,13 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <script>
-    let map;
-    let userMarker;
-    let radarMarkers = [];
-    let alertTimeout;
-    
-    let userLat = -19.91894; 
-    let userLng = -43.93866;
-    let tileLayer;
-    let routingControl = null;
-    let searchActive = false; 
-    let routeActive = false; 
-    let prevLat = null;
-    let prevLng = null;
-    let prevTime = null;
+    let map, userMarker, radarMarkers = [], alertTimeout;
+    let userLat = -19.91894, userLng = -43.93866, tileLayer, routingControl = null;
+    let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
 
+    // URL BASE OFICIAL DA API DE DADOS ABERTOS DA PBH
+    const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
+    
     const iconMap = {
       'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
       'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
@@ -541,60 +310,39 @@
       const N0 = 10000000.0; const E0 = 500000.0;
       const e2 = 2*f - f*f; const ep2 = e2 / (1 - e2);
       const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
-
       const M = yNorte - N0;
       const mu = M / (a * (1 - e2/4 - 3*e2*e2/64 - 5*e2*e2*e2/256));
       const phi1 = mu + (3*e1/2 - 27*e1*e1*e1/32) * Math.sin(2*mu) + (21*e1*e1/16 - 55*e1*e1*e1*e1/32) * Math.sin(4*mu) + (151*e1*e1*e1/96) * Math.sin(6*mu);
-
       const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1) * Math.sin(phi1));
       const T1 = Math.tan(phi1) * Math.tan(phi1);
       const C1 = ep2 * Math.cos(phi1) * Math.cos(phi1);
       const R1 = a * (1 - e2) / Math.pow(1 - e2 * Math.sin(phi1) * Math.sin(phi1), 1.5);
       const D = (xLeste - E0) / (N1 * k0);
-
       let lat = phi1 - (N1 * Math.tan(phi1) / R1) * (D*D/2 - (5+3*T1+10*C1-4*C1*C1-9*ep2)*Math.pow(D,4)/24 + (61+90*T1+298*C1+45*T1*T1-252*ep2-3*C1*C1)*Math.pow(D,6)/720);
       let lng = (D - (1+2*T1+C1)*Math.pow(D,3)/6 + (5-2*C1+28*T1-3*C1*C1+8*ep2+24*T1*T1)*Math.pow(D,5)/120) / Math.cos(phi1);
-      
       lng = (lng * 180 / Math.PI) - 51; 
       lat = lat * 180 / Math.PI;
-
       return { lat: Math.round(lat * 1000000) / 1000000, lng: Math.round(lng * 1000000) / 1000000 };
     }
 
     function extrairCoordenadas(record) {
         let coordenadasEncontradas = null;
-
         if (record[9]) {
             const parts = String(record[9]).replace(/\s+/g, '').split(',').map(Number);
-            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-                coordenadasEncontradas = parts;
-            }
+            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) coordenadasEncontradas = parts;
         }
-
         if (!coordenadasEncontradas) {
             for (let i = 0; i < record.length; i++) {
                 if (!record[i] || String(record[i]).length > 30) continue; 
                 const parts = String(record[i]).replace(/\s+/g, '').split(',').map(Number);
-                if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-                    coordenadasEncontradas = parts;
-                    break;
-                }
+                if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { coordenadasEncontradas = parts; break; }
             }
         }
-
         if (!coordenadasEncontradas) return null; 
-
         let v1 = coordenadasEncontradas[0];
         let v2 = coordenadasEncontradas[1];
-
-        if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) {
-            return converterSIRGAS2000paraWGS84(v1, v2);
-        }
-
-        if (v1 < -30 && v2 > -30) { 
-            return { lat: v2, lng: v1 }; 
-        }
-
+        if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) return converterSIRGAS2000paraWGS84(v1, v2);
+        if (v1 < -30 && v2 > -30) return { lat: v2, lng: v1 }; 
         return { lat: v1, lng: v2 };
     }
 
@@ -615,35 +363,21 @@
       $("#route-query").keypress((e) => { if (e.which == 13) $("#btn-calc-route").click(); });
 
       function fecharTodasBarras() { searchActive = false; routeActive = false; $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").removeClass('active'); }
-      
       $("#btn-search-bar").click(() => { if (searchActive) { fecharTodasBarras(); return; } if (routeActive) routeActive = false; searchActive = true; $("#search-bar-radares").addClass('active'); setTimeout(() => $("#query").focus(), 300); });
       $("#btn-route-bar").click(() => { if (routeActive) { fecharTodasBarras(); return; } if (searchActive) searchActive = false; routeActive = true; $("#search-bar-rota").addClass('active'); setTimeout(() => $("#route-query").focus(), 300); });
-      
-      // CORREÇÃO 2: Botão de centralizar agora força uma requisição ativa ao GPS se o marcador ainda não existir
       $("#btn-center").click(() => { 
         fecharTodasBarras(); 
-        if (userMarker) { 
-          map.setView(userMarker.getLatLng(), map.getZoom()); 
-        } else if (navigator.geolocation) {
+        if (userMarker) map.setView(userMarker.getLatLng(), map.getZoom()); 
+        else if (navigator.geolocation) {
           showNotification("Buscando sinal GPS...");
-          navigator.geolocation.getCurrentPosition(updateUserLocation, 
-            (err) => showNotification("Erro de GPS. Verifique as permissões."), 
-            { enableHighAccuracy: true, timeout: 10000 }
-          );
-        } else {
-          showNotification("GPS não disponível neste dispositivo.");
+          navigator.geolocation.getCurrentPosition(updateUserLocation, (err) => showNotification("Erro de GPS."), { enableHighAccuracy: true, timeout: 10000 });
         }
       });
 
       map.on('click', fecharTodasBarras);
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
-      
-      // CORREÇÃO 1: Adicionado toast de feedback visual ao atualizar
-      $("#btn-refresh").click(() => {
-        showNotification("Atualizando base de radares...");
-        carregarRadares();
-      });
+      $("#btn-refresh").click(() => { showNotification("Sincronizando com PBH..."); carregarRadares(); });
 
       if (navigator.geolocation) navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 });
       else { hideFullscreenLoading(); showNotification("GPS não suportado."); }
@@ -669,56 +403,145 @@
         userMarker.bindTooltip("Você", { permanent: true, direction: "top", offset: [0, -30] });
         map.setView([newLat, newLng], 16); 
       } else userMarker.setLatLng([newLat, newLng]);
-      
       verificarProximidade(userLat, userLng);
     }
    
-    function carregarRadares() {
-      // CORREÇÃO 1 PRINCIPAL: Adicionado timestamp (?v=...) para quebrar o CACHE do navegador e do Service Worker
-      fetch("radares.json?v=" + Date.now())
-        .then(response => { 
-          if (!response.ok) throw new Error(response.status); 
-          return response.json(); 
-        })
-        .then(data => {
-          radarMarkers.forEach(marker => map.removeLayer(marker));
-          radarMarkers = [];
+    /* ====================================================================
+       SISTEMA HÍBRIDO: Tenta API Oficial da PBH, cai para o JSON Local
+       ==================================================================== */
+    async function carregarRadares() {
+      $("#loading").show().html("<div class='loading-spinner'></div><div>Consultando API PBH...</div>");
+      
+      try {
+        // 1. Pega os metadados do dataset para encontrar o link do CSV mais recente
+        const metaResponse = await fetch(`${API_PBH_BASE}package_show?id=fiscalizacao-eletronica`);
+        const metaData = await metaResponse.json();
+        
+        if (!metaData.success || !metaData.result.resources) throw new Error("Estrutura da API inválida");
 
-          const records = data.records || [];
-          const todosOsRadares = [...records, ...injetarRadaresIA()];
+        // 2. Procura o recurso que seja um CSV (geralmente o mais atualizado)
+        const csvResource = metaData.result.resources.find(r => r.format.toLowerCase() === 'csv');
+        
+        if (!csvResource || !csvResource.url) throw new Error("CSV não encontrado nos dados da PBH");
 
-          for (let i = 0; i < todosOsRadares.length; i++) {
-            const record = todosOsRadares[i];
-            const endereco = record[2] || "Endereço não informado";
-            let tipo = (record[3] || "Não Identificado").trim();
-            const velocidade = record[4] || "0";
+        // 3. Faz o download do CSV
+        showNotification("Baixando base oficial...");
+        const csvResponse = await fetch(csvResource.url);
+        const csvText = await csvResponse.text();
 
-            const coordsFinais = extrairCoordenadas(record);
-            
-            if (!coordsFinais) continue; 
+        // 4. Transforma o CSV da PBH no formato de Array que seu código já entende
+        const recordsFromAPI = parseCSVtoRecords(csvText);
+        
+        // 5. Se conseguiu extrair dados, renderiza
+        if (recordsFromAPI.length > 0) {
+            renderizarRadaresNoMapa(recordsFromAPI, "API Oficial PBH");
+            return;
+        } else {
+            throw new Error("CSV baixado, mas falhou ao ler as linhas.");
+        }
 
-            const iconeRadar = L.icon({ iconUrl: getIconUrl(tipo), iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
-            const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
-            
-            const tipoExibicao = ajusteNomes[tipo] || tipo;
-            const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)');
-            const tituloPopup = isIA ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` : `<b>${tipoExibicao}</b>`;
-            
-            radarMarker.bindPopup(`<div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">${tituloPopup}<br>${endereco}<br><span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span></div>`);
-            radarMarker.radarData = { latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao, isIA };
-            radarMarkers.push(radarMarker);
+      } catch (error) {
+        console.warn("Falha na API da PBH, usando JSON local. Erro:", error);
+        // FALLBACK: Se a API falhar (timeout, CORS, ou site fora do ar), usa o JSON local
+        try {
+            const response = await fetch(`radares.json?v=${Date.now()}`);
+            const data = await response.json();
+            const records = data.records || [];
+            renderizarRadaresNoMapa(records, "JSON Local (Offline)");
+        } catch (e) {
+            console.error("Erro crítico:", e);
+            hideFullscreenLoading();
+            $("#loading").hide();
+            showNotification("Sem conexão com PBH ou JSON local ausente.");
+        }
+      }
+    }
+
+    /* ====================================================================
+       CONVERSOR DE CSV DA PBH PARA O FORMATO DO APP
+       O CSV da PBH geralmente tem cabeçalhos. Essa função acha as colunas
+       de Endereço, Tipo, Velocidade e Coordenadas UTM automaticamente.
+       ==================================================================== */
+    function parseCSVtoRecords(csvText) {
+      const lines = csvText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length < 2) return [];
+
+      // Pega a primeira linha como cabeçalho
+      const headers = lines[0].split(';').map(h => h.toLowerCase().replace(/"/g, '').trim());
+      const dataLines = lines.slice(1);
+
+      // Acha os índices das colunas baseado no nome (a PBH muda os nomes às vezes)
+      let idxEndereco = headers.findIndex(h => h.includes('endere') || h.includes('local'));
+      let idxTipo = headers.findIndex(h => h.includes('tipo') || h.includes('equip') || h.includes('descr'));
+      let idxVelocidade = headers.findIndex(h => h.includes('veloc') || h.includes('limite'));
+      let idxLeste = headers.findIndex(h => h.includes('leste') || h.includes('x') || h.includes('coord_x'));
+      let idxNorte = headers.findIndex(h => h.includes('norte') || h.includes('y') || h.includes('coord_y'));
+
+      const recordsFormatados = [];
+
+      dataLines.forEach(line => {
+          // Divide mantendo aspas simples, lidando com vírgulas dentro de endereços
+          const cols = line.split(';').map(c => c.replace(/^"|"$/g, '').trim());
+          
+          if (cols.length < 3) return; // Ignora linhas quebradas
+
+          const endereco = idxEndereco !== -1 ? cols[idxEndereco] : "Endereço não informado";
+          const tipo = idxTipo !== -1 ? cols[idxTipo] : "Não Identificado";
+          const velocidade = idxVelocidade !== -1 ? cols[idxVelocidade] : "0";
+          
+          // Monta string de coordenada para o detetive do seu código processar
+          let coordString = null;
+          if (idxLeste !== -1 && idxNorte !== -1 && cols[idxLeste] && cols[idxNorte]) {
+              coordString = `${cols[idxLeste]},${cols[idxNorte]}`;
           }
 
-          map.setView([userLat, userLng], 16);
-          hideFullscreenLoading();
-          $("#loading").hide();
-        })
-        .catch(error => {
-          console.error("Erro JSON:", error);
-          hideFullscreenLoading();
-          $("#loading").hide();
-          showNotification("Erro ao ler a base de radares.");
-        });
+          // Formata no padrão que o extrairCoordenadas() espera: 
+          // [ null, null, ENDEREÇO, TIPO, VELOCIDADE, null, null, null, null, "COORDENADAS" ]
+          recordsFormatados.push([ 
+              null, null, 
+              endereco, tipo, velocidade, 
+              null, null, null, null, 
+              coordString 
+          ]);
+      });
+
+      return recordsFormatados;
+    }
+
+    /* ====================================================================
+       RENDERIZAÇÃO FINAL (Usada pela API e pelo JSON Local)
+       ==================================================================== */
+    function renderizarRadaresNoMapa(records, origem) {
+      radarMarkers.forEach(marker => map.removeLayer(marker));
+      radarMarkers = [];
+
+      const todosOsRadares = [...records, ...injetarRadaresIA()];
+
+      for (let i = 0; i < todosOsRadares.length; i++) {
+        const record = todosOsRadares[i];
+        const endereco = record[2] || "Endereço não informado";
+        let tipo = (record[3] || "Não Identificado").trim();
+        const velocidade = record[4] || "0";
+
+        const coordsFinais = extrairCoordenadas(record);
+        if (!coordsFinais) continue; 
+
+        const iconeRadar = L.icon({ iconUrl: getIconUrl(tipo), iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
+        const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
+        
+        const tipoExibicao = ajusteNomes[tipo] || tipo;
+        const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)');
+        const tituloPopup = isIA ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` : `<b>${tipoExibicao}</b>`;
+        
+        radarMarker.bindPopup(`<div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">${tituloPopup}<br>${endereco}<br><span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span></div>`);
+        radarMarker.radarData = { latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao, isIA };
+        radarMarkers.push(radarMarker);
+      }
+
+      map.setView([userLat, userLng], 16);
+      hideFullscreenLoading();
+      $("#loading").hide();
+      showNotification(`Base carregada (${origem})`);
     }
     
     function verificarProximidade(uLat, uLng) {
@@ -754,11 +577,13 @@
 
     function showError(error) { 
       hideFullscreenLoading(); 
-      if(error.code === 1) showNotification("Permissão de GPS negada. Ative nas configurações.");
+      if(error.code === 1) showNotification("Permissão de GPS negada.");
       else showNotification("Ative seu GPS."); 
     }
     
-    if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+    // Desabilitado o Service Worker temporariamente para não dar cache na API
+    // if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+    
     window.onload = initMap;
   </script>
 
