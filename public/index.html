@@ -147,8 +147,8 @@
 
   <div class="loading-fullscreen" id="loading-fullscreen">
     <div class="spinner-ring"></div>
-    <div class="loading-text">Conectando à <span>API da PBH</span></div>
-    <div class="loading-sub">Buscando dados oficiais de fiscalização...</div>
+    <div class="loading-text">Conectando à <span>Base de Dados</span></div>
+    <div class="loading-sub">Sincronizando radares...</div>
   </div>
 
   <header>
@@ -197,7 +197,7 @@
 
     <div class="loading-overlay" id="loading" style="display:none;">
       <div class="loading-spinner"></div>
-      <div>Buscando dados na PBH...</div>
+      <div>Buscando dados...</div>
     </div>
   </div>
 
@@ -211,10 +211,10 @@
     let map, userMarker, radarMarkers = [], alertTimeout;
     let userLat = -19.91894, userLng = -43.93866, tileLayer, routingControl = null;
     let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
-
+    
     // URL BASE OFICIAL DA API DE DADOS ABERTOS DA PBH
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
-    
+
     const iconMap = {
       'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
       'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
@@ -329,21 +329,32 @@
 
     function extrairCoordenadas(record) {
         let coordenadasEncontradas = null;
+        
+        // 1. Tenta direto no indice 9 (formato antigo JSON)
         if (record[9]) {
             const parts = String(record[9]).replace(/\s+/g, '').split(',').map(Number);
             if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) coordenadasEncontradas = parts;
         }
+        
+        // 2. Se não achar, busca em todo o array (robustez)
         if (!coordenadasEncontradas) {
             for (let i = 0; i < record.length; i++) {
-                if (!record[i] || String(record[i]).length > 30) continue; 
+                if (!record[i] || String(record[i]).length > 40) continue; 
                 const parts = String(record[i]).replace(/\s+/g, '').split(',').map(Number);
-                if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { coordenadasEncontradas = parts; break; }
+                if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { 
+                    coordenadasEncontradas = parts; break; 
+                }
             }
         }
+        
         if (!coordenadasEncontradas) return null; 
         let v1 = coordenadasEncontradas[0];
         let v2 = coordenadasEncontradas[1];
+        
+        // Se for UTM (números grandes)
         if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) return converterSIRGAS2000paraWGS84(v1, v2);
+        
+        // Se parecer Lat/Lng invertido ou não
         if (v1 < -30 && v2 > -30) return { lat: v2, lng: v1 }; 
         return { lat: v1, lng: v2 };
     }
@@ -379,7 +390,7 @@
       map.on('click', fecharTodasBarras);
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
-      $("#btn-refresh").click(() => { showNotification("Sincronizando com PBH..."); carregarRadares(); });
+      $("#btn-refresh").click(() => { showNotification("Sincronizando dados..."); carregarRadares(); });
 
       if (navigator.geolocation) navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 });
       else { hideFullscreenLoading(); showNotification("GPS não suportado."); }
@@ -409,96 +420,129 @@
     }
    
     /* ====================================================================
-       SISTEMA HÍBRIDO: Tenta API Oficial da PBH, cai para o JSON Local
+       SISTEMA DE CARREGAMENTO HÍBRIDO (CORRIGIDO)
+       1. Tenta carregar o JSON Local (mais rápido e confiável).
+       2. Se falhar, tenta a API da PBH.
        ==================================================================== */
     async function carregarRadares() {
-      $("#loading").show().html("<div class='loading-spinner'></div><div>Consultando API PBH...</div>");
+      // Se ainda temos markers, limpa para evitar duplicação no refresh
+      if (radarMarkers.length > 0) {
+          radarMarkers.forEach(marker => map.removeLayer(marker));
+          radarMarkers = [];
+      }
+
+      // ESTRATÉGIA 1: JSON LOCAL
+      try {
+        console.log("Tentando carregar JSON local...");
+        const response = await fetch(`radares.json?v=${Date.now()}`);
+        if (!response.ok) throw new Error("Arquivo não encontrado");
+        
+        const data = await response.json();
+        let records = [];
+        
+        // Suporta tanto o formato direto quanto o formato CKAN (result.records)
+        if (Array.isArray(data)) {
+            records = data;
+        } else if (data.result && Array.isArray(data.result.records)) {
+            records = data.result.records;
+        } else if (data.records && Array.isArray(data.records)) {
+            records = data.records;
+        }
+
+        if (records.length > 0) {
+            console.log(`Sucesso: ${records.length} radares do JSON Local.`);
+            renderizarRadaresNoMapa(records, "JSON Local");
+            return; // Termina aqui se deu certo
+        }
+      } catch (e) {
+        console.warn("Falha ao carregar JSON local:", e);
+      }
+
+      // ESTRATÉGIA 2: API DA PBH (Fallback)
+      $("#loading").show().html("<div class='loading-spinner'></div><div>Tentando API PBH...</div>");
       
       try {
-        // 1. Pega os metadados do dataset para encontrar o link do CSV mais recente
         const metaResponse = await fetch(`${API_PBH_BASE}package_show?id=fiscalizacao-eletronica`);
         const metaData = await metaResponse.json();
         
-        if (!metaData.success || !metaData.result.resources) throw new Error("Estrutura da API inválida");
+        if (!metaData.success || !metaData.result.resources) throw new Error("API PBH: Estrutura inválida");
 
-        // 2. Procura o recurso que seja um CSV (geralmente o mais atualizado)
         const csvResource = metaData.result.resources.find(r => r.format.toLowerCase() === 'csv');
         
-        if (!csvResource || !csvResource.url) throw new Error("CSV não encontrado nos dados da PBH");
+        if (!csvResource || !csvResource.url) throw new Error("API PBH: CSV não encontrado");
 
-        // 3. Faz o download do CSV
-        showNotification("Baixando base oficial...");
         const csvResponse = await fetch(csvResource.url);
+        if (!csvResponse.ok) throw new Error("API PBH: Erro no download");
+        
         const csvText = await csvResponse.text();
-
-        // 4. Transforma o CSV da PBH no formato de Array que seu código já entende
         const recordsFromAPI = parseCSVtoRecords(csvText);
         
-        // 5. Se conseguiu extrair dados, renderiza
         if (recordsFromAPI.length > 0) {
             renderizarRadaresNoMapa(recordsFromAPI, "API Oficial PBH");
-            return;
         } else {
-            throw new Error("CSV baixado, mas falhou ao ler as linhas.");
+            throw new Error("Nenhum dado extraído do CSV.");
         }
 
       } catch (error) {
-        console.warn("Falha na API da PBH, usando JSON local. Erro:", error);
-        // FALLBACK: Se a API falhar (timeout, CORS, ou site fora do ar), usa o JSON local
-        try {
-            const response = await fetch(`radares.json?v=${Date.now()}`);
-            const data = await response.json();
-            const records = data.records || [];
-            renderizarRadaresNoMapa(records, "JSON Local (Offline)");
-        } catch (e) {
-            console.error("Erro crítico:", e);
-            hideFullscreenLoading();
-            $("#loading").hide();
-            showNotification("Sem conexão com PBH ou JSON local ausente.");
-        }
+        console.warn("Falha na API da PBH:", error);
+        hideFullscreenLoading();
+        $("#loading").hide();
+        // Se tudo falhar, carrega pelo menos os dados de IA hardcoded
+        console.log("Carregando apenas dados de IA (Hardcoded).");
+        renderizarRadaresNoMapa([], "Dados de IA (Offline)");
       }
     }
 
     /* ====================================================================
-       CONVERSOR DE CSV DA PBH PARA O FORMATO DO APP
-       O CSV da PBH geralmente tem cabeçalhos. Essa função acha as colunas
-       de Endereço, Tipo, Velocidade e Coordenadas UTM automaticamente.
+       CONVERSOR DE CSV DA PBH
        ==================================================================== */
     function parseCSVtoRecords(csvText) {
-      const lines = csvText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const lines = csvText.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length < 2) return [];
 
-      // Pega a primeira linha como cabeçalho
+      // Remove aspas do cabeçalho e lower case
       const headers = lines[0].split(';').map(h => h.toLowerCase().replace(/"/g, '').trim());
       const dataLines = lines.slice(1);
 
-      // Acha os índices das colunas baseado no nome (a PBH muda os nomes às vezes)
-      let idxEndereco = headers.findIndex(h => h.includes('endere') || h.includes('local'));
-      let idxTipo = headers.findIndex(h => h.includes('tipo') || h.includes('equip') || h.includes('descr'));
-      let idxVelocidade = headers.findIndex(h => h.includes('veloc') || h.includes('limite'));
-      let idxLeste = headers.findIndex(h => h.includes('leste') || h.includes('x') || h.includes('coord_x'));
-      let idxNorte = headers.findIndex(h => h.includes('norte') || h.includes('y') || h.includes('coord_y'));
+      let idxEndereco = headers.findIndex(h => h.includes('endere') || h.includes('local') || h.includes('logrado'));
+      let idxTipo = headers.findIndex(h => h.includes('tipo') || h.includes('equip') || h.includes('descr') || h.includes('especie'));
+      let idxVelocidade = headers.findIndex(h => h.includes('veloc') || h.includes('limite') || h.includes('maxim'));
+      let idxLeste = headers.findIndex(h => h.includes('leste') || h.includes('x') || h.includes('coord_x') || h.includes('utm_e'));
+      let idxNorte = headers.findIndex(h => h.includes('norte') || h.includes('y') || h.includes('coord_y') || h.includes('utm_n'));
 
       const recordsFormatados = [];
 
       dataLines.forEach(line => {
-          // Divide mantendo aspas simples, lidando com vírgulas dentro de endereços
+          // Divide mantendo aspas
           const cols = line.split(';').map(c => c.replace(/^"|"$/g, '').trim());
           
-          if (cols.length < 3) return; // Ignora linhas quebradas
+          if (cols.length < 3) return; 
 
-          const endereco = idxEndereco !== -1 ? cols[idxEndereco] : "Endereço não informado";
-          const tipo = idxTipo !== -1 ? cols[idxTipo] : "Não Identificado";
+          // Pega dados com fallback para coluna vazia
+          const endereco = idxEndereco !== -1 ? cols[idxEndereco] : (cols[2] || "Endereço não informado");
+          const tipo = idxTipo !== -1 ? cols[idxTipo] : (cols[3] || "Não Identificado");
           const velocidade = idxVelocidade !== -1 ? cols[idxVelocidade] : "0";
           
-          // Monta string de coordenada para o detetive do seu código processar
           let coordString = null;
+          
+          // Tenta coordenadas separadas
           if (idxLeste !== -1 && idxNorte !== -1 && cols[idxLeste] && cols[idxNorte]) {
               coordString = `${cols[idxLeste]},${cols[idxNorte]}`;
+          } 
+          // Tenta achar lat/lng junta em qualquer coluna
+          else {
+              for(let c of cols) {
+                  if(c && c.includes(',') && !c.includes(' ')) {
+                      // Checa se é lat,lng (numeros)
+                      const parts = c.split(',');
+                      if(parts.length == 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                          coordString = c;
+                          break;
+                      }
+                  }
+              }
           }
 
-          // Formata no padrão que o extrairCoordenadas() espera: 
-          // [ null, null, ENDEREÇO, TIPO, VELOCIDADE, null, null, null, null, "COORDENADAS" ]
           recordsFormatados.push([ 
               null, null, 
               endereco, tipo, velocidade, 
@@ -511,13 +555,14 @@
     }
 
     /* ====================================================================
-       RENDERIZAÇÃO FINAL (Usada pela API e pelo JSON Local)
+       RENDERIZAÇÃO
        ==================================================================== */
     function renderizarRadaresNoMapa(records, origem) {
-      radarMarkers.forEach(marker => map.removeLayer(marker));
-      radarMarkers = [];
+      // Se não vieram registros externos, usa apenas a lista injetada
+      const radaresExternos = records || [];
+      const todosOsRadares = [...radaresExternos, ...injetarRadaresIA()];
 
-      const todosOsRadares = [...records, ...injetarRadaresIA()];
+      let contador = 0;
 
       for (let i = 0; i < todosOsRadares.length; i++) {
         const record = todosOsRadares[i];
@@ -538,12 +583,18 @@
         radarMarker.bindPopup(`<div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">${tituloPopup}<br>${endereco}<br><span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span></div>`);
         radarMarker.radarData = { latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao, isIA };
         radarMarkers.push(radarMarker);
+        contador++;
       }
 
       map.setView([userLat, userLng], 16);
       hideFullscreenLoading();
       $("#loading").hide();
-      showNotification(`Base carregada (${origem})`);
+      
+      if (contador > 0) {
+          showNotification(`Base carregada (${origem})`);
+      } else {
+          showNotification("Nenhum radar encontrado.");
+      }
     }
     
     function verificarProximidade(uLat, uLng) {
@@ -587,23 +638,13 @@
       else showNotification("Ative seu GPS."); 
     }
     
-    
-
-    // Desbloqueia o áudio no primeiro toque do usuário no mapa
-     document.addEventListener('click', function desbloquearAudio() {
-    const sound = document.getElementById("alert-soud");
-    if (sound) {
-        sound.play().then(() => {
-            sound.pause();
-            sound.currentTime = 0;
-        }).catch(() => {});
-    }
-    document.removeEventListener('click', desbloquearAudio);
-}, { once: true });
-
-
-// Desabilitado o Service Worker temporariamente para não dar cache na API
-    // if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+    document.addEventListener('click', function desbloquearAudio() {
+        const sound = document.getElementById("alert-soud");
+        if (sound) {
+            sound.play().then(() => { sound.pause(); sound.currentTime = 0; }).catch(() => {});
+        }
+        document.removeEventListener('click', desbloquearAudio);
+    }, { once: true });
     
     window.onload = initMap;
   </script>
