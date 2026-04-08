@@ -241,17 +241,30 @@
       'Leitor de Reconhecimento Facial': 'Leitor de Reconhecimento Facial (OCR-F)'
     };
 
-    function getIconUrl(tipo) {
-      if (iconMap[tipo]) return iconMap[tipo];
-      if (tipo.includes('Velocidade')) return iconMap['Controlador Eletrônico de Velocidade'];
-      if (tipo.includes('Semáforo')) return iconMap['Detector de Avanço de Semáforo'];
-      if (tipo.includes('Conversão') || tipo.includes('Retorno')) return iconMap['Detector de Conversão/Retorno em local Proibido'];
-      if (tipo.includes('Invasão')) return iconMap['Detector de Invasão de Faixa de Exclusiva - MOVE'];
-      if (tipo.includes('Celular')) return iconMap['Detector de Uso de Celular'];
-      if (tipo.includes('OCR')) return iconMap['Leitor Inteligente de Placas (OCR-P)'];
-      if (tipo.includes('Facial')) return iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
-      if (tipo.includes('Misto') || tipo.includes('CEM')) return iconMap['Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)'];
-      return iconMap['default'];
+    // ========================================================================
+    // FUNÇÃO ATUALIZADA: Seleciona ícone baseado no Tipo e Velocidade
+    // ========================================================================
+    function getIconUrl(tipo, velocidade) {
+      // Pega o ícone base pelo tipo
+      let iconeBase = iconMap[tipo] || iconMap['default'];
+      
+      // Se não for um "Controlador de Velocidade" (CEV) ou misto que tenha velocidade no nome,
+      // retorna o ícone padrão do tipo (ex: Semáforo, Celular, etc).
+      const isRadarDeVelocidade = tipo.includes('Velocidade') || tipo.includes('Misto');
+      
+      if (isRadarDeVelocidade) {
+        // Tenta converter a velocidade para número inteiro
+        const v = parseInt(velocidade);
+        
+        if (v === 50) return '/imagens_app/ic_radar_cev_50.png';
+        if (v === 70) return '/imagens_app/ic_radar_cev_70.png';
+        
+        // Se for 60 ou outro valor qualquer, usa o padrão 60
+        return '/imagens_app/ic_radar_cev.png';
+      }
+      
+      // Para os outros tipos (DAS, DUC, etc), usa o ícone original
+      return iconeBase;
     }
 
     function showNotification(message) {
@@ -573,7 +586,11 @@
         const coordsFinais = extrairCoordenadas(record);
         if (!coordsFinais) continue; 
 
-        const iconeRadar = L.icon({ iconUrl: getIconUrl(tipo), iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
+        // ============================================================
+        // ALTERAÇÃO AQUI: Passa a velocidade para getIconUrl
+        // ============================================================
+        const iconeRadar = L.icon({ iconUrl: getIconUrl(tipo, velocidade), iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
+        
         const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
         
         const tipoExibicao = ajusteNomes[tipo] || tipo;
@@ -605,7 +622,12 @@
         const distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
         if (distance < 300) { 
           alertTriggered = true;
-          $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal));
+          
+          // ============================================================
+          // ALTERAÇÃO AQUI: Passa a velocidade máxima para o alerta
+          // ============================================================
+          $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal, dados.velocidade_maxima));
+          
           $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
           $("#alert-title").text(dados.isIA ? "⚠️ Câmera Inteligente Detectada!" : "Atenção! Radar Detectado");
           
