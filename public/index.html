@@ -250,32 +250,47 @@
       'Leitor de Reconhecimento Facial': 'Leitor de Reconhecimento Facial (OCR-F)'
     };
 
-    // ========================================================================
-    // FUNÇÃO ATUALIZADA: Seleciona ícone baseado no Tipo e Velocidade
+      // ========================================================================
+    // FUNÇÃO getIconUrl CORRIGIDA para garantir que o CEV apareça
     // ========================================================================
     function getIconUrl(tipo, velocidade) {
-      // Pega o ícone base pelo tipo
-      let iconeBase = iconMap[tipo] || iconMap['default'];
+      // 1. Limpa espaços extras que possam vir do JSON (erro do espaço em branco)
+      const tipoLimpo = tipo ? tipo.trim() : "";
       
-      // Se não for um "Controlador de Velocidade" (CEV) ou misto que tenha velocidade no nome,
-      // retorna o ícone padrão do tipo (ex: Semáforo, Celular, etc).
-      const isRadarDeVelocidade = tipo.includes('Velocidade') || tipo.includes('Misto');
-      
-      if (isRadarDeVelocidade) {
-        // Tenta converter a velocidade para número inteiro
-        const v = parseInt(velocidade);
+      // 2. Verifica se é um radar de velocidade (incluindo Misto)
+      const isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('Misto');
+
+      if (isRadarVelocidade) {
+        const vel = parseInt(velocidade) || 0;
         
-        if (v === 50) return '/imagens_app/ic_radar_cev_50.png';
-        if (v === 70) return '/imagens_app/ic_radar_cev_70.png';
+        // Lógica para escolher a imagem baseada na velocidade
+        if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
+        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
         
-        // Se for 60 ou outro valor qualquer, usa o padrão 60
-        return '/imagens_app/ic_radar_cev.png';
+        // Se for 60 (padrão) ou qualquer outro valor
+        // AQUI ESTAVA O PROVÁVEL ERRO: Vamos forçar o retorno correto do mapa
+        return '/imagens_app/ic_radar_cev_v2.png'; 
       }
       
-      // Para os outros tipos (DAS, DUC, etc), usa o ícone original
-      return iconeBase;
-    }
+      // 3. Para os outros tipos (Semáforo, Celular, etc), busca no mapa
+      // Tenta achar exatamente
+      let icone = iconMap[tipoLimpo];
+      
+      // Se não achou exato, tenta achar por palavras-chave
+      if (!icone) {
+        if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
+        else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
+        else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
+        else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
+        else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão/Retorno em local Proibido'];
+        else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa de Exclusiva - MOVE'];
+      }
 
+      // 4. Se ainda não achou, usa o default
+      if (!icone) icone = iconMap['default'];
+      
+      return icone;
+    }
     function showNotification(message) {
       const $toast = $("#toast-msg"); $toast.text(message).addClass("show");
       setTimeout(() => { $toast.removeClass("show"); }, 3000);
