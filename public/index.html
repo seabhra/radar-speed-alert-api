@@ -9,7 +9,7 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <!-- ================================== -->
-     
+
     <title>Radar X9 BH - Alerta Inteligente (OSM + IA)</title>
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -208,7 +208,7 @@
     </div>
   </div>
 
-  <audio id="alert-soud" src="alerta.mp3" preload="auto"></audio>
+  <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
@@ -223,20 +223,20 @@
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
 
     const iconMap = {
-      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
-      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
-      'Detector de Conversão/Retorno em local Proibido': '/imagens_app/ic_radar_rcp.png',
-      'Detector de Invasão de Faixa de Exclusiva - MOVE': '/imagens_app/ic_radar_dife.png',
-      'Detector de Uso de Celular': '/imagens_app/ic_radar_duc.png',
-      'Detector de Redução de Velocidade': '/imagens_app/ic_radar_rev.png',
-      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr.png',
-      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial.png',
-      'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
-      'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
-      'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
-      'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
-      'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
-      'default': '/imagens_app/ic_radar_cev.png'
+      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev_v2.png',
+      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das_v2.png',
+      'Detector de Conversão/Retorno em local Proibido': '/imagens_app/ic_radar_rcp_v2.png',
+      'Detector de Invasão de Faixa de Exclusiva - MOVE': '/imagens_app/ic_radar_dife_v2.png',
+      'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
+      'Detector de Redução de Velocidade': '/imagens_app/ic_radar_rev_v2.png',
+      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr_v2.png',
+      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial_v2.png',
+      'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem_v2.png',
+      'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem_v2.png',
+      'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem_v2.png',
+      'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev_v2.png',
+      'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das_v2.png',
+      'default': '/imagens_app/ic_radar_cev_v2.png'
     };
 
     const ajusteNomes = {
