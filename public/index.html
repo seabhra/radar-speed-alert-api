@@ -557,7 +557,11 @@
           $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal));
           $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
           $("#alert-title").text(dados.isIA ? "⚠️ Câmera Inteligente Detectada!" : "Atenção! Radar Detectado");
-          const sound = document.getElementById("alert-soud"); sound.currentTime = 0; sound.play().catch(e => {});
+          
+          const sound = document.getElementById("alert-soud"); 
+          sound.currentTime = 0; 
+          sound.play().catch(e => { console.warn("Áudio bloqueado:", e); });
+
           $("#alert-container").fadeIn(200); clearTimeout(alertTimeout);
           alertTimeout = setTimeout(() => $("#alert-container").fadeOut(500), 5000);
         }
@@ -583,7 +587,22 @@
       else showNotification("Ative seu GPS."); 
     }
     
-    // Desabilitado o Service Worker temporariamente para não dar cache na API
+    
+
+    // Desbloqueia o áudio no primeiro toque do usuário no mapa
+     document.addEventListener('click', function desbloquearAudio() {
+    const sound = document.getElementById("alert-soud");
+    if (sound) {
+        sound.play().then(() => {
+            sound.pause();
+            sound.currentTime = 0;
+        }).catch(() => {});
+    }
+    document.removeEventListener('click', desbloquearAudio);
+}, { once: true });
+
+
+// Desabilitado o Service Worker temporariamente para não dar cache na API
     // if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
     
     window.onload = initMap;
