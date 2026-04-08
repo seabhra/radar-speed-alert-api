@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- === ADICIONE ESTAS LINHAS AQUI === -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!-- ================================== -->
+     
+    <title>Radar X9 BH - Alerta Inteligente (OSM + IA)</title>
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #0f1115;
+      --panel-color: #1a1d24;
+      --accent-color: #00ff88;
+      --alert-color: #ff3333;
+      --text-main: #ffffff;
+      --text-muted: #a0a0a0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background-color: var(--panel-color);
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid var(--accent-color);
+      box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
+      z-index: 1000;
+    }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .app-icon { width: 50px; height: 40px; border-radius: 8px; }
+    h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; }
+    h1 span { color: var(--accent-color); }
+    .search-container {
+      position: absolute; top: 0; left: 0; width: 100%;
+      background-color: rgba(26, 29, 36, 0.95); backdrop-filter: blur(5px);
+      display: flex; gap: 10px; z-index: 1000;
+      max-height: 0px; overflow: hidden; opacity: 0; padding: 0px 15px;
+      border-bottom: 1px solid transparent;
+      transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease, border 0.3s ease;
+    }
+    .search-container.active {
+      max-height: 70px; opacity: 1; padding: 10px 15px;
+      border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .search-container input {
+      flex: 1; padding: 12px 15px; border-radius: 30px; border: 1px solid #333;
+      background-color: var(--bg-color); color: var(--text-main); font-size: 0.9rem; outline: none;
+    }
+    .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; }
+    #map { width: 100%; height: 100%; background-color: #bbb7b7; }
+    .speed-widget {
+      position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    .speed-value {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
+      font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+      color: #000; line-height: 1; text-align: center; z-index: 2; white-space: nowrap;
+      font-variant-numeric: tabular-nums; letter-spacing: -1px;
+    }    
+    .btn-search, .map-btn {
+      display: flex; align-items: center; justify-content: center;
+      --btn-size: 45px; --icon-scale: 0.85; width: var(--btn-size); height: var(--btn-size);
+      background-size: calc(var(--btn-size) * var(--icon-scale)); background-repeat: no-repeat;
+      background-position: center; background-color: var(--bg-color); border: 1px solid #333;
+      border-radius: 50%; cursor: pointer; transition: 0.2s; flex-shrink: 0;
+    }
+    .btn-search:hover, .map-btn:hover { border-color: var(--accent-color); transform: scale(1.05); }
+    #btn-route-bar {
+      --btn-size: 50px; --icon-scale: 0.95;
+      background-color: rgba(255, 165, 0, 0.9); border: 2px solid rgba(255, 165, 0, 0.6);
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.3); z-index: 10;
+    }
+    .map-controls {
+      position: absolute; right: 15px; bottom: 40px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 500;
+    }
+    .map-btn img, .control-btn img {
+      width: calc(var(--btn-size) * var(--icon-scale)); height: calc(var(--btn-size) * var(--icon-scale));
+      object-fit: contain; pointer-events: none; transition: 0.2s;
+    }
+    #btn-search-bar { background-color: rgba(76, 220, 205, 0.9); }
+    #btn-center { background-color: rgba(0, 255, 136, 0.9); border: 2px solid rgba(0, 255, 136, 0.5); }
+    #btn-refresh { background-color: rgba(100, 100, 255, 0.9); }
+    #btn-zoom-in, #btn-zoom-out { background-color: rgba(150, 150, 150, 0.8); --icon-scale: 0.6; }
+    #alert-container {
+      position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000;
+      display: none; animation: slideUp 0.3s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .alert-bar {
+      background-color: var(--alert-color); color: white; padding: 15px;
+      display: flex; align-items: center; gap: 15px; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
+    }
+    .alert-bar img { width: 40px; height: 40px; }
+    .alert-info h3 { font-size: 1.1rem; margin-bottom: 3px; text-transform: uppercase; color: white; font-weight: 800; }
+    .alert-info p { font-size: 0.85rem; opacity: 0.9; }
+    .toast-notification {
+      position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+      background-color: var(--panel-color); color: var(--text-main); padding: 15px 25px;
+      border-radius: 30px; border: 1px solid #555; box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      z-index: 2000; opacity: 0; font-size: 0.9rem; font-weight: 600; text-align: center;
+      pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; white-space: nowrap;
+    }
+    .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .loading-overlay {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: var(--panel-color); padding: 20px 30px; border-radius: 10px;
+      border: 1px solid var(--accent-color); text-align: center; z-index: 1001;
+    }
+    .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .leaflet-control-zoom, .leaflet-control-attribution, .leaflet-routing-container { display: none !important; }
+    .loading-fullscreen {
+      position: fixed; inset: 0; width: 100%; height: 100%; background-color: var(--bg-color);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    .loading-fullscreen.fade-out { opacity: 0; visibility: hidden; }
+    .loading-fullscreen .spinner-ring { width: 70px; height: 70px; border-radius: 50%; position: relative; margin-bottom: 24px; }
+    .loading-fullscreen .spinner-ring::before, .loading-fullscreen .spinner-ring::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent; }
+    .loading-fullscreen .spinner-ring::before { border-top-color: var(--accent-color); border-right-color: var(--accent-color); animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite; }
+    .loading-fullscreen .spinner-ring::after { inset: 8px; border-bottom-color: #ff3333; border-left-color: #ff3333; animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse; }
+    @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-fullscreen .loading-text { font-size: 1rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; text-align: center; padding: 0 20px; }
+    .loading-fullscreen .loading-text span { color: var(--accent-color); font-weight: 800; }
+    .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.75rem; color: #555; animation: pulseText 1.8s ease-in-out infinite; }
+    @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+  </style>
+</head>
+<body>
+
+  <div class="loading-fullscreen" id="loading-fullscreen">
+    <div class="spinner-ring"></div>
+    <div class="loading-text">Conectando à <span>Base de Dados</span></div>
+    <div class="loading-sub">Sincronizando radares...</div>
+  </div>
+
+  <header>
+    <div class="header-left">
+      <img src="/imagens_app/ic_icon_app.png" alt="App Icon" class="app-icon">
+      <h1>RADAR <span>X9</span> BH</h1>
+    </div>
+  </header>
+
+  <div class="map-wrapper">
+    <div class="search-container" id="search-bar-radares">
+      <input type="text" id="query" placeholder="Buscar radar ou IA (tipo ou endereço)...">
+      <button class="btn-search" id="btn-search-radar" title="Buscar Radares" style="background-image: url('/imagens_app/ic_radar_busca.png');"></button>
+    </div>
+    <div class="search-container" id="search-bar-rota">
+      <input type="text" id="route-query" placeholder="Insira endereço de uma rota...">
+      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-image: url('/imagens_app/ic_gps_busca.png');"></button>
+    </div>
+
+    <div id="map"></div>
+    <div class="toast-notification" id="toast-msg"></div>
+
+    <div class="speed-widget">
+      <img src="/imagens_app/ic_speed_limit.png" alt="Velocidade" class="speed-bg">
+      <div class="speed-value" id="speed-display">0</div>
+    </div>
+
+    <div class="map-controls">
+      <button class="map-btn" id="btn-search-bar" title="Ativa e Focar Barra de Busca"><img src="/imagens_app/ic_radar_busca.png" alt="busca"></button>
+      <button class="map-btn" id="btn-route-bar" title="Ativa e Focar Barra de Rota"><img src="/imagens_app/ic_gps_busca.png" alt="Rota"></button>
+      <button class="map-btn" id="btn-center" title="Minha Localização"><img src="/imagens_app/ic_location_button.png" alt="Centro"></button>
+      <button class="map-btn" id="btn-refresh" title="Atualizar Radares"><img src="/imagens_app/ic_refresh_button.png" alt="Refresh"></button>
+      <button class="map-btn" id="btn-zoom-in" title="Zoom In"><img src="/imagens_app/ic_zoom_in.png" alt="Zoom In"></button>
+      <button class="map-btn" id="btn-zoom-out" title="Zoom Out"><img src="/imagens_app/ic_zoom_out.png" alt="Zoom Out"></button>
+    </div>
+
+    <div id="alert-container">
+      <div class="alert-bar">
+        <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Tipo Radar">
+        <div class="alert-info">
+          <h3 id="alert-title">Atenção! Radar Detectado</h3>
+          <p id="alert-text">Você está próximo a um radar.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="loading-overlay" id="loading" style="display:none;">
+      <div class="loading-spinner"></div>
+      <div>Buscando dados...</div>
+    </div>
+  </div>
+
+  <audio id="alert-soud" src="alerta.mp3" preload="auto"></audio>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    let map, userMarker, radarMarkers = [], alertTimeout;
+    let userLat = -19.91894, userLng = -43.93866, tileLayer, routingControl = null;
+    let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
+    
+    // URL BASE OFICIAL DA API DE DADOS ABERTOS DA PBH
+    const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
+
+    const iconMap = {
+      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
+      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
+      'Detector de Conversão/Retorno em local Proibido': '/imagens_app/ic_radar_rcp.png',
+      'Detector de Invasão de Faixa de Exclusiva - MOVE': '/imagens_app/ic_radar_dife.png',
+      'Detector de Uso de Celular': '/imagens_app/ic_radar_duc.png',
+      'Detector de Redução de Velocidade': '/imagens_app/ic_radar_rev.png',
+      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr.png',
+      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial.png',
+      'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
+      'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
+      'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
+      'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
+      'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
+      'default': '/imagens_app/ic_radar_cev.png'
+    };
+
+    const ajusteNomes = {
+      'Controlador Eletrônico de Velocidade': 'Controlador Eletrônico de Velocidade (CEV)',
+      'Detector de Avanço de Semáforo': 'Detector de Avanço de Semáforo (DAS)',
+      'Detector de Trânsito em Local Proibido': 'Detector de Trânsito em Local Proibido (DTLP)',
+      'Detector de Uso de Celular': 'Detector de Uso de Celular (DUC)',
+      'Leitor Inteligente de Placas': 'Leitor Inteligente de Placas (OCR-P)',
+      'Leitor de Reconhecimento Facial': 'Leitor de Reconhecimento Facial (OCR-F)'
+    };
+
+    // ========================================================================
+    // FUNÇÃO ATUALIZADA: Seleciona ícone baseado no Tipo e Velocidade
+    // ========================================================================
+    function getIconUrl(tipo, velocidade) {
+      // Pega o ícone base pelo tipo
+      let iconeBase = iconMap[tipo] || iconMap['default'];
+      
+      // Se não for um "Controlador de Velocidade" (CEV) ou misto que tenha velocidade no nome,
+      // retorna o ícone padrão do tipo (ex: Semáforo, Celular, etc).
+      const isRadarDeVelocidade = tipo.includes('Velocidade') || tipo.includes('Misto');
+      
+      if (isRadarDeVelocidade) {
+        // Tenta converter a velocidade para número inteiro
+        const v = parseInt(velocidade);
+        
+        if (v === 50) return '/imagens_app/ic_radar_cev_50.png';
+        if (v === 70) return '/imagens_app/ic_radar_cev_70.png';
+        
+        // Se for 60 ou outro valor qualquer, usa o padrão 60
+        return '/imagens_app/ic_radar_cev.png';
+      }
+      
+      // Para os outros tipos (DAS, DUC, etc), usa o ícone original
+      return iconeBase;
+    }
+
+    function showNotification(message) {
+      const $toast = $("#toast-msg"); $toast.text(message).addClass("show");
+      setTimeout(() => { $toast.removeClass("show"); }, 3000);
+    }
+
+    function injetarRadaresIA() {
+      return [
+        { lat: -19.919007, lng:-43.938792, end: "Av. Afonso Pena, Próx. à Praça Sete/Sentido Savassi", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+        { lat: -19.919115, lng: -43.938580, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
+        { lat:-19.919191, lng:-43.938468, end: "Av. Afonso Pena, Próx. à Praça Sete/sentido Rodoviária", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
+        { lat: -19.931347, lng: -43.985536, end: "Rua Conde Pereira Carneiro, sentido Gameleira/Centro, Esquina Av. Amazonas", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
+        { lat: -19.871740, lng: -43.955001, end: "Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos, São Francisco/Centro", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
+        { lat: -19.835851, lng: -43.907504, end: "Rod. Camilo Teixeira da Costa, 210 – Tupi/Centro", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" },
+        { lat: -19.835947, lng: -43.907236, end: "Rod. Camilo Teixeira da Costa, 210 – Centro/Tupi", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" }
+      ].map(r => [ null, null, r.end, r.tipo, r.vel, null, null, null, null, `${r.lat},${r.lng}` ]);
+    }
+
+    function hideFullscreenLoading() {
+      const el = document.getElementById('loading-fullscreen');
+      if (el) { el.classList.add('fade-out'); setTimeout(() => el.remove(), 600); }
+    }
+
+    function calcularDistancia(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; const p1 = lat1 * Math.PI / 180; const p2 = lat2 * Math.PI / 180;
+      const dp = (lat2 - lat1) * Math.PI / 180; const dl = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    }
+
+    function aplicarTemaMapa() {
+      const hora = new Date().getHours();
+      const urlAtual = (hora >= 19 || hora < 6) ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      if (tileLayer) tileLayer.setUrl(urlAtual); 
+      else tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+    }
+
+    async function buscarCoordenadas(endereco) {
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&countrycodes=br&limit=1`);
+        const d = await r.json(); return (d && d.length > 0) ? { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) } : null;
+      } catch (e) { return null; }
+    }
+
+    function calcularRota(destLat, destLng) {
+      if (routingControl) map.removeControl(routingControl);
+      routingControl = L.Routing.control({
+        waypoints: [ L.latLng(userLat, userLng), L.latLng(destLat, destLng) ],
+        routeWhileDragging: false, addWaypoints: false, language: 'pt-BR', show: false,
+        lineOptions: { styles: [{ color: '#0044cc', opacity: 0.8, weight: 7 }, { color: '#33aaff', opacity: 1, weight: 4 }] },
+        createMarker: () => null
+      }).addTo(map);
+    }
+
+    function converterSIRGAS2000paraWGS84(xLeste, yNorte) {
+      const a = 6378137.0; const f = 1 / 298.257222101; const k0 = 0.9996;
+      const N0 = 10000000.0; const E0 = 500000.0;
+      const e2 = 2*f - f*f; const ep2 = e2 / (1 - e2);
+      const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+      const M = yNorte - N0;
+      const mu = M / (a * (1 - e2/4 - 3*e2*e2/64 - 5*e2*e2*e2/256));
+      const phi1 = mu + (3*e1/2 - 27*e1*e1*e1/32) * Math.sin(2*mu) + (21*e1*e1/16 - 55*e1*e1*e1*e1/32) * Math.sin(4*mu) + (151*e1*e1*e1/96) * Math.sin(6*mu);
+      const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1) * Math.sin(phi1));
+      const T1 = Math.tan(phi1) * Math.tan(phi1);
+      const C1 = ep2 * Math.cos(phi1) * Math.cos(phi1);
+      const R1 = a * (1 - e2) / Math.pow(1 - e2 * Math.sin(phi1) * Math.sin(phi1), 1.5);
+      const D = (xLeste - E0) / (N1 * k0);
+      let lat = phi1 - (N1 * Math.tan(phi1) / R1) * (D*D/2 - (5+3*T1+10*C1-4*C1*C1-9*ep2)*Math.pow(D,4)/24 + (61+90*T1+298*C1+45*T1*T1-252*ep2-3*C1*C1)*Math.pow(D,6)/720);
+      let lng = (D - (1+2*T1+C1)*Math.pow(D,3)/6 + (5-2*C1+28*T1-3*C1*C1+8*ep2+24*T1*T1)*Math.pow(D,5)/120) / Math.cos(phi1);
+      lng = (lng * 180 / Math.PI) - 51; 
+      lat = lat * 180 / Math.PI;
+      return { lat: Math.round(lat * 1000000) / 1000000, lng: Math.round(lng * 1000000) / 1000000 };
+    }
+
+    function extrairCoordenadas(record) {
+        let coordenadasEncontradas = null;
+        
+        // 1. Tenta direto no indice 9 (formato antigo JSON)
+        if (record[9]) {
+            const parts = String(record[9]).replace(/\s+/g, '').split(',').map(Number);
+            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) coordenadasEncontradas = parts;
+        }
+        
+        // 2. Se não achar, busca em todo o array (robustez)
+        if (!coordenadasEncontradas) {
+            for (let i = 0; i < record.length; i++) {
+                if (!record[i] || String(record[i]).length > 40) continue; 
+                const parts = String(record[i]).replace(/\s+/g, '').split(',').map(Number);
+                if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { 
+                    coordenadasEncontradas = parts; break; 
+                }
+            }
+        }
+        
+        if (!coordenadasEncontradas) return null; 
+        let v1 = coordenadasEncontradas[0];
+        let v2 = coordenadasEncontradas[1];
+        
+        // Se for UTM (números grandes)
+        if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) return converterSIRGAS2000paraWGS84(v1, v2);
+        
+        // Se parecer Lat/Lng invertido ou não
+        if (v1 < -30 && v2 > -30) return { lat: v2, lng: v1 }; 
+        return { lat: v1, lng: v2 };
+    }
+
+    function initMap() {
+      map = L.map('map', { center: [userLat, userLng], zoom: 16, zoomControl: false });
+      aplicarTemaMapa(); setInterval(aplicarTemaMapa, 300000);
+
+      $("#btn-search-radar").click(() => buscarRadares($("#query").val()));
+      $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
+      $("#btn-calc-route").click(async () => {
+        const endereco = $("#route-query").val().trim();
+        if (endereco.length < 5) { showNotification("Digite um endereço."); return; }
+        $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
+        const coords = await buscarCoordenadas(endereco);
+        if (coords) { calcularRota(coords.lat, coords.lng); map.setView([coords.lat, coords.lng], 16); $("#loading").hide(); } 
+        else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
+      });
+      $("#route-query").keypress((e) => { if (e.which == 13) $("#btn-calc-route").click(); });
+
+      function fecharTodasBarras() { searchActive = false; routeActive = false; $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").removeClass('active'); }
+      $("#btn-search-bar").click(() => { if (searchActive) { fecharTodasBarras(); return; } if (routeActive) routeActive = false; searchActive = true; $("#search-bar-radares").addClass('active'); setTimeout(() => $("#query").focus(), 300); });
+      $("#btn-route-bar").click(() => { if (routeActive) { fecharTodasBarras(); return; } if (searchActive) searchActive = false; routeActive = true; $("#search-bar-rota").addClass('active'); setTimeout(() => $("#route-query").focus(), 300); });
+      $("#btn-center").click(() => { 
+        fecharTodasBarras(); 
+        if (userMarker) map.setView(userMarker.getLatLng(), map.getZoom()); 
+        else if (navigator.geolocation) {
+          showNotification("Buscando sinal GPS...");
+          navigator.geolocation.getCurrentPosition(updateUserLocation, (err) => showNotification("Erro de GPS."), { enableHighAccuracy: true, timeout: 10000 });
+        }
+      });
+
+      map.on('click', fecharTodasBarras);
+      $("#btn-zoom-in").click(() => map.zoomIn());
+      $("#btn-zoom-out").click(() => map.zoomOut());
+      $("#btn-refresh").click(() => { showNotification("Sincronizando dados..."); carregarRadares(); });
+
+      if (navigator.geolocation) navigator.geolocation.watchPosition(updateUserLocation, showError, { enableHighAccuracy: true, maximumAge: 5000 });
+      else { hideFullscreenLoading(); showNotification("GPS não suportado."); }
+      
+      carregarRadares();
+    }
+
+    function updateUserLocation(position) {
+      const newLat = position.coords.latitude; const newLng = position.coords.longitude;
+      let speedKmh = 0; const currentTime = Date.now();
+      if (prevLat !== null && prevTime !== null) {
+        const dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
+        const time = (currentTime - prevTime) / 1000;
+        if (time > 0) speedKmh = Math.round((dist / time) * 3.6); 
+      }
+      if (speedKmh > 250) speedKmh = 0;
+      $("#speed-display").text(speedKmh);
+      prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
+
+      const userIcon = L.icon({ iconUrl: '/imagens_app/ic_gps_marker.png', iconSize: [40, 40], iconAnchor: [20, 40] });
+      if (!userMarker) {
+        userMarker = L.marker([newLat, newLng], { icon: userIcon }).addTo(map);
+        userMarker.bindTooltip("Você", { permanent: true, direction: "top", offset: [0, -30] });
+        map.setView([newLat, newLng], 16); 
+      } else userMarker.setLatLng([newLat, newLng]);
+      verificarProximidade(userLat, userLng);
+    }
+   
+    /* ====================================================================
+       SISTEMA DE CARREGAMENTO HÍBRIDO (CORRIGIDO)
+       1. Tenta carregar o JSON Local (mais rápido e confiável).
+       2. Se falhar, tenta a API da PBH.
+       ==================================================================== */
+    async function carregarRadares() {
+      // Se ainda temos markers, limpa para evitar duplicação no refresh
+      if (radarMarkers.length > 0) {
+          radarMarkers.forEach(marker => map.removeLayer(marker));
+          radarMarkers = [];
+      }
+
+      // ESTRATÉGIA 1: JSON LOCAL
+      try {
+        console.log("Tentando carregar JSON local...");
+        const response = await fetch(`radares.json?v=${Date.now()}`);
+        if (!response.ok) throw new Error("Arquivo não encontrado");
+        
+        const data = await response.json();
+        let records = [];
+        
+        // Suporta tanto o formato direto quanto o formato CKAN (result.records)
+        if (Array.isArray(data)) {
+            records = data;
+        } else if (data.result && Array.isArray(data.result.records)) {
+            records = data.result.records;
+        } else if (data.records && Array.isArray(data.records)) {
+            records = data.records;
+        }
+
+        if (records.length > 0) {
+            console.log(`Sucesso: ${records.length} radares do JSON Local.`);
+            renderizarRadaresNoMapa(records, "JSON Local");
+            return; // Termina aqui se deu certo
+        }
+      } catch (e) {
+        console.warn("Falha ao carregar JSON local:", e);
+      }
+
+      // ESTRATÉGIA 2: API DA PBH (Fallback)
+      $("#loading").show().html("<div class='loading-spinner'></div><div>Tentando API PBH...</div>");
+      
+      try {
+        const metaResponse = await fetch(`${API_PBH_BASE}package_show?id=fiscalizacao-eletronica`);
+        const metaData = await metaResponse.json();
+        
+        if (!metaData.success || !metaData.result.resources) throw new Error("API PBH: Estrutura inválida");
+
+        const csvResource = metaData.result.resources.find(r => r.format.toLowerCase() === 'csv');
+        
+        if (!csvResource || !csvResource.url) throw new Error("API PBH: CSV não encontrado");
+
+        const csvResponse = await fetch(csvResource.url);
+        if (!csvResponse.ok) throw new Error("API PBH: Erro no download");
+        
+        const csvText = await csvResponse.text();
+        const recordsFromAPI = parseCSVtoRecords(csvText);
+        
+        if (recordsFromAPI.length > 0) {
+            renderizarRadaresNoMapa(recordsFromAPI, "API Oficial PBH");
+        } else {
+            throw new Error("Nenhum dado extraído do CSV.");
+        }
+
+      } catch (error) {
+        console.warn("Falha na API da PBH:", error);
+        hideFullscreenLoading();
+        $("#loading").hide();
+        // Se tudo falhar, carrega pelo menos os dados de IA hardcoded
+        console.log("Carregando apenas dados de IA (Hardcoded).");
+        renderizarRadaresNoMapa([], "Dados de IA (Offline)");
+      }
+    }
+
+    /* ====================================================================
+       CONVERSOR DE CSV DA PBH
+       ==================================================================== */
+    function parseCSVtoRecords(csvText) {
+      const lines = csvText.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length < 2) return [];
+
+      // Remove aspas do cabeçalho e lower case
+      const headers = lines[0].split(';').map(h => h.toLowerCase().replace(/"/g, '').trim());
+      const dataLines = lines.slice(1);
+
+      let idxEndereco = headers.findIndex(h => h.includes('endere') || h.includes('local') || h.includes('logrado'));
+      let idxTipo = headers.findIndex(h => h.includes('tipo') || h.includes('equip') || h.includes('descr') || h.includes('especie'));
+      let idxVelocidade = headers.findIndex(h => h.includes('veloc') || h.includes('limite') || h.includes('maxim'));
+      let idxLeste = headers.findIndex(h => h.includes('leste') || h.includes('x') || h.includes('coord_x') || h.includes('utm_e'));
+      let idxNorte = headers.findIndex(h => h.includes('norte') || h.includes('y') || h.includes('coord_y') || h.includes('utm_n'));
+
+      const recordsFormatados = [];
+
+      dataLines.forEach(line => {
+          // Divide mantendo aspas
+          const cols = line.split(';').map(c => c.replace(/^"|"$/g, '').trim());
+          
+          if (cols.length < 3) return; 
+
+          // Pega dados com fallback para coluna vazia
+          const endereco = idxEndereco !== -1 ? cols[idxEndereco] : (cols[2] || "Endereço não informado");
+          const tipo = idxTipo !== -1 ? cols[idxTipo] : (cols[3] || "Não Identificado");
+          const velocidade = idxVelocidade !== -1 ? cols[idxVelocidade] : "0";
+          
+          let coordString = null;
+          
+          // Tenta coordenadas separadas
+          if (idxLeste !== -1 && idxNorte !== -1 && cols[idxLeste] && cols[idxNorte]) {
+              coordString = `${cols[idxLeste]},${cols[idxNorte]}`;
+          } 
+          // Tenta achar lat/lng junta em qualquer coluna
+          else {
+              for(let c of cols) {
+                  if(c && c.includes(',') && !c.includes(' ')) {
+                      // Checa se é lat,lng (numeros)
+                      const parts = c.split(',');
+                      if(parts.length == 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                          coordString = c;
+                          break;
+                      }
+                  }
+              }
+          }
+
+          recordsFormatados.push([ 
+              null, null, 
+              endereco, tipo, velocidade, 
+              null, null, null, null, 
+              coordString 
+          ]);
+      });
+
+      return recordsFormatados;
+    }
+
+    /* ====================================================================
+       RENDERIZAÇÃO
+       ==================================================================== */
+    function renderizarRadaresNoMapa(records, origem) {
+      // Se não vieram registros externos, usa apenas a lista injetada
+      const radaresExternos = records || [];
+      const todosOsRadares = [...radaresExternos, ...injetarRadaresIA()];
+
+      let contador = 0;
+
+      for (let i = 0; i < todosOsRadares.length; i++) {
+        const record = todosOsRadares[i];
+        const endereco = record[2] || "Endereço não informado";
+        let tipo = (record[3] || "Não Identificado").trim();
+        const velocidade = record[4] || "0";
+
+        const coordsFinais = extrairCoordenadas(record);
+        if (!coordsFinais) continue; 
+
+        // ============================================================
+        // ALTERAÇÃO AQUI: Passa a velocidade para getIconUrl
+        // ============================================================
+        const iconeRadar = L.icon({ iconUrl: getIconUrl(tipo, velocidade), iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
+        
+        const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
+        
+        const tipoExibicao = ajusteNomes[tipo] || tipo;
+        const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)');
+        const tituloPopup = isIA ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` : `<b>${tipoExibicao}</b>`;
+        
+        radarMarker.bindPopup(`<div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">${tituloPopup}<br>${endereco}<br><span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span></div>`);
+        radarMarker.radarData = { latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao, isIA };
+        radarMarkers.push(radarMarker);
+        contador++;
+      }
+
+      map.setView([userLat, userLng], 16);
+      hideFullscreenLoading();
+      $("#loading").hide();
+      
+      if (contador > 0) {
+          showNotification(`Base carregada (${origem})`);
+      } else {
+          showNotification("Nenhum radar encontrado.");
+      }
+    }
+    
+    function verificarProximidade(uLat, uLng) {
+      let alertTriggered = false;
+      radarMarkers.forEach(marker => {
+        if (alertTriggered) return;
+        const dados = marker.radarData;
+        const distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
+        if (distance < 300) { 
+          alertTriggered = true;
+          
+          // ============================================================
+          // ALTERAÇÃO AQUI: Passa a velocidade máxima para o alerta
+          // ============================================================
+          $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal, dados.velocidade_maxima));
+          
+          $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
+          $("#alert-title").text(dados.isIA ? "⚠️ Câmera Inteligente Detectada!" : "Atenção! Radar Detectado");
+          
+          const sound = document.getElementById("alert-soud"); 
+          sound.currentTime = 0; 
+          sound.play().catch(e => { console.warn("Áudio bloqueado:", e); });
+
+          $("#alert-container").fadeIn(200); clearTimeout(alertTimeout);
+          alertTimeout = setTimeout(() => $("#alert-container").fadeOut(500), 5000);
+        }
+      });
+    }
+
+    function buscarRadares(query) {
+      if (!query || query.length < 2) return;
+      let encontrou = false; const boundsGroup = L.featureGroup(); const q = query.toLowerCase();
+      radarMarkers.forEach(marker => {
+        const d = marker.radarData;
+        if (`${d.endereco} ${d.tipoOriginal} ${d.tipoExibicao}`.toLowerCase().includes(q)) {
+          encontrou = true; boundsGroup.addLayer(marker); marker.openPopup(); 
+        }
+      });
+      if (encontrou) map.fitBounds(boundsGroup.getBounds().pad(0.5)); 
+      else showNotification("Nenhum radar encontrado.");
+    }
+
+    function showError(error) { 
+      hideFullscreenLoading(); 
+      if(error.code === 1) showNotification("Permissão de GPS negada.");
+      else showNotification("Ative seu GPS."); 
+    }
+    
+    document.addEventListener('click', function desbloquearAudio() {
+        const sound = document.getElementById("alert-soud");
+        if (sound) {
+            sound.play().then(() => { sound.pause(); sound.currentTime = 0; }).catch(() => {});
+        }
+        document.removeEventListener('click', desbloquearAudio);
+    }, { once: true });
+    
+    window.onload = initMap;
+  </script>
+
+</body>
+</html>
