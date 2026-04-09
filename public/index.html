@@ -4,17 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <!-- Cache Control -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
   <title>Radar X9 BH - Alerta Inteligente (OSM + IA)</title>
 
-  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-  <!-- Fonte Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
   <style>
@@ -38,28 +35,44 @@
       overflow: hidden;
     }
 
-    /* === CORREÇÃO CRÍTICA: PADRONIZAÇÃO DE TAMANHO DE ÍCONES DO MAPA === */
-    /* Define que TODOS os marcadores (Radares, GPS) terão exatamente 50px */
+    /* ========================================================================
+       CORREÇÃO DEFINITIVA DE TAMANHO DE ÍCONES
+       ======================================================================== */
+    
+    /* 1. Define o tamanho do contêiner do marcador (a caixa externa) */
     .leaflet-marker-icon {
         width: 50px !important;
         height: 50px !important;
-        /* Centraliza horizontalmente (metade de 50px) */
+        /* Centraliza o marcador na coordenada (metade da largura para esquerda, altura total para cima) */
         margin-left: -25px !important; 
-        /* Âncora no pé do ícone (altura total de 50px) */
         margin-top: -50px !important;  
         border-radius: 0 !important;
-        /* FORÇA a imagem a caber dentro do tamanho, mesmo que o arquivo original seja enorme */
-        object-fit: contain !important; 
-        object-position: bottom center !important;
-        box-sizing: border-box !important;
-        z-index: 400 !important; /* Garante que fiquem acima das ruas */
+        border: none !important;
+        background-color: transparent !important;
     }
 
-    /* Destaque especial para o marcador do usuário */
-    .user-gps-marker {
-        z-index: 1000 !important;
-        filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+    /* 2. FORÇA A IMAGEM DENTRO DO MARCADOR (Isso corrige os arquivos PNG grandes) */
+    .leaflet-marker-icon img {
+        width: 50px !important;
+        height: 50px !important;
+        /* 'contain' garante que a imagem inteira apareça dentro do box 50x50, sem distorcer */
+        object-fit: contain !important; 
+        /* Alinha a base do ícone com o fundo da caixa */
+        object-position: bottom center !important;
+        display: block !important; 
+        padding: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
+
+    /* 3. Garante que o marcador do usuário (GPS) também obedeça */
+    .user-gps-marker img {
+        width: 50px !important;
+        height: 50px !important;
+        object-fit: contain !important;
+    }
+
+    /* ======================================================================== */
 
     header {
       background-color: var(--panel-color);
@@ -91,28 +104,47 @@
       border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
     .search-container input {
-      flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444;
-      background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
+      flex: 1; 
+      padding: 14px 20px; 
+      border-radius: 30px; 
+      border: 1px solid #444;
+      background-color: #000; 
+      color: #fff; 
+      font-size: 1rem; 
+      outline: none; 
+      font-family: 'Inter', sans-serif;
+      height: 50px; /* Altura fixa para alinhar com o botão */
     }
     .search-container input:focus { border-color: var(--accent-color); }
     
-    /* Ajuste dos botões dentro da barra de busca */
+    /* Botões de Ação da Busca (Ajustados) */
     .btn-search {
       flex-shrink: 0;
-      width: 50px; height: 50px;
-      background-color: var(--accent-color); border: none;
-      border-radius: 50%; cursor: pointer; 
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.2s;
+      width: 50px; 
+      height: 50px;
+      background-color: var(--accent-color); 
+      border: none;
+      border-radius: 50%; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      transition: transform 0.2s, background-color 0.2s;
     }
-    .btn-search:active { transform: scale(0.9); }
-    .btn-search img { width: 28px; height: 28px; object-fit: contain; }
+    .btn-search:active { transform: scale(0.95); }
+    .btn-search img { 
+      width: 24px; 
+      height: 24px; 
+      object-fit: contain; 
+      filter: brightness(0); /* Deixa o ícone preto para contraste no fundo verde */
+    }
 
     /* Map Area */
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; }
 
     /* Speed Widget */
+   /* Speed Widget */
 
 
     .speed-widget {
@@ -125,19 +157,17 @@
       font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
       color: #000; line-height: 1; text-align: center; z-index: 2; white-space: nowrap;
       font-variant-numeric: tabular-nums; letter-spacing: -1px;
-    } 
+    }  
 
-    
-    
 
-    /* Buttons - MAIORES E AJUSTADOS */
+    /* Map Controls Buttons */
     .map-controls {
       position: absolute; right: 15px; bottom: 30px;
       display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 500;
     }
     .map-btn {
       display: flex; align-items: center; justify-content: center;
-      width: 50px; height: 50px; /* Aumentado de 48px para 58px */
+      width: 58px; height: 58px;
       background-color: rgba(30, 30, 30, 0.9); border: 1px solid #555;
       border-radius: 50%; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
@@ -145,17 +175,15 @@
     .map-btn:active { transform: scale(0.95); }
 
     .map-btn img { 
-      width: 50px; height: 50px; /* Aumentado de 24px para 32px */
+      width: 32px; height: 32px; 
       object-fit: contain; pointer-events: none; 
     }
 
-    /* Estilos específicos para botões de destaque */
     #btn-route-bar {
       background-color: rgba(255, 140, 0, 0.9); border: 2px solid rgba(255, 140, 0, 0.4);
-      box-shadow: 0 0 10px rgba(255, 140, 0, 0.3); width: 64px; height: 64px; /* Um pouco maior */
+      box-shadow: 0 0 10px rgba(255, 140, 0, 0.3); width: 64px; height: 64px;
     }
     #btn-route-bar img { width: 36px; height: 36px; }
-
     #btn-search-bar { background-color: rgba(76, 220, 205, 0.9); }
     #btn-center { background-color: rgba(0, 255, 136, 0.9); border: 2px solid rgba(0, 255, 136, 0.3); }
     
@@ -285,7 +313,6 @@
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
 
   <script>
-    // Variáveis Globais
     let map, userMarker, radarMarkers = [], alertTimeout;
     let userLat = -19.91894, userLng = -43.93866, tileLayer, routingControl = null;
     let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
@@ -325,7 +352,7 @@
       if (isRadarVelocidade) {
         const vel = parseInt(velocidade) || 0;
         if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
-        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png'; // Ícone problemático será ajustado pelo CSS
+        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
         return '/imagens_app/ic_radar_cev_v2.png'; 
       }
       
@@ -530,11 +557,10 @@
 
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
       
-      // Atualizado para 50x50 para combinar com os radares
       const userIcon = L.icon({
           iconUrl: userIconUrl,
           iconSize: [50, 50],
-          iconAnchor: [25, 25], // Centrado no ponto GPS
+          iconAnchor: [25, 25],
           popupAnchor: [0, -25],
           className: 'user-gps-marker'
       });
@@ -645,12 +671,11 @@
 
         const iconeUrl = getIconUrl(tipo, velocidade);
         
-        // ATUALIZADO: Tamanho ajustado para 50px para bater com o CSS
         const iconeRadar = L.icon({ 
             iconUrl: iconeUrl, 
-            iconSize: [50, 50],       // Aumentado de 40 para 50
-            iconAnchor: [25, 50],     // Âncora ajustada (centro X, base Y)
-            popupAnchor: [0, -50]     // Popup ajustado
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
         });
         
         const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
