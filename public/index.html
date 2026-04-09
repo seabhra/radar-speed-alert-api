@@ -22,6 +22,11 @@
       --alert-color: #ff3333;
       --text-main: #ffffff;
       --text-muted: #a0a0a0;
+      
+      /* Variável para o botão padrão (Fundo Escuro Uniforme) */
+      --btn-bg: rgba(20, 20, 20, 0.85);
+      --btn-border: rgba(255, 255, 255, 0.15);
+      --btn-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
@@ -36,42 +41,32 @@
     }
 
     /* ========================================================================
-       CORREÇÃO DEFINITIVA DE TAMANHO DE ÍCONES
+       CORREÇÃO DE TAMANHO DE ÍCONES DO MAPA (Marcadores)
        ======================================================================== */
-    
-    /* 1. Define o tamanho do contêiner do marcador (a caixa externa) */
     .leaflet-marker-icon {
         width: 50px !important;
         height: 50px !important;
-        /* Centraliza o marcador na coordenada (metade da largura para esquerda, altura total para cima) */
         margin-left: -25px !important; 
         margin-top: -50px !important;  
         border-radius: 0 !important;
         border: none !important;
         background-color: transparent !important;
     }
-
-    /* 2. FORÇA A IMAGEM DENTRO DO MARCADOR (Isso corrige os arquivos PNG grandes) */
     .leaflet-marker-icon img {
         width: 50px !important;
         height: 50px !important;
-        /* 'contain' garante que a imagem inteira apareça dentro do box 50x50, sem distorcer */
         object-fit: contain !important; 
-        /* Alinha a base do ícone com o fundo da caixa */
         object-position: bottom center !important;
         display: block !important; 
         padding: 0 !important;
         margin: 0 !important;
         box-sizing: border-box !important;
     }
-
-    /* 3. Garante que o marcador do usuário (GPS) também obedeça */
     .user-gps-marker img {
         width: 50px !important;
         height: 50px !important;
         object-fit: contain !important;
     }
-
     /* ======================================================================== */
 
     header {
@@ -93,19 +88,19 @@
     .search-container {
       position: absolute; top: 0; left: 0; width: 100%;
       background-color: rgba(26, 29, 36, 0.98); backdrop-filter: blur(8px);
-      display: flex; gap: 12px; z-index: 1000;
+      display: flex; gap: 15px; z-index: 1000;
       max-height: 0px; overflow: hidden; opacity: 0; padding: 0px 15px;
       border-bottom: 1px solid transparent;
       transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease, border 0.3s ease;
       align-items: center;
     }
     .search-container.active {
-      max-height: 90px; opacity: 1; padding: 15px;
+      max-height: 100px; opacity: 1; padding: 15px;
       border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
     .search-container input {
       flex: 1; 
-      padding: 14px 20px; 
+      padding: 0 20px; 
       border-radius: 30px; 
       border: 1px solid #444;
       background-color: #000; 
@@ -113,39 +108,83 @@
       font-size: 1rem; 
       outline: none; 
       font-family: 'Inter', sans-serif;
-      height: 50px; /* Altura fixa para alinhar com o botão */
+      /* Altura do input ajustada para bater com o botão (60px) */
+      height: 60px; 
     }
     .search-container input:focus { border-color: var(--accent-color); }
     
-    /* Botões de Ação da Busca (Ajustados) */
-    .btn-search {
+    /* ========================================================================
+       PADRONIZAÇÃO DE BOTÕES (Busca + Mapa)
+       ======================================================================== */
+    
+    /* Classe base para botões da barra de busca e do mapa */
+    .app-btn {
       flex-shrink: 0;
-      width: 50px; 
-      height: 50px;
-      background-color: var(--accent-color); 
-      border: none;
-      border-radius: 50%; 
-      cursor: pointer; 
       display: flex; 
       align-items: center; 
       justify-content: center;
-      transition: transform 0.2s, background-color 0.2s;
+      
+      /* TAMANHO ÚNICO: 60x60 */
+      width: 60px; 
+      height: 60px;
+      
+      /* APARÊNCIA ÚNICA: Fundo escuro uniforme */
+      background-color: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      border-radius: 50%; /* Shape circular */
+      
+      cursor: pointer; 
+      transition: all 0.2s ease;
+      box-shadow: var(--btn-shadow);
+      backdrop-filter: blur(4px);
     }
-    .btn-search:active { transform: scale(0.95); }
-    .btn-search img { 
-      width: 40px; 
-      height: 40px; 
+    
+    /* Efeitos de Hover/Active */
+    .app-btn:hover { 
+      background-color: rgba(40, 40, 40, 0.95); 
+      border-color: rgba(255, 255, 255, 0.4); 
+      transform: scale(1.05); 
+    }
+    .app-btn:active { transform: scale(0.95); }
+
+    /* Ícones dentro dos botões */
+    .app-btn img { 
+      width: 32px; /* Ícones maiores */
+      height: 32px; 
       object-fit: contain; 
-      filter: brightness(0); /* Deixa o ícone preto para contraste no fundo verde */
+      pointer-events: none;
+      /* Filtro para deixar ícones brancos/bons contrastes no fundo escuro */
+      filter: brightness(0) invert(1); 
     }
+
+    /* Ajuste específico para a classe usada no HTML antigo */
+    .map-controls .map-btn, 
+    .search-container .btn-search {
+        /* Força as regras acima */
+        background-color: var(--btn-bg) !important;
+        border: 1px solid var(--btn-border) !important;
+        width: 60px !important;
+        height: 60px !important;
+    }
+    
+    /* Remover bordas específicas antigas para uniformizar */
+    #btn-center { border-color: var(--btn-border) !important; background: var(--btn-bg) !important; }
+    #btn-route-bar { border-color: var(--btn-border) !important; background: var(--btn-bg) !important; width: 60px !important; height: 60px !important; }
+    #btn-search-bar { background: var(--btn-bg) !important; border-color: var(--btn-border) !important; }
+
+    /* ======================================================================== */
 
     /* Map Area */
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; }
 
-   /* Speed Widget */
+    /* Map Controls Position */
+    .map-controls {
+      position: absolute; right: 15px; bottom: 30px;
+      display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: 500;
+    }
 
-
+    /* Speed Widget */
     .speed-widget {
       position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500;
       display: flex; align-items: center; justify-content: center;
@@ -158,34 +197,6 @@
       font-variant-numeric: tabular-nums; letter-spacing: -1px;
     }  
 
-
-    /* Map Controls Buttons */
-    .map-controls {
-      position: absolute; right: 15px; bottom: 30px;
-      display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 500;
-    }
-    .map-btn {
-      display: flex; align-items: center; justify-content: center;
-      width: 50px; height: 50px;
-      background-color: rgba(30, 30, 30, 0.9); border: 1px solid #555;
-      border-radius: 50%; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    }
-    .map-btn:hover { border-color: var(--accent-color); transform: scale(1.05); }
-    .map-btn:active { transform: scale(0.95); }
-
-    .map-btn img { 
-      width: 40px; height: 40px; 
-      object-fit: contain; pointer-events: none; 
-    }
-
-    #btn-route-bar {
-      background-color: rgba(255, 140, 0, 0.9); border: 2px solid rgba(255, 140, 0, 0.4);
-      box-shadow: 0 0 10px rgba(255, 140, 0, 0.3); width: 64px; height: 64px;
-    }
-    #btn-route-bar img { width: 40px; height: 40px; }
-    #btn-search-bar { background-color: rgba(76, 220, 205, 0.9); }
-    #btn-center { background-color: rgba(0, 255, 136, 0.9); border: 2px solid rgba(0, 255, 136, 0.3); }
-    
     /* Alerts & Toasts */
     #alert-container {
       position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000;
@@ -258,7 +269,8 @@
     <!-- Barra de Busca de Radares -->
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
-      <button class="btn-search" id="btn-search-radar" title="Buscar">
+      <!-- Botão estilizado com a classe .app-btn -->
+      <button class="btn-search app-btn" id="btn-search-radar" title="Buscar">
         <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca">
       </button>
     </div>
@@ -266,7 +278,8 @@
     <!-- Barra de Rota -->
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
-      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;">
+      <!-- Botão estilizado com a classe .app-btn -->
+      <button class="btn-search app-btn" id="btn-calc-route" title="Traçar Rota">
         <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
       </button>
     </div>
@@ -280,12 +293,13 @@
     </div>
 
     <div class="map-controls">
-      <button class="map-btn" id="btn-search-bar" title="Buscar Radares"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca"></button>
-      <button class="map-btn" id="btn-route-bar" title="Navegar / Rota"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
-      <button class="map-btn" id="btn-center" title="Centralizar GPS"><img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro"></button>
-      <button class="map-btn" id="btn-refresh" title="Atualizar Dados"><img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh"></button>
-      <button class="map-btn" id="btn-zoom-in" title="Aumentar Zoom"><img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In"></button>
-      <button class="map-btn" id="btn-zoom-out" title="Diminuir Zoom"><img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out"></button>
+      <!-- Botões do mapa estilizados via CSS para igualar aos de busca -->
+      <button class="map-btn app-btn" id="btn-search-bar" title="Buscar Radares"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca"></button>
+      <button class="map-btn app-btn" id="btn-route-bar" title="Navegar / Rota"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
+      <button class="map-btn app-btn" id="btn-center" title="Centralizar GPS"><img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro"></button>
+      <button class="map-btn app-btn" id="btn-refresh" title="Atualizar Dados"><img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh"></button>
+      <button class="map-btn app-btn" id="btn-zoom-in" title="Aumentar Zoom"><img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In"></button>
+      <button class="map-btn app-btn" id="btn-zoom-out" title="Diminuir Zoom"><img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out"></button>
     </div>
 
     <div id="alert-container">
@@ -751,3 +765,4 @@
   </script>
 </body>
 </html>
+
