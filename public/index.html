@@ -397,7 +397,7 @@
    
   
     let map, userMarker, radarMarkers = [], alertTimeout;
-    let userLat = -19.91894, userLng = -43.93866, tileLayer, routingControl = null;
+    let userLat = -19.919055, userLng =-43.938641, tileLayer, routingControl = null;
     let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
     let isFollowing = true; // Novidade: Controla se o mapa segue o usuário
     let watchId = null;     // Novidade: ID do rastreador GPS para poder reiniciar
@@ -564,7 +564,7 @@
     }
 
     function initMap() {
-      map = L.map('map', { center: [userLat, userLng], zoom: 16, zoomControl: false });
+      map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false });
       aplicarTemaMapa(); 
       setInterval(aplicarTemaMapa, 300000);
 
@@ -658,11 +658,13 @@
 
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
       
+       // AJUSTE DE TAMANHO DE ICONES NO MAP
+      
       const userIcon = L.icon({
           iconUrl: userIconUrl,
           iconSize: [50, 50],
-          iconAnchor: [25, 25], 
-          popupAnchor: [0, -25],
+        iconAnchor: [25, 50], 
+         popupAnchor: [0, -50],
           className: 'user-gps-marker'
       });
 
