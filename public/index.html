@@ -77,6 +77,90 @@
     h1 span { color: var(--accent-color); }
 
 
+/* ================= SEARCH ================= */
+.search-container {
+  position: absolute; top: 0; left: 0; width: 100%;
+  background-color: rgba(26, 29, 36, 0.98);
+  backdrop-filter: blur(8px);
+  display: flex; gap: 12px; z-index: 1000;
+
+  max-height: 0; overflow: hidden; opacity: 0;
+  padding: 0 15px;
+
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease;
+  align-items: center;
+}
+
+.search-container.active {
+  max-height: 90px;
+  opacity: 1;
+  padding: 15px;
+  border-bottom: 1px solid #333;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.search-container input {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 30px;
+  border: 1px solid #444;
+  background-color: #000;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  font-family: 'Inter', sans-serif;
+}
+
+.search-container input:focus {
+  border-color: var(--accent-color);
+}
+
+/* BOTÃO BUSCA PADRONIZADO */
+.btn-search {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(40, 40, 40, 0.95);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+
+  transition: all 0.2s ease;
+}
+
+.btn-search:active {
+  transform: scale(0.9);
+}
+
+.btn-search img {
+  width: 30px;
+  height: 30px;
+}
+
+
+/* ================= MAP ================= */
+.map-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  background-color: #2a2a2a;
+  z-index: 1;
+}
+
 /* ================= MAP BUTTONS ================= */
 .map-controls {
   position: absolute;
@@ -155,8 +239,7 @@
 }
 
 
-      /* Speed Widget */
-
+/* icone de velocidade */
     .speed-widget {
       position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500;
       display: flex; align-items: center; justify-content: center;
@@ -168,6 +251,9 @@
       color: #000; line-height: 1; text-align: center; z-index: 2; white-space: nowrap;
       font-variant-numeric: tabular-nums; letter-spacing: -1px;
     } 
+
+    
+    
     
     /* Alerts & Toasts */
     #alert-container {
