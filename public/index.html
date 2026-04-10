@@ -118,9 +118,11 @@
 
 
 /* BOTÃO BUSCA PADRONIZADO 
+
+
 /* BOTÃO BUSCA PADRONIZADO */
 .btn-search {
-  position: relative; /* necessário */
+  position: relative; /* necessário para centralização absoluta */
 
   flex-shrink: 0;
   width: 46px;
@@ -129,19 +131,19 @@
   border: none;
   cursor: pointer;
 
-  display: block; /* remove interferência do flex */
-
   background: rgba(76, 137, 198, 0.95);
   box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5);
 
   transition: all 0.2s ease;
+
+  overflow: hidden; /* impede o ícone de “vazar” */
 }
 
 .btn-search:active {
   transform: scale(0.9);
 }
 
-/* CENTRALIZAÇÃO REAL */
+/* ÍCONE CENTRALIZADO CORRETAMENTE */
 .btn-search img {
   position: absolute;
   top: 50%;
@@ -150,19 +152,21 @@
   width: 40px;
   height: 40px;
   object-fit: contain;
+  display: block;
 
   transform: translate(-50%, -50%);
-  display: block;
 }
-    
-/* AJUSTE FINO DE CENTRALIZAÇÃO */
-.btn-search img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
 
-  transform: translate(1px, 1px); /* ajuste fino visual */
+/* AJUSTE FINO OPCIONAL (caso algum ícone ainda pareça torto) */
+#btn-search-bar img {
+  transform: translate(-50%, -52%);
 }
+
+#btn-route-bar img {
+  transform: translate(-48%, -50%);
+}
+
+
     
     /* ================= MAP ================= */
 .map-wrapper {
