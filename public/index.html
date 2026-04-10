@@ -1,18 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+  <!-- Cache Control -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
   <title>Radar X9 BH - Alerta Inteligente (OSM + IA)</title>
 
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <!-- Fonte Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
   <style>
@@ -36,44 +38,28 @@
       overflow: hidden;
     }
 
-    /* ========================================================================
-       CORREÇÃO DEFINITIVA DE TAMANHO DE ÍCONES
-       ======================================================================== */
-    
-    /* 1. Define o tamanho do contêiner do marcador (a caixa externa) */
+    /* === CORREÇÃO CRÍTICA: PADRONIZAÇÃO DE TAMANHO DE ÍCONES DO MAPA === */
+    /* Define que TODOS os marcadores (Radares, GPS) terão exatamente 50px */
     .leaflet-marker-icon {
         width: 50px !important;
         height: 50px !important;
-        /* Centraliza o marcador na coordenada (metade da largura para esquerda, altura total para cima) */
+        /* Centraliza horizontalmente (metade de 50px) */
         margin-left: -25px !important; 
+        /* Âncora no pé do ícone (altura total de 50px) */
         margin-top: -50px !important;  
         border-radius: 0 !important;
-        border: none !important;
-        background-color: transparent !important;
-    }
-
-    /* 2. FORÇA A IMAGEM DENTRO DO MARCADOR (Isso corrige os arquivos PNG grandes) */
-    .leaflet-marker-icon img {
-        width: 50px !important;
-        height: 50px !important;
-        /* 'contain' garante que a imagem inteira apareça dentro do box 50x50, sem distorcer */
+        /* FORÇA a imagem a caber dentro do tamanho, mesmo que o arquivo original seja enorme */
         object-fit: contain !important; 
-        /* Alinha a base do ícone com o fundo da caixa */
         object-position: bottom center !important;
-        display: block !important; 
-        padding: 0 !important;
-        margin: 0 !important;
         box-sizing: border-box !important;
+        z-index: 400 !important; /* Garante que fiquem acima das ruas */
     }
 
-    /* 3. Garante que o marcador do usuário (GPS) também obedeça */
-    .user-gps-marker img {
-        width: 50px !important;
-        height: 50px !important;
-        object-fit: contain !important;
+    /* Destaque especial para o marcador do usuário */
+    .user-gps-marker {
+        z-index: 1000 !important;
+        filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
     }
-
-    /* ======================================================================== */
 
     header {
       background-color: var(--panel-color);
@@ -105,46 +91,28 @@
       border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
     .search-container input {
-      flex: 1; 
-      padding: 14px 20px; 
-      border-radius: 30px; 
-      border: 1px solid #444;
-      background-color: #000; 
-      color: #fff; 
-      font-size: 1rem; 
-      outline: none; 
-      font-family: 'Inter', sans-serif;
-      height: 50px; /* Altura fixa para alinhar com o botão */
+      flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444;
+      background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
     }
     .search-container input:focus { border-color: var(--accent-color); }
     
-    /* Botões de Ação da Busca (Ajustados) */
+    /* Ajuste dos botões dentro da barra de busca */
     .btn-search {
       flex-shrink: 0;
-      width: 50px; 
-      height: 50px;
-      background-color: var(--accent-color); 
-      border: none;
-      border-radius: 50%; 
-      cursor: pointer; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center;
-      transition: transform 0.2s, background-color 0.2s;
+      width: 50px; height: 50px;
+      background-color: var(--accent-color); border: none;
+      border-radius: 50%; cursor: pointer; 
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s;
     }
-    .btn-search:active { transform: scale(0.95); }
-    .btn-search img { 
-      width: 40px; 
-      height: 40px; 
-      object-fit: contain; 
-      filter: brightness(0); /* Deixa o ícone preto para contraste no fundo verde */
-    }
+    .btn-search:active { transform: scale(0.9); }
+    .btn-search img { width: 28px; height: 28px; object-fit: contain; }
 
     /* Map Area */
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; }
 
-   /* Speed Widget */
+    /* Speed Widget */
 
 
     .speed-widget {
@@ -153,22 +121,23 @@
     }
     .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
     .speed-value {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -70%);
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%);
       font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
       color: #000; line-height: 1; text-align: center; z-index: 2; white-space: nowrap;
       font-variant-numeric: tabular-nums; letter-spacing: -1px;
-    }  
+    } 
 
+    
+    
 
-    /* Map Controls Buttons */
+    /* Buttons - MAIORES E AJUSTADOS */
     .map-controls {
       position: absolute; right: 15px; bottom: 30px;
       display: flex; flex-direction: column; align-items: center; gap: 12px; z-index: 500;
     }
     .map-btn {
       display: flex; align-items: center; justify-content: center;
-      width: 50px; height: 50px;
+      width: 58px; height: 58px; /* Aumentado de 48px para 58px */
       background-color: rgba(30, 30, 30, 0.9); border: 1px solid #555;
       border-radius: 50%; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
@@ -176,15 +145,17 @@
     .map-btn:active { transform: scale(0.95); }
 
     .map-btn img { 
-      width: 40px; height: 40px; 
+      width: 32px; height: 32px; /* Aumentado de 24px para 32px */
       object-fit: contain; pointer-events: none; 
     }
 
+    /* Estilos específicos para botões de destaque */
     #btn-route-bar {
       background-color: rgba(255, 140, 0, 0.9); border: 2px solid rgba(255, 140, 0, 0.4);
-      box-shadow: 0 0 10px rgba(255, 140, 0, 0.3); width: 64px; height: 64px;
+      box-shadow: 0 0 10px rgba(255, 140, 0, 0.3); width: 64px; height: 64px; /* Um pouco maior */
     }
-    #btn-route-bar img { width: 40px; height: 40px; }
+    #btn-route-bar img { width: 36px; height: 36px; }
+
     #btn-search-bar { background-color: rgba(76, 220, 205, 0.9); }
     #btn-center { background-color: rgba(0, 255, 136, 0.9); border: 2px solid rgba(0, 255, 136, 0.3); }
     
@@ -314,9 +285,14 @@
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
 
   <script>
+    // Variáveis Globais
+   
+  
     let map, userMarker, radarMarkers = [], alertTimeout;
     let userLat = -19.91894, userLng = -43.93866, tileLayer, routingControl = null;
     let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
+    let isFollowing = true; // Novidade: Controla se o mapa segue o usuário
+    let watchId = null;     // Novidade: ID do rastreador GPS para poder reiniciar
     
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
 
@@ -353,7 +329,7 @@
       if (isRadarVelocidade) {
         const vel = parseInt(velocidade) || 0;
         if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
-        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
+        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png'; 
         return '/imagens_app/ic_radar_cev_v2.png'; 
       }
       
@@ -462,10 +438,30 @@
         return { lat: v1, lng: v2 };
     }
 
+    function startGPSTracking() {
+      if (!navigator.geolocation) {
+        hideFullscreenLoading(); 
+        showNotification("GPS não suportado neste navegador."); 
+        return;
+      }
+
+      // Se já existe um watch rodando, limpa antes de iniciar outro
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+
+      watchId = navigator.geolocation.watchPosition(updateUserLocation, showError, { 
+        enableHighAccuracy: true, 
+        maximumAge: 2000,  // Reduzido para 2s para maior precisão em movimento
+        timeout: 15000     // Aumentado para 15s para dar tempo do chip GPS aquecer
+      });
+    }
+
     function initMap() {
       map = L.map('map', { center: [userLat, userLng], zoom: 16, zoomControl: false });
       aplicarTemaMapa(); 
       setInterval(aplicarTemaMapa, 300000);
+
+      // NOVIDADE: Se o usuário arrastar o mapa, para de seguir o GPS automaticamente
+      map.on('dragstart', () => { isFollowing = false; });
 
       $("#btn-search-radar").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
@@ -478,6 +474,7 @@
         if (coords) { 
           calcularRota(coords.lat, coords.lng); 
           map.flyTo([coords.lat, coords.lng], 16, { duration: 1.5 }); 
+          isFollowing = false; // Para de seguir o GPS ao traçar rota
           $("#loading").hide(); 
           fecharTodasBarras();
         } 
@@ -507,34 +504,24 @@
         setTimeout(() => $("#route-query").focus(), 300); 
       });
       
+      // CORRIGIDO: Botão de centralizar agora funciona perfeitamente e reativa o modo "Seguir"
       $("#btn-center").click(() => { 
-        fecharTodasBarras(); 
+        fecharTodasBarras();
+        isFollowing = true; // Reativa o modo seguir
+        
         if (userMarker) {
-          map.flyTo(userMarker.getLatLng(), map.getZoom(), { duration: 1 });
-        } else if (navigator.geolocation) {
-          showNotification("Buscando sinal GPS...");
-          navigator.geolocation.getCurrentPosition((pos) => {
-            updateUserLocation(pos);
-            map.flyTo([pos.coords.latitude, pos.coords.longitude], 18);
-          }, (err) => showNotification("Erro de GPS."), { enableHighAccuracy: true, timeout: 10000 });
+          map.flyTo(userMarker.getLatLng(), 17, { duration: 0.5 });
+        } else {
+          showNotification("Aguardando sinal GPS...");
         }
       });
 
-      map.on('click', fecharTodasBarras);
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => { showNotification("Atualizando base de radares..."); carregarRadares(); });
 
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(updateUserLocation, showError, { 
-          enableHighAccuracy: true, 
-          maximumAge: 0, 
-          timeout: 10000 
-        });
-      } else { 
-        hideFullscreenLoading(); 
-        showNotification("GPS não suportado neste navegador."); 
-      }
+      // Inicia o rastreamento
+      startGPSTracking();
       
       carregarRadares();
     }
@@ -545,11 +532,16 @@
       let speedKmh = 0; 
       const currentTime = Date.now();
       
-      if (prevLat !== null && prevTime !== null) {
+      // Usa a velocidade do hardware se disponível (muito mais preciso que calcular pelo JS)
+      if (position.coords.speed !== null && position.coords.speed >= 0) {
+        speedKmh = Math.round(position.coords.speed * 3.6); // Converte m/s para km/h
+      } 
+      else if (prevLat !== null && prevTime !== null) {
         const dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
         const time = (currentTime - prevTime) / 1000;
         if (time > 0) speedKmh = Math.round((dist / time) * 3.6); 
       }
+      
       if (speedKmh > 250) speedKmh = 0;
       
       $("#speed-display").text(speedKmh);
@@ -561,7 +553,7 @@
       const userIcon = L.icon({
           iconUrl: userIconUrl,
           iconSize: [50, 50],
-          iconAnchor: [25, 25],
+          iconAnchor: [25, 25], 
           popupAnchor: [0, -25],
           className: 'user-gps-marker'
       });
@@ -569,12 +561,16 @@
       if (!userMarker) {
         userMarker = L.marker([newLat, newLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
         userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
-        map.setView([newLat, newLng], 17); 
+        hideFullscreenLoading(); // Esconde a tela de loading só quando o GPS pega de verdade
       } else {
         userMarker.setLatLng([newLat, newLng]);
       }
       
-      map.panTo([newLat, newLng]);
+      // NOVIDADE: Só move a câmera se o modo "Seguir" estiver ativo
+      if (isFollowing) {
+        map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
+      }
+      
       verificarProximidade(userLat, userLng);
     }
    
@@ -674,9 +670,9 @@
         
         const iconeRadar = L.icon({ 
             iconUrl: iconeUrl, 
-            iconSize: [50, 50],
-            iconAnchor: [25, 50],
-            popupAnchor: [0, -50]
+            iconSize: [50, 50],       
+            iconAnchor: [25, 50],     
+            popupAnchor: [0, -50]     
         });
         
         const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
@@ -691,7 +687,6 @@
         contador++;
       }
 
-      hideFullscreenLoading();
       $("#loading").hide();
       if (contador > 0) showNotification(`Base carregada: ${origem}`);
       else showNotification("Nenhum radar encontrado.");
@@ -730,17 +725,23 @@
           encontrou = true; boundsGroup.addLayer(marker); marker.openPopup(); 
         }
       });
-      if (encontrou) map.fitBounds(boundsGroup.getBounds().pad(0.2)); 
+      if (encontrou) { map.fitBounds(boundsGroup.getBounds().pad(0.2)); isFollowing = false; } 
       else showNotification("Nenhum radar encontrado.");
     }
 
-    function showError(error) { 
-      hideFullscreenLoading(); 
+    function showError(error) {   
       let msg = "Erro ao obter localização.";
-      if(error.code === 1) msg = "Permissão de GPS negada.";
-      if(error.code === 2) msg = "Sinal GPS indisponível.";
-      if(error.code === 3) msg = "Tempo de GPS esgotado.";
+      if(error.code === 1) msg = "Permissão de GPS negada. Habilite nas configurações do navegador.";
+      if(error.code === 2) msg = "Sinal GPS indisponível. Verifique se está ao ar livre.";
+      if(error.code === 3) msg = "Tempo de GPS esgotado. Tentando novamente...";
+      
       showNotification(msg); 
+      hideFullscreenLoading();
+      
+      // Tenta reiniciar o GPS após 5 segundos em caso de timeout (comum no mobile)
+      if(error.code === 3) {
+        setTimeout(startGPSTracking, 5000);
+      }
     }
     
     document.addEventListener('click', function desbloquearAudio() {
@@ -751,5 +752,8 @@
     
     window.onload = initMap;
   </script>
+
+
+  
 </body>
 </html>
