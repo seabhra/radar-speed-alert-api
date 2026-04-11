@@ -636,6 +636,8 @@
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
       
        // AJUSTE DE TAMANHO DE ICONES NO MAP
+
+
       
       const userIcon = L.icon({
           iconUrl: userIconUrl,
@@ -755,12 +757,13 @@
 
         const iconeUrl = getIconUrl(tipo, velocidade);
         
-        const iconeRadar = L.icon({ 
-            iconUrl: iconeUrl, 
-            iconSize: [50, 50],       
-            iconAnchor: [25, 50],     
-            popupAnchor: [0, -50]     
-        });
+       const iconeRadar = L.icon({ 
+    iconUrl: iconeUrl, 
+    iconSize: [40, 40],   // ← altere aqui para o tamanho desejado
+    iconAnchor: [20, 40], // ← deve ser sempre metade do iconSize (x, y)
+    popupAnchor: [0, -40] // ← negativo do iconSize y
+});
+        
         
         const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
         
