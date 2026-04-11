@@ -38,29 +38,6 @@
       overflow: hidden;
     }
 
-    /* === CORREÇÃO CRÍTICA: PADRONIZAÇÃO DE TAMANHO DE ÍCONES DO MAPA === */
-    /* Define que TODOS os marcadores (Radares, GPS) terão exatamente 50px */
-    .leaflet-marker-icon {
-        width: 50px !important;
-        height: 50px !important;
-        /* Centraliza horizontalmente (metade de 50px) */
-        margin-left: -25px !important; 
-        /* Âncora no pé do ícone (altura total de 50px) */
-        margin-top: -50px !important;  
-        border-radius: 0 !important;
-        /* FORÇA a imagem a caber dentro do tamanho, mesmo que o arquivo original seja enorme */
-        object-fit: contain !important; 
-        object-position: bottom center !important;
-        box-sizing: border-box !important;
-        z-index: 400 !important; /* Garante que fiquem acima das ruas */
-    }
-
-    /* Destaque especial para o marcador do usuário */
-    .user-gps-marker {
-        z-index: 1000 !important;
-        filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
-    }
-
     header {
       background-color: var(--panel-color);
       padding: 15px;
