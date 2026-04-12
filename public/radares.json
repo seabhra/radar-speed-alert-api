@@ -262,7 +262,7 @@
     [248,"1523","Rua dos Tupis, Esq. Av. Afonso Pena","Detector de Avanço de Semáforo","60","Rua Espírito Santo/Av. Afonso Pena","Único","1","1","-19.918766,-43.937244"],
     [249,"1524","Rua dos Tupis, Esq. Av. Afonso Pena"," Detector de Conversão em Local Proibido ","60","Rua Espírito Santo/Av. Afonso Pena","Único","1","1"," -19.922096,-43.936955 "],
     [250,"1525","Rua dos Tupis, Esq. Av. Afonso Pena","Detector de Avanço de Semáforo","60","Rua Espírito Santo/Av. Afonso Pena","Único","1","1","-19.918773,-43.937250"],
-    [251,"1526","Rua dos Tupis, Esq. Av. Afonso Pena","Detector de Conversão em local Proibido","60","Rua Espírito Santo/Av. Afonso Pena","Único","1","1","-19.918770,-43.937241"],
+    [251,"1526","Rua dos Tupis, Esq. Av. Afonso Pena"," Detector de Tráfego em Local Proibido  (DTLP)","60","Rua Espírito Santo/Av. Afonso Pena","Único","1","1","-19.916120,-43.936263"],
     [252,"1527","Av. Cristiano Machado, a 100 metros da Rua Joana Darc - Pista MOVE"," Detector de Invasão de Faixa Exclusiva - MOVE ","60","Centro/Bairro","Único","1","1"," -19.855070,-43.935085"],
     [253,"1528","Av. Cristiano Machado, 2150 - Pista MOVE","Detector de Invasão de Faixa Exclusiva - MOVE","60","Centro/Bairro","Único","1","1"," -19.88870, -43.92926"],
     [254,"1529","Av. Cristiano Machado, a 200 metros da Rua Joana Darc - Pista MOVE"," Detector de Invasão de Faixa Exclusiva - MOVE ","60","Bairro/Centro","Único","1","1"," -19.854033,-43.935025 "],
