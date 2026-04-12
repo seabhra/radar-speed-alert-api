@@ -96,7 +96,7 @@
     [82,"1239","Av. Amazonas, esquina com Rua Padre Belchior","Detector de Avanço de Semáforo","60","Praça Raul Soares/Praça Rui Barbosa","Único","1382","BRI1382","-19.918157,-43.936941"],
     [83,"1240","Av. Amazonas, esquina com Rua Padre Belchior","Detector de Conversão/Retorno em local Proibido","60","Praça Raul Soares/Praça Rui Barbosa","Único","1382","BRI1382","-19.918161,-43.936946"],
     [84,"1241","Rua Padre Belchior, esquina com Av. Amazonas","Detector de Avanço de Semáforo","60","Av. Augusto de Lima/Av. Amazonas","Único","1389","BRI1389","-19.917847,-43.936962"],
-    [85,"1242","Rua Padre Belchior, esquina com Av. Amazonas","Detector de Invasão de Faixa de Exclusiva - MOVE","60","Av. Augusto de Lima/Av. Amazonas","Único","1389","BRI1389","-19.917844,-43.936964"],
+    [85,"1242","Rua Padre Belchior, esquina com Av. Amazonas","Detector de Invasão de Faixa Exclusiva - MOVE","60","Av. Augusto de Lima/Av. Amazonas","Único","1389","BRI1389","-19.917844,-43.936964"],
     [86,"1263","Av. José Cândido da Silveira, 330","Controlador Eletrônico de Velocidade","60","Centro/Bairro","Único","5202","KBH5202","-19.915654,-43.931061"],
     [87,"1264","Av. José Cândido da Silveira, a 416 metros da Rua João das Chagas","Controlador Eletrônico de Velocidade","60","Bairro/Centro","Único","5203","KBH5203","-19.914019,-43.929277"],
     [88,"1265","Av. Pastor Anselmo Silvestre, a 34 metros da Rua Patolândia","Controlador Eletrônico de Velocidade","60","São Paulo/Santa Inês","Único","8201","KBH8201","-19.913957,-43.928740"],
@@ -263,9 +263,9 @@
     [249,"1524","Rua dos Tupis, Esq. Av. Afonso Pena","Detector de Conversão/Retorno em local Proibido","60","Rua Espírito Santo/Av. Afonso Pena","Único","1","1","-19.918764,-43.937236"],
     [250,"1525","Rua dos Tupis, Esq. Av. Afonso Pena","Detector de Avanço de Semáforo","60","Rua Espírito Santo/Av. Afonso Pena","Único","1","1","-19.918773,-43.937250"],
     [251,"1526","Rua dos Tupis, Esq. Av. Afonso Pena","Detector de Conversão/Retorno em local Proibido","60","Rua Espírito Santo/Av. Afonso Pena","Único","1","1","-19.918770,-43.937241"],
-    [252,"1527","Av. Cristiano Machado, 2150 - Pista MOVE"," Detector de Invasão de Faixa Exclusiva - MOVE ","60","Centro/Bairro","Único","1","1","-19.888509,-43.929434"],
+    [252,"1527","Av. Cristiano Machado, a 100 metros da Rua Joana Darc - Pista MOVE"," Detector de Invasão de Faixa Exclusiva - MOVE ","60","Centro/Bairro","Único","1","1"," -19.855070,-43.935085"],
     [253,"1528","Av. Cristiano Machado, 2150 - Pista MOVE","Detector de Invasão de Faixa Exclusiva - MOVE","60","Centro/Bairro","Único","1","1"," -19.88870, -43.92926"],
-    [254,"1529","Av. Cristiano Machado, 2273 - Pista MOVE"," Detector de Invasão de Faixa Exclusiva - MOVE ","60","Bairro/Centro","Único","1","1","-19.888678,-43.929262"],
+    [254,"1529","Av. Cristiano Machado, a 200 metros da Rua Joana Darc - Pista MOVE"," Detector de Invasão de Faixa Exclusiva - MOVE ","60","Bairro/Centro","Único","1","1"," -19.854033,-43.935025 "],
     [255,"1530","Av. Cristiano Machado, 2273 - Pista MOVE","Detector de Invasão de Faixa Exclusiva - MOVE","60","Bairro/Centro","Único","1","1"," -19.88855, -43.92939"],
     [256,"1531","Av. Cristiano Machado, Esq. Rua Dom Leme - Pista MOVE"," Detector de Invasão de Faixa Exclusiva - MOVE ","60","Bairro/Centro","Único","1","1","-19.886206,-43.929235"],
     [257,"1532","Av. Cristiano Machado, Esq. Rua Dom Leme - Pista MOVE","Detector de Invasão de Faixa Exclusiva - MOVE","60","Bairro/Centro","Único","1","1"," -19.88607, -43.92930"],
@@ -273,7 +273,7 @@
     [259,"1534","Rua Dom Leme, Esq. Av. Cristiano Machado","Detector de Conversão/Retorno em local Proibido","40","Silveira/Cidade Nova","Único","1","1","-19.909943,-43.928564"],
     [260,"1535","Av. Cristiano Machado, Esq. Rua Professor Pimenta da Veiga - Pista MOVE","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1","1","-19.909880,-43.928641"],
     [261,"1536","Av. Cristiano Machado, Esq. Rua Professor Pimenta da Veiga - Pista MOVE","Detector de Invasão de Faixa Exclusiva - MOVE","60","Centro/Bairro","Único","1","1"," -19.88641, -43.92927 "],
- [262,"1537","Rua Professor Pimenta da Veiga, Esq. Av. Cristiano Machado","Detector de Avanço de Semáforo","40","Cidade Nova/Silveira","Único","1","1","-19.909843,-43.928681"],
+    [262,"1537","Rua Professor Pimenta da Veiga, Esq. Av. Cristiano Machado","Detector de Avanço de Semáforo","40","Cidade Nova/Silveira","Único","1","1","-19.909843,-43.928681"],
     [263,"1538","Rua Professor Pimenta da Veiga, Esq. Av. Cristiano Machado","Detector de Conversão/Retorno em local Proibido","40","Cidade Nova/Silveira","Único","1","1","-19.909846,-43.928684"],
     [264,"1539","Av. Dom Pedro II, 2222","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1312","BRI1312","-19.920458,-43.941486"],
     [265,"1540","Av. Dom Pedro II, 2275","Detector de Avanço de Semáforo","60","Bairro/Centro","Único","1313","BRI1313","-19.920486,-43.941654"],
@@ -305,3 +305,4 @@
     [291,"1589","Rod. Camilo Teixeira da Costa, 210 - Tupi","Detector de Redução de Velocidade","60","Tupi/Belo Horizonte","Único","1004","KBH5302","-19.835947,-43.907236"]
   ]
 }
+
