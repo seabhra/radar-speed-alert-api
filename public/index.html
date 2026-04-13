@@ -371,17 +371,24 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
 
   <script>
     // Variáveis Globais
-   
-  
     let map, userMarker, radarMarkers = [], alertTimeout;
     let userLat = -19.919055, userLng =-43.938641, tileLayer, routingControl = null;
     let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
-    let isFollowing = true; // Novidade: Controla se o mapa segue o usuário
-    let watchId = null;     // Novidade: ID do rastreador GPS para poder reiniciar
+    let isFollowing = true; 
+    let watchId = null;     
     
+    // NOVO: Controle de qual GPS está mandando os dados
+    let gpsSource = 'none'; // 'browser' | 'appinventor' | 'none'
+    let gpsInitialized = false;
+    let browserGpsTimeout = null;
+
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
 
     const iconMap = {
@@ -532,6 +539,83 @@
         return { lat: v1, lng: v2 };
     }
 
+    // ===================================================================
+    // FUNÇÃO GLOBAL CHAMADA PELO APP INVENTOR VIA RunJavaScript
+    // ===================================================================
+    function receberCoordenadasDoAppInventor(lat, lng, speed) {
+      lat = parseFloat(lat);
+      lng = parseFloat(lng);
+      speed = parseFloat(speed) || 0;
+
+      if (isNaN(lat) || isNaN(lng)) return;
+
+      // Para o GPS do navegador se ainda estiver rodando
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+      if (browserGpsTimeout) {
+        clearTimeout(browserGpsTimeout);
+        browserGpsTimeout = null;
+      }
+
+      gpsSource = 'appinventor';
+      
+      // Se veio 0 (porque seu App Inventor não tem Speed), o HTML calcula sozinho
+      processarNovaPosicao(lat, lng, speed);
+    }
+
+    // ===================================================================
+    // FUNÇÃO UNIFICADA DE POSIÇÃO (Usada pelo Browser E pelo App Inventor)
+    // ===================================================================
+    function processarNovaPosicao(newLat, newLng, speedKmh) {
+      const currentTime = Date.now();
+
+      // Calcula velocidade automaticamente se não veio do hardware
+      if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
+        const dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
+        const time = (currentTime - prevTime) / 1000;
+        if (time > 0) speedKmh = Math.round((dist / time) * 3.6); 
+      }
+      
+      if (speedKmh > 250) speedKmh = 0;
+      
+      $("#speed-display").text(speedKmh);
+      prevLat = newLat; prevLng = newLng; prevTime = currentTime; 
+      userLat = newLat; userLng = newLng;
+
+      const userIconUrl = '/imagens_app/ic_gps_marker.png';
+      const userIcon = L.icon({
+          iconUrl: userIconUrl,
+          iconSize: [50, 50],
+          iconAnchor: [25, 50], 
+          popupAnchor: [0, -50],
+          className: 'user-gps-marker'
+      });
+
+      if (!userMarker) {
+        userMarker = L.marker([newLat, newLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
+        userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+        
+        // Primeira posição recebida
+        if (!gpsInitialized) {
+          gpsInitialized = true;
+          hideFullscreenLoading();
+        }
+      } else {
+        userMarker.setLatLng([newLat, newLng]);
+      }
+      
+      if (isFollowing) {
+        map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
+      }
+      
+      verificarProximidade(userLat, userLng);
+    }
+
+    // ===================================================================
+    // GPS DO NAVEGADOR (Fallback para uso fora do App Inventor)
+    // ===================================================================
     function startGPSTracking() {
       if (!navigator.geolocation) {
         hideFullscreenLoading(); 
@@ -539,14 +623,32 @@
         return;
       }
 
-      // Se já existe um watch rodando, limpa antes de iniciar outro
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
 
-      watchId = navigator.geolocation.watchPosition(updateUserLocation, showError, { 
-        enableHighAccuracy: true, 
-        maximumAge: 2000,  // Reduzido para 2s para maior precisão em movimento
-        timeout: 15000     // Aumentado para 15s para dar tempo do chip GPS aquecer
-      });
+      watchId = navigator.geolocation.watchPosition(
+        function(position) {
+          if (gpsSource !== 'appinventor') gpsSource = 'browser';
+          const newLat = position.coords.latitude; 
+          const newLng = position.coords.longitude;
+          let speedKmh = 0; 
+          
+          if (position.coords.speed !== null && position.coords.speed >= 0) {
+            speedKmh = Math.round(position.coords.speed * 3.6);
+          }
+          
+          processarNovaPosicao(newLat, newLng, speedKmh);
+        }, 
+        showError, 
+        { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
+      );
+
+      // Se o browser não conseguir GPS em 8s, é porque provavelmente está no App Inventor
+      browserGpsTimeout = setTimeout(() => {
+        if (!gpsInitialized && gpsSource === 'none') {
+          showNotification("Aguardando GPS do app...");
+          hideFullscreenLoading(); // Tira o loading para não travar a tela
+        }
+      }, 8000);
     }
 
     function initMap() {
@@ -554,7 +656,6 @@
       aplicarTemaMapa(); 
       setInterval(aplicarTemaMapa, 300000);
 
-      // NOVIDADE: Se o usuário arrastar o mapa, para de seguir o GPS automaticamente
       map.on('dragstart', () => { isFollowing = false; });
 
       $("#btn-search-radar").click(() => buscarRadares($("#query").val()));
@@ -568,7 +669,7 @@
         if (coords) { 
           calcularRota(coords.lat, coords.lng); 
           map.flyTo([coords.lat, coords.lng], 16, { duration: 1.5 }); 
-          isFollowing = false; // Para de seguir o GPS ao traçar rota
+          isFollowing = false; 
           $("#loading").hide(); 
           fecharTodasBarras();
         } 
@@ -598,11 +699,9 @@
         setTimeout(() => $("#route-query").focus(), 300); 
       });
       
-      // CORRIGIDO: Botão de centralizar agora funciona perfeitamente e reativa o modo "Seguir"
       $("#btn-center").click(() => { 
         fecharTodasBarras();
-        isFollowing = true; // Reativa o modo seguir
-        
+        isFollowing = true; 
         if (userMarker) {
           map.flyTo(userMarker.getLatLng(), 17, { duration: 0.5 });
         } else {
@@ -614,62 +713,10 @@
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => { showNotification("Atualizando base de radares..."); carregarRadares(); });
 
-      // Inicia o rastreamento
+      // Tenta iniciar GPS do navegador (se falhar, espera o App Inventor)
       startGPSTracking();
       
       carregarRadares();
-    }
-
-    function updateUserLocation(position) {
-      const newLat = position.coords.latitude; 
-      const newLng = position.coords.longitude;
-      let speedKmh = 0; 
-      const currentTime = Date.now();
-      
-      // Usa a velocidade do hardware se disponível (muito mais preciso que calcular pelo JS)
-      if (position.coords.speed !== null && position.coords.speed >= 0) {
-        speedKmh = Math.round(position.coords.speed * 3.6); // Converte m/s para km/h
-      } 
-      else if (prevLat !== null && prevTime !== null) {
-        const dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
-        const time = (currentTime - prevTime) / 1000;
-        if (time > 0) speedKmh = Math.round((dist / time) * 3.6); 
-      }
-      
-      if (speedKmh > 250) speedKmh = 0;
-      
-      $("#speed-display").text(speedKmh);
-      prevLat = newLat; prevLng = newLng; prevTime = currentTime; 
-      userLat = newLat; userLng = newLng;
-
-      const userIconUrl = '/imagens_app/ic_gps_marker.png';
-      
-       // AJUSTE DE TAMANHO DE ICONES NO MAP
-
-
-      
-      const userIcon = L.icon({
-          iconUrl: userIconUrl,
-          iconSize: [50, 50],
-        iconAnchor: [25, 50], 
-         popupAnchor: [0, -50],
-          className: 'user-gps-marker'
-      });
-
-      if (!userMarker) {
-        userMarker = L.marker([newLat, newLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
-        userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
-        hideFullscreenLoading(); // Esconde a tela de loading só quando o GPS pega de verdade
-      } else {
-        userMarker.setLatLng([newLat, newLng]);
-      }
-      
-      // NOVIDADE: Só move a câmera se o modo "Seguir" estiver ativo
-      if (isFollowing) {
-        map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
-      }
-      
-      verificarProximidade(userLat, userLng);
     }
    
     function injetarRadaresIA() {
@@ -768,9 +815,9 @@
         
        const iconeRadar = L.icon({ 
     iconUrl: iconeUrl, 
-    iconSize: [40, 40],   // ← altere aqui para o tamanho desejado
-    iconAnchor: [20, 40], // ← deve ser sempre metade do iconSize (x, y)
-    popupAnchor: [0, -40] // ← negativo do iconSize y
+    iconSize: [40, 40],   
+    iconAnchor: [20, 40], 
+    popupAnchor: [0, -40] 
 });
         
         
@@ -829,6 +876,9 @@
     }
 
     function showError(error) {   
+      // Se o App Inventor já está mandando dados, ignora erros do navegador
+      if (gpsSource === 'appinventor') return; 
+      
       let msg = "Erro ao obter localização.";
       if(error.code === 1) msg = "Permissão de GPS negada. Habilite nas configurações do navegador.";
       if(error.code === 2) msg = "Sinal GPS indisponível. Verifique se está ao ar livre.";
@@ -853,6 +903,7 @@
   </script>
 
 
-  
+
+    
 </body>
 </html>
