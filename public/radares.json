@@ -196,9 +196,10 @@
     [181,"1436","Av. Cristiano Machado, 2273","Detector de Avanço de Semáforo","60","Bairro/Centro","Único","1030","BRI1030","-19.909947,-43.928556"],
     [182,"1438","Av. Cristiano Machado, 2150","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1029","BRI1029","-19.909968,-43.928468"],
     [183,"1439","Rua Mato Grosso, Esq. Av. do Contorno","Detector de Avanço de Semáforo","60","Barro Preto/Centro","Único","1","1","-19.918606,-43.939120"],
-    [184,"1440","Av. Presidente Antônio Carlos, Esq. Rua Rio Novo","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1397","BRI1397","-19.916210,-43.934940"],
-    [185,"1441","Av. Presidente Antônio Carlos, Esq. Rua Rio Novo","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1399","BRI1399","-19.916210,-43.934995"],
-    [186,"1442","Av. Presidente Antônio Carlos, Esq. Rua Rio Novo","Detector de Avanço de Semáforo","60","Bairro/Centro","Único","1402","BRI1402","-19.916230,-43.935047"],
+    [184,"1440","Av. Vilarinho, ESq. Rua Madre Tereza"," Detector de Invasão de Faixa Exclusiva (DIFEX)","60","Centro/Venda Nova","Único","1397","BRI1397","-19.808710,-43.967983"],
+    
+[185,"1441","Av. Presidente Antônio Carlos, Esq. Rua Rio Novo","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1399","BRI1399"," -19.907277,-43.943149 "],
+    [186,"1442","Av. Presidente Antônio Carlos, Esq. Rua Rio Novo","Detector de Avanço de Semáforo","60","Bairro/Centro","Único","1402","BRI1402"," -19.907350,-43.943530 "],
     [187,"1443","Av. do Contorno, Esq. Rua Espírito Santo","Detector de Avanço de Semáforo","60","Barro Preto/Centro","Único","1741","BRI1741","-19.919116,-43.937682"],
     [188,"1445","Av. do Contorno, Esq. Rua Espírito Santo","Detector de Avanço de Semáforo","60","Barro Preto/Centro","Único","1700","BRI1700","-19.919101,-43.937661"],
     [189,"1446","Av. do Contorno, Esq. Rua Espírito Santo","Detector de Avanço de Semáforo","60","Centro/Barro Preto","Único","1543","BRI1543","-19.919063,-43.937458"],
