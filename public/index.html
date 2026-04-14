@@ -150,6 +150,40 @@
   z-index: 1;
 }
 
+/* ================= COMPASS WIDGET (NOVO) ================= */
+.compass-widget {
+  position: absolute;
+  top: 20px; /* Parte superior da tela */
+  left: 20px; /* Lado esquerdo */
+  width: 60px;
+  height: 60px;
+  z-index: 500; /* Mesmo nível dos botões de mapa */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Permite clicar através da bússola se necessário */
+}
+
+/* Imagem de fundo da bússola (Dial fixo) */
+.compass-base {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 1;
+  opacity: 0.9;
+}
+
+/* Imagem da ponteira (Gira com o GPS) */
+.compass-needle {
+  position: absolute;
+  width: 80%; /* Levemente menor que a base */
+  height: 80%;
+  object-fit: contain;
+  z-index: 2;
+  transition: transform 0.4s cubic-bezier(0.1, 0.7, 1.0, 0.1); /* Movimento suave */
+}
+
 /* ================= MAP BUTTONS ================= */
 .map-controls {
   position: absolute;
@@ -335,6 +369,14 @@
     <div id="map"></div>
     <div class="toast-notification" id="toast-msg"></div>
 
+    <!-- WIDGET DE BÚSSOLA (NOVO - Adicionado no lado superior esquerdo) -->
+    <div class="compass-widget">
+      <!-- Base da Bússola (Fixa) -->
+      <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src='https://cdn-icons-png.flaticon.com/512/2838/2838773.png'" alt="Bússola" class="compass-base">
+      <!-- Ponteira da Bússola (Gira) -->
+      <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'" alt="Ponteira" class="compass-needle" id="compass-needle-img">
+    </div>
+
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
@@ -389,6 +431,12 @@
     let gpsInitialized = false;
     let browserGpsTimeout = null;
 
+    // NOVO: Variáveis para cálculo de direção (Heading) caso não venha do hardware
+    let lastHeadingTime = 0;
+    let lastHeadingLat = 0;
+    let lastHeadingLng = 0;
+    let currentHeading = 0; // Em graus (0-360)
+
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
 
     const iconMap = {
@@ -423,6 +471,7 @@
       'Leitor de Reconhecimento Facial': 'Reconhecimento Facial (OCR-F)'
     };
 
+    // Função auxiliar para obter URL do ícone
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
       const isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('Misto');
@@ -447,17 +496,20 @@
       return icone;
     }
 
+    // Função para mostrar notificação toast
     function showNotification(message) {
       const $toast = $("#toast-msg"); 
       $toast.text(message).addClass("show");
       setTimeout(() => { $toast.removeClass("show"); }, 3500);
     }
 
+    // Esconde o loading inicial
     function hideFullscreenLoading() {
       const el = document.getElementById('loading-fullscreen');
       if (el) { el.classList.add('fade-out'); setTimeout(() => el.remove(), 600); }
     }
 
+    // Calcula distância entre dois pontos (Haversine)
     function calcularDistancia(lat1, lon1, lat2, lon2) {
       const R = 6371e3; 
       const p1 = lat1 * Math.PI / 180; 
@@ -468,6 +520,7 @@
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
     }
 
+    // Aplica o tema do mapa (Claro/Escuro)
     function aplicarTemaMapa() {
       const hora = new Date().getHours();
       const urlAtual = (hora >= 19 || hora < 6) 
@@ -477,6 +530,7 @@
       else tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
     }
 
+    // Busca coordenadas via Nominatim
     async function buscarCoordenadas(endereco) {
       try {
         const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&countrycodes=br&limit=1`);
@@ -485,6 +539,7 @@
       } catch (e) { return null; }
     }
 
+    // Calcula rota usando OSRM
     function calcularRota(destLat, destLng) {
       if (routingControl) map.removeControl(routingControl);
       routingControl = L.Routing.control({
@@ -496,6 +551,7 @@
       }).addTo(map);
     }
 
+    // Conversão de coordenadas SIRGAS2000 para WGS84
     function converterSIRGAS2000paraWGS84(xLeste, yNorte) {
       const a = 6378137.0; const f = 1 / 298.257222101; const k0 = 0.9996;
       const N0 = 10000000.0; const E0 = 500000.0;
@@ -516,6 +572,7 @@
       return { lat: Math.round(lat * 1000000) / 1000000, lng: Math.round(lng * 1000000) / 1000000 };
     }
 
+    // Extrai coordenadas do registro do radar
     function extrairCoordenadas(record) {
         let coordenadasEncontradas = null;
         if (record[9]) {
@@ -540,6 +597,20 @@
     }
 
     // ===================================================================
+    // FUNÇÃO NOVA: Atualizar a Bússola Visual
+    // ===================================================================
+    function atualizarBussola(headingDegrees) {
+      const needle = document.getElementById('compass-needle-img');
+      if (needle) {
+        // Rota a imagem da ponteira. 'rotate(${deg}deg)'
+        // O valor negativo é usado se a imagem estiver orientada para o Norte por padrão,
+        // mas geralmente rotacionamos no sentido do movimento.
+        // Ajuste conforme a orientação original da sua imagem 'ic_compass_ponteira.png'.
+        needle.style.transform = `rotate(${headingDegrees}deg)`; 
+      }
+    }
+
+    // ===================================================================
     // FUNÇÃO GLOBAL CHAMADA PELO APP INVENTOR VIA RunJavaScript
     // ===================================================================
     function receberCoordenadasDoAppInventor(lat, lng, speed) {
@@ -561,6 +632,27 @@
 
       gpsSource = 'appinventor';
       
+      // Calcula direção baseada na movimentação (Heading estimado)
+      // Nota: Se o App Inventor enviar o heading no futuro, podemos usar ele diretamente.
+      const now = Date.now();
+      if (lastHeadingTime > 0 && (now - lastHeadingTime) < 3000) {
+        const dy = lat - lastHeadingLat;
+        const dx = (lng - lastHeadingLng) * Math.cos(lat * Math.PI / 180);
+        const calcHeading = (Math.atan2(dy, dx) * 180 / Math.PI) + 90;
+        // Ajuste para 0-360
+        let finalHeading = calcHeading;
+        if (finalHeading < 0) finalHeading += 360;
+        if (finalHeading >= 360) finalHeading -= 360;
+        
+        // Suavização simples
+        currentHeading = finalHeading;
+        atualizarBussola(currentHeading);
+      }
+
+      lastHeadingLat = lat;
+      lastHeadingLng = lng;
+      lastHeadingTime = now;
+
       // Se veio 0 (porque seu App Inventor não tem Speed), o HTML calcula sozinho
       processarNovaPosicao(lat, lng, speed);
     }
@@ -635,7 +727,13 @@
           if (position.coords.speed !== null && position.coords.speed >= 0) {
             speedKmh = Math.round(position.coords.speed * 3.6);
           }
-          
+
+          // GPS do navegador muitas vezes envia o Heading (direção)
+          if (position.coords.heading !== null && !isNaN(position.coords.heading)) {
+            // Heading é 0=Norte, 90=Leste
+            atualizarBussola(position.coords.heading);
+          }
+
           processarNovaPosicao(newLat, newLng, speedKmh);
         }, 
         showError, 
@@ -651,6 +749,7 @@
       }, 8000);
     }
 
+    // Inicialização do Mapa
     function initMap() {
       map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false });
       aplicarTemaMapa(); 
@@ -658,9 +757,11 @@
 
       map.on('dragstart', () => { isFollowing = false; });
 
+      // Evento de Busca de Radares
       $("#btn-search-radar").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
       
+      // Evento de Cálculo de Rota
       $("#btn-calc-route").click(async () => {
         const endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
@@ -677,6 +778,7 @@
       });
       $("#route-query").keypress((e) => { if (e.which == 13) $("#btn-calc-route").click(); });
 
+      // Controle das barras de busca
       function fecharTodasBarras() { 
         searchActive = false; routeActive = false; 
         $("#search-bar-radares").removeClass('active'); 
@@ -709,6 +811,7 @@
         }
       });
 
+      // Controles de Zoom e Refresh
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => { showNotification("Atualizando base de radares..."); carregarRadares(); });
@@ -719,6 +822,7 @@
       carregarRadares();
     }
    
+    // Injeta dados de radares estáticos (IA/Fallback)
     function injetarRadaresIA() {
       return [
         { lat: -19.919007, lng:-43.938792, end: "Av. Afonso Pena, Próx. à Praça Sete/Sentido Savassi", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
@@ -730,12 +834,14 @@
       ].map(r => [ null, null, r.end, r.tipo, r.vel, null, null, null, null, `${r.lat},${r.lng}` ]);
     }
 
+    // Função Principal de Carregamento de Radares
     async function carregarRadares() {
       if (radarMarkers.length > 0) {
           radarMarkers.forEach(marker => map.removeLayer(marker));
           radarMarkers = [];
       }
 
+      // Tenta ler JSON local primeiro
       try {
         console.log("Tentando JSON local...");
         const response = await fetch(`radares.json?v=${Date.now()}`);
@@ -749,6 +855,7 @@
         }
       } catch (e) { console.warn("Falha JSON local:", e); }
 
+      // Fallback para API PBH
       $("#loading").show().html("<div class='loading-spinner'></div><div>Conectando API PBH...</div>");
       try {
         const metaResponse = await fetch(`${API_PBH_BASE}package_show?id=fiscalizacao-eletronica`);
@@ -772,6 +879,7 @@
       }
     }
 
+    // Parser CSV simples
     function parseCSVtoRecords(csvText) {
       const lines = csvText.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length < 2) return [];
@@ -797,6 +905,7 @@
       return out;
     }
 
+    // Renderiza os marcadores no mapa
     function renderizarRadaresNoMapa(records, origem) {
       const radaresExternos = records || [];
       const todosOsRadares = [...radaresExternos, ...injetarRadaresIA()];
@@ -838,6 +947,7 @@
       else showNotification("Nenhum radar encontrado.");
     }
     
+    // Verifica proximidade com radares
     function verificarProximidade(uLat, uLng) {
       let alertTriggered = false;
       radarMarkers.forEach(marker => {
@@ -862,6 +972,7 @@
       });
     }
 
+    // Busca radares por texto
     function buscarRadares(query) {
       if (!query || query.length < 2) return;
       let encontrou = false; const boundsGroup = L.featureGroup(); const q = query.toLowerCase();
@@ -875,6 +986,7 @@
       else showNotification("Nenhum radar encontrado.");
     }
 
+    // Tratamento de erros de GPS
     function showError(error) {   
       // Se o App Inventor já está mandando dados, ignora erros do navegador
       if (gpsSource === 'appinventor') return; 
@@ -893,17 +1005,17 @@
       }
     }
     
+    // Desbloquear áudio no primeiro clique (requisito dos navegadores)
     document.addEventListener('click', function desbloquearAudio() {
         const sound = document.getElementById("alert-soud");
         if (sound) sound.play().then(() => { sound.pause(); sound.currentTime = 0; }).catch(() => {});
         document.removeEventListener('click', desbloquearAudio);
     }, { once: true });
     
+    // Inicializa o app ao carregar a página
     window.onload = initMap;
   </script>
-
-
-
-    
+   
 </body>
 </html>
+
