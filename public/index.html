@@ -155,8 +155,8 @@
   position: absolute;
   top: 20px; /* Parte superior da tela */
   left: 20px; /* Lado esquerdo */
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   z-index: 500; /* Mesmo nível dos botões de mapa */
   display: flex;
   align-items: center;
@@ -276,7 +276,10 @@ align-items: center;
 justify-content: center; 
 } 
 .speed-bg {
- position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+ position: absolute; inset: 0; 
+width: 100%;
+ height: 100%; 
+object-fit: contain;
  pointer-events: none; } 
 
 .speed-value {
@@ -284,7 +287,8 @@ justify-content: center;
   /* Centralização exata no eixo X e ajuste fino no Y */
   top: 50%; 
   left: 50%; 
-  transform: translate(-50%, -50%); 
+transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */ 
+
     /* Estilização */
   font-size: 28px;
   font-weight: 700; 
@@ -300,7 +304,6 @@ justify-content: center;
   font-variant-numeric: tabular-nums; 
   letter-spacing: -0.5px;
 }
-
     
     
     /* Alerts & Toasts */
