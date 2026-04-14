@@ -14,8 +14,6 @@
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
-  <!-- Leaflet Rotated Marker -->
-  <script src="https://unpkg.com/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.js"></script>
   <!-- Fonte Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
@@ -138,13 +136,10 @@
       z-index: 1;
     }
 
-    /* Container de rotação do mapa */
-    .map-rotate-container {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    /* Container de rotação do mapa - aplica transform CSS diretamente no mapa */
+    .map-rotated {
       transform-origin: center center;
+      transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
 
     /* ================= COMPASS WIDGET ================= */
@@ -460,9 +455,8 @@
     let lastHeadingLng = 0;
     let currentHeading = 0;
 
-    // Variável de rotação do mapa (ângulo de rotação da bússola)
-    let mapRotationAngle = 0;
-    let userMarkerRotation = 0;
+    // Variável de rotação do mapa - ângulo em graus
+    let currentMapRotation = 0;
 
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
 
@@ -495,45 +489,40 @@
       'Leitor de Reconhecimento Facial': 'Reconhecimento Facial (OCR-F)'
     };
 
-    // ================= FUNÇÃO DE ROTAÇÃO DO MAPA (CORRIGIDA) =================
-    // Esta função rotaciona o marker do usuário e ajusta a visualização
-    // Simula a rotação do mapa mantendo a orientação Norte-Sul real
+    // ================= FUNÇÃO DE ROTAÇÃO DO MAPA (CSS TRANSFORM) =================
+    // Esta função aplica rotação diretamente no elemento do mapa usando CSS
     function rotationMap(angleDegrees) {
-      if (!userMarker) {
-        showNotification("Aguardando GPS para rotacionar...");
-        return;
-      }
+      const mapElement = document.getElementById('map');
+      if (!mapElement) return;
       
       // Acumula o ângulo de rotação
-      mapRotationAngle = (mapRotationAngle + angleDegrees) % 360;
+      currentMapRotation = (currentMapRotation + angleDegrees) % 360;
       
-      // Rotaciona o marker do usuário para indicar a direção "para cima" do mapa
-      // O marker rotaciona no sentido oposto para que o ícone do usuário continue apontando para Norte
-      userMarkerRotation = (userMarkerRotation - angleDegrees) % 360;
+      // Aplica a rotação no elemento do mapa
+      mapElement.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+      mapElement.style.transform = `rotate(${currentMapRotation}deg)`;
       
-      if (userMarker.setRotation) {
-        userMarker.setRotation(userMarkerRotation);
-      }
-      
-      // Reorienta a bússola visualmente
-      atualizarBussola(currentHeading - mapRotationAngle);
+      // Ajusta a bússola para compensar a rotação do mapa
+      atualizarBussola(currentHeading - currentMapRotation);
       
       // Mostra notificação
-      const directionNames = ['Norte', 'Leste', 'Sul', 'Oeste'];
-      const directionIndex = Math.round(mapRotationAngle / 90) % 4;
-      showNotification(`Mapa orientado para ${directionNames[directionIndex]}`);
+      const directionNames = ['↑ Norte', '→ Leste', '↓ Sul', '← Oeste'];
+      const directionIndex = Math.round(currentMapRotation / 90) % 4;
+      const rotationDegrees = currentMapRotation === 0 ? '0°' : `${currentMapRotation}°`;
+      showNotification(`Mapa girado ${rotationDegrees} (${directionNames[directionIndex]})`);
       
       // Salva a preferência
-      localStorage.setItem('mapRotation', mapRotationAngle);
+      localStorage.setItem('mapRotation', currentMapRotation);
     }
     
     // Função para resetar rotação
     function resetMapRotation() {
-      mapRotationAngle = 0;
-      userMarkerRotation = 0;
-      if (userMarker && userMarker.setRotation) {
-        userMarker.setRotation(0);
-      }
+      const mapElement = document.getElementById('map');
+      if (!mapElement) return;
+      
+      currentMapRotation = 0;
+      mapElement.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1)';
+      mapElement.style.transform = 'rotate(0deg)';
       atualizarBussola(currentHeading);
       showNotification("Mapa reorientado para o Norte");
       localStorage.setItem('mapRotation', 0);
@@ -549,7 +538,7 @@
       const needle = document.getElementById('compass-needle-img');
       if (needle) {
         // Ajusta a rotação da ponteira considerando a rotação do mapa
-        const adjustedHeading = (headingDegrees + mapRotationAngle) % 360;
+        const adjustedHeading = headingDegrees % 360;
         needle.style.transform = `rotate(${adjustedHeading}deg)`;
       }
     }
@@ -582,7 +571,7 @@
         if (finalHeading < 0) finalHeading += 360;
         if (finalHeading >= 360) finalHeading -= 360;
         currentHeading = finalHeading;
-        atualizarBussola(currentHeading);
+        atualizarBussola(currentHeading - currentMapRotation);
       }
 
       lastHeadingLat = lat;
@@ -609,29 +598,25 @@
       userLat = newLat; userLng = newLng;
 
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
-      
-      // Usa o marker com rotação suportada
+      const userIcon = L.icon({
+          iconUrl: userIconUrl,
+          iconSize: [50, 50],
+          iconAnchor: [25, 50], 
+          popupAnchor: [0, -50],
+          className: 'user-gps-marker'
+      });
+
       if (!userMarker) {
-        userMarker = L.marker([newLat, newLng], {
-          icon: L.icon({
-            iconUrl: userIconUrl,
-            iconSize: [50, 50],
-            iconAnchor: [25, 50],
-            popupAnchor: [0, -50],
-            className: 'user-gps-marker'
-          }),
-          rotationAngle: userMarkerRotation,
-          rotationOrigin: 'center center'
-        }).addTo(map);
+        userMarker = L.marker([newLat, newLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
         userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
         
         // Restaura rotação salva
         const savedRotation = localStorage.getItem('mapRotation');
         if (savedRotation && !gpsInitialized) {
-          mapRotationAngle = parseFloat(savedRotation);
-          userMarkerRotation = -mapRotationAngle;
-          userMarker.setRotation(userMarkerRotation);
-          atualizarBussola(currentHeading);
+          currentMapRotation = parseFloat(savedRotation);
+          const mapElement = document.getElementById('map');
+          if (mapElement) mapElement.style.transform = `rotate(${currentMapRotation}deg)`;
+          atualizarBussola(currentHeading - currentMapRotation);
         }
         
         if (!gpsInitialized) {
@@ -672,7 +657,7 @@
 
           if (position.coords.heading !== null && !isNaN(position.coords.heading)) {
             currentHeading = position.coords.heading;
-            atualizarBussola(currentHeading);
+            atualizarBussola(currentHeading - currentMapRotation);
           }
 
           processarNovaPosicao(newLat, newLng, speedKmh);
