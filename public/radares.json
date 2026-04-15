@@ -334,7 +334,9 @@
     [316,"1614","Rodovia Juscelino Kubitschek (040), cruzamento com Anel Rodoviário Celso Mello Azevedo"," Leitor de Reconhecimento Facial (OCR-F)","70","Rio de Janeiro/Vitória","10029","KBH53032","-20.001157,-43.964560 "],
     [317,"1615","Rodovia Januário Carneiro, cruzamento com Alameda Oscar Niemeyer"," Leitor Inteligente de Placas (OCR-P)","60"," Belo Horizonte/Nova Lima","Único","10030","KBH53033","-19.983492,-43.947051 "],
     [318,"1616"," Rodovia Januário Carneiro, cruzamento com Alameda Oscar Niemeyer "," Leitor de Reconhecimento Facial (OCR-F)","60","Nova Lima/Belo Horizonte","10034","KBH53034","-19.983976,-43.946600 "],
-    [319,"1617","Anel Rodoviário, próximo à Rua Walter Ianni","Controle Eletrônico de Velocidade","70","Vitória/Rio de Janeiro","Único","10035","KBH53035","-19.860565,-43.919338 "]
+    [319,"1617","Anel Rodoviário, próximo à Rua Walter Ianni","Controle Eletrônico de Velocidade","70","Vitória/Rio de Janeiro","Único","10035","KBH53035","-19.860565,-43.919338 "],
+    [320,"1618"," Anel Rodoviário Celso Mello Azevedo, próximo bairro Jardim Vitória "," Leitor Inteligente de Placas (OCR-P)","60","","Vitória/Rio de Janeiro ","Único","10036","KBH53036"," -19.854480,-43.891282 "],
+    [321,"1619","Anel Rodoviário Celso Mello Azevedo, próximo bairro Jardim Vitória "," Leitor de Reconhecimento Facial (OCR-F)","60","Vitória/Rio de Janeiro","10037","KBH53037"," -19.854056,-43.890767"]
 
 
   ]
