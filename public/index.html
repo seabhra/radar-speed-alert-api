@@ -505,7 +505,10 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
     // Função auxiliar para obter URL do ícone
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
-      const isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('Misto');
+    
+      // Verificar primeiro por tipos específicos que contêm "Velocidade" mas NÃO são CRV
+     const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) 
+                          || tipoLimpo.includes('Misto');
 
       if (isRadarVelocidade) {
         const vel = parseInt(velocidade) || 0;
