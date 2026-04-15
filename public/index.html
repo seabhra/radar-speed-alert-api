@@ -493,51 +493,76 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
       'default': '/imagens_app/ic_radar_cev_v2.png'
     };
 
-    const ajusteNomes = {
-      'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
-      
-      'Controle de Redução de Velocidade (CRV)':'Painel de Redução de Velocidade (PRV)',
-      'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
-      'Detector de Avanço de Semáforo': 'Radar de Avanço de Semáforo (DAS)',
-      'Detector de Conversão em Local Proibido' :'Detector de Conversão em Local Proibido (DCP)',
-      'Detector de Tráfego em Local Proibido': 'Zona de Tráfego Proibido (ZTP)',
-      'Detector de Invasão de Faixa Exclusiva (DIFEX)': 'Faixa Exclusiva de Ônibus e Táxis (FOT)',
-      'Detector de Faixa Preferencial de Ônibus (BUS)': 'Faixa Preferencial de Ônibus (BUS)',
-      'Detector de Uso de Celular': 'Radar de Uso de Celular (DUC)',
-      'Leitor Inteligente de Placas': 'Leitor de Placas (OCR-P)',
-      'Leitor de Reconhecimento Facial': 'Reconhecimento Facial (OCR-F)'
-    };
+  const ajusteNomes = {
+  'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
+  'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
+  'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
+  'Detector de Avanço de Semáforo': 'Radar de Avanço de Semáforo (DAS)',
+  'Detector de Conversão em Local Proibido': 'Detector de Conversão em Local Proibido (DCP)',
+  'Detector de Tráfego em Local Proibido': 'Zona de Tráfego Proibido (ZTP)',
+  'Detector de Invasão de Faixa Exclusiva (DIFEX)': 'Faixa Exclusiva de Ônibus e Táxis (FOT)',
+  'Detector de Faixa Preferencial de Ônibus (BUS)': 'Faixa Preferencial de Ônibus (BUS)',
+  'Detector de Uso de Celular': 'Radar de Uso de Celular (DUC)',
+  'Leitor Inteligente de Placas': 'Leitor de Placas (OCR-P)',
+  'Leitor de Reconhecimento Facial': 'Reconhecimento Facial (OCR-F)',
+  'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': 'Radar Misto (CEM)',
+  'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP)': 'Radar Misto (CEM)',
+  'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (MOVE)': 'Radar Misto (CEM)'
+};
+
 
     // Função auxiliar para obter URL do ícone
     function getIconUrl(tipo, velocidade) {
-      const tipoLimpo = tipo ? tipo.trim() : "";
-    
-      // Verificar primeiro por tipos específicos que contêm "Velocidade" mas NÃO são CRV
-     const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) 
-                          || tipoLimpo.includes('Misto');
+  const tipoLimpo = tipo ? tipo.trim() : "";
+  
+  // Verificar CEM primeiro (pois contém 'Misto' mas tem ícone específico)
+  if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) {
+    return iconMap['Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)'] || '/imagens_app/ic_radar_cem_v2.png';
+  }
+  
+  // Verificar DPFP (Detector de Parada sobre Faixa de Pedestres)
+  if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) {
+    return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
+  }
+  
+  // Verificar CRV (pois contém 'Velocidade' mas não deve ser tratado como radar de velocidade)
+  if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') {
+    return iconMap['Controle de Redução de Velocidade (CRV)'];
+  }
+  
+  // Radar de velocidade (excluindo CRV que já foi tratado)
+  const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) 
+                          || (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('Redução'));
 
-      if (isRadarVelocidade) {
-        const vel = parseInt(velocidade) || 0;
-        if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
-        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png'; 
-        return '/imagens_app/ic_radar_cev_v2.png'; 
-      }
-      
-      let icone = iconMap[tipoLimpo];
-      if (!icone) {
-        if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
-        else if (tipoLimpo.includes('Redutor')) icone = iconMap['Painel de Redução de Velocidade (PRV)'];  
-        else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
-        else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
-        else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
-        else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em local Proibido'];
-        else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa de Exclusiva - MOVE'];
-      }
-      if (!icone) icone = iconMap['default'];
-      return icone;
-    }
-
-    // Função para mostrar notificação toast
+  if (isRadarVelocidade) {
+    const vel = parseInt(velocidade) || 0;
+    if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
+    if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png'; 
+    return '/imagens_app/ic_radar_cev_v2.png'; 
+  }
+  
+  // Busca direta no iconMap
+  let icone = iconMap[tipoLimpo];
+  
+  // Fallback por palavras-chave
+  if (!icone) {
+    if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
+    else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) icone = iconMap['Controle de Redução de Velocidade (CRV)'];
+    else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
+    else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
+    else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
+    else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em Local Proibido'];
+    else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa Exclusiva - MOVE'];
+    else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres') || tipoLimpo.includes('DPFP')) 
+      icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
+    else if (tipoLimpo.includes('Faixa Exclusiva') || tipoLimpo.includes('DIFEX')) 
+      icone = iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'];
+  }
+  
+  if (!icone) icone = iconMap['default'];
+  return icone;
+}
+     // Função para mostrar notificação toast
     function showNotification(message) {
       const $toast = $("#toast-msg"); 
       $toast.text(message).addClass("show");
