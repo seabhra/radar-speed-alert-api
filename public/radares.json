@@ -20,7 +20,7 @@
     [6,"34","Av. Antônio Abrahão Caram, a 42 metros da Rua Alexandre Barbosa","Controlador Eletrônico de Velocidade","60","São Luiz/Liberdade","Único","2401","KBH2401","-19.86091,-43.96401"],
     [7,"45","Av. Deputado Álvaro Antônio, a 260 metros da Av. Adão Alves de Souza","Controlador Eletrônico de Velocidade","60","Betânia/Barreiro","Único","1402","KBH1402","-19.97366,-44.00665"],
     [8,"61","Av. José Cândido da Silveira, 509","Controlador Eletrônico de Velocidade","60","Bairro/Centro","Único","5201","KBH5201","-19.89350,-43.92258"],
-    [9,"62","Av. José Cândido da Silveira, 1500","Controlador Eletrônico de Velocidade","60","Centro/Bairro","Único","5204","KBH5204","-19.88400,-43.91592"],
+    [9,"62","Av. José Cândido da Silveira, 1500","Controlador Eletrônico de Velocidade","60","Centro/Bairro","Único","5204","KBH5204","-19.883378,-43.915411"],
     [10,"66","Av. Waldyr Soeiro Emrich, a 87 metros da Av. Adão Alves de Souza","Controlador Eletrônico de Velocidade","60","Betânia/Diamante","Único","1204","KBH1204","-19.97804,-44.00553"],
     [11,"70","Av. Teresa Cristina oposto ao nº 888","Controlador Eletrônico de Velocidade","60","Bairro/Centro","Único","6101","KBH6101","-19.91733,-43.96547"],
     [12,"72","Av. Teresa Cristina, oposto ao nº 3.826","Controlador Eletrônico de Velocidade","60","Bairro/Centro","Único","6103","KBH6103","-19.92777,-43.98282"],
@@ -79,11 +79,11 @@
     [64,"1206","Av. Heráclito Mourão de Miranda, esquina Av.Ayres da Mata Machado"," Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP) ","60","Bandeirantes/Serrano","Único","6000003","6000003","-19.878621,-44.005389"],
     [65,"1207","Av. Heráclito Mourão de Miranda, esquina Av.Ayres da Mata Machado","Detector de Conversão em Local Proibido ","60","Bandeirantes/Serrano","Único","6000003","6000003"," -19.878384,-44.005533 "],
     [66,"1223","Av. José Cândido da Silveira, esquina com Rua Lauro Gomes Vidal","Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP) ","60","Cidade Nova/Goiânia","Único","1136","BRI1136"," -19.880036,-43.913062"],
-    [67,"1224","Av. José Cândido da Silveira, esquina com Rua Lauro Gomes Vidal"," Detector de Conversão em Local Proibido ","60","Cidade Nova/Goiânia","Único","1136","BRI1136"," -19.880006,-43.913003 "],
-    [68,"1225","Rodovia MGT-262, próximo da Rua  Aparecida do Norte","Controle de Redução de Velocidade (CRV) ","40","Belo Horizonte/Sabará","Único","1185","BRI1185","-19.869036,-43.893642 "],
+    [67,"1224","Trevo de Sabará"," Leitor de Reconhecimento Facial (OCR-F)","60","Belo Horizonte/Goiânia","Único","1136","BRI1136","-19.875367,-43.904361"],
+    [68,"1225","Rodovia MGT-262, próximo da Rua  Aparecida do Norte","Controle de Redução de Velocidade (CRV) ","40","Belo Horizonte/Sabará","Único","1185","BRI1185"," -19.869036,-43.893642 "],
     [69,"1226","Rodovia MGT-262, próximo da Rua  Aparecida do Norte","Controle de Redução de Velocidade (CRV)","40","Sabará/Belo Horizonte","Único","1298","BRI1298","-19.868526,-43.893203"],
-    [70,"1227","Rua Lauro Gomes Vidal, esquina com Av. José Cândido da Silveira","Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP)","40","Santa Inês/Dom Joaquim","Único","1425","BRI1425","-19.879817,-43.913113 "],
-    [71,"1228","Rua Quatro Mil Novecentos e Sessenta e Quatro, esquina com Av. José Cândido da Silveira","Detector de Avanço de Semáforo","40","Santa Inês/Dom Joaquim","Único","1427","BRI1427","-19.913263,-43.927839"],
+    [70,"1227","Rua Lauro Gomes Vidal, esquina com Av. José Cândido da Silveira"," Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP)","40","Santa Inês/Dom Joaquim","Único","1425","BRI1425","-19.879817,-43.913113 "],
+    [71,"1228","Rua Quatro Mil Novecentos e Sessenta e Quatro, esquina com Av. José Cândido da Silveira","Detector de Avanço de Semáforo","40","Santa Inês/Dom Joaquim","Único","1427","BRI1427"," -19.879817,-43.913105 "],
     [72,"1229","Av. Heráclito de Mourão Miranda, esquina com Av. Santa Terezinha","Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP) ","60","Bandeirantes/Serrano","Único","6000001","6000001"," -19.869227,-43.999330 "],
     [73,"1230","Av. Heráclito de Mourão Miranda, esquina com Av. Santa Terezinha"," Detector de Conversão em Local Proibido ","60","Bandeirantes/Serrano","Único","6000001","6000001"," -19.869265,-43.999340 "],
     [74,"1231","Av. Heráclito de Mourão Miranda, esquina com Av. Santa Terezinha","Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP) ","60","Castelo/Bandeirantes","Único","6000002","6000002"," -19.869545,-43.999045 "],
@@ -189,6 +189,7 @@
     [174,"1429","Av. Cristiano Machado,  a 500 metros da Rua Cel. Romão da Mota","Controlador Eletrônico de Velocidade","70","Bairro/Centro","Único","1535","BRI1535"," -19.82575, -43.94380"],
     [175,"1430","Rua Dom Leme, Esq. Av. Cristiano Machado","Detector de Avanço de Semáforo","40","Silveira/Cidade Nova","Único","1","1"," -19.88604, -43.92949"],
     [176,"1431","Av. Cristiano Machado, Esq. Av. Vilarinho"," Detector de Invasão de Faixa Exclusiva (DIFEX)","60","Centro/Bairro","Único","1524","BRI1524"," -19.822936,-43.945158"],
+
     [177,"1432","Av. Cristiano Machado, oposto ao 3411","Detector de Avanço de Semáforo","60","Bairro/Centro","Único","1039","BRI1039","-19.909358,-43.927750"],
     [178,"1433","Av. Cristiano Machado, oposto ao 4001 - Pista Principal","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1140","BRI1140","-19.909148,-43.927469"],
     [179,"1434","Av. Cristiano Machado, oposto ao 4001 - Pista Marginal","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1201","BRI1201","-19.909127,-43.927442"],
@@ -197,7 +198,8 @@
     [182,"1438","Av. Cristiano Machado, 2150","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1029","BRI1029"," -19.888671,-43.929170"],
     [183,"1439","Rua Mato Grosso, Esq. Av. do Contorno","Detector de Avanço de Semáforo","60","Barro Preto/Centro","Único","1","1","-19.918606,-43.939120"],
     [184,"1440","Av. Vilarinho, ESq. Rua Madre Tereza"," Detector de Invasão de Faixa Exclusiva (DIFEX)","60","Centro/Venda Nova","Único","1397","BRI1397","-19.808710,-43.967983"],
-    [185,"1441","Av. Presidente Antônio Carlos, Esq. Rua Rio Novo","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1399","BRI1399"," -19.907277,-43.943149 "],
+    
+[185,"1441","Av. Presidente Antônio Carlos, Esq. Rua Rio Novo","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1399","BRI1399"," -19.907277,-43.943149 "],
     [186,"1442","Av. Presidente Antônio Carlos, Esq. Rua Rio Novo","Detector de Avanço de Semáforo","60","Bairro/Centro","Único","1402","BRI1402"," -19.907350,-43.943530 "],
     [187,"1443","Av. do Contorno, Esq. Rua Espírito Santo","Detector de Avanço de Semáforo","60","Barro Preto/Centro","Único","1741","BRI1741","-19.919116,-43.937682"],
     [188,"1445","Av. do Contorno, Esq. Rua Espírito Santo","Detector de Avanço de Semáforo","60","Barro Preto/Centro","Único","1700","BRI1700","-19.919101,-43.937661"],
@@ -220,6 +222,7 @@
     [205,"1462","Av. do Contorno, Esq. Av. dos Andradas","Detector de Avanço de Semáforo","60","Floresta/Santa Efigênia","Único","1262","BR11262","-19.917697,-43.932800"],
     [206,"1463","Av. Tereza Cristina, Esq. Rua Santa Quitéria","Detector de Faixa Preferencial de Ônibus (BUS)","60","Centro/Carlos Prates","Único","1299"," -19.916984,-43.964616"],
     [207,"1464","Av. Vilarinho, Esq. Rua Antônio José de Oliveira"," Detector de Invasão de Faixa Exclusiva (DIFEX)","60","Centro/Venda Nova","Único","1726","BRI1726","-19.81359, -43.95677"],
+
     [208,"1465","Av. Dos Andradas, Esq. Av. Silviano Brandão"," Detector de Faixa Preferencial de Ônibus (BUS)","60","Bairro/Centro","Único","1676","BRI1676"," -19.907869,-43.910501 "],
     [209,"1466","Av. Carandaí, Esq. Av. Afonso Pena - Pista da Direita","Detector de Avanço de Semáforo","60","Santa Efigênia/Centro","Único","1676","BRI1676"," -19.926897,-43.933640"],
     [210,"1467","Av. Nossa Senhora do Carmo, Esq. Praça da Harmonia - Pista Externa","Detector de Avanço de Semáforo","60","Centro/Bairro","Único","1362","BRI1362","-19.921734,-43.937536"],
@@ -303,7 +306,7 @@
     [288,"1586","Rua Conde Pereira Carneiro, Esquina Av. Amazonas","Detector de Uso de Celular","60","Gameleira/ Centro","Único","1001","KBH5303","-19.931347,-43.985536"],
     [289,"1587","Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos","Detector de Uso de Celular","60","São Francisco/ Centro","Único","1002","KBH5304","-19.871740,-43.955001"],
     [290,"1588","Rod. Camilo Teixeira da Costa, 210 - Tupi ","Controle de Redução de Velocidade (CRV)","60","Belo Horizonte/Tupi","Único","1003","KBH5305","-19.835851,-43.907504"],
-    [291,"1589","Rod. Camilo Teixeira da Costa, 210 - Tupi","Controle de Redução de Velocidade (CRV)","60","Tupi/Belo Horizonte","Único","1004","KBH5302","-19.835947,-43.907236"]
+    [291,"1589","Rod. Camilo Teixeira da Costa, 210 - Tupi","Controle de Redução de Velocidade (CRV)","60","Tupi/Belo Horizonte","Único","1004","KBH5306","-19.835947,-43.907236"]
   ]
 }
 
