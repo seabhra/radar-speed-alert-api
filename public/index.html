@@ -517,10 +517,11 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
       let icone = iconMap[tipoLimpo];
       if (!icone) {
         if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
+        else if (tipoLimpo.includes('Redutor')) icone = iconMap['Painel de Redução de Velocidade (PRV)'];  
         else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
         else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
         else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
-        else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão/Retorno em local Proibido'];
+        else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em local Proibido'];
         else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa de Exclusiva - MOVE'];
       }
       if (!icone) icone = iconMap['default'];
