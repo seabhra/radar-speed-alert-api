@@ -307,7 +307,36 @@
     [289,"1587","Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos","Detector de Uso de Celular","60","São Francisco/ Centro","Único","1002","KBH5304","-19.871740,-43.955001"],
     [290,"1588","Rod. Camilo Teixeira da Costa, 210","Controle de Redução de Velocidade (CRV)","60","Belo Horizonte/Tupi","Único","1003","KBH5305","-19.835851,-43.907504"],
     [291,"1589","Rod. Camilo Teixeira da Costa, 210","Controle de Redução de Velocidade (CRV)","60","Tupi/Belo Horizonte","Único","1004","KBH5306","-19.835947,-43.907236"],
-    [292,"1590"," Av. Amazonas, Esquina Av. Afonso Pena ","Detector de Parada sobre Faixa de Pedestres  (DPFP)","60","Praça da Estação/Praça Sete","Único","1005","KBH5307","-19.918896,-43.938513"]
+    [292,"1590"," Av. Amazonas, Esquina Av. Afonso Pena ","Detector de Parada sobre Faixa de Pedestres  (DPFP)","60","Praça da Estação/Praça Sete","Único","1005","KBH5307","-19.918896,-43.938513"],
+    [293,"1591"," Av. Amazonas, Esquina Av. Afonso Pena ","Detector de Parada sobre Faixa de Pedestres  (DPFP)","60","Praça Sete/ Praça da Estação","Único","1006","KBH5308"," -19.919183,-43.938741"],
+    [294,"1592","Av. Afonso Pena, Esquina Av. Amazonas","Detector de Parada sobre Faixa de Pedestres  (DPFP)","60","Rodoviária/Mangabeiras","Único","1007","KBH5309"," -19.918972,-43.938776"],
+    [295,"1593","Av. Afonso Pena, Esquina Av. Amazonas","Detector de Parada sobre Faixa de Pedestres  (DPFP)","60","Mangabeiras/Rodoviária","Único","1008","KBH53010"," -19.919153,-43.938521 "],
+    [296,"1594","Trevo de Sabará"," Leitor Inteligente de Placas (OCR-P)","60","Sabará/Belo Hoizonte","Único","1009","KBH53011","-19.875438,-43.904167"],
+    [297,"1595","Av. Contagem, Esq. Rua Timóteo"," Leitor Inteligente de Placas (OCR-P)","60","Bairro/Centro","Único","10010","KBH53012","-19.894163,-43.910669"],
+    [298,"1596","Av. Contagem, Esq. Rua Timóteo"," Leitor de Reconhecimento Facial (OCR-F)","60","Bairro/Centro","Único","10011","KBH53013","-19.894062,-43.910519"],
+    [299,"1597","Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Cristiano Machado"," Leitor Inteligente de Placas (OCR-P)","70","Vitória/Rio de Janeiro","Único","10012","KBH53014"," -19.865953,-43.929927"],
+    [300,"1598","Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Cristiano Machado "," Leitor de Reconhecimento Facial (OCR-F)","70"," Rio de Janeiro/Vitória","Único","10013","KBH53015","-19.866175,-43.929809 "],
+    [301,"1599","Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Antônio Carlos"," Leitor Inteligente de Placas (OCR-P)","70"," Vitória/Rio de Janeiro ","Único","10014","KBH53016","-19.878243,-43.952168"],
+    [302,"1600","Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Antônio Carlos "," Leitor de Reconhecimento Facial (OCR-F)","70"," Rio de Janeiro/Vitória ","10015","KBH53018"," -19.878818,-43.952383"],
+    [303,"1601"," Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Carlos Luz "," Leitor Inteligente de Placas (OCR-P)","70","Vitória/Rio de Janeiro ","Único","10016","KBH53019","-19.886899,-43.969012 "],
+    [304,"1602","Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Carlos Luz ","Leitor de Reconhecimento Facial (OCR-F)","70","Rio de Janeiro/Vitória ","Único","10017","KBH53020"," -19.887348,-43.969109"],
+    [305,"1603","Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Pedro II "," Leitor Inteligente de Placas (OCR-P)","70"," Vitória/Rio de Janeiro ","Único","10018","KBH53021"," -19.904484,-43.987155 "],
+    [306,"1604","Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Pedro II "," Leitor de Reconhecimento Facial (OCR-F)","70"," Rio de Janeiro/Vitória ","Único","10019","KBH53022"," -19.904948,-43.987380 "],
+    [307,"1605"," Anel Rodoviário Celso Mello Azevedo, cruzamento com Rua Pará de Minas"," Leitor Inteligente de Placas (OCR-P)","70","Vitória/Rio de Janeiro ","Único","10020","KBH53023"," -19.913744,-43.993700 "],
+    [308,"1606"," Anel Rodoviário Celso Mello Azevedo, cruzamento com Rua Pará de Minas "," Leitor de Reconhecimento Facial (OCR-F)","70","Rio de Janeiro/Vitória","Único","10021","KBH53024","-19.914349,-43.993657"],
+    [309,"1607"," Anel Rodoviário Celso Mello Azevedo, cruzamento com Rodovia Juscelino Kubitschek (040)"," Leitor Inteligente de Placas (OCR-P)","70"," Vitória/Rio de Janeiro ","Único","10022","KBH53025","-19.926070,-44.006166 "],
+    [310,"1608"," Anel Rodoviário Celso Mello Azevedo, cruzamento com Rodovia Juscelino Kubitschek (040)"," Leitor de Reconhecimento Facial (OCR-F)","70","Rio de Janeiro/Vitória","10023","KBH53026"," -19.926796,-44.006059"],
+    [311,"1609"," Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Amazonas"," Leitor Inteligente de Placas (OCR-P)","70"," Vitória/Rio de Janeiro ","Único","10024","KBH53027","-19.945970,-44.008076 "],
+    [312,"1610"," Anel Rodoviário Celso Mello Azevedo, cruzamento com Av. Amazonas "," Leitor de Reconhecimento Facial (OCR-F)","70","Rio de Janeiro/Vitória","10025","KBH53028"," -19.949192,-44.008284 "],
+    [313,"1611",", Av. Waldir Soeiro Emrich, cruzamento com Anel Rodoviário Celso Mello Azevedo "," Leitor Inteligente de Placas (OCR-P)","60"," Vitória/Rio de Janeiro ","Único","10026","KBH53029"," -19.969497,-43.992916"],
+    [314,"1612"," Anel Rodoviário Celso Mello Azevedo, cruzamento com Waldir Soeiro Emrich"," Leitor de Reconhecimento Facial (OCR-F)","70","Rio de Janeiro/Vitória","10027","KBH53030"," -19.970818,-43.991114"],
+    [315,"1613 Rodovia Juscelino Kubitschek (040), cruzamento com Anel Rodoviário Celso Mello Azevedo "," Leitor Inteligente de Placas (OCR-P)","70"," Vitória/Rio de Janeiro ","Único","10028","KBH53031","-20.002064,-43.964882"],
+    [316,"1614","Rodovia Juscelino Kubitschek (040), cruzamento com Anel Rodoviário Celso Mello Azevedo"," Leitor de Reconhecimento Facial (OCR-F)","70","Rio de Janeiro/Vitória","10029","KBH53032","-20.001157,-43.964560 "],
+    [317,"1615","Rodovia Januário Carneiro, cruzamento com Alameda Oscar Niemeyer"," Leitor Inteligente de Placas (OCR-P)","60"," Belo Horizonte/Nova Lima","Único","10030","KBH53033","-19.983492,-43.947051 "],
+    [318,"1616"," Rodovia Januário Carneiro, cruzamento com Alameda Oscar Niemeyer "," Leitor de Reconhecimento Facial (OCR-F)","60","Nova Lima/Belo Horizonte","10034","KBH53034","-19.983976,-43.946600 "],
+    [319,"1617","Anel Rodoviário, próximo à Rua Walter Ianni","Controle Eletrônico de Velocidade","70","Vitória/Rio de Janeiro","Único","10035","KBH53035","-19.860565,-43.919338 "]
+
+
   ]
 }
 
