@@ -357,6 +357,20 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
     .loading-fullscreen .loading-text span { color: var(--accent-color); }
     .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.8rem; color: #777; animation: pulseText 1.8s ease-in-out infinite; }
     @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    /* Estilo para os ícones de radar padronizados */
+    .radar-marker-icon {
+      background: transparent !important;
+      border: none !important;
+    }
+    
+    .radar-marker-icon div {
+      transition: transform 0.2s ease;
+    }
+    
+    .radar-marker-icon div:hover {
+      transform: scale(1.1);
+    }
   </style>
 </head>
 <body>
@@ -438,10 +452,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
 
   <script>
     // Variáveis Globais
@@ -510,6 +520,25 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
   'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (MOVE)': 'Radar Misto DAS + MOVE (CEM)'
 };
 
+    // Função para criar ícone padronizado com divIcon (todos os ícones terão o mesmo tamanho)
+    function criarIconeRadar(iconeUrl, tamanho = 40) {
+        return L.divIcon({
+            html: `<div style="
+                width: ${tamanho}px; 
+                height: ${tamanho}px; 
+                background-image: url('${iconeUrl}'); 
+                background-size: contain; 
+                background-repeat: no-repeat; 
+                background-position: center;
+                background-color: transparent;
+                filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+            "></div>`,
+            iconSize: [tamanho, tamanho],
+            iconAnchor: [tamanho/2, tamanho],
+            popupAnchor: [0, -tamanho/2],
+            className: 'radar-marker-icon'
+        });
+    }
 
     // Função auxiliar para obter URL do ícone
     function getIconUrl(tipo, velocidade) {
@@ -668,10 +697,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
     function atualizarBussola(headingDegrees) {
       const needle = document.getElementById('compass-needle-img');
       if (needle) {
-        // Rota a imagem da ponteira. 'rotate(${deg}deg)'
-        // O valor negativo é usado se a imagem estiver orientada para o Norte por padrão,
-        // mas geralmente rotacionamos no sentido do movimento.
-        // Ajuste conforme a orientação original da sua imagem 'ic_compass_ponteira.png'.
         needle.style.transform = `rotate(${headingDegrees}deg)`; 
       }
     }
@@ -699,18 +724,15 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
       gpsSource = 'appinventor';
       
       // Calcula direção baseada na movimentação (Heading estimado)
-      // Nota: Se o App Inventor enviar o heading no futuro, podemos usar ele diretamente.
       const now = Date.now();
       if (lastHeadingTime > 0 && (now - lastHeadingTime) < 3000) {
         const dy = lat - lastHeadingLat;
         const dx = (lng - lastHeadingLng) * Math.cos(lat * Math.PI / 180);
         const calcHeading = (Math.atan2(dy, dx) * 180 / Math.PI) + 90;
-        // Ajuste para 0-360
         let finalHeading = calcHeading;
         if (finalHeading < 0) finalHeading += 360;
         if (finalHeading >= 360) finalHeading -= 360;
         
-        // Suavização simples
         currentHeading = finalHeading;
         atualizarBussola(currentHeading);
       }
@@ -719,7 +741,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
       lastHeadingLng = lng;
       lastHeadingTime = now;
 
-      // Se veio 0 (porque seu App Inventor não tem Speed), o HTML calcula sozinho
       processarNovaPosicao(lat, lng, speed);
     }
 
@@ -755,7 +776,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
         userMarker = L.marker([newLat, newLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
         userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
         
-        // Primeira posição recebida
         if (!gpsInitialized) {
           gpsInitialized = true;
           hideFullscreenLoading();
@@ -794,9 +814,7 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
             speedKmh = Math.round(position.coords.speed * 3.6);
           }
 
-          // GPS do navegador muitas vezes envia o Heading (direção)
           if (position.coords.heading !== null && !isNaN(position.coords.heading)) {
-            // Heading é 0=Norte, 90=Leste
             atualizarBussola(position.coords.heading);
           }
 
@@ -806,11 +824,10 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
         { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
       );
 
-      // Se o browser não conseguir GPS em 8s, é porque provavelmente está no App Inventor
       browserGpsTimeout = setTimeout(() => {
         if (!gpsInitialized && gpsSource === 'none') {
           showNotification("Aguardando GPS do app...");
-          hideFullscreenLoading(); // Tira o loading para não travar a tela
+          hideFullscreenLoading();
         }
       }, 8000);
     }
@@ -882,7 +899,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => { showNotification("Atualizando base de radares..."); carregarRadares(); });
 
-      // Tenta iniciar GPS do navegador (se falhar, espera o App Inventor)
       startGPSTracking();
       
       carregarRadares();
@@ -907,7 +923,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
           radarMarkers = [];
       }
 
-      // Tenta ler JSON local primeiro
       try {
         console.log("Tentando JSON local...");
         const response = await fetch(`radares.json?v=${Date.now()}`);
@@ -921,7 +936,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
         }
       } catch (e) { console.warn("Falha JSON local:", e); }
 
-      // Fallback para API PBH
       $("#loading").show().html("<div class='loading-spinner'></div><div>Conectando API PBH...</div>");
       try {
         const metaResponse = await fetch(`${API_PBH_BASE}package_show?id=fiscalizacao-eletronica`);
@@ -971,7 +985,7 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
       return out;
     }
 
-    // Renderiza os marcadores no mapa
+    // Renderiza os marcadores no mapa (USANDO A NOVA FUNÇÃO criarIconeRadar)
     function renderizarRadaresNoMapa(records, origem) {
       const radaresExternos = records || [];
       const todosOsRadares = [...radaresExternos, ...injetarRadaresIA()];
@@ -988,13 +1002,8 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 
         const iconeUrl = getIconUrl(tipo, velocidade);
         
-       const iconeRadar = L.icon({ 
-    iconUrl: iconeUrl, 
-    iconSize: [40, 40],   
-    iconAnchor: [20, 40], 
-    popupAnchor: [0, -40] 
-});
-        
+        // Usando a nova função criarIconeRadar para garantir ícones padronizados
+        const iconeRadar = criarIconeRadar(iconeUrl, 40);
         
         const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
         
@@ -1054,7 +1063,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 
     // Tratamento de erros de GPS
     function showError(error) {   
-      // Se o App Inventor já está mandando dados, ignora erros do navegador
       if (gpsSource === 'appinventor') return; 
       
       let msg = "Erro ao obter localização.";
@@ -1065,23 +1073,20 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
       showNotification(msg); 
       hideFullscreenLoading();
       
-      // Tenta reiniciar o GPS após 5 segundos em caso de timeout (comum no mobile)
       if(error.code === 3) {
         setTimeout(startGPSTracking, 5000);
       }
     }
     
-    // Desbloquear áudio no primeiro clique (requisito dos navegadores)
+    // Desbloquear áudio no primeiro clique
     document.addEventListener('click', function desbloquearAudio() {
         const sound = document.getElementById("alert-soud");
         if (sound) sound.play().then(() => { sound.pause(); sound.currentTime = 0; }).catch(() => {});
         document.removeEventListener('click', desbloquearAudio);
     }, { once: true });
     
-    // Inicializa o app ao carregar a página
     window.onload = initMap;
   </script>
    
 </body>
 </html>
-
