@@ -16,9 +16,8 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
   
   <!-- Leaflet Rotate Plugin - Para rotação do mapa -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.1.4/leaflet-rotate.css" />
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.1.4/leaflet-rotate.js"></script>
   <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
+
   
   <!-- Google Fonts para tipografia moderna -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
@@ -168,7 +167,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -60%);
+    transform: translate(-50%, -60%); /* ===antes era translate(-100%, -60%);====== */
     font-size: 28px;
     font-weight: 700;
     font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
@@ -692,70 +691,35 @@
     // FUNÇÃO: inicializarBotaoRotacaoMapa - Configura o botão de rotação
     // ===================================================================
     function inicializarBotaoRotacaoMapa() {
-    var rotateBtn = document.getElementById('btn-rotate-map');
-    var isRotated = false;
-    var originalView = null;
+  const rotateBtn = document.getElementById('btn-rotate-map');
+  let isRotated = false;
 
-    if (!rotateBtn) return;
+  if (!rotateBtn) return;
 
-    rotateBtn.addEventListener('click', function() {
-        var mapContainer = map.getContainer();
+  rotateBtn.addEventListener('click', function () {
 
-        if (!isRotated) {
-            originalView = {
-                center: map.getCenter(),
-                zoom: map.getZoom()
-            };
+    if (!isRotated) {
 
-            var rotationAngle = (currentHeading > 0 && currentHeading < 360)
-                ? (360 - currentHeading)
-                : 45;
+      const rotationAngle = (currentHeading > 0 && currentHeading < 360)
+        ? currentHeading
+        : 45;
 
-            // Calcula escala para cobrir cantos vazios
-            var rad = rotationAngle * Math.PI / 180;
-            var scale = Math.abs(Math.cos(rad)) + Math.abs(Math.sin(rad));
+      map.setBearing(rotationAngle);
 
-            mapContainer.style.transition = 'transform 0.5s ease';
-            mapContainer.style.transform = 'rotate(' + rotationAngle + 'deg) scale(' + scale + ')';
+      showNotification("Mapa rotacionado");
+      rotateBtn.classList.add('rotated');
+      isRotated = true;
 
-            var controls = document.querySelectorAll('.map-controls, .compass-widget, .speed-widget');
-            controls.forEach(function(control) {
-                control.style.transition = 'transform 0.5s ease';
-                // Contra-rotaciona E contra-escala os controles
-                control.style.transform = 'rotate(' + (-rotationAngle) + 'deg) scale(' + (1 / scale) + ')';
-            });
+    } else {
 
-            setTimeout(function() {
-                map.invalidateSize();
-                map.setView(originalView.center, originalView.zoom);
-            }, 550); // após a transição terminar
+      map.setBearing(0);
 
-            showNotification("Mapa rotacionado");
-            rotateBtn.classList.add('rotated');
-            isRotated = true;
+      showNotification("Mapa resetado (Norte para cima)");
+      rotateBtn.classList.remove('rotated');
+      isRotated = false;
+    }
 
-        } else {
-            mapContainer.style.transition = 'transform 0.5s ease';
-            mapContainer.style.transform = 'rotate(0deg) scale(1)';
-
-            var controls = document.querySelectorAll('.map-controls, .compass-widget, .speed-widget');
-            controls.forEach(function(control) {
-                control.style.transition = 'transform 0.5s ease';
-                control.style.transform = 'rotate(0deg) scale(1)';
-            });
-
-            setTimeout(function() {
-                map.invalidateSize();
-                if (originalView) {
-                    map.setView(originalView.center, originalView.zoom);
-                }
-            }, 550);
-
-            showNotification("Mapa resetado (Norte para cima)");
-            rotateBtn.classList.remove('rotated');
-            isRotated = false;
-        }
-    });
+  });
 }
 
 
