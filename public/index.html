@@ -141,6 +141,17 @@
         box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
     }
 
+    /* Suporte para rotação do mapa */
+    .leaflet-container {
+        transition: transform 0.3s ease;
+    }
+    
+    /* Quando o mapa estiver rotacionado, ajusta os controles */
+    .map-rotated .map-controls {
+        transition: all 0.3s ease;
+    }
+
+
     /* ================= WIDGET DE VELOCIDADE ================= */
     .speed-widget { 
       position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; 
@@ -660,54 +671,57 @@
       }
     }
 
-   
-      // ===================================================================
+    // ===================================================================
     // FUNÇÃO: inicializarBotaoRotacaoMapa - Configura o botão de rotação
     // ===================================================================
     function inicializarBotaoRotacaoMapa() {
         var rotateBtn = document.getElementById('btn-rotate-map');
         var isRotated = false;
-        var originalCenter = null;
-        var originalZoom = null;
+        var originalBearing = 0;
         
         if (!rotateBtn) return;
         
         rotateBtn.addEventListener('click', function() {
             if (!isRotated) {
-                // Salva o estado atual do mapa
-                originalCenter = map.getCenter();
-                originalZoom = map.getZoom();
-                
-                // Se temos a direção do usuário, rotaciona visualmente o container
-                if (currentHeading > 0) {
+                // Rotaciona o mapa para seguir a direção do usuário (se disponível)
+                if (currentHeading > 0 && userMarker) {
+                    // Aplica rotação baseada na direção atual do usuário
+                    // Usa CSS rotate no container do mapa
                     var mapContainer = map.getContainer();
                     var rotationAngle = -currentHeading; // Inverte para compensar
                     
-                    // Aplica rotação CSS ao container do mapa
                     mapContainer.style.transition = 'transform 0.5s ease';
                     mapContainer.style.transform = 'rotate(' + rotationAngle + 'deg)';
                     
-                    // Ajusta o tamanho do mapa para compensar a rotação
+                    // Adiciona classe para ajustar controles
+                    document.querySelector('.map-wrapper').classList.add('map-rotated');
+                    
                     setTimeout(function() {
                         map.invalidateSize();
                     }, 100);
                     
                     showNotification("Mapa rotacionado para sua direção (" + Math.round(currentHeading) + "°)");
                 } else {
-                    showNotification("Aguardando sinal GPS para orientação automática");
+                    // Fallback: rotaciona visualmente 45 graus
+                    var mapContainer = map.getContainer();
+                    mapContainer.style.transition = 'transform 0.5s ease';
+                    mapContainer.style.transform = 'rotate(45deg)';
+                    
+                    setTimeout(function() {
+                        map.invalidateSize();
+                    }, 100);
+                    
+                    showNotification("Mapa rotacionado 45° (Aguardando heading do GPS)");
                 }
                 rotateBtn.classList.add('rotated');
                 isRotated = true;
             } else {
-                // Reseta a rotação do mapa
+                // Reseta a rotação do mapa (volta ao Norte)
                 var mapContainer = map.getContainer();
                 mapContainer.style.transform = 'rotate(0deg)';
                 mapContainer.style.transition = 'transform 0.5s ease';
                 
-                // Restaura o centro e zoom se necessário
-                if (originalCenter) {
-                    map.setView(originalCenter, originalZoom, { animate: true, duration: 0.5 });
-                }
+                document.querySelector('.map-wrapper').classList.remove('map-rotated');
                 
                 setTimeout(function() {
                     map.invalidateSize();
@@ -718,7 +732,9 @@
                 isRotated = false;
             }
         });
-    }  
+    }
+
+
     // ===================================================================
     // FUNÇÃO: receberCoordenadasDoAppInventor - Interface com App Inventor
     // ===================================================================
