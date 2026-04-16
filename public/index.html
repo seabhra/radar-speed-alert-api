@@ -702,17 +702,16 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
     }
 
     // ===================================================================
-    // FUNÇÃO: Atualizar a Bússola Visual
+    // FUNÇÃO NOVA: Atualizar a Bússola Visual
     // ===================================================================
     function atualizarBussola(headingDegrees) {
-      const needle = document.getElementById('compass-needle-img");
+      const needle = document.getElementById('compass-needle-img');
       if (needle) {
         needle.style.transform = `rotate(${headingDegrees}deg)`; 
       }
     }
-
     // ===================================================================
-    // FUNÇÃO: App Inventor (Com cálculo integrado da Bússola por Movimento)
+    // FUNÇÃO GLOBAL CHAMADA PELO APP INVENTOR VIA RunJavaScript
     // ===================================================================
     function receberCoordenadasDoAppInventor(lat, lng, speed) {
       lat = parseFloat(lat);
@@ -733,25 +732,50 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
 
       gpsSource = 'appinventor';
       
-      // Calcula a distância percorrida para saber se gira a bússola
-      let dist = 0;
-      if (prevLat !== null) {
-        dist = calcularDistancia(prevLat, prevLng, lat, lng);
+      // Passa os dados. O cálculo da bússola é feito lá dentro agora.
+      processarNovaPosicao(lat, lng, speed);
+    }
+    // ===================================================================
+    // FUNÇÃO GLOBAL CHAMADA PELO APP INVENTOR VIA RunJavaScript
+    // ===================================================================
+    function receberCoordenadasDoAppInventor(lat, lng, speed) {
+      lat = parseFloat(lat);
+      lng = parseFloat(lng);
+      speed = parseFloat(speed) || 0;
+
+      if (isNaN(lat) || isNaN(lng)) return;
+
+      // Para o GPS do navegador se ainda estiver rodando
+      if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      }
+      if (browserGpsTimeout) {
+        clearTimeout(browserGpsTimeout);
+        browserGpsTimeout = null;
       }
 
-      // SÓ gira a bússola se o carro andou MAIS de 3 metros (evita erro quando parado)
-      if (dist > 3) {
-        const dy = lat - prevLat;
-        const dx = (lng - prevLng) * Math.cos(lat * Math.PI / 180);
+      gpsSource = 'appinventor';
+
+      // ==========================================================
+      // Calcula direção baseada na movimentação (Heading estimado)
+      // ==========================================================
+      const now = Date.now();
+      if (lastHeadingTime > 0 && (now - lastHeadingTime) < 3000) {
+        const dy = lat - lastHeadingLat;
+        const dx = (lng - lastHeadingLng) * Math.cos(lat * Math.PI / 180);
+        const calcHeading = (Math.atan2(dy, dx) * 180 / Math.PI) + 90;
+        let finalHeading = calcHeading;
+        if (finalHeading < 0) finalHeading += 360;
+        if (finalHeading >= 360) finalHeading -= 360;
         
-        // Calcula o ângulo correto (0 = Norte, 90 = Leste, 180 = Sul)
-        let calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
-        if (calcHeading < 0) calcHeading += 360;
-        if (calcHeading >= 360) calcHeading -= 360;
-        
-        currentHeading = calcHeading;
+        currentHeading = finalHeading;
         atualizarBussola(currentHeading);
       }
+
+      lastHeadingLat = lat;
+      lastHeadingLng = lng;
+      lastHeadingTime = now;
 
       processarNovaPosicao(lat, lng, speed);
     }
@@ -759,7 +783,7 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
     // ===================================================================
     // FUNÇÃO UNIFICADA DE POSIÇÃO (Usada pelo Browser E pelo App Inventor)
     // ===================================================================
-    function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading = null) {
+    function processarNovaPosicao(newLat, newLng, speedKmh) {
       const currentTime = Date.now();
 
       // Calcula velocidade automaticamente se não veio do hardware
@@ -775,13 +799,18 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
       prevLat = newLat; prevLng = newLng; prevTime = currentTime; 
       userLat = newLat; userLng = newLng;
 
-      // Se for GPS do Navegador e tiver heading de hardware, usa aqui
-      if (gpsSource === 'browser' && hardwareHeading !== null && !isNaN(hardwareHeading)) {
-        currentHeading = hardwareHeading;
-        atualizarBussola(currentHeading);
-      }
-
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
+
+  // ====================================
+  // Substitua por esta versão mais simples:
+  // =======================================
+    const iconeRadar = L.icon({
+    iconUrl: iconeUrl,
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40],
+    className: 'radar-icon-simple'
+}); 
      
       const userIcon = L.icon({
           iconUrl: userIconUrl,
@@ -833,8 +862,11 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
             speedKmh = Math.round(position.coords.speed * 3.6);
           }
 
-          // Envia o heading do hardware (se existir) para a função unificada
-          processarNovaPosicao(newLat, newLng, speedKmh, position.coords.heading);
+          if (position.coords.heading !== null && !isNaN(position.coords.heading)) {
+            atualizarBussola(position.coords.heading);
+          }
+
+          processarNovaPosicao(newLat, newLng, speedKmh);
         }, 
         showError, 
         { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
