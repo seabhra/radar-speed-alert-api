@@ -792,15 +792,6 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
       userLat = newLat; userLng = newLng;
 
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
-
-  // Substitua por esta versão mais simples:
-    const iconeRadar = L.icon({
-    iconUrl: iconeUrl,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40],
-    className: 'radar-icon-simple'
-}); 
      
       const userIcon = L.icon({
           iconUrl: userIconUrl,
