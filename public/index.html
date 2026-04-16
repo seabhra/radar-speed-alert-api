@@ -154,7 +154,7 @@
 .compass-widget {
   position: absolute;
   top: 20px; /* Parte superior da tela */
-  left: -25px; /* Lado esquerdo */
+  left: -20px; /* Lado esquerdo */
   width: 80px;
   height: 80px;
   z-index: 500; /* Mesmo nível dos botões de mapa */
@@ -502,9 +502,7 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
       'Detector de Conversão em Local Proibido': '/imagens_app/ic_radar_rcp_v2.png',
       'Detector de Invasão de Faixa Exclusiva - MOVE': '/imagens_app/ic_radar_dife_v2.png',
       'Detector de Invasão de Faixa Exclusiva (DIFEX)': '/imagens_app/ic_radar_difex_v2.png',
-      
       'Detector de Parada sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp_v2.png',
-      
       'Detector de Faixa Preferencial de Ônibus (BUS)': '/imagens_app/ic_radar_fpref_v2.png',
       'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
       
@@ -797,15 +795,6 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
       userLat = newLat; userLng = newLng;
 
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
-
-  // Substitua por esta versão mais simples:
-    const iconeRadar = L.icon({
-    iconUrl: iconeUrl,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40],
-    className: 'radar-icon-simple'
-}); 
      
       const userIcon = L.icon({
           iconUrl: userIconUrl,
