@@ -361,7 +361,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 
  
 /* Força o tamanho dos ícones de radar-marker (divIcon) */
-/* Força o tamanho dos ícones de radar-marker (divIcon) */
 .radar-marker-icon {
     background: transparent !important;
     border: none !important;
@@ -526,7 +525,7 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 // ===================================================================
 // FUNÇÃO MELHORADA PARA CRIAR ÍCONES PADRONIZADOS
 // ===================================================================
-function criarIconeRadar(iconeUrl, tamanho = 35) {
+function criarIconeRadar(iconeUrl, tamanho = 40) {
     return L.divIcon({
         // Mudança chave: Ao invés de background-image, usamos uma tag <img> real
         html: `<img src="${iconeUrl}" style="
