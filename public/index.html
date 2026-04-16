@@ -660,40 +660,65 @@
       }
     }
 
-    // ===================================================================
+   
+      // ===================================================================
     // FUNÇÃO: inicializarBotaoRotacaoMapa - Configura o botão de rotação
     // ===================================================================
     function inicializarBotaoRotacaoMapa() {
         var rotateBtn = document.getElementById('btn-rotate-map');
         var isRotated = false;
-        var originalBearing = 0;
+        var originalCenter = null;
+        var originalZoom = null;
         
         if (!rotateBtn) return;
         
         rotateBtn.addEventListener('click', function() {
             if (!isRotated) {
-                // Rotaciona o mapa para seguir a direção do usuário (se disponível)
-                if (currentHeading > 0 && userMarker) {
-                    // Aplica rotação baseada na direção atual do usuário
-                    map.setBearing(currentHeading);
-                    showNotification("Mapa rotacionado para sua direção");
+                // Salva o estado atual do mapa
+                originalCenter = map.getCenter();
+                originalZoom = map.getZoom();
+                
+                // Se temos a direção do usuário, rotaciona visualmente o container
+                if (currentHeading > 0) {
+                    var mapContainer = map.getContainer();
+                    var rotationAngle = -currentHeading; // Inverte para compensar
+                    
+                    // Aplica rotação CSS ao container do mapa
+                    mapContainer.style.transition = 'transform 0.5s ease';
+                    mapContainer.style.transform = 'rotate(' + rotationAngle + 'deg)';
+                    
+                    // Ajusta o tamanho do mapa para compensar a rotação
+                    setTimeout(function() {
+                        map.invalidateSize();
+                    }, 100);
+                    
+                    showNotification("Mapa rotacionado para sua direção (" + Math.round(currentHeading) + "°)");
                 } else {
-                    // Fallback: rotaciona 90 graus para demonstração
-                    map.setBearing(45);
-                    showNotification("Mapa rotacionado 45° (Aguardando heading do GPS)");
+                    showNotification("Aguardando sinal GPS para orientação automática");
                 }
                 rotateBtn.classList.add('rotated');
                 isRotated = true;
             } else {
-                // Reseta a rotação do mapa (volta ao Norte)
-                map.setBearing(0);
+                // Reseta a rotação do mapa
+                var mapContainer = map.getContainer();
+                mapContainer.style.transform = 'rotate(0deg)';
+                mapContainer.style.transition = 'transform 0.5s ease';
+                
+                // Restaura o centro e zoom se necessário
+                if (originalCenter) {
+                    map.setView(originalCenter, originalZoom, { animate: true, duration: 0.5 });
+                }
+                
+                setTimeout(function() {
+                    map.invalidateSize();
+                }, 100);
+                
                 rotateBtn.classList.remove('rotated');
                 showNotification("Mapa resetado (Norte para cima)");
                 isRotated = false;
             }
         });
-    }
-    
+    }  
     // ===================================================================
     // FUNÇÃO: receberCoordenadasDoAppInventor - Interface com App Inventor
     // ===================================================================
