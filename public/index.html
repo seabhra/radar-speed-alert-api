@@ -53,301 +53,101 @@
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
     h1 span { color: var(--accent-color); }
 
-
 /* ================= SEARCH ================= */
 .search-container {
   position: absolute; top: 0; left: 0; width: 100%;
   background-color: rgba(26, 29, 36, 0.98);
   backdrop-filter: blur(8px);
   display: flex; gap: 12px; z-index: 1000;
-
   max-height: 0; overflow: hidden; opacity: 0;
   padding: 0 15px;
-
   border-bottom: 1px solid transparent;
   transition: all 0.3s ease;
   align-items: center;
 }
-
 .search-container.active {
-  max-height: 90px;
-  opacity: 1;
-  padding: 15px;
-  border-bottom: 1px solid #333;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  max-height: 90px; opacity: 1; padding: 15px;
+  border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
-
 .search-container input {
-  flex: 1;
-  padding: 14px 20px;
-  border-radius: 30px;
-  border: 1px solid #444;
-  background-color: #000;
-  color: #fff;
-  font-size: 1rem;
-  outline: none;
-  font-family: 'Inter', sans-serif;
+  flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444;
+  background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
 }
-
-.search-container input:focus {
-  border-color: var(--accent-color);
-}
-
+.search-container input:focus { border-color: var(--accent-color); }
 
 /* BOTÃO BUSCA PADRONIZADO */
 .btn-search {
-  position: relative; /* necessário para centralização absoluta */
-
-  flex-shrink: 0;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-
-  background: rgba(76, 137, 198, 0.95);
-  box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5);
-
-  transition: all 0.2s ease;
-
-  overflow: hidden; /* impede o ícone de “vazar” */
+  position: relative; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%;
+  border: none; cursor: pointer; background: rgba(76, 137, 198, 0.95);
+  box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); transition: all 0.2s ease; overflow: hidden;
 }
-
-.btn-search:active {
-  transform: scale(0.9);
-}
-
-/* ÍCONE CENTRALIZADO CORRETAMENTE */
+.btn-search:active { transform: scale(0.9); }
 .btn-search img {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  display: block;
-
-  transform: translate(-50%, -50%);
+  position: absolute; top: 50%; left: 50%; width: 40px; height: 40px;
+  object-fit: contain; display: block; transform: translate(-50%, -50%);
 }
-
-
-
     
     /* ================= MAP ================= */
-.map-wrapper {
-  position: relative;
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-  width: 100%;
-}
+.map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
+#map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; }
 
-#map {
-  width: 100%;
-  height: 100%;
-  background-color: #2a2a2a;
-  z-index: 1;
-}
-
-/* ================= COMPASS WIDGET (NOVO) ================= */
+/* ================= COMPASS WIDGET ================= */
 .compass-widget {
-  position: absolute;
-  top: 20px; /* Parte superior da tela */
-  left: 10px; /* Lado esquerdo */
-  width: 80px;
-  height: 80px;
-  z-index: 500; /* Mesmo nível dos botões de mapa */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none; /* Permite clicar através da bússola se necessário */
+  position: absolute; top: 20px; left: 10px; width: 80px; height: 80px;
+  z-index: 500; display: flex; align-items: center; justify-content: center; pointer-events: none;
 }
-
-/* Imagem de fundo da bússola (Dial fixo) */
-.compass-base {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  z-index: 1;
-  opacity: 0.9;
-}
-
-/* Imagem da ponteira (Gira com o GPS) */
+.compass-base { position: absolute; width: 100%; height: 100%; object-fit: contain; z-index: 1; opacity: 0.9; }
 .compass-needle {
-  position: absolute;
-  width: 55%; /* Levemente menor que a base */
-  height: 55%;
-  object-fit: contain;
-  z-index: 2;
-  transition: transform 0.4s cubic-bezier(0.1, 0.7, 1.0, 0.1); /* Movimento suave */
+  position: absolute; width: 55%; height: 55%; object-fit: contain; z-index: 2;
+  transition: transform 0.4s cubic-bezier(0.1, 0.7, 1.0, 0.1);
 }
 
 /* ================= MAP BUTTONS ================= */
 .map-controls {
-  position: absolute;
-  right: 15px;
-  bottom: 30px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-
-  z-index: 500;
+  position: absolute; right: 15px; bottom: 30px; display: flex; flex-direction: column;
+  align-items: center; gap: 10px; z-index: 500;
 }
-
-/* BOTÃO BASE (PADRÃO DARK UNIFICADO) */
 .map-btn {
-  width: 50px;
-  height: 50px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 50%;
-  cursor: pointer;
-
-  background: rgba(20, 20, 20, 0.92);
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
-
-  transition: all 0.2s ease;
+  width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; cursor: pointer; background: rgba(20, 20, 20, 0.92);
+  border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: all 0.2s ease;
 }
+.map-btn:hover { transform: scale(1.08); border-color: var(--accent-color); box-shadow: 0 0 10px rgba(255,255,255,0.15); }
+.map-btn:active { transform: scale(0.92); }
+.map-btn img { width: 30px; height: 30px; object-fit: contain; pointer-events: none; }
 
-.map-btn:hover {
-  transform: scale(1.08);
-  border-color: var(--accent-color);
-  box-shadow: 0 0 10px rgba(255,255,255,0.15);
-}
-
-.map-btn:active {
-  transform: scale(0.92);
-}
-
-/* ÍCONE */
-.map-btn img {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-/* ================= DESTAQUES AJUSTADOS ================= */
-
-/* ROTA (destaque sem quebrar o padrão dark) */
-#btn-route-bar {
-  width: 54px;
-  height: 54px;
-
-  border: 1px solid rgba(255,140,0,0.5);
-  box-shadow: 0 0 12px rgba(255,140,0,0.35);
-}
-
-#btn-route-bar img {
-  width: 34px;
-  height: 34px;
-}
-
-/* BUSCA */
-#btn-search-bar {
-  border: 1px solid rgba(0, 200, 180, 0.35);
-}
-
-/* CENTRALIZAR */
-#btn-center {
-  border: 1px solid rgba(0, 255, 136, 0.35);
-}
-
+#btn-route-bar { width: 54px; height: 54px; border: 1px solid rgba(255,140,0,0.5); box-shadow: 0 0 12px rgba(255,140,0,0.35); }
+#btn-route-bar img { width: 34px; height: 34px; }
+#btn-search-bar { border: 1px solid rgba(0, 200, 180, 0.35); }
+#btn-center { border: 1px solid rgba(0, 255, 136, 0.35); }
 
 /* icone de velocidade */
-
-
-.speed-widget {
- position: absolute; 
-bottom: -15px; 
-left: -25px; 
-width: 150px; 
-height: 150px; 
-z-index: 500;
- display: flex; 
-align-items: center; 
-justify-content: center; 
-} 
-.speed-bg {
- position: absolute; inset: 0; 
-width: 100%;
- height: 100%; 
-object-fit: contain;
- pointer-events: none; } 
-
+.speed-widget { position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500; display: flex; align-items: center; justify-content: center; } 
+.speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; } 
 .speed-value {
-  position: absolute;
-  /* Centralização exata no eixo X e ajuste fino no Y */
-  top: 50%; 
-  left: 50%; 
-transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */ 
-
-    /* Estilização */
-  font-size: 28px;
-  font-weight: 700; 
-  font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-  color: #000; 
-  line-height: 1; 
-  z-index: 2; 
-  white-space: nowrap;
-  /* Alinhamento de texto interno */
-  text-align: center; 
-    /* Garante que cada número ocupe o mesmo espaço, 
-     evitando que o texto 'dance' quando os números mudam */
-  font-variant-numeric: tabular-nums; 
-  letter-spacing: -0.5px;
+  position: absolute; top: 50%; left: 50%; transform: translate(-100%, -60%);
+  font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+  color: #000; line-height: 1; z-index: 2; white-space: nowrap; text-align: center;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.5px;
 }
     
-    
     /* Alerts & Toasts */
-    #alert-container {
-      position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000;
-      display: none; animation: slideUp 0.3s ease-out; pointer-events: none;
-    }
+    #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    .alert-bar {
-      background: linear-gradient(90deg, #cc0000, #990000); color: white; padding: 18px;
-      display: flex; align-items: center; gap: 15px; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
-      border-top: 2px solid #ff5555;
-    }
+    .alert-bar { background: linear-gradient(90deg, #cc0000, #990000); color: white; padding: 18px; display: flex; align-items: center; gap: 15px; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); border-top: 2px solid #ff5555; }
     .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
     .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; color: white; font-weight: 800; text-shadow: 0 1px 2px black; }
     .alert-info p { font-size: 0.95rem; opacity: 0.95; text-shadow: 0 1px 2px black; }
-
-    .toast-notification {
-      position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
-      background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px;
-      border-radius: 50px; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-      z-index: 2000; opacity: 0; font-size: 0.95rem; font-weight: 600; text-align: center;
-      pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; white-space: nowrap;
-    }
+    .toast-notification { position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px; border-radius: 50px; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0,0,0,0.8); z-index: 2000; opacity: 0; font-size: 0.95rem; font-weight: 600; text-align: center; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; white-space: nowrap; }
     .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
     /* Loadings */
-    .loading-overlay {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      background: rgba(20, 20, 20, 0.9); padding: 20px 30px; border-radius: 12px;
-      border: 1px solid var(--accent-color); text-align: center; z-index: 1001;
-      backdrop-filter: blur(5px);
-    }
+    .loading-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.9); padding: 20px 30px; border-radius: 12px; border: 1px solid var(--accent-color); text-align: center; z-index: 1001; backdrop-filter: blur(5px); }
     .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
-    
     .leaflet-control-zoom, .leaflet-control-attribution, .leaflet-routing-container { display: none !important; }
     
-    .loading-fullscreen {
-      position: fixed; inset: 0; width: 100%; height: 100%; background-color: var(--bg-color);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
+    .loading-fullscreen { position: fixed; inset: 0; width: 100%; height: 100%; background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
     .loading-fullscreen.fade-out { opacity: 0; visibility: hidden; }
     .loading-fullscreen .spinner-ring { width: 60px; height: 60px; border-radius: 50%; position: relative; margin-bottom: 24px; }
     .loading-fullscreen .spinner-ring::before, .loading-fullscreen .spinner-ring::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent; }
@@ -359,28 +159,9 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
     .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.8rem; color: #777; animation: pulseText 1.8s ease-in-out infinite; }
     @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-    /* Força o tamanho dos ícones de radar-icon */
-    .radar-icon-simple img {
-    width: 40px !important;
-    height: 40px !important;
-    object-fit: contain !important;
-}
-
-
-/* Força o tamanho dos ícones de radar-marker (divIcon) */
-.radar-marker-icon {
-    background: transparent !important;
-    border: none !important;
-}
-
-/* Segurança extra: Força a tag IMG dentro da div a nunca crescer */
-.radar-marker-icon img {
-    width: 40px !important;
-    height: 40px !important;
-    object-fit: contain !important;
-    display: block !important;
-}
-   
+    .radar-icon-simple img { width: 40px !important; height: 40px !important; object-fit: contain !important; }
+    .radar-marker-icon { background: transparent !important; border: none !important; }
+    .radar-marker-icon img { width: 40px !important; height: 40px !important; object-fit: contain !important; display: block !important; }
   </style>
 </head>
 <body>
@@ -399,30 +180,20 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
   </header>
 
   <div class="map-wrapper">
-    <!-- Barra de Busca de Radares -->
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
-      <button class="btn-search" id="btn-search-radar" title="Buscar">
-        <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca">
-      </button>
+      <button class="btn-search" id="btn-search-radar" title="Buscar"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca"></button>
     </div>
-
-    <!-- Barra de Rota -->
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
-      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;">
-        <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
-      </button>
+      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
     </div>
 
     <div id="map"></div>
     <div class="toast-notification" id="toast-msg"></div>
 
-    <!-- WIDGET DE BÚSSOLA (NOVO - Adicionado no lado superior esquerdo) -->
     <div class="compass-widget">
-      <!-- Base da Bússola (Fixa) -->
       <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src='https://cdn-icons-png.flaticon.com/512/2838/2838773.png'" alt="Bússola" class="compass-base">
-      <!-- Ponteira da Bússola (Gira) -->
       <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'" alt="Ponteira" class="compass-needle" id="compass-needle-img">
     </div>
 
@@ -458,502 +229,229 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
-  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
 
   <script>
-    // Variáveis Globais
     let map, userMarker, radarMarkers = [], alertTimeout;
     let userLat = -19.919055, userLng =-43.938641, tileLayer, routingControl = null;
     let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
-    let isFollowing = true; 
-    let watchId = null;     
-    
-    // NOVO: Controle de qual GPS está mandando os dados
-    let gpsSource = 'none'; // 'browser' | 'appinventor' | 'none'
-    let gpsInitialized = false;
-    let browserGpsTimeout = null;
-
-    // NOVO: Variáveis para cálculo de direção (Heading) caso não venha do hardware
-    let lastHeadingTime = 0;
-    let lastHeadingLat = 0;
-    let lastHeadingLng = 0;
-    let currentHeading = 0; // Em graus (0-360)
-
+    let isFollowing = true, watchId = null, gpsSource = 'none', gpsInitialized = false, browserGpsTimeout = null;
+    let lastHeadingTime = 0, lastHeadingLat = 0, lastHeadingLng = 0, currentHeading = 0;
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
 
     const iconMap = {
       'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev_v2.png',
       'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das_v2.png',
-       'Detector de Tráfego em Local Proibido': '/imagens_app/ic_radar_dtlp_v2.png',
+      'Detector de Tráfego em Local Proibido': '/imagens_app/ic_radar_dtlp_v2.png',
       'Detector de Conversão em Local Proibido': '/imagens_app/ic_radar_rcp_v2.png',
       'Detector de Invasão de Faixa Exclusiva - MOVE': '/imagens_app/ic_radar_dife_v2.png',
       'Detector de Invasão de Faixa Exclusiva (DIFEX)': '/imagens_app/ic_radar_difex_v2.png',
       'Detector de Parada sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp_v2.png',
       'Detector de Faixa Preferencial de Ônibus (BUS)': '/imagens_app/ic_radar_fpref_v2.png',
       'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
-      
       'Controle de Redução de Velocidade (CRV)': '/imagens_app/ic_radar_crv_v2.png',
-  
-      
       'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr_v2.png',
       'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial_v2.png',
-     
       'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev_v2.png',
       'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das_v2.png',
-
-       'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem_v2.png',
+      'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem_v2.png',
       'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP)': '/imagens_app/ic_radar_cem_v2.png',
       'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (MOVE)': '/imagens_app/ic_radar_cem_v2.png',
-      
       'default': '/imagens_app/ic_radar_cev_v2.png'
     };
 
-  const ajusteNomes = {
-  'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
-  'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
-  'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
-  'Detector de Avanço de Semáforo': 'Radar de Avanço de Semáforo (DAS)',
-  'Detector de Conversão em Local Proibido': 'Detector de Conversão em Local Proibido (DCP)',
-  'Detector de Tráfego em Local Proibido': 'Zona de Tráfego Proibido (ZTP)',
-  'Detector de Invasão de Faixa Exclusiva (DIFEX)': 'Faixa Exclusiva de Ônibus e Táxis (FOT)',
-  'Detector de Faixa Preferencial de Ônibus (BUS)': 'Faixa Preferencial de Ônibus (BUS)',
-  'Detector de Uso de Celular': 'Radar de Uso de Celular (DUC)',
-  'Leitor Inteligente de Placas': 'Leitor de Placas (OCR-P)',
-  'Leitor de Reconhecimento Facial': 'Reconhecimento Facial (OCR-F)',
-  'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': 'Radar Misto CEV + DAS (CEM)',
-  'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP)': 'Radar Misto DAS + DCP (CEM)',
-  'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (MOVE)': 'Radar Misto DAS + MOVE (CEM)'
-};
+    const ajusteNomes = {
+      'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
+      'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
+      'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
+      'Detector de Avanço de Semáforo': 'Radar de Avanço de Semáforo (DAS)',
+      'Detector de Conversão em Local Proibido': 'Detector de Conversão em Local Proibido (DCP)',
+      'Detector de Tráfego em Local Proibido': 'Zona de Tráfego Proibido (ZTP)',
+      'Detector de Invasão de Faixa Exclusiva (DIFEX)': 'Faixa Exclusiva de Ônibus e Táxis (FOT)',
+      'Detector de Faixa Preferencial de Ônibus (BUS)': 'Faixa Preferencial de Ônibus (BUS)',
+      'Detector de Uso de Celular': 'Radar de Uso de Celular (DUC)',
+      'Leitor Inteligente de Placas': 'Leitor de Placas (OCR-P)',
+      'Leitor de Reconhecimento Facial': 'Reconhecimento Facial (OCR-F)',
+      'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': 'Radar Misto CEV + DAS (CEM)',
+      'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP)': 'Radar Misto DAS + DCP (CEM)',
+      'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (MOVE)': 'Radar Misto DAS + MOVE (CEM)'
+    };
 
+    function criarIconeRadar(iconeUrl, tamanho = 40) {
+      return L.divIcon({
+        html: `<img src="${iconeUrl}" style="width: ${tamanho}px; height: ${tamanho}px; object-fit: contain; display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" />`,
+        iconSize: [tamanho, tamanho], iconAnchor: [tamanho/2, tamanho], popupAnchor: [0, -tamanho/2], className: 'radar-marker-icon'
+      });
+    }
 
-// ===================================================================
-// FUNÇÃO MELHORADA PARA CRIAR ÍCONES PADRONIZADOS
-// ===================================================================
-function criarIconeRadar(iconeUrl, tamanho = 40) {
-    return L.divIcon({
-        // Mudança chave: Ao invés de background-image, usamos uma tag <img> real
-        html: `<img src="${iconeUrl}" style="
-            width: ${tamanho}px; 
-            height: ${tamanho}px; 
-            object-fit: contain; 
-            display: block;
-            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-        " />`,
-        iconSize: [tamanho, tamanho],
-        iconAnchor: [tamanho/2, tamanho], 
-        popupAnchor: [0, -tamanho/2],     
-        className: 'radar-marker-icon'
-    });
-}
-
-
-// Função auxiliar para obter URL do ícone
     function getIconUrl(tipo, velocidade) {
-  const tipoLimpo = tipo ? tipo.trim() : "";
-  
-  // Verificar CEM primeiro (pois contém 'Misto' mas tem ícone específico)
-  if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) {
-    return iconMap['Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)'] || '/imagens_app/ic_radar_cem_v2.png';
-  }
-  
-  // Verificar DPFP (Detector de Parada sobre Faixa de Pedestres)
-  if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) {
-    return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
-  }
-  
-  // Verificar CRV (pois contém 'Velocidade' mas não deve ser tratado como radar de velocidade)
-  if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') {
-    return iconMap['Controle de Redução de Velocidade (CRV)'];
-  }
-  
-  // Radar de velocidade (excluindo CRV que já foi tratado)
-  const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) 
-                          || (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('Redução'));
-
-  if (isRadarVelocidade) {
-    const vel = parseInt(velocidade) || 0;
-    if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
-    if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png'; 
-    return '/imagens_app/ic_radar_cev_v2.png'; 
-  }
-  
-  // Busca direta no iconMap
-  let icone = iconMap[tipoLimpo];
-  
-  // Fallback por palavras-chave
-  if (!icone) {
-    if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
-    else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) icone = iconMap['Controle de Redução de Velocidade (CRV)'];
-    else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
-    else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
-    else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
-    else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em Local Proibido'];
-    else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa Exclusiva - MOVE'];
-    else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres') || tipoLimpo.includes('DPFP')) 
-      icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
-    else if (tipoLimpo.includes('Faixa Exclusiva') || tipoLimpo.includes('DIFEX')) 
-      icone = iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'];
-  }
-  
-  if (!icone) icone = iconMap['default'];
-  return icone;
-}
-     // Função para mostrar notificação toast
-    function showNotification(message) {
-      const $toast = $("#toast-msg"); 
-      $toast.text(message).addClass("show");
-      setTimeout(() => { $toast.removeClass("show"); }, 3500);
+      const tipoLimpo = tipo ? tipo.trim() : "";
+      if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) return iconMap['Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)'] || '/imagens_app/ic_radar_cem_v2.png';
+      if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
+      if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') return iconMap['Controle de Redução de Velocidade (CRV)'];
+      const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) || (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('Redução'));
+      if (isRadarVelocidade) { const vel = parseInt(velocidade) || 0; if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png'; if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png'; return '/imagens_app/ic_radar_cev_v2.png'; }
+      let icone = iconMap[tipoLimpo];
+      if (!icone) {
+        if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
+        else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) icone = iconMap['Controle de Redução de Velocidade (CRV)'];
+        else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
+        else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
+        else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
+        else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em Local Proibido'];
+        else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa Exclusiva - MOVE'];
+        else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres') || tipoLimpo.includes('DPFP')) icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
+        else if (tipoLimpo.includes('Faixa Exclusiva') || tipoLimpo.includes('DIFEX')) icone = iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'];
+      }
+      if (!icone) icone = iconMap['default'];
+      return icone;
     }
 
-    // Esconde o loading inicial
-    function hideFullscreenLoading() {
-      const el = document.getElementById('loading-fullscreen');
-      if (el) { el.classList.add('fade-out'); setTimeout(() => el.remove(), 600); }
-    }
+    function showNotification(message) { const $toast = $("#toast-msg"); $toast.text(message).addClass("show"); setTimeout(() => { $toast.removeClass("show"); }, 3500); }
+    function hideFullscreenLoading() { const el = document.getElementById('loading-fullscreen'); if (el) { el.classList.add('fade-out'); setTimeout(() => el.remove(), 600); } }
 
-    // Calcula distância entre dois pontos (Haversine)
     function calcularDistancia(lat1, lon1, lat2, lon2) {
-      const R = 6371e3; 
-      const p1 = lat1 * Math.PI / 180; 
-      const p2 = lat2 * Math.PI / 180;
-      const dp = (lat2 - lat1) * Math.PI / 180; 
-      const dl = (lon2 - lon1) * Math.PI / 180;
+      const R = 6371e3; const p1 = lat1 * Math.PI / 180; const p2 = lat2 * Math.PI / 180;
+      const dp = (lat2 - lat1) * Math.PI / 180; const dl = (lon2 - lon1) * Math.PI / 180;
       const a = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
     }
 
-    // Aplica o tema do mapa (Claro/Escuro)
     function aplicarTemaMapa() {
       const hora = new Date().getHours();
-      const urlAtual = (hora >= 19 || hora < 6) 
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
-        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-      if (tileLayer) tileLayer.setUrl(urlAtual); 
-      else tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+      const urlAtual = (hora >= 19 || hora < 6) ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+      if (tileLayer) tileLayer.setUrl(urlAtual); else tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
     }
 
-    // Busca coordenadas via Nominatim
     async function buscarCoordenadas(endereco) {
-      try {
-        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&countrycodes=br&limit=1`);
-        const d = await r.json(); 
-        return (d && d.length > 0) ? { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) } : null;
-      } catch (e) { return null; }
+      try { const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(endereco)}&countrycodes=br&limit=1`); const d = await r.json(); return (d && d.length > 0) ? { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) } : null; } catch (e) { return null; }
     }
 
-    // Calcula rota usando OSRM
     function calcularRota(destLat, destLng) {
       if (routingControl) map.removeControl(routingControl);
       routingControl = L.Routing.control({
-        waypoints: [ L.latLng(userLat, userLng), L.latLng(destLat, destLng) ],
-        routeWhileDragging: false, addWaypoints: false, language: 'pt-BR', show: false,
-        lineOptions: { styles: [{ color: '#0044cc', opacity: 0.8, weight: 6 }, { color: '#00aaff', opacity: 0.9, weight: 3 }] },
-        createMarker: () => null,
+        waypoints: [ L.latLng(userLat, userLng), L.latLng(destLat, destLng) ], routeWhileDragging: false, addWaypoints: false, language: 'pt-BR', show: false,
+        lineOptions: { styles: [{ color: '#0044cc', opacity: 0.8, weight: 6 }, { color: '#00aaff', opacity: 0.9, weight: 3 }] }, createMarker: () => null,
         router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' })
       }).addTo(map);
     }
 
-    // Conversão de coordenadas SIRGAS2000 para WGS84
     function converterSIRGAS2000paraWGS84(xLeste, yNorte) {
-      const a = 6378137.0; const f = 1 / 298.257222101; const k0 = 0.9996;
-      const N0 = 10000000.0; const E0 = 500000.0;
-      const e2 = 2*f - f*f; const ep2 = e2 / (1 - e2);
-      const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
-      const M = yNorte - N0;
+      const a = 6378137.0; const f = 1 / 298.257222101; const k0 = 0.9996; const N0 = 10000000.0; const E0 = 500000.0;
+      const e2 = 2*f - f*f; const ep2 = e2 / (1 - e2); const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2)); const M = yNorte - N0;
       const mu = M / (a * (1 - e2/4 - 3*e2*e2/64 - 5*e2*e2*e2/256));
       const phi1 = mu + (3*e1/2 - 27*e1*e1*e1/32) * Math.sin(2*mu) + (21*e1*e1/16 - 55*e1*e1*e1*e1/32) * Math.sin(4*mu) + (151*e1*e1*e1/96) * Math.sin(6*mu);
-      const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1) * Math.sin(phi1));
-      const T1 = Math.tan(phi1) * Math.tan(phi1);
-      const C1 = ep2 * Math.cos(phi1) * Math.cos(phi1);
-      const R1 = a * (1 - e2) / Math.pow(1 - e2 * Math.sin(phi1) * Math.sin(phi1), 1.5);
-      const D = (xLeste - E0) / (N1 * k0);
+      const N1 = a / Math.sqrt(1 - e2 * Math.sin(phi1) * Math.sin(phi1)); const T1 = Math.tan(phi1) * Math.tan(phi1); const C1 = ep2 * Math.cos(phi1) * Math.cos(phi1);
+      const R1 = a * (1 - e2) / Math.pow(1 - e2 * Math.sin(phi1) * Math.sin(phi1), 1.5); const D = (xLeste - E0) / (N1 * k0);
       let lat = phi1 - (N1 * Math.tan(phi1) / R1) * (D*D/2 - (5+3*T1+10*C1-4*C1*C1-9*ep2)*Math.pow(D,4)/24 + (61+90*T1+298*C1+45*T1*T1-252*ep2-3*C1*C1)*Math.pow(D,6)/720);
       let lng = (D - (1+2*T1+C1)*Math.pow(D,3)/6 + (5-2*C1+28*T1-3*C1*C1+8*ep2+24*T1*T1)*Math.pow(D,5)/120) / Math.cos(phi1);
-      lng = (lng * 180 / Math.PI) - 51; 
-      lat = lat * 180 / Math.PI;
+      lng = (lng * 180 / Math.PI) - 51; lat = lat * 180 / Math.PI;
       return { lat: Math.round(lat * 1000000) / 1000000, lng: Math.round(lng * 1000000) / 1000000 };
     }
 
-    // Extrai coordenadas do registro do radar
     function extrairCoordenadas(record) {
-        let coordenadasEncontradas = null;
-        if (record[9]) {
-            const parts = String(record[9]).replace(/\s+/g, '').split(',').map(Number);
-            if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) coordenadasEncontradas = parts;
-        }
-        if (!coordenadasEncontradas) {
-            for (let i = 0; i < record.length; i++) {
-                if (!record[i] || String(record[i]).length > 40) continue; 
-                const parts = String(record[i]).replace(/\s+/g, '').split(',').map(Number);
-                if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { 
-                    coordenadasEncontradas = parts; break; 
-                }
-            }
-        }
-        if (!coordenadasEncontradas) return null; 
-        let v1 = coordenadasEncontradas[0];
-        let v2 = coordenadasEncontradas[1];
-        if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) return converterSIRGAS2000paraWGS84(v1, v2);
-        if (v1 < -30 && v2 > -30) return { lat: v2, lng: v1 }; 
-        return { lat: v1, lng: v2 };
+      let coordenadasEncontradas = null;
+      if (record[9]) { const parts = String(record[9]).replace(/\s+/g, '').split(',').map(Number); if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) coordenadasEncontradas = parts; }
+      if (!coordenadasEncontradas) { for (let i = 0; i < record.length; i++) { if (!record[i] || String(record[i]).length > 40) continue; const parts = String(record[i]).replace(/\s+/g, '').split(',').map(Number); if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) { coordenadasEncontradas = parts; break; } } }
+      if (!coordenadasEncontradas) return null; let v1 = coordenadasEncontradas[0]; let v2 = coordenadasEncontradas[1];
+      if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) return converterSIRGAS2000paraWGS84(v1, v2);
+      if (v1 < -30 && v2 > -30) return { lat: v2, lng: v1 }; return { lat: v1, lng: v2 };
     }
 
-    // ===================================================================
-    // FUNÇÃO NOVA: Atualizar a Bússola Visual
-    // ===================================================================
     function atualizarBussola(headingDegrees) {
-      const needle = document.getElementById('compass-needle-img');
-      if (needle) {
-        needle.style.transform = `rotate(${headingDegrees}deg)`; 
-      }
+      const needle = document.getElementById('compass-needle-img");
+      if (needle) { needle.style.transform = `rotate(${headingDegrees}deg)`; }
     }
-    // ===================================================================
-    // FUNÇÃO GLOBAL CHAMADA PELO APP INVENTOR VIA RunJavaScript
-    // ===================================================================
+
     function receberCoordenadasDoAppInventor(lat, lng, speed) {
-      lat = parseFloat(lat);
-      lng = parseFloat(lng);
-      speed = parseFloat(speed) || 0;
-
+      lat = parseFloat(lat); lng = parseFloat(lng); speed = parseFloat(speed) || 0;
       if (isNaN(lat) || isNaN(lng)) return;
-
-      // Para o GPS do navegador se ainda estiver rodando
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-      }
-      if (browserGpsTimeout) {
-        clearTimeout(browserGpsTimeout);
-        browserGpsTimeout = null;
-      }
-
+      if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+      if (browserGpsTimeout) { clearTimeout(browserGpsTimeout); browserGpsTimeout = null; }
       gpsSource = 'appinventor';
       
-      // Passa os dados. O cálculo da bússola é feito lá dentro agora.
-      processarNovaPosicao(lat, lng, speed);
-    }
-    // ===================================================================
-    // FUNÇÃO GLOBAL CHAMADA PELO APP INVENTOR VIA RunJavaScript
-    // ===================================================================
-    function receberCoordenadasDoAppInventor(lat, lng, speed) {
-      lat = parseFloat(lat);
-      lng = parseFloat(lng);
-      speed = parseFloat(speed) || 0;
-
-      if (isNaN(lat) || isNaN(lng)) return;
-
-      // Para o GPS do navegador se ainda estiver rodando
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-        watchId = null;
+      let dist = 0;
+      if (prevLat !== null) { dist = calcularDistancia(prevLat, prevLng, lat, lng); }
+      if (dist > 3) {
+        const dy = lat - prevLat; const dx = (lng - prevLng) * Math.cos(lat * Math.PI / 180);
+        let calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
+        if (calcHeading < 0) calcHeading += 360; if (calcHeading >= 360) calcHeading -= 360;
+        currentHeading = calcHeading; atualizarBussola(currentHeading);
       }
-      if (browserGpsTimeout) {
-        clearTimeout(browserGpsTimeout);
-        browserGpsTimeout = null;
-      }
-
-      gpsSource = 'appinventor';
-
-      // ==========================================================
-      // Calcula direção baseada na movimentação (Heading estimado)
-      // ==========================================================
-      const now = Date.now();
-      if (lastHeadingTime > 0 && (now - lastHeadingTime) < 3000) {
-        const dy = lat - lastHeadingLat;
-        const dx = (lng - lastHeadingLng) * Math.cos(lat * Math.PI / 180);
-        const calcHeading = (Math.atan2(dy, dx) * 180 / Math.PI) + 90;
-        let finalHeading = calcHeading;
-        if (finalHeading < 0) finalHeading += 360;
-        if (finalHeading >= 360) finalHeading -= 360;
-        
-        currentHeading = finalHeading;
-        atualizarBussola(currentHeading);
-      }
-
-      lastHeadingLat = lat;
-      lastHeadingLng = lng;
-      lastHeadingTime = now;
-
       processarNovaPosicao(lat, lng, speed);
     }
 
-    // ===================================================================
-    // FUNÇÃO UNIFICADA DE POSIÇÃO (Usada pelo Browser E pelo App Inventor)
-    // ===================================================================
-    function processarNovaPosicao(newLat, newLng, speedKmh) {
+    function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading = null) {
       const currentTime = Date.now();
-
-      // Calcula velocidade automaticamente se não veio do hardware
       if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
-        const dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
-        const time = (currentTime - prevTime) / 1000;
+        const dist = calcularDistancia(prevLat, prevLng, newLat, newLng); const time = (currentTime - prevTime) / 1000;
         if (time > 0) speedKmh = Math.round((dist / time) * 3.6); 
       }
-      
-      if (speedKmh > 250) speedKmh = 0;
-      
-      $("#speed-display").text(speedKmh);
-      prevLat = newLat; prevLng = newLng; prevTime = currentTime; 
-      userLat = newLat; userLng = newLng;
+      if (speedKmh > 250) speedKmh = 0; $("#speed-display").text(speedKmh);
+      prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
+
+      if (gpsSource === 'browser' && hardwareHeading !== null && !isNaN(hardwareHeading)) {
+        currentHeading = hardwareHeading; atualizarBussola(currentHeading);
+      }
 
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
-
-  // ====================================
-  // Substitua por esta versão mais simples:
-  // =======================================
-    const iconeRadar = L.icon({
-    iconUrl: iconeUrl,
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40],
-    className: 'radar-icon-simple'
-}); 
-     
-      const userIcon = L.icon({
-          iconUrl: userIconUrl,
-          iconSize: [50, 50],
-          iconAnchor: [25, 50], 
-          popupAnchor: [0, -50],
-          className: 'user-gps-marker'
-      });
+      const userIcon = L.icon({ iconUrl: userIconUrl, iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50], className: 'user-gps-marker' });
 
       if (!userMarker) {
         userMarker = L.marker([newLat, newLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
         userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
-        
-        if (!gpsInitialized) {
-          gpsInitialized = true;
-          hideFullscreenLoading();
-        }
-      } else {
-        userMarker.setLatLng([newLat, newLng]);
-      }
+        if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
+      } else { userMarker.setLatLng([newLat, newLng]); }
       
-      if (isFollowing) {
-        map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
-      }
-      
+      if (isFollowing) { map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 }); }
       verificarProximidade(userLat, userLng);
     }
 
-    // =========================================================
-    // GPS DO NAVEGADOR (Fallback para uso fora do App Inventor)
-    // =========================================================
     function startGPSTracking() {
-      if (!navigator.geolocation) {
-        hideFullscreenLoading(); 
-        showNotification("GPS não suportado neste navegador."); 
-        return;
-      }
-
+      if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado neste navegador."); return; }
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-
       watchId = navigator.geolocation.watchPosition(
         function(position) {
           if (gpsSource !== 'appinventor') gpsSource = 'browser';
-          const newLat = position.coords.latitude; 
-          const newLng = position.coords.longitude;
-          let speedKmh = 0; 
-          
-          if (position.coords.speed !== null && position.coords.speed >= 0) {
-            speedKmh = Math.round(position.coords.speed * 3.6);
-          }
-
-          if (position.coords.heading !== null && !isNaN(position.coords.heading)) {
-            atualizarBussola(position.coords.heading);
-          }
-
-          processarNovaPosicao(newLat, newLng, speedKmh);
-        }, 
-        showError, 
-        { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
+          const newLat = position.coords.latitude; const newLng = position.coords.longitude; let speedKmh = 0; 
+          if (position.coords.speed !== null && position.coords.speed >= 0) { speedKmh = Math.round(position.coords.speed * 3.6); }
+          processarNovaPosicao(newLat, newLng, speedKmh, position.coords.heading);
+        }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
       );
-
-      browserGpsTimeout = setTimeout(() => {
-        if (!gpsInitialized && gpsSource === 'none') {
-          showNotification("Aguardando GPS do app...");
-          hideFullscreenLoading();
-        }
-      }, 8000);
+      browserGpsTimeout = setTimeout(() => { if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); } }, 8000);
     }
-     // ====================
-    // Inicialização do Mapa
-    // =====================
+
     function initMap() {
       map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false });
-      aplicarTemaMapa(); 
-      setInterval(aplicarTemaMapa, 300000);
-
+      aplicarTemaMapa(); setInterval(aplicarTemaMapa, 300000);
       map.on('dragstart', () => { isFollowing = false; });
 
-      // Evento de Busca de Radares
       $("#btn-search-radar").click(() => buscarRadares($("#query").val()));
       $("#query").keypress((e) => { if (e.which == 13) buscarRadares($("#query").val()); });
       
-      // Evento de Cálculo de Rota
       $("#btn-calc-route").click(async () => {
         const endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
         $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
         const coords = await buscarCoordenadas(endereco);
-        if (coords) { 
-          calcularRota(coords.lat, coords.lng); 
-          map.flyTo([coords.lat, coords.lng], 16, { duration: 1.5 }); 
-          isFollowing = false; 
-          $("#loading").hide(); 
-          fecharTodasBarras();
-        } 
+        if (coords) { calcularRota(coords.lat, coords.lng); map.flyTo([coords.lat, coords.lng], 16, { duration: 1.5 }); isFollowing = false; $("#loading").hide(); fecharTodasBarras(); }
         else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
       });
       $("#route-query").keypress((e) => { if (e.which == 13) $("#btn-calc-route").click(); });
 
-      // Controle das barras de busca
-      function fecharTodasBarras() { 
-        searchActive = false; routeActive = false; 
-        $("#search-bar-radares").removeClass('active'); 
-        $("#search-bar-rota").removeClass('active'); 
-      }
+      function fecharTodasBarras() { searchActive = false; routeActive = false; $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").removeClass('active'); }
+      $("#btn-search-bar").click(() => { if (searchActive) { fecharTodasBarras(); return; } if (routeActive) routeActive = false; searchActive = true; $("#search-bar-radares").addClass('active'); setTimeout(() => $("#query").focus(), 300); });
+      $("#btn-route-bar").click(() => { if (routeActive) { fecharTodasBarras(); return; } if (searchActive) searchActive = false; routeActive = true; $("#search-bar-rota").addClass('active'); setTimeout(() => $("#route-query").focus(), 300); });
+      $("#btn-center").click(() => { fecharTodasBarras(); isFollowing = true; if (userMarker) { map.flyTo(userMarker.getLatLng(), 17, { duration: 0.5 }); } else { showNotification("Aguardando sinal GPS..."); } });
 
-      $("#btn-search-bar").click(() => { 
-        if (searchActive) { fecharTodasBarras(); return; } 
-        if (routeActive) routeActive = false; 
-        searchActive = true; 
-        $("#search-bar-radares").addClass('active'); 
-        setTimeout(() => $("#query").focus(), 300); 
-      });
-      
-      $("#btn-route-bar").click(() => { 
-        if (routeActive) { fecharTodasBarras(); return; } 
-        if (searchActive) searchActive = false; 
-        routeActive = true; 
-        $("#search-bar-rota").addClass('active'); 
-        setTimeout(() => $("#route-query").focus(), 300); 
-      });
-      
-      $("#btn-center").click(() => { 
-        fecharTodasBarras();
-        isFollowing = true; 
-        if (userMarker) {
-          map.flyTo(userMarker.getLatLng(), 17, { duration: 0.5 });
-        } else {
-          showNotification("Aguardando sinal GPS...");
-        }
-      });
-
-      // Controles de Zoom e Refresh
       $("#btn-zoom-in").click(() => map.zoomIn());
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => { showNotification("Atualizando base de radares..."); carregarRadares(); });
-
-      startGPSTracking();
-      
-      carregarRadares();
+      startGPSTracking(); carregarRadares();
     }
    
-    // Injeta dados de radares estáticos (IA/Fallback)
     function injetarRadaresIA() {
       return [
         { lat: -19.919007, lng:-43.938792, end: "Av. Afonso Pena, Próx. à Praça Sete/Sentido Savassi", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
@@ -965,26 +463,15 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
       ].map(r => [ null, null, r.end, r.tipo, r.vel, null, null, null, null, `${r.lat},${r.lng}` ]);
     }
 
-    // Função Principal de Carregamento de Radares
     async function carregarRadares() {
-      if (radarMarkers.length > 0) {
-          radarMarkers.forEach(marker => map.removeLayer(marker));
-          radarMarkers = [];
-      }
-
+      if (radarMarkers.length > 0) { radarMarkers.forEach(marker => map.removeLayer(marker)); radarMarkers = []; }
       try {
-        console.log("Tentando JSON local...");
         const response = await fetch(`radares.json?v=${Date.now()}`);
         if (!response.ok) throw new Error("Arquivo não encontrado");
         const data = await response.json();
         let records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-        if (records.length > 0) {
-            console.log(`Sucesso: ${records.length} radares do JSON Local.`);
-            renderizarRadaresNoMapa(records, "JSON Local");
-            return;
-        }
+        if (records.length > 0) { renderizarRadaresNoMapa(records, "JSON Local"); return; }
       } catch (e) { console.warn("Falha JSON local:", e); }
-
       $("#loading").show().html("<div class='loading-spinner'></div><div>Conectando API PBH...</div>");
       try {
         const metaResponse = await fetch(`${API_PBH_BASE}package_show?id=fiscalizacao-eletronica`);
@@ -996,19 +483,10 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
         if (!csvResponse.ok) throw new Error("API PBH: Erro download");
         const csvText = await csvResponse.text();
         const recordsFromAPI = parseCSVtoRecords(csvText);
-        if (recordsFromAPI.length > 0) {
-            renderizarRadaresNoMapa(recordsFromAPI, "API Oficial PBH");
-        } else {
-            throw new Error("Nenhum dado extraído.");
-        }
-      } catch (error) {
-        console.warn("Falha API:", error);
-        $("#loading").hide();
-        renderizarRadaresNoMapa([], "Dados de IA (Offline)");
-      }
+        if (recordsFromAPI.length > 0) { renderizarRadaresNoMapa(recordsFromAPI, "API Oficial PBH"); } else { throw new Error("Nenhum dado extraído."); }
+      } catch (error) { console.warn("Falha API:", error); $("#loading").hide(); renderizarRadaresNoMapa([], "Dados de IA (Offline)"); }
     }
 
-    // Parser CSV simples
     function parseCSVtoRecords(csvText) {
       const lines = csvText.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
       if (lines.length < 2) return [];
@@ -1019,123 +497,68 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
       let idxVel = headers.findIndex(h => h.includes('veloc'));
       let idxX = headers.findIndex(h => h.includes('leste') || h.includes('x'));
       let idxY = headers.findIndex(h => h.includes('norte') || h.includes('y'));
-
       const out = [];
       dataLines.forEach(line => {
-          const cols = line.split(';').map(c => c.replace(/^"|"$/g, '').trim());
-          if (cols.length < 3) return; 
-          const end = idxEnd !== -1 ? cols[idxEnd] : (cols[2] || "S/N");
-          const tipo = idxTipo !== -1 ? cols[idxTipo] : "Radar";
-          const vel = idxVel !== -1 ? cols[idxVel] : "60";
-          let coordStr = null;
-          if (idxX !== -1 && idxY !== -1 && cols[idxX] && cols[idxY]) coordStr = `${cols[idxX]},${cols[idxY]}`;
-          out.push([ null, null, end, tipo, vel, null, null, null, null, coordStr ]);
+        const cols = line.split(';').map(c => c.replace(/^"|"$/g, '').trim());
+        if (cols.length < 3) return; 
+        const end = idxEnd !== -1 ? cols[idxEnd] : (cols[2] || "S/N"); const tipo = idxTipo !== -1 ? cols[idxTipo] : "Radar"; const vel = idxVel !== -1 ? cols[idxVel] : "60";
+        let coordStr = null; if (idxX !== -1 && idxY !== -1 && cols[idxX] && cols[idxY]) coordStr = `${cols[idxX]},${cols[idxY]}`;
+        out.push([ null, null, end, tipo, vel, null, null, null, null, coordStr ]);
       });
       return out;
     }
 
-    // Renderiza os marcadores no mapa (USANDO A NOVA FUNÇÃO criarIconeRadar)
     function renderizarRadaresNoMapa(records, origem) {
-      const radaresExternos = records || [];
-      const todosOsRadares = [...radaresExternos, ...injetarRadaresIA()];
-      let contador = 0;
-
+      const radaresExternos = records || []; const todosOsRadares = [...radaresExternos, ...injetarRadaresIA()]; let contador = 0;
       for (let i = 0; i < todosOsRadares.length; i++) {
-        const record = todosOsRadares[i];
-        const endereco = record[2] || "Endereço não informado";
-        let tipo = (record[3] || "Não Identificado").trim();
-        const velocidade = record[4] || "0";
-
-        const coordsFinais = extrairCoordenadas(record);
-        if (!coordsFinais) continue; 
-
-        const iconeUrl = getIconUrl(tipo, velocidade);
-        
-        // Usando a nova função criarIconeRadar para garantir ícones padronizados
-        const iconeRadar = criarIconeRadar(iconeUrl, 40);
-        
+        const record = todosOsRadares[i]; const endereco = record[2] || "Endereço não informado";
+        let tipo = (record[3] || "Não Identificado").trim(); const velocidade = record[4] || "0";
+        const coordsFinais = extrairCoordenadas(record); if (!coordsFinais) continue; 
+        const iconeUrl = getIconUrl(tipo, velocidade); const iconeRadar = criarIconeRadar(iconeUrl, 40);
         const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
-        
-        const tipoExibicao = ajusteNomes[tipo] || tipo;
-        const isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
+        const tipoExibicao = ajusteNomes[tipo] || tipo; const isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
         const tituloPopup = isIA ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` : `<b>${tipoExibicao}</b>`;
-        
         radarMarker.bindPopup(`<div style="color:#222; font-family:'Inter'; text-align:center; min-width:200px;">${tituloPopup}<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">${endereco}<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ${velocidade} km/h</div></div>`);
         radarMarker.radarData = { latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao, isIA };
-        radarMarkers.push(radarMarker);
-        contador++;
+        radarMarkers.push(radarMarker); contador++;
       }
-
       $("#loading").hide();
-      if (contador > 0) showNotification(`Base carregada: ${origem}`);
-      else showNotification("Nenhum radar encontrado.");
+      if (contador > 0) showNotification(`Base carregada: ${origem}`); else showNotification("Nenhum radar encontrado.");
     }
     
-    // Verifica proximidade com radares
     function verificarProximidade(uLat, uLng) {
       let alertTriggered = false;
       radarMarkers.forEach(marker => {
-        if (alertTriggered) return;
-        const dados = marker.radarData;
-        const distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
-        
-        if (distance < 300) { 
-          alertTriggered = true;
-          $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal, dados.velocidade_maxima));
+        if (alertTriggered) return; const dados = marker.radarData; const distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
+        if (distance < 300) {
+          alertTriggered = true; $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal, dados.velocidade_maxima));
           $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
           $("#alert-title").text(dados.isIA ? "⚠️ Câmera IA Detectada!" : "Atenção! Radar Próximo");
-          
-          const sound = document.getElementById("alert-soud"); 
-          sound.currentTime = 0; 
-          sound.play().catch(e => console.warn("Audio blocked:", e));
-
-          $("#alert-container").stop(true, true).fadeIn(200); 
-          clearTimeout(alertTimeout);
-          alertTimeout = setTimeout(() => $("#alert-container").fadeOut(500), 5000);
+          const sound = document.getElementById("alert-soud"); sound.currentTime = 0; sound.play().catch(e => console.warn("Audio blocked:", e));
+          $("#alert-container").stop(true, true).fadeIn(200); clearTimeout(alertTimeout); alertTimeout = setTimeout(() => $("#alert-container").fadeOut(500), 5000);
         }
       });
     }
 
-    // Busca radares por texto
     function buscarRadares(query) {
-      if (!query || query.length < 2) return;
-      let encontrou = false; const boundsGroup = L.featureGroup(); const q = query.toLowerCase();
-      radarMarkers.forEach(marker => {
-        const d = marker.radarData;
-        if (`${d.endereco} ${d.tipoOriginal} ${d.tipoExibicao}`.toLowerCase().includes(q)) {
-          encontrou = true; boundsGroup.addLayer(marker); marker.openPopup(); 
-        }
-      });
-      if (encontrou) { map.fitBounds(boundsGroup.getBounds().pad(0.2)); isFollowing = false; } 
-      else showNotification("Nenhum radar encontrado.");
+      if (!query || query.length < 2) return; let encontrou = false; const boundsGroup = L.featureGroup(); const q = query.toLowerCase();
+      radarMarkers.forEach(marker => { const d = marker.radarData; if (`${d.endereco} ${d.tipoOriginal} ${d.tipoExibicao}`.toLowerCase().includes(q)) { encontrou = true; boundsGroup.addLayer(marker); marker.openPopup(); } });
+      if (encontrou) { map.fitBounds(boundsGroup.getBounds().pad(0.2)); isFollowing = false; } else showNotification("Nenhum radar encontrado.");
     }
 
-    // Tratamento de erros de GPS
     function showError(error) {   
-      if (gpsSource === 'appinventor') return; 
-      
-      let msg = "Erro ao obter localização.";
-      if(error.code === 1) msg = "Permissão de GPS negada. Habilite nas configurações do navegador.";
-      if(error.code === 2) msg = "Sinal GPS indisponível. Verifique se está ao ar livre.";
-      if(error.code === 3) msg = "Tempo de GPS esgotado. Tentando novamente...";
-      
-      showNotification(msg); 
-      hideFullscreenLoading();
-      
-      if(error.code === 3) {
-        setTimeout(startGPSTracking, 5000);
-      }
+      if (gpsSource === 'appinventor') return; let msg = "Erro ao obter localização.";
+      if(error.code === 1) msg = "Permissão de GPS negada."; if(error.code === 2) msg = "Sinal GPS indisponível."; if(error.code === 3) msg = "Tempo de GPS esgotado. Tentando novamente...";
+      showNotification(msg); hideFullscreenLoading(); if(error.code === 3) { setTimeout(startGPSTracking, 5000); }
     }
     
-    // Desbloquear áudio no primeiro clique
     document.addEventListener('click', function desbloquearAudio() {
-        const sound = document.getElementById("alert-soud");
-        if (sound) sound.play().then(() => { sound.pause(); sound.currentTime = 0; }).catch(() => {});
-        document.removeEventListener('click', desbloquearAudio);
+      const sound = document.getElementById("alert-soud");
+      if (sound) sound.play().then(() => { sound.pause(); sound.currentTime = 0; }).catch(() => {});
+      document.removeEventListener('click', desbloquearAudio);
     }, { once: true });
     
     window.onload = initMap;
   </script>
-   
 </body>
 </html>
