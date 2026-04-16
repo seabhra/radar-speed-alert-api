@@ -15,6 +15,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
   
+  <!-- Leaflet Rotate Plugin - Para rotação do mapa -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.1.4/leaflet-rotate.css" />
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.1.4/leaflet-rotate.js"></script>
+  
   <!-- Google Fonts para tipografia moderna -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
@@ -683,49 +687,56 @@
         
         rotateBtn.addEventListener('click', function() {
             if (!isRotated) {
-                // Rotaciona o mapa para seguir a direção do usuário (se disponível)
-                if (currentHeading > 0 && userMarker) {
-                    // Aplica rotação baseada na direção atual do usuário
-                    // Usa CSS rotate no container do mapa
+                // Verifica se o mapa tem suporte a rotação
+                if (typeof map.getBearing === 'function') {
+                    // Obtém a direção atual (heading) ou usa 45 graus como fallback
+                    var targetBearing = (currentHeading > 0) ? currentHeading : 45;
+                    
+                    // Aplica rotação suave ao mapa
+                    map.setBearing(targetBearing, { animate: true });
+                    
+                    showNotification("Mapa rotacionado para " + Math.round(targetBearing) + "°");
+                    rotateBtn.classList.add('rotated');
+                    isRotated = true;
+                } else {
+                    // Fallback: tenta usar CSS rotate com correção de centro
                     var mapContainer = map.getContainer();
-                    var rotationAngle = -currentHeading; // Inverte para compensar
+                    var center = map.getCenter();
+                    var rotationAngle = (currentHeading > 0) ? -currentHeading : 45;
+                    
+                    // Salva o centro atual
+                    var currentCenter = map.getCenter();
+                    var currentZoom = map.getZoom();
                     
                     mapContainer.style.transition = 'transform 0.5s ease';
                     mapContainer.style.transform = 'rotate(' + rotationAngle + 'deg)';
                     
-                    // Adiciona classe para ajustar controles
-                    document.querySelector('.map-wrapper').classList.add('map-rotated');
+                    // Ajusta a posição dos controles
+                    document.querySelector('.map-controls').style.transform = 'rotate(' + (-rotationAngle) + 'deg)';
                     
+                    // Força recálculo do tamanho do mapa
                     setTimeout(function() {
                         map.invalidateSize();
+                        map.setView(currentCenter, currentZoom);
                     }, 100);
                     
-                    showNotification("Mapa rotacionado para sua direção (" + Math.round(currentHeading) + "°)");
-                } else {
-                    // Fallback: rotaciona visualmente 45 graus
-                    var mapContainer = map.getContainer();
-                    mapContainer.style.transition = 'transform 0.5s ease';
-                    mapContainer.style.transform = 'rotate(45deg)';
-                    
-                    setTimeout(function() {
-                        map.invalidateSize();
-                    }, 100);
-                    
-                    showNotification("Mapa rotacionado 45° (Aguardando heading do GPS)");
+                    showNotification("Mapa rotacionado (Modo experimental)");
+                    rotateBtn.classList.add('rotated');
+                    isRotated = true;
                 }
-                rotateBtn.classList.add('rotated');
-                isRotated = true;
             } else {
-                // Reseta a rotação do mapa (volta ao Norte)
-                var mapContainer = map.getContainer();
-                mapContainer.style.transform = 'rotate(0deg)';
-                mapContainer.style.transition = 'transform 0.5s ease';
-                
-                document.querySelector('.map-wrapper').classList.remove('map-rotated');
-                
-                setTimeout(function() {
-                    map.invalidateSize();
-                }, 100);
+                // Reseta a rotação
+                if (typeof map.setBearing === 'function') {
+                    map.setBearing(0, { animate: true });
+                } else {
+                    var mapContainer = map.getContainer();
+                    mapContainer.style.transform = 'rotate(0deg)';
+                    document.querySelector('.map-controls').style.transform = 'rotate(0deg)';
+                    
+                    setTimeout(function() {
+                        map.invalidateSize();
+                    }, 100);
+                }
                 
                 rotateBtn.classList.remove('rotated');
                 showNotification("Mapa resetado (Norte para cima)");
