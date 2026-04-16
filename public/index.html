@@ -154,7 +154,7 @@
 .compass-widget {
   position: absolute;
   top: 20px; /* Parte superior da tela */
-  left: 20px; /* Lado esquerdo */
+  left: -25px; /* Lado esquerdo */
   width: 80px;
   height: 80px;
   z-index: 500; /* Mesmo nível dos botões de mapa */
@@ -177,8 +177,8 @@
 /* Imagem da ponteira (Gira com o GPS) */
 .compass-needle {
   position: absolute;
-  width: 60%; /* Levemente menor que a base */
-  height: 60%;
+  width: 55%; /* Levemente menor que a base */
+  height: 55%;
   object-fit: contain;
   z-index: 2;
   transition: transform 0.4s cubic-bezier(0.1, 0.7, 1.0, 0.1); /* Movimento suave */
@@ -267,7 +267,8 @@
 
 .speed-widget {
  position: absolute; 
-bottom: -15px; left: -25px; 
+bottom: -15px; 
+left: -25px; 
 width: 150px; 
 height: 150px; 
 z-index: 500;
@@ -358,8 +359,14 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
     .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.8rem; color: #777; animation: pulseText 1.8s ease-in-out infinite; }
     @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
+    /* Força o tamanho dos ícones de radar-icon */
+    .radar-icon-simple img {
+    width: 40px !important;
+    height: 40px !important;
+    object-fit: contain !important;
+}
 
-    /* Força o tamanho dos ícones de radar */
+/* Força o tamanho dos ícones de radar-marker */
 .radar-marker-icon {
     background: transparent !important;
     border: none !important;
@@ -790,6 +797,16 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
       userLat = newLat; userLng = newLng;
 
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
+
+  // Substitua por esta versão mais simples:
+    const iconeRadar = L.icon({
+    iconUrl: iconeUrl,
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40],
+    className: 'radar-icon-simple'
+}); 
+     
       const userIcon = L.icon({
           iconUrl: userIconUrl,
           iconSize: [50, 50],
