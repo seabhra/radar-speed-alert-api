@@ -368,8 +368,6 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 
 
 /* Força o tamanho dos ícones de radar-marker (divIcon) */
-
-
 .radar-marker-icon {
     background: transparent !important;
     border: none !important;
@@ -378,21 +376,16 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 .radar-marker-icon div {
     width: 40px !important;
     height: 40px !important;
+    max-width: 40px !important; /* Impede que a imagem estoure a caixa */
+    max-height: 40px !important; /* Impede que a imagem estoure a caixa */
     background-size: contain !important;
     background-repeat: no-repeat !important;
     background-position: center !important;
-}
-
-/* Fallback para ícones comuns do Leaflet */
-.radar-icon-fixed {
-    width: 40px !important;
-    height: 40px !important;
-}
-
-.radar-icon-fixed img {
-    width: 40px !important;
-    height: 40px !important;
-    object-fit: contain !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
    
   </style>
@@ -548,24 +541,24 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 // ===================================================================
 
 function criarIconeRadar(iconeUrl, tamanho = 40) {
+    const tamanhoInterno = tamanho - 2; // Deixa 2px de margem de segurança
     return L.divIcon({
         html: `<div style="
             width: ${tamanho}px; 
             height: ${tamanho}px; 
             background-image: url('${iconeUrl}'); 
-            background-size: contain; 
+            background-size: ${tamanhoInterno}px ${tamanhoInterno}px; 
             background-repeat: no-repeat; 
             background-position: center;
             background-color: transparent;
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
         "></div>`,
         iconSize: [tamanho, tamanho],
-        iconAnchor: [tamanho/2, tamanho], // Aponta a base do ícone no local exato do radar
-        popupAnchor: [0, -tamanho/2],     // Faz o popup surgir em cima do ícone
+        iconAnchor: [tamanho/2, tamanho],
+        popupAnchor: [0, -tamanho/2],
         className: 'radar-marker-icon'
     });
 }
-
 
 
 // Função auxiliar para obter URL do ícone
