@@ -129,6 +129,17 @@
     #btn-route-bar { width: 54px; height: 54px; border: 1px solid rgba(255,140,0,0.5); }
     #btn-search-bar { border: 1px solid rgba(0, 200, 180, 0.35); }
     #btn-center { border: 1px solid rgba(0, 255, 136, 0.35); }
+    
+    /* Botão de Rotação do Mapa */
+    #btn-rotate-map {
+        border: 1px solid rgba(0, 255, 255, 0.35);
+        transition: transform 0.3s ease;
+    }
+    #btn-rotate-map.rotated {
+        transform: rotate(90deg);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    }
 
     /* ================= WIDGET DE VELOCIDADE ================= */
     .speed-widget { 
@@ -278,6 +289,10 @@
 
     <!-- BOTÕES DE CONTROLE DO MAPA -->
     <div class="map-controls">
+       <!-- NOVO BOTÃO: ROTACIONAR MAPA (ACIMA DO BOTÃO DE BUSCA) -->
+       <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
+        <img src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
+      </button>
       <button class="map-btn" id="btn-search-bar" title="Buscar Radares">
         <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
       </button>
@@ -645,6 +660,40 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: inicializarBotaoRotacaoMapa - Configura o botão de rotação
+    // ===================================================================
+    function inicializarBotaoRotacaoMapa() {
+        var rotateBtn = document.getElementById('btn-rotate-map');
+        var isRotated = false;
+        var originalBearing = 0;
+        
+        if (!rotateBtn) return;
+        
+        rotateBtn.addEventListener('click', function() {
+            if (!isRotated) {
+                // Rotaciona o mapa para seguir a direção do usuário (se disponível)
+                if (currentHeading > 0 && userMarker) {
+                    // Aplica rotação baseada na direção atual do usuário
+                    map.setBearing(currentHeading);
+                    showNotification("Mapa rotacionado para sua direção");
+                } else {
+                    // Fallback: rotaciona 90 graus para demonstração
+                    map.setBearing(45);
+                    showNotification("Mapa rotacionado 45° (Aguardando heading do GPS)");
+                }
+                rotateBtn.classList.add('rotated');
+                isRotated = true;
+            } else {
+                // Reseta a rotação do mapa (volta ao Norte)
+                map.setBearing(0);
+                rotateBtn.classList.remove('rotated');
+                showNotification("Mapa resetado (Norte para cima)");
+                isRotated = false;
+            }
+        });
+    }
+    
     // ===================================================================
     // FUNÇÃO: receberCoordenadasDoAppInventor - Interface com App Inventor
     // ===================================================================
