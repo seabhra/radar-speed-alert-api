@@ -678,65 +678,67 @@
     // ===================================================================
     // FUNÇÃO: inicializarBotaoRotacaoMapa - Configura o botão de rotação
     // ===================================================================
+        // ===================================================================
+    // FUNÇÃO: inicializarBotaoRotacaoMapa - Configura o botão de rotação
+    // ===================================================================
     function inicializarBotaoRotacaoMapa() {
         var rotateBtn = document.getElementById('btn-rotate-map');
         var isRotated = false;
-        var originalBearing = 0;
+        var originalView = null;
         
         if (!rotateBtn) return;
         
         rotateBtn.addEventListener('click', function() {
+            var mapContainer = map.getContainer();
+            var mapWrapper = document.querySelector('.map-wrapper');
+            
             if (!isRotated) {
-                // Verifica se o mapa tem suporte a rotação
-                if (typeof map.getBearing === 'function') {
-                    // Obtém a direção atual (heading) ou usa 45 graus como fallback
-                    var targetBearing = (currentHeading > 0) ? currentHeading : 45;
-                    
-                    // Aplica rotação suave ao mapa
-                    map.setBearing(targetBearing, { animate: true });
-                    
-                    showNotification("Mapa rotacionado para " + Math.round(targetBearing) + "°");
-                    rotateBtn.classList.add('rotated');
-                    isRotated = true;
-                } else {
-                    // Fallback: tenta usar CSS rotate com correção de centro
-                    var mapContainer = map.getContainer();
-                    var center = map.getCenter();
-                    var rotationAngle = (currentHeading > 0) ? -currentHeading : 45;
-                    
-                    // Salva o centro atual
-                    var currentCenter = map.getCenter();
-                    var currentZoom = map.getZoom();
-                    
-                    mapContainer.style.transition = 'transform 0.5s ease';
-                    mapContainer.style.transform = 'rotate(' + rotationAngle + 'deg)';
-                    
-                    // Ajusta a posição dos controles
-                    document.querySelector('.map-controls').style.transform = 'rotate(' + (-rotationAngle) + 'deg)';
-                    
-                    // Força recálculo do tamanho do mapa
-                    setTimeout(function() {
-                        map.invalidateSize();
-                        map.setView(currentCenter, currentZoom);
-                    }, 100);
-                    
-                    showNotification("Mapa rotacionado (Modo experimental)");
-                    rotateBtn.classList.add('rotated');
-                    isRotated = true;
-                }
+                // Salva o estado atual
+                originalView = {
+                    center: map.getCenter(),
+                    zoom: map.getZoom(),
+                    bounds: map.getBounds()
+                };
+                
+                // Calcula o ângulo de rotação (45 graus ou heading do usuário)
+                var rotationAngle = (currentHeading > 0 && currentHeading < 360) ? 
+                                    (360 - currentHeading) : 45;
+                
+                // Aplica rotação ao container do mapa
+                mapContainer.style.transition = 'transform 0.5s ease';
+                mapContainer.style.transform = 'rotate(' + rotationAngle + 'deg)';
+                
+                // Compensa a rotação nos controles
+                var controls = document.querySelectorAll('.map-controls, .compass-widget, .speed-widget');
+                controls.forEach(function(control) {
+                    control.style.transition = 'transform 0.5s ease';
+                    control.style.transform = 'rotate(' + (-rotationAngle) + 'deg)';
+                });
+                
+                // Ajusta os popups e tooltips
+                setTimeout(function() {
+                    map.invalidateSize();
+                    map.setView(originalView.center, originalView.zoom);
+                }, 100);
+                
+                showNotification("Mapa rotacionado");
+                rotateBtn.classList.add('rotated');
+                isRotated = true;
             } else {
-                // Reseta a rotação
-                if (typeof map.setBearing === 'function') {
-                    map.setBearing(0, { animate: true });
-                } else {
-                    var mapContainer = map.getContainer();
-                    mapContainer.style.transform = 'rotate(0deg)';
-                    document.querySelector('.map-controls').style.transform = 'rotate(0deg)';
-                    
-                    setTimeout(function() {
-                        map.invalidateSize();
-                    }, 100);
-                }
+                // Reseta rotação
+                mapContainer.style.transform = 'rotate(0deg)';
+                
+                var controls = document.querySelectorAll('.map-controls, .compass-widget, .speed-widget');
+                controls.forEach(function(control) {
+                    control.style.transform = 'rotate(0deg)';
+                });
+                
+                setTimeout(function() {
+                    map.invalidateSize();
+                    if (originalView) {
+                        map.setView(originalView.center, originalView.zoom);
+                    }
+                }, 100);
                 
                 rotateBtn.classList.remove('rotated');
                 showNotification("Mapa resetado (Norte para cima)");
