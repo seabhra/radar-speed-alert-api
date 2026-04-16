@@ -368,31 +368,17 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 
 
 /* Força o tamanho dos ícones de radar-marker (divIcon) */
-
-
 .radar-marker-icon {
     background: transparent !important;
     border: none !important;
 }
 
-.radar-marker-icon div {
-    width: 40px !important;
-    height: 40px !important;
-    background-size: contain !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-}
-
-/* Fallback para ícones comuns do Leaflet */
-.radar-icon-fixed {
-    width: 40px !important;
-    height: 40px !important;
-}
-
-.radar-icon-fixed img {
+/* Segurança extra: Força a tag IMG dentro da div a nunca crescer */
+.radar-marker-icon img {
     width: 40px !important;
     height: 40px !important;
     object-fit: contain !important;
+    display: block !important;
 }
    
   </style>
@@ -546,26 +532,22 @@ transform: translate(-100%, -60%); /* primeiro para esquerda e segundo sobe */
 // ===================================================================
 // FUNÇÃO MELHORADA PARA CRIAR ÍCONES PADRONIZADOS
 // ===================================================================
-
 function criarIconeRadar(iconeUrl, tamanho = 40) {
     return L.divIcon({
-        html: `<div style="
+        // Mudança chave: Ao invés de background-image, usamos uma tag <img> real
+        html: `<img src="${iconeUrl}" style="
             width: ${tamanho}px; 
             height: ${tamanho}px; 
-            background-image: url('${iconeUrl}'); 
-            background-size: contain; 
-            background-repeat: no-repeat; 
-            background-position: center;
-            background-color: transparent;
+            object-fit: contain; 
+            display: block;
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
-        "></div>`,
+        " />`,
         iconSize: [tamanho, tamanho],
-        iconAnchor: [tamanho/2, tamanho], // Aponta a base do ícone no local exato do radar
-        popupAnchor: [0, -tamanho/2],     // Faz o popup surgir em cima do ícone
+        iconAnchor: [tamanho/2, tamanho], 
+        popupAnchor: [0, -tamanho/2],     
         className: 'radar-marker-icon'
     });
 }
-
 
 
 // Função auxiliar para obter URL do ícone
@@ -720,16 +702,17 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
     }
 
     // ===================================================================
-    // FUNÇÃO NOVA: Atualizar a Bússola Visual
+    // FUNÇÃO: Atualizar a Bússola Visual
     // ===================================================================
     function atualizarBussola(headingDegrees) {
-      const needle = document.getElementById('compass-needle-img');
+      const needle = document.getElementById('compass-needle-img");
       if (needle) {
         needle.style.transform = `rotate(${headingDegrees}deg)`; 
       }
     }
+
     // ===================================================================
-    // FUNÇÃO GLOBAL CHAMADA PELO APP INVENTOR VIA RunJavaScript
+    // FUNÇÃO: App Inventor (Com cálculo integrado da Bússola por Movimento)
     // ===================================================================
     function receberCoordenadasDoAppInventor(lat, lng, speed) {
       lat = parseFloat(lat);
@@ -750,96 +733,62 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
 
       gpsSource = 'appinventor';
       
-      // Passa os dados. O cálculo da bússola é feito lá dentro agora.
-      processarNovaPosicao(lat, lng, speed);
-    
-      // ==========================================================
-      // Calcula direção baseada na movimentação (Heading estimado)
-      // ==========================================================
-      const now = Date.now();
-      if (lastHeadingTime > 0 && (now - lastHeadingTime) < 3000) {
-        const dy = lat - lastHeadingLat;
-        const dx = (lng - lastHeadingLng) * Math.cos(lat * Math.PI / 180);
-        const calcHeading = (Math.atan2(dy, dx) * 180 / Math.PI) + 90;
-        let finalHeading = calcHeading;
-        if (finalHeading < 0) finalHeading += 360;
-        if (finalHeading >= 360) finalHeading -= 360;
-        
-        currentHeading = finalHeading;
-        atualizarBussola(currentHeading);
-      }
-
-      lastHeadingLat = lat;
-      lastHeadingLng = lng;
-      lastHeadingTime = now;
-
-      processarNovaPosicao(lat, lng, speed);
-    }
-
-        // ===================================================================
-    // FUNÇÃO UNIFICADA DE POSIÇÃO (Ativa Mapa, Velocidade e Bússola)
-    // ===================================================================
-    function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading = null) {
-      const currentTime = Date.now();
+      // Calcula a distância percorrida para saber se gira a bússola
       let dist = 0;
-
-      // 1. Calcula velocidade automaticamente se não veio do hardware
-      if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
-        dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
-        const time = (currentTime - prevTime) / 1000;
-        if (time > 0) speedKmh = Math.round((dist / time) * 3.6); 
-      } else if (prevLat !== null) {
-        // Se a velocidade veio do hardware, calcula a distância só para a bússola
-        dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
+      if (prevLat !== null) {
+        dist = calcularDistancia(prevLat, prevLng, lat, lng);
       }
-      
-      if (speedKmh > 250) speedKmh = 0;
-      $("#speed-display").text(speedKmh);
-      
-      // ===================================================================
-      // 2. LÓGICA INTELIGENTE DA BÚSSOLA (Ativada pelo Movimento GPS)
-      // ===================================================================
-      
-      // Prioridade 1: Se o celular enviou o heading do hardware (bússola física)
-      if (hardwareHeading !== null && !isNaN(hardwareHeading)) {
-        currentHeading = hardwareHeading;
-      } 
-      // Prioridade 2: Calcula baseado no deslocamento real
-      else if (dist > 3) { 
-        // SÓ gira a bússola se o carro andou MAIS de 3 metros.
-        // Isso evita que a ponteira fique rodando igual um louco quando você está parado no farol
-        // devido à imprecisão de 2-3 metros do GPS comum.
-        
-        const dy = newLat - prevLat;
-        const dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
+
+      // SÓ gira a bússola se o carro andou MAIS de 3 metros (evita erro quando parado)
+      if (dist > 3) {
+        const dy = lat - prevLat;
+        const dx = (lng - prevLng) * Math.cos(lat * Math.PI / 180);
         
         // Calcula o ângulo correto (0 = Norte, 90 = Leste, 180 = Sul)
         let calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
-        
-        // Ajusta para ficar sempre entre 0 e 360 graus
         if (calcHeading < 0) calcHeading += 360;
         if (calcHeading >= 360) calcHeading -= 360;
         
         currentHeading = calcHeading;
-      }
-      
-      // Aplica a rotação visual na ponteira
-      if (currentHeading > 0) {
         atualizarBussola(currentHeading);
       }
 
-      // 3. Atualiza variáveis de controle e Mapa
+      processarNovaPosicao(lat, lng, speed);
+    }
+
+    // ===================================================================
+    // FUNÇÃO UNIFICADA DE POSIÇÃO (Usada pelo Browser E pelo App Inventor)
+    // ===================================================================
+    function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading = null) {
+      const currentTime = Date.now();
+
+      // Calcula velocidade automaticamente se não veio do hardware
+      if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
+        const dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
+        const time = (currentTime - prevTime) / 1000;
+        if (time > 0) speedKmh = Math.round((dist / time) * 3.6); 
+      }
+      
+      if (speedKmh > 250) speedKmh = 0;
+      
+      $("#speed-display").text(speedKmh);
       prevLat = newLat; prevLng = newLng; prevTime = currentTime; 
       userLat = newLat; userLng = newLng;
+
+      // Se for GPS do Navegador e tiver heading de hardware, usa aqui
+      if (gpsSource === 'browser' && hardwareHeading !== null && !isNaN(hardwareHeading)) {
+        currentHeading = hardwareHeading;
+        atualizarBussola(currentHeading);
+      }
 
       const userIconUrl = '/imagens_app/ic_gps_marker.png';
      
       const userIcon = L.icon({
-        iconUrl: iconeUrl,
-        iconSize: [40, 40],
-        iconAnchor: [20, 40],
-        popupAnchor: [0, -40],
-        className: 'user-gps-marker'
+          iconUrl: userIconUrl,
+          iconSize: [50, 50],
+          iconAnchor: [25, 50], 
+          popupAnchor: [0, -50],
+          className: 'user-gps-marker'
       });
 
       if (!userMarker) {
@@ -860,12 +809,10 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
       
       verificarProximidade(userLat, userLng);
     }
-  
 
     // =========================================================
     // GPS DO NAVEGADOR (Fallback para uso fora do App Inventor)
     // =========================================================
-    
     function startGPSTracking() {
       if (!navigator.geolocation) {
         hideFullscreenLoading(); 
@@ -886,11 +833,8 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
             speedKmh = Math.round(position.coords.speed * 3.6);
           }
 
-          // Tenta pegar a direção direto do hardware do celular (se disponível)
-          const hardwareHeading = position.coords.heading;
-
-          // Passa o heading de hardware para a função unificada
-          processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading);
+          // Envia o heading do hardware (se existir) para a função unificada
+          processarNovaPosicao(newLat, newLng, speedKmh, position.coords.heading);
         }, 
         showError, 
         { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
@@ -903,8 +847,7 @@ function criarIconeRadar(iconeUrl, tamanho = 40) {
         }
       }, 8000);
     }
-    
-    // ====================
+     // ====================
     // Inicialização do Mapa
     // =====================
     function initMap() {
