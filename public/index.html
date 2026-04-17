@@ -139,10 +139,11 @@
     .map-btn:active { transform: scale(0.92); }
     .map-btn img { width: 30px; height: 30px; object-fit: contain; pointer-events: none; }
 
-    /* Botão de alerta on/off */
+    /* Botão de alerta on/off com ícones de som */
     .alert-toggle-btn {
       background: rgba(204, 0, 0, 0.9);
       border: 2px solid #ff5555;
+      transition: all 0.3s ease;
     }
     .alert-toggle-btn.alert-off {
       background: rgba(68, 68, 68, 0.9);
@@ -150,6 +151,9 @@
     }
     .alert-toggle-btn.alert-off img {
       filter: grayscale(1);
+    }
+    .alert-toggle-btn img {
+      transition: all 0.3s ease;
     }
 
     /* Botões com destaques específicos */
@@ -353,8 +357,8 @@
        <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
         <img src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
       </button>
-      <button class="map-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar">
-        <img src="/imagens_app/ic_radar_das.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'" alt="Alerta">
+      <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar">
+        <img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
       </button>
       <button class="map-btn" id="btn-search-bar" title="Buscar Radares">
         <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
@@ -792,10 +796,12 @@
     }
 
     // ===================================================================
-    // FUNÇÃO: inicializarBotaoAlertaToggle - Configura botão liga/desliga alerta
+    // FUNÇÃO: inicializarBotaoAlertaToggle - Configura botão liga/desliga alerta com ícones
     // ===================================================================
     function inicializarBotaoAlertaToggle() {
       const alertBtn = document.getElementById('btn-alert-toggle');
+      const alertIcon = document.getElementById('alert-toggle-icon');
+      
       if (!alertBtn) return;
       
       alertBtn.addEventListener('click', function() {
@@ -803,12 +809,22 @@
         
         if (alertaHabilitado) {
           alertBtn.classList.remove('alert-off');
+          // Troca ícone para som ligado
+          if (alertIcon) {
+            alertIcon.src = "/imagens_app/ic_sound_on.png";
+            alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
+          }
           showNotification("🔔 Alerta de radar LIGADO");
           
           // Fecha qualquer alerta pendente ao ligar
           fecharAlertaImediatamente();
         } else {
           alertBtn.classList.add('alert-off');
+          // Troca ícone para som desligado
+          if (alertIcon) {
+            alertIcon.src = "/imagens_app/ic_sound_off.png";
+            alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
+          }
           showNotification("🔕 Alerta de radar DESLIGADO");
           
           // Fecha alerta imediatamente ao desligar
