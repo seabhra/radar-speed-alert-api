@@ -139,10 +139,24 @@
     .map-btn:active { transform: scale(0.92); }
     .map-btn img { width: 30px; height: 30px; object-fit: contain; pointer-events: none; }
 
+    /* Botão de alerta on/off */
+    .alert-toggle-btn {
+      background: rgba(204, 0, 0, 0.9);
+      border: 2px solid #ff5555;
+    }
+    .alert-toggle-btn.alert-off {
+      background: rgba(68, 68, 68, 0.9);
+      border-color: #888;
+    }
+    .alert-toggle-btn.alert-off img {
+      filter: grayscale(1);
+    }
+
     /* Botões com destaques específicos */
     #btn-route-bar { width: 54px; height: 54px; border: 1px solid rgba(255,140,0,0.5); }
     #btn-search-bar { border: 1px solid rgba(0, 200, 180, 0.35); }
     #btn-center { border: 1px solid rgba(0, 255, 136, 0.35); }
+    #btn-alert-toggle { border: 1px solid rgba(255, 51, 51, 0.5); }
     
     /* Botão de Rotação do Mapa */
     #btn-rotate-map {
@@ -270,7 +284,6 @@
     @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
     /* ================= ESTILOS DOS ÍCONES DO MAPA ================= */
-    /* Força tamanho padronizado para todos os ícones de radar */
     .radar-marker-icon {
       background: transparent !important;
       border: none !important;
@@ -339,6 +352,9 @@
     <div class="map-controls">
        <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
         <img src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
+      </button>
+      <button class="map-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar">
+        <img src="/imagens_app/ic_radar_das.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'" alt="Alerta">
       </button>
       <button class="map-btn" id="btn-search-bar" title="Buscar Radares">
         <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
@@ -409,21 +425,27 @@
     let gpsInitialized = false;      // Flag se o GPS já inicializou
     let browserGpsTimeout = null;    // Timeout para fallback do GPS
     
+    // Variável de controle do alerta (LIGADO por padrão)
+    let alertaHabilitado = true;
+    
+    // Variável para controlar o último radar alertado
+    let ultimoRadarAlertado = null;
+    
     // Configurações de alerta melhoradas
     const ALERT_CONFIG = {
       DISTANCIA_MAXIMA: 80,        // 80 metros (bem mais próximo)
       DISTANCIA_CRITICA: 40,       // Alerta mais urgente
       TEMPO_ALERTA: 4000,          // 4 segundos
-      MESMA_VIA_TOLERANCIA: 25     // Tolerância de metros para considerar mesma via
+      DISTANCIA_PASSAR_RADAR: 10   // Distância para considerar que já passou do radar (10m)
     };
     
     // ===================================================================
     // VARIÁVEIS DA BÚSSOLA
     // ===================================================================
-    let lastHeadingTime = 0;         // Timestamp da última atualização do heading
-    let lastHeadingLat = 0;          // Última latitude para cálculo do heading
-    let lastHeadingLng = 0;          // Última longitude para cálculo do heading
-    let currentHeading = 0;          // Direção atual em graus (0=Norte, 90=Leste)
+    let lastHeadingTime = 0;
+    let lastHeadingLat = 0;
+    let lastHeadingLng = 0;
+    let currentHeading = 0;
     
     // URL base da API da PBH
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
@@ -594,6 +616,25 @@
     }
 
     // ===================================================================
+    // FUNÇÃO: fecharAlertaImediatamente - Fecha o alerta e para o som
+    // ===================================================================
+    function fecharAlertaImediatamente() {
+      $("#alert-container").fadeOut(100);
+      clearTimeout(alertTimeout);
+      
+      // Para o som se estiver tocando
+      var sound = document.getElementById("alert-soud");
+      if (sound) {
+        sound.pause();
+        sound.currentTime = 0;
+      }
+      
+      // Reseta estilo do alert bar
+      $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
+      $(".alert-bar").removeClass("alert-bar-critico");
+    }
+
+    // ===================================================================
     // FUNÇÃO: aplicarTemaMapa - Alterna tema claro/escuro baseado no horário
     // ===================================================================
     function aplicarTemaMapa() {
@@ -751,6 +792,32 @@
     }
 
     // ===================================================================
+    // FUNÇÃO: inicializarBotaoAlertaToggle - Configura botão liga/desliga alerta
+    // ===================================================================
+    function inicializarBotaoAlertaToggle() {
+      const alertBtn = document.getElementById('btn-alert-toggle');
+      if (!alertBtn) return;
+      
+      alertBtn.addEventListener('click', function() {
+        alertaHabilitado = !alertaHabilitado;
+        
+        if (alertaHabilitado) {
+          alertBtn.classList.remove('alert-off');
+          showNotification("🔔 Alerta de radar LIGADO");
+          
+          // Fecha qualquer alerta pendente ao ligar
+          fecharAlertaImediatamente();
+        } else {
+          alertBtn.classList.add('alert-off');
+          showNotification("🔕 Alerta de radar DESLIGADO");
+          
+          // Fecha alerta imediatamente ao desligar
+          fecharAlertaImediatamente();
+        }
+      });
+    }
+
+    // ===================================================================
     // FUNÇÃO: receberCoordenadasDoAppInventor - Interface com App Inventor
     // ===================================================================
     function receberCoordenadasDoAppInventor(lat, lng, speed) {
@@ -839,8 +906,13 @@
         map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
       }
       
-      // VERIFICA PROXIMIDADE COM RADARES (USANDO A DIREÇÃO)
-      verificarProximidade(userLat, userLng, currentHeading);
+      // VERIFICA PROXIMIDADE COM RADARES (se o alerta estiver ligado)
+      if (alertaHabilitado) {
+        verificarProximidade(userLat, userLng, currentHeading);
+      } else {
+        // Se alerta estiver desligado, garante que não haja alerta visível
+        fecharAlertaImediatamente();
+      }
     }
 
     // ===================================================================
@@ -897,6 +969,15 @@
           // Verifica direção (se disponível)
           var direcaoInfo = verificarDirecao(uLat, uLng, heading, dados.latitude, dados.longitude);
           
+          // Se já passou do radar (muito perto E se afastando), fecha alerta imediatamente
+          if (distance < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR && direcaoInfo.estaAfastando) {
+            if (ultimoRadarAlertado === marker) {
+              fecharAlertaImediatamente();
+              ultimoRadarAlertado = null;
+            }
+            return;
+          }
+          
           // Ignora se estiver se afastando do radar (já passou)
           if (direcaoInfo.estaAfastando && distance > 30) {
             return;
@@ -911,6 +992,11 @@
               marker: marker
             });
           }
+        } else {
+          // Se o radar não está mais próximo e era o último alertado, pode resetar
+          if (ultimoRadarAlertado === marker && distance > ALERT_CONFIG.DISTANCIA_MAXIMA) {
+            ultimoRadarAlertado = null;
+          }
         }
       });
       
@@ -924,6 +1010,18 @@
         var radar = alertasProximos[0];
         var distance = radar.distancia;
         var dados = radar.dados;
+        
+        // Se já estamos alertando este mesmo radar e ele ainda está próximo, não faz nada
+        if (ultimoRadarAlertado === radar.marker) {
+          return;
+        }
+        
+        // Se é um radar diferente, fecha o alerta anterior
+        if (ultimoRadarAlertado !== null) {
+          fecharAlertaImediatamente();
+        }
+        
+        ultimoRadarAlertado = radar.marker;
         
         // Define prioridade do alerta baseado na distância
         var prioridade = distance < ALERT_CONFIG.DISTANCIA_CRITICA ? "critico" : "normal";
@@ -962,25 +1060,30 @@
           alertBar.removeClass("alert-bar-critico");
         }
         
-        // Toca som de alerta (tom diferente para alerta crítico)
-        var sound = document.getElementById("alert-soud");
-        if (sound) {
-          sound.currentTime = 0;
-          if (prioridade === "critico") {
-            sound.volume = 0.8;
-          } else {
-            sound.volume = 0.5;
+        // Toca som de alerta (apenas se alerta estiver habilitado)
+        if (alertaHabilitado) {
+          var sound = document.getElementById("alert-soud");
+          if (sound) {
+            sound.currentTime = 0;
+            if (prioridade === "critico") {
+              sound.volume = 0.8;
+            } else {
+              sound.volume = 0.5;
+            }
+            sound.play().catch(function(e) { console.warn("Audio blocked:", e); });
           }
-          sound.play().catch(function(e) { console.warn("Audio blocked:", e); });
         }
         
         // Exibe alerta com animação
         $("#alert-container").stop(true, true).fadeIn(200);
         clearTimeout(alertTimeout);
         alertTimeout = setTimeout(function() { 
-          $("#alert-container").fadeOut(500);
-          $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
-          $(".alert-bar").removeClass("alert-bar-critico");
+          if (ultimoRadarAlertado === radar.marker) {
+            $("#alert-container").fadeOut(500);
+            $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
+            $(".alert-bar").removeClass("alert-bar-critico");
+            ultimoRadarAlertado = null;
+          }
         }, ALERT_CONFIG.TEMPO_ALERTA);
       }
     }
@@ -1074,6 +1177,7 @@
       });
       
       inicializarBotaoRotacaoMapa();
+      inicializarBotaoAlertaToggle();
       startGPSTracking();
       carregarRadares();
     }
