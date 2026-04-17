@@ -183,6 +183,12 @@
         transition: all 0.3s ease;
     }
 
+    /* Estilo do marcador do usuário em rota */
+    .user-navigator-marker {
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      transition: all 0.1s ease;
+    }
+
 
     /* ================= WIDGET DE VELOCIDADE ================= */
     .speed-widget { 
@@ -369,7 +375,7 @@
       <button class="map-btn" id="btn-center" title="Centralizar GPS">
         <img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
       </button>
-      <button class="map-btn" id="btn-refresh" title="Atualizar Dados">
+      <button class="map-btn" id="btn-refresh" title="Resetar Mapa">
         <img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
       </button>
       <button class="map-btn" id="btn-zoom-in" title="Aumentar Zoom">
@@ -428,12 +434,18 @@
     let gpsSource = 'none';          // Fonte do GPS: 'browser' ou 'appinventor'
     let gpsInitialized = false;      // Flag se o GPS já inicializou
     let browserGpsTimeout = null;    // Timeout para fallback do GPS
+    let destinoAtual = null;         // Armazena destino atual para atualizar rota
+    let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 }; // Posição inicial do mapa
     
     // Variável de controle do alerta (LIGADO por padrão)
     let alertaHabilitado = true;
     
     // Variável para controlar o último radar alertado
     let ultimoRadarAlertado = null;
+    
+    // Timer para retornar ao GPS quando mapa for mexido
+    let returnToGpsTimer = null;
+    const TEMPO_RETORNO_GPS = 8000; // 8 segundos
     
     // Configurações de alerta melhoradas
     const ALERT_CONFIG = {
@@ -478,6 +490,13 @@
       'default': '/imagens_app/ic_radar_cev_v2.png'
     };
 
+    // Tipos que NÃO devem gerar alerta sonoro (apenas manter ícone no mapa)
+    const TIPOS_SEM_ALERTA = [
+      'Detector de Faixa Preferencial de Ônibus (BUS)',
+      'Faixa Preferencial de Ônibus (BUS)',
+      'BUS'
+    ];
+
     // ===================================================================
     // MAPA DE AJUSTE DE NOMES PARA EXIBIÇÃO
     // ===================================================================
@@ -497,6 +516,18 @@
       'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão em Local Proibido (DCP)': 'Radar Misto DAS + DCP (CEM)',
       'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (MOVE)': 'Radar Misto DAS + MOVE (CEM)'
     };
+
+    // ===================================================================
+    // FUNÇÃO: deveAlertaRadar - Verifica se o tipo de radar deve gerar alerta
+    // ===================================================================
+    function deveAlertaRadar(tipo) {
+      for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {
+        if (tipo && tipo.includes(TIPOS_SEM_ALERTA[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
 
     // ===================================================================
     // FUNÇÃO: criarIconeRadar - Cria ícone padronizado para radares
@@ -580,6 +611,35 @@
     }
 
     // ===================================================================
+    // FUNÇÃO: resetarMapa - Reseta o mapa para posição inicial
+    // ===================================================================
+    function resetarMapa() {
+      // Reseta a visão do mapa para posição original
+      map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
+      
+      // Reseta rotação do mapa
+      map.setBearing(0);
+      document.getElementById('btn-rotate-map')?.classList.remove('rotated');
+      
+      // Reseta o modo "seguir" para true
+      isFollowing = true;
+      
+      // Remove rota ativa se existir
+      if (routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+      }
+      
+      // Limpa destino atual
+      destinoAtual = null;
+      
+      // Fecha barras de busca
+      fecharTodasBarras();
+      
+      showNotification("Mapa resetado para posição inicial");
+    }
+
+    // ===================================================================
     // FUNÇÃO: calcularDistancia - Calcula distância entre dois pontos (Haversine)
     // ===================================================================
     function calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -626,14 +686,12 @@
       $("#alert-container").fadeOut(100);
       clearTimeout(alertTimeout);
       
-      // Para o som se estiver tocando
       var sound = document.getElementById("alert-soud");
       if (sound) {
         sound.pause();
         sound.currentTime = 0;
       }
       
-      // Reseta estilo do alert bar
       $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
       $(".alert-bar").removeClass("alert-bar-critico");
     }
@@ -673,6 +731,9 @@
     // ===================================================================
     function calcularRota(destLat, destLng) {
       if (routingControl) map.removeControl(routingControl);
+      
+      destinoAtual = { lat: destLat, lng: destLng };
+      
       routingControl = L.Routing.control({
         waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
         routeWhileDragging: false,
@@ -688,6 +749,17 @@
         createMarker: function() { return null; },
         router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' })
       }).addTo(map);
+    }
+
+    // ===================================================================
+    // FUNÇÃO: atualizarRota - Atualiza a rota com a posição atual do usuário
+    // ===================================================================
+    function atualizarRota() {
+      if (destinoAtual && userLat && userLng) {
+        if (routingControl) {
+          routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
+        }
+      }
     }
 
     // ===================================================================
@@ -796,7 +868,7 @@
     }
 
     // ===================================================================
-    // FUNÇÃO: inicializarBotaoAlertaToggle - Configura botão liga/desliga alerta com ícones
+    // FUNÇÃO: inicializarBotaoAlertaToggle - Configura botão liga/desliga alerta
     // ===================================================================
     function inicializarBotaoAlertaToggle() {
       const alertBtn = document.getElementById('btn-alert-toggle');
@@ -809,25 +881,19 @@
         
         if (alertaHabilitado) {
           alertBtn.classList.remove('alert-off');
-          // Troca ícone para som ligado
           if (alertIcon) {
             alertIcon.src = "/imagens_app/ic_sound_on.png";
             alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
           }
           showNotification("🔔 Alerta de radar LIGADO");
-          
-          // Fecha qualquer alerta pendente ao ligar
           fecharAlertaImediatamente();
         } else {
           alertBtn.classList.add('alert-off');
-          // Troca ícone para som desligado
           if (alertIcon) {
             alertIcon.src = "/imagens_app/ic_sound_off.png";
             alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
           }
           showNotification("🔕 Alerta de radar DESLIGADO");
-          
-          // Fecha alerta imediatamente ao desligar
           fecharAlertaImediatamente();
         }
       });
@@ -874,7 +940,6 @@
       if (speedKmh > 250) speedKmh = 0;
       $("#speed-display").text(speedKmh);
       
-      // Lógica da bússola
       if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
         currentHeading = hardwareHeading;
       } 
@@ -897,13 +962,14 @@
       userLat = newLat;
       userLng = newLng;
 
-      var userIconUrl = '/imagens_app/ic_gps_marker.png';
+      // Ícone do usuário com estilo de navegador
+      var userIconUrl = '/imagens_app/ic_navigator_map.png';
       var userIcon = L.icon({
         iconUrl: userIconUrl,
         iconSize: [50, 50],
         iconAnchor: [25, 50],
         popupAnchor: [0, -50],
-        className: 'user-gps-marker'
+        className: 'user-navigator-marker'
       });
 
       if (!userMarker) {
@@ -918,15 +984,20 @@
         userMarker.setLatLng([newLat, newLng]);
       }
       
+      // Atualiza a rota se houver destino ativo
+      if (destinoAtual) {
+        atualizarRota();
+      }
+      
+      // Se o modo "seguir" estiver ativo, centraliza o mapa
       if (isFollowing) {
         map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
       }
       
-      // VERIFICA PROXIMIDADE COM RADARES (se o alerta estiver ligado)
+      // Verifica proximidade com radares (apenas se alerta estiver ligado)
       if (alertaHabilitado) {
         verificarProximidade(userLat, userLng, currentHeading);
       } else {
-        // Se alerta estiver desligado, garante que não haja alerta visível
         fecharAlertaImediatamente();
       }
     }
@@ -978,14 +1049,17 @@
       
       radarMarkers.forEach(function(marker) {
         var dados = marker.radarData;
+        
+        // Verifica se este tipo de radar deve gerar alerta
+        if (!deveAlertaRadar(dados.tipoOriginal)) {
+          return; // Ignora alerta para este tipo (BUS, etc)
+        }
+        
         var distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
         
-        // Só processa se estiver dentro da distância máxima (80m)
         if (distance < ALERT_CONFIG.DISTANCIA_MAXIMA) {
-          // Verifica direção (se disponível)
           var direcaoInfo = verificarDirecao(uLat, uLng, heading, dados.latitude, dados.longitude);
           
-          // Se já passou do radar (muito perto E se afastando), fecha alerta imediatamente
           if (distance < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR && direcaoInfo.estaAfastando) {
             if (ultimoRadarAlertado === marker) {
               fecharAlertaImediatamente();
@@ -994,12 +1068,10 @@
             return;
           }
           
-          // Ignora se estiver se afastando do radar (já passou)
           if (direcaoInfo.estaAfastando && distance > 30) {
             return;
           }
           
-          // Só alerta se estiver se aproximando (ou não temos info de direção)
           if (direcaoInfo.estaAproximando) {
             alertasProximos.push({
               distancia: distance,
@@ -1009,37 +1081,31 @@
             });
           }
         } else {
-          // Se o radar não está mais próximo e era o último alertado, pode resetar
           if (ultimoRadarAlertado === marker && distance > ALERT_CONFIG.DISTANCIA_MAXIMA) {
             ultimoRadarAlertado = null;
           }
         }
       });
       
-      // Ordena por distância (mais próximo primeiro)
       alertasProximos.sort(function(a, b) {
         return a.distancia - b.distancia;
       });
       
-      // Dispara alerta para o radar mais próximo
       if (alertasProximos.length > 0) {
         var radar = alertasProximos[0];
         var distance = radar.distancia;
         var dados = radar.dados;
         
-        // Se já estamos alertando este mesmo radar e ele ainda está próximo, não faz nada
         if (ultimoRadarAlertado === radar.marker) {
           return;
         }
         
-        // Se é um radar diferente, fecha o alerta anterior
         if (ultimoRadarAlertado !== null) {
           fecharAlertaImediatamente();
         }
         
         ultimoRadarAlertado = radar.marker;
         
-        // Define prioridade do alerta baseado na distância
         var prioridade = distance < ALERT_CONFIG.DISTANCIA_CRITICA ? "critico" : "normal";
         var titulo = dados.isIA ? "⚠️ Câmera IA!" : "📸 Radar à Frente!";
         
@@ -1047,7 +1113,6 @@
           titulo = "🚨 ATENÇÃO MÁXIMA! " + titulo;
         }
         
-        // Texto do alerta com informações precisas
         var textoAlerta = dados.endereco + ' - Máx: ' + dados.velocidade_maxima + 'km/h';
         textoAlerta += ' (a ' + Math.round(distance) + 'm';
         
@@ -1056,17 +1121,14 @@
         }
         textoAlerta += ')';
         
-        // Adiciona aviso se for muito próximo
         if (distance < 30) {
           textoAlerta += ' ⚠️ MUITO PRÓXIMO!';
         }
         
-        // Atualiza UI do alerta
         $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal, dados.velocidade_maxima));
         $("#alert-text").text(textoAlerta);
         $("#alert-title").text(titulo);
         
-        // Adiciona classe especial para alerta crítico
         var alertBar = $(".alert-bar");
         if (prioridade === "critico") {
           alertBar.css("background", "linear-gradient(90deg, #ff0000, #cc0000)");
@@ -1076,21 +1138,15 @@
           alertBar.removeClass("alert-bar-critico");
         }
         
-        // Toca som de alerta (apenas se alerta estiver habilitado)
         if (alertaHabilitado) {
           var sound = document.getElementById("alert-soud");
           if (sound) {
             sound.currentTime = 0;
-            if (prioridade === "critico") {
-              sound.volume = 0.8;
-            } else {
-              sound.volume = 0.5;
-            }
+            sound.volume = prioridade === "critico" ? 0.8 : 0.5;
             sound.play().catch(function(e) { console.warn("Audio blocked:", e); });
           }
         }
         
-        // Exibe alerta com animação
         $("#alert-container").stop(true, true).fadeIn(200);
         clearTimeout(alertTimeout);
         alertTimeout = setTimeout(function() { 
@@ -1119,7 +1175,27 @@
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
       
-      map.on('dragstart', function() { isFollowing = false; });
+      // Quando o usuário começa a arrastar o mapa, desativa o modo "seguir" e agenda retorno
+      map.on('dragstart', function() { 
+        isFollowing = false;
+        
+        // Limpa timer anterior se existir
+        if (returnToGpsTimer) {
+          clearTimeout(returnToGpsTimer);
+        }
+      });
+      
+      // Quando o usuário para de arrastar o mapa, agenda retorno ao GPS
+      map.on('dragend', function() {
+        // Agenda retorno ao GPS após TEMPO_RETORNO_GPS milissegundos
+        returnToGpsTimer = setTimeout(function() {
+          if (!isFollowing && userMarker) {
+            isFollowing = true;
+            map.setView(userMarker.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 });
+            showNotification("Voltando à sua posição atual");
+          }
+        }, TEMPO_RETORNO_GPS);
+      });
 
       $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
       $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
@@ -1138,6 +1214,7 @@
           isFollowing = false;
           $("#loading").hide();
           fecharTodasBarras();
+          showNotification("Rota calculada com sucesso!");
         } else {
           $("#loading").hide();
           showNotification("Endereço não encontrado.");
@@ -1179,18 +1256,20 @@
         isFollowing = true;
         if (userMarker) {
           map.flyTo(userMarker.getLatLng(), 17, { duration: 0.5 });
+          showNotification("Centralizando na sua posição");
         } else {
           showNotification("Aguardando sinal GPS...");
         }
       });
 
-      $("#btn-zoom-in").click(function() { map.zoomIn(); });
-      $("#btn-zoom-out").click(function() { map.zoomOut(); });
-      
+      // Botão Refresh - Reseta tudo para posição inicial
       $("#btn-refresh").click(function() { 
-        showNotification("Atualizando base de radares..."); 
+        resetarMapa();
         carregarRadares(); 
       });
+      
+      $("#btn-zoom-in").click(function() { map.zoomIn(); });
+      $("#btn-zoom-out").click(function() { map.zoomOut(); });
       
       inicializarBotaoRotacaoMapa();
       inicializarBotaoAlertaToggle();
@@ -1208,7 +1287,8 @@
         { lat: -19.919191, lng: -43.938468, end: "Av. Afonso Pena, Próx. à Praça Sete/sentido Rodoviária", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
         { lat: -19.931347, lng: -43.985536, end: "Rua Conde Pereira Carneiro, sentido Gameleira/Centro", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
         { lat: -19.871740, lng: -43.955001, end: "Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
-        { lat: -19.835851, lng: -43.907504, end: "Rod. Camilo Teixeira da Costa, 210 – Tupi/Centro", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" }
+        { lat: -19.835851, lng: -43.907504, end: "Rod. Camilo Teixeira da Costa, 210 – Tupi/Centro", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" },
+        { lat: -19.922500, lng: -43.945000, end: "Av. Amazonas, 500 - Centro", tipo: "Detector de Faixa Preferencial de Ônibus (BUS)", vel: "40" }
       ].map(function(r) { 
         return [null, null, r.end, r.tipo, r.vel, null, null, null, null, r.lat + ',' + r.lng]; 
       });
@@ -1399,7 +1479,7 @@
     }
     
     // ===================================================================
-    // EVENTO: Desbloqueia áudio no primeiro clique (requisito dos navegadores)
+    // EVENTO: Desbloqueia áudio no primeiro clique
     // ===================================================================
     document.addEventListener('click', function desbloquearAudio() {
       var sound = document.getElementById("alert-soud");
@@ -1413,7 +1493,7 @@
     }, { once: true });
     
     // ===================================================================
-    // INICIALIZAÇÃO: Quando a página carrega, inicia o app
+    // INICIALIZAÇÃO
     // ===================================================================
     window.onload = initMap;
   </script>
