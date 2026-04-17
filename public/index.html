@@ -183,10 +183,20 @@
         transition: all 0.3s ease;
     }
 
-    /* Estilo do marcador do usuário em rota */
+    /* Estilos dos marcadores do usuário */
+    .user-gps-marker {
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    
     .user-navigator-marker {
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-      transition: all 0.1s ease;
+      animation: pulseMarker 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulseMarker {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
 
 
@@ -490,7 +500,7 @@
       'default': '/imagens_app/ic_radar_cev_v2.png'
     };
 
-    // Tipos que NÃO devem gerar alerta sonoro (apenas manter ícone no mapa)
+    // Tipos que NÃO devem gerar alerta (apenas manter ícone no mapa)
     const TIPOS_SEM_ALERTA = [
       'Detector de Faixa Preferencial de Ônibus (BUS)',
       'Faixa Preferencial de Ônibus (BUS)',
@@ -611,35 +621,6 @@
     }
 
     // ===================================================================
-    // FUNÇÃO: resetarMapa - Reseta o mapa para posição inicial
-    // ===================================================================
-    function resetarMapa() {
-      // Reseta a visão do mapa para posição original
-      map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
-      
-      // Reseta rotação do mapa
-      map.setBearing(0);
-      document.getElementById('btn-rotate-map')?.classList.remove('rotated');
-      
-      // Reseta o modo "seguir" para true
-      isFollowing = true;
-      
-      // Remove rota ativa se existir
-      if (routingControl) {
-        map.removeControl(routingControl);
-        routingControl = null;
-      }
-      
-      // Limpa destino atual
-      destinoAtual = null;
-      
-      // Fecha barras de busca
-      fecharTodasBarras();
-      
-      showNotification("Mapa resetado para posição inicial");
-    }
-
-    // ===================================================================
     // FUNÇÃO: calcularDistancia - Calcula distância entre dois pontos (Haversine)
     // ===================================================================
     function calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -727,6 +708,35 @@
     }
 
     // ===================================================================
+    // FUNÇÃO: atualizarIconeUsuario - Atualiza o ícone do usuário baseado no estado de navegação
+    // ===================================================================
+    function atualizarIconeUsuario() {
+      if (!userMarker) return;
+      
+      var estaEmNavegacao = (destinoAtual !== null && routingControl !== null);
+      var userIconUrl;
+      var iconClassName;
+      
+      if (estaEmNavegacao) {
+        userIconUrl = '/imagens_app/ic_navigator_map.png';
+        iconClassName = 'user-navigator-marker';
+      } else {
+        userIconUrl = '/imagens_app/ic_gps_marker.png';
+        iconClassName = 'user-gps-marker';
+      }
+      
+      var userIcon = L.icon({
+        iconUrl: userIconUrl,
+        iconSize: [50, 50],
+        iconAnchor: [25, 50],
+        popupAnchor: [0, -50],
+        className: iconClassName
+      });
+      
+      userMarker.setIcon(userIcon);
+    }
+
+    // ===================================================================
     // FUNÇÃO: calcularRota - Traça rota entre usuário e destino usando OSRM
     // ===================================================================
     function calcularRota(destLat, destLng) {
@@ -749,17 +759,59 @@
         createMarker: function() { return null; },
         router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' })
       }).addTo(map);
+      
+      // Atualiza o ícone do usuário para o ícone de navegação
+      atualizarIconeUsuario();
+      
+      showNotification("Navegação iniciada! Ícone do veículo alterado.");
     }
 
     // ===================================================================
     // FUNÇÃO: atualizarRota - Atualiza a rota com a posição atual do usuário
     // ===================================================================
     function atualizarRota() {
-      if (destinoAtual && userLat && userLng) {
-        if (routingControl) {
-          routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
-        }
+      if (destinoAtual && userLat && userLng && routingControl) {
+        routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
       }
+    }
+
+    // ===================================================================
+    // FUNÇÃO: removerRota - Remove a rota ativa e volta ícone padrão
+    // ===================================================================
+    function removerRota() {
+      if (routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+      }
+      destinoAtual = null;
+      
+      // Volta o ícone do usuário para o padrão (GPS marker)
+      atualizarIconeUsuario();
+      
+      showNotification("Navegação encerrada");
+    }
+
+    // ===================================================================
+    // FUNÇÃO: resetarMapa - Reseta o mapa para posição inicial
+    // ===================================================================
+    function resetarMapa() {
+      // Reseta a visão do mapa para posição original
+      map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
+      
+      // Reseta rotação do mapa
+      map.setBearing(0);
+      document.getElementById('btn-rotate-map')?.classList.remove('rotated');
+      
+      // Reseta o modo "seguir" para true
+      isFollowing = true;
+      
+      // Remove rota ativa se existir
+      removerRota();
+      
+      // Fecha barras de busca
+      fecharTodasBarras();
+      
+      showNotification("Mapa resetado para posição inicial");
     }
 
     // ===================================================================
@@ -962,18 +1014,17 @@
       userLat = newLat;
       userLng = newLng;
 
-      // Ícone do usuário com estilo de navegador
-      var userIconUrl = '/imagens_app/ic_navigator_map.png';
-      var userIcon = L.icon({
-        iconUrl: userIconUrl,
-        iconSize: [50, 50],
-        iconAnchor: [25, 50],
-        popupAnchor: [0, -50],
-        className: 'user-navigator-marker'
-      });
-
+      // Cria o marcador do usuário se não existir
       if (!userMarker) {
-        userMarker = L.marker([newLat, newLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
+        // Ícone padrão: ic_gps_marker.png (sem navegação ativa)
+        var defaultIcon = L.icon({
+          iconUrl: '/imagens_app/ic_gps_marker.png',
+          iconSize: [50, 50],
+          iconAnchor: [25, 50],
+          popupAnchor: [0, -50],
+          className: 'user-gps-marker'
+        });
+        userMarker = L.marker([newLat, newLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
         userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
         
         if (!gpsInitialized) {
@@ -983,6 +1034,9 @@
       } else {
         userMarker.setLatLng([newLat, newLng]);
       }
+      
+      // Atualiza o ícone baseado no estado de navegação
+      atualizarIconeUsuario();
       
       // Atualiza a rota se houver destino ativo
       if (destinoAtual) {
@@ -1052,7 +1106,7 @@
         
         // Verifica se este tipo de radar deve gerar alerta
         if (!deveAlertaRadar(dados.tipoOriginal)) {
-          return; // Ignora alerta para este tipo (BUS, etc)
+          return;
         }
         
         var distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
