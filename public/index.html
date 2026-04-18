@@ -9,24 +9,31 @@
 
   <title>Radar X9 BH - Alerta Inteligente (OSM + IA)</title>
 
-  <!-- Leaflet CSS -->
+  <!-- =================================================================== -->
+  <!-- BIBLIOTECAS EXTERNAS                                               -->
+  <!-- =================================================================== -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
   <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
   <style>
+    /* =================================================================== */
+    /* VARIÁVEIS GLOBAIS - TEMA DARK                                       */
+    /* =================================================================== */
     :root {
-      --bg-color: #0f1115;
-      --panel-color: #1a1d24;
-      --accent-color: #00ff88;
-      --alert-color: #ff3333;
-      --text-main: #ffffff;
-      --text-muted: #a0a0a0;
+      --bg-color: #0f1115;        /* Fundo principal escuro */
+      --panel-color: #1a1d24;     /* Cor dos painéis */
+      --accent-color: #00ff88;    /* Verde destaque */
+      --alert-color: #ff3333;     /* Vermelho para alertas */
+      --text-main: #ffffff;       /* Texto principal branco */
+      --text-muted: #a0a0a0;      /* Texto secundário cinza */
     }
     
+    /* Reset básico - remove margens e paddings padrão */
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
+    /* Corpo da página - ocupa toda a tela */
     body {
       font-family: 'Inter', sans-serif;
       background-color: var(--bg-color);
@@ -37,6 +44,9 @@
       overflow: hidden;
     }
 
+    /* =================================================================== */
+    /* HEADER - BARRA SUPERIOR DO APLICATIVO                              */
+    /* =================================================================== */
     header {
       background-color: var(--panel-color);
       padding: 15px;
@@ -52,6 +62,9 @@
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
     h1 span { color: var(--accent-color); }
 
+    /* =================================================================== */
+    /* BARRA DE BUSCA - PARA RADARES E ROTAS                               */
+    /* =================================================================== */
     .search-container {
       position: absolute; top: 0; left: 0; width: 100%;
       background-color: rgba(26, 29, 36, 0.98);
@@ -65,18 +78,22 @@
     }
     .search-container.active {
       max-height: 90px; opacity: 1; padding: 15px;
-      border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      border-bottom: 1px solid #333;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
     .search-container input {
       flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444;
-      background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
+      background-color: #000; color: #fff; font-size: 1rem; outline: none;
+      font-family: 'Inter', sans-serif;
     }
     .search-container input:focus { border-color: var(--accent-color); }
 
+    /* Botão de busca estilizado */
     .btn-search {
       position: relative; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%;
       border: none; cursor: pointer; background: rgba(76, 137, 198, 0.95);
-      box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); transition: all 0.2s ease; overflow: hidden;
+      box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); transition: all 0.2s ease;
+      overflow: hidden;
     }
     .btn-search:active { transform: scale(0.9); }
     .btn-search img {
@@ -84,30 +101,32 @@
       object-fit: contain; display: block; transform: translate(-50%, -50%);
     }
     
+    /* =================================================================== */
+    /* CONTAINER DO MAPA - ÁREA PRINCIPAL                                  */
+    /* =================================================================== */
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; }
 
+    /* =================================================================== */
+    /* BÚSSOLA - WIDGET VISUAL                                            */
+    /* =================================================================== */
     .compass-widget {
       position: absolute; top: 20px; left: 5px; width: 80px; height: 80px;
-      z-index: 500; display: flex; align-items: center; justify-content: center; pointer-events: none;
+      z-index: 500; display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
     }
     .compass-base { 
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      z-index: 1;
-      opacity: 0.9;
+      position: absolute; width: 100%; height: 100%; object-fit: contain;
+      z-index: 1; opacity: 0.9;
     }
     .compass-needle {
-      position: absolute;
-      width: 55%;
-      height: 55%;
-      object-fit: contain;
-      z-index: 2;
-      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: absolute; width: 55%; height: 55%; object-fit: contain;
+      z-index: 2; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
+    /* =================================================================== */
+    /* BOTÕES DE CONTROLE DO MAPA (BARRA LATERAL DIREITA)                  */
+    /* =================================================================== */
     .map-controls {
       position: absolute; right: 15px; bottom: 30px; display: flex; flex-direction: column;
       align-items: center; gap: 10px; z-index: 500;
@@ -122,19 +141,16 @@
     .map-btn:active { transform: scale(0.92); }
     .map-btn img { width: 30px; height: 30px; object-fit: contain; pointer-events: none; }
 
+    /* Botão de alerta on/off */
     .alert-toggle-btn {
       background: rgba(29, 28, 28, 0.9);
       border: 2px solid rgba(255,255,255,0.08);
       transition: all 0.3s ease;
     }
-    .alert-toggle-btn.alert-off {
-      background: rgba(68, 68, 68, 0.9);
-      border-color: #888;
-    }
-    .alert-toggle-btn.alert-off img {
-      filter: grayscale(1);
-    }
+    .alert-toggle-btn.alert-off { background: rgba(68, 68, 68, 0.9); border-color: #888; }
+    .alert-toggle-btn.alert-off img { filter: grayscale(1); }
 
+    /* Cores específicas para cada botão */
     #btn-route-bar { width: 54px; height: 54px; border: 1px solid rgba(255,140,0,0.5); }
     #btn-search-bar { border: 1px solid rgba(0, 200, 180, 0.35); }
     #btn-center { border: 1px solid rgba(0, 255, 136, 0.35); }
@@ -142,27 +158,28 @@
     #btn-rotate-map { border: 1px solid rgba(0, 255, 255, 0.35); transition: transform 0.3s ease; }
     #btn-rotate-map.rotated { transform: rotate(90deg); border-color: var(--accent-color); box-shadow: 0 0 15px rgba(0, 255, 136, 0.3); }
 
-    .leaflet-container { transition: transform 0.3s ease; }
-    
-    /* Estilos dos marcadores do usuário */
-    .user-gps-marker {
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    }
+    /* =================================================================== */
+    /* MARCADORES DO USUÁRIO E ROTA                                       */
+    /* =================================================================== */
+    .user-gps-marker { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
     .user-navigator-marker {
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
       animation: pulseMarker 1.5s ease-in-out infinite;
     }
     
-    /* Estilos dos marcadores de rota (origem e destino) */
+    /* Marcador de partida da rota (ícone navegador) */
     .route-start-marker {
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
       animation: pulseStart 1s ease-in-out infinite;
     }
+    
+    /* Marcador de chegada da rota (bandeira/pino) */
     .route-end-marker {
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
       animation: pulseEnd 1.2s ease-in-out infinite;
     }
     
+    /* Animações de pulsação para os marcadores */
     @keyframes pulseMarker {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
@@ -179,29 +196,24 @@
       100% { transform: scale(1); }
     }
 
+    /* =================================================================== */
+    /* WIDGET DE VELOCIDADE                                               */
+    /* =================================================================== */
     .speed-widget { 
       position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; 
       z-index: 500; display: flex; align-items: center; justify-content: center; 
     } 
     .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; } 
     .speed-value {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-62%, -60%);
-      font-size: 28px;
-      font-weight: 700;
-      font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-      color: #000;
-      line-height: 1;
-      z-index: 2;
-      white-space: nowrap;
-      text-align: center;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.5px;
-      min-width: 3ch;
+      position: absolute; top: 50%; left: 50%; transform: translate(-62%, -60%);
+      font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+      color: #000; line-height: 1; z-index: 2; white-space: nowrap; text-align: center;
+      font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch;
     }
     
+    /* =================================================================== */
+    /* ALERTAS E NOTIFICAÇÕES                                             */
+    /* =================================================================== */
     #alert-container { 
       position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; 
       display: none; animation: slideUp 0.3s ease-out; pointer-events: none; 
@@ -222,6 +234,7 @@
     .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
     .alert-info p { font-size: 0.95rem; opacity: 0.95; }
     
+    /* Toast de notificação temporária */
     .toast-notification { 
       position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
       background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px;
@@ -231,6 +244,7 @@
     }
     .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* Loading overlay */
     .loading-overlay { 
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
       background: rgba(20, 20, 20, 0.9); padding: 20px 30px; border-radius: 12px;
@@ -244,8 +258,10 @@
     }
     @keyframes spin { 100% { transform: rotate(360deg); } }
     
+    /* Remove controles padrão do Leaflet */
     .leaflet-control-zoom, .leaflet-control-attribution, .leaflet-routing-container { display: none !important; }
     
+    /* Tela de loading inicial */
     .loading-fullscreen { 
       position: fixed; inset: 0; background-color: var(--bg-color);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -270,6 +286,7 @@
     .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.8rem; color: #777; animation: pulseText 1.8s ease-in-out infinite; }
     @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
+    /* Estilo dos marcadores de radar */
     .radar-marker-icon {
       background: transparent !important;
       border: none !important;
@@ -284,12 +301,18 @@
 </head>
 <body>
 
+  <!-- =================================================================== -->
+  <!-- TELA DE LOADING INICIAL                                             -->
+  <!-- =================================================================== -->
   <div class="loading-fullscreen" id="loading-fullscreen">
     <div class="spinner-ring"></div>
     <div class="loading-text">Iniciando <span>Radar X9</span></div>
     <div class="loading-sub">Sincronizando satélites...</div>
   </div>
 
+  <!-- =================================================================== -->
+  <!-- HEADER DO APLICATIVO                                                -->
+  <!-- =================================================================== -->
   <header>
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
@@ -297,7 +320,12 @@
     </div>
   </header>
 
+  <!-- =================================================================== -->
+  <!-- ÁREA PRINCIPAL - MAPA E CONTROLES                                   -->
+  <!-- =================================================================== -->
   <div class="map-wrapper">
+    
+    <!-- BARRA DE BUSCA DE RADARES -->
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
       <button class="btn-search" id="btn-search-radar" title="Buscar">
@@ -305,6 +333,7 @@
       </button>
     </div>
 
+    <!-- BARRA DE ROTA/NAVEGAÇÃO -->
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
       <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;">
@@ -312,22 +341,27 @@
       </button>
     </div>
 
+    <!-- MAPA (Leaflet) -->
     <div id="map"></div>
     
+    <!-- TOAST PARA NOTIFICAÇÕES -->
     <div class="toast-notification" id="toast-msg"></div>
 
+    <!-- WIDGET DE BÚSSOLA VISUAL -->
     <div class="compass-widget">
       <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src='https://cdn-icons-png.flaticon.com/512/2838/2838773.png'" alt="Bússola" class="compass-base">
       <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'" alt="Ponteira" class="compass-needle" id="compass-needle-img">
     </div>
 
+    <!-- WIDGET DE VELOCIDADE -->
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
+    <!-- BOTÕES DE CONTROLE DO MAPA -->
     <div class="map-controls">
-       <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
+      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
         <img src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
       </button>
       <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar">
@@ -353,6 +387,7 @@
       </button>
     </div>
 
+    <!-- ALERTA DE RADAR PRÓXIMO -->
     <div id="alert-container">
       <div class="alert-bar">
         <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
@@ -363,14 +398,19 @@
       </div>
     </div>
 
+    <!-- LOADING OVERLAY PARA OPERAÇÕES -->
     <div class="loading-overlay" id="loading" style="display:none;">
       <div class="loading-spinner"></div>
       <div style="margin-top:10px; color:#fff;">Processando...</div>
     </div>
   </div>
 
+  <!-- ÁUDIO DE ALERTA -->
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
+  <!-- =================================================================== -->
+  <!-- BIBLIOTECAS EXTERNAS                                                -->
+  <!-- =================================================================== -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
@@ -379,50 +419,73 @@
     // ===================================================================
     // VARIÁVEIS GLOBAIS
     // ===================================================================
-    let map;
-    let userMarker;
-    let radarMarkers = [];
-    let alertTimeout;
-    let userLat = -19.919055;
-    let userLng = -43.938641;
-    let tileLayer;
-    let routingControl = null;
-    let searchActive = false;
-    let routeActive = false;
-    let prevLat = null;
-    let prevLng = null;
-    let prevTime = null;
-    let isFollowing = true;
-    let watchId = null;
-    let gpsSource = 'none';
-    let gpsInitialized = false;
-    let browserGpsTimeout = null;
-    let destinoAtual = null;
+    
+    let map;                         // Instância do mapa Leaflet
+    let userMarker;                  // Marcador da posição do usuário
+    let radarMarkers = [];           // Array com todos os marcadores de radar
+    let alertTimeout;                // Timeout para fechar alerta automático
+    
+    // Posição inicial (Praça Sete - Belo Horizonte)
+    let userLat = -19.919055;        
+    let userLng = -43.938641;        
+    
+    let tileLayer;                   // Camada de tiles do mapa
+    let routingControl = null;       // Controle de rota
+    let searchActive = false;        // Estado da barra de busca
+    let routeActive = false;         // Estado da barra de rota
+    let prevLat = null;              // Latitude anterior (para cálculo de velocidade)
+    let prevLng = null;              // Longitude anterior
+    let prevTime = null;             // Tempo anterior
+    let isFollowing = true;          // Se o mapa segue o GPS automaticamente
+    let watchId = null;              // ID do watcher do GPS
+    let gpsSource = 'none';          // Fonte do GPS: 'browser' ou 'appinventor'
+    let gpsInitialized = false;      // Flag se o GPS já inicializou
+    let browserGpsTimeout = null;    // Timeout para fallback do GPS
+    let destinoAtual = null;         // Armazena destino atual para atualizar rota
     let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
     
+    // Controle do alerta sonoro (LIGADO por padrão)
     let alertaHabilitado = true;
+    
+    // Variável para controlar o último radar alertado (evita repetição)
     let ultimoRadarAlertado = null;
+    
+    // Timer para retornar ao GPS quando mapa for mexido
     let returnToGpsTimer = null;
-    const TEMPO_RETORNO_GPS = 8000;
+    const TEMPO_RETORNO_GPS = 8000;   // 8 segundos
     
-    // Marcadores de origem e destino da rota
-    let startRouteMarker = null;
-    let endRouteMarker = null;
+    // ===================================================================
+    // MARCADORES DE ROTA (ORIGEM E DESTINO)
+    // ===================================================================
+    let startRouteMarker = null;      // Marcador de partida (ic_navigator_map.png)
+    let endRouteMarker = null;        // Marcador de chegada (ic_icon_chegada.png)
     
+    // ===================================================================
+    // CONFIGURAÇÕES DE ALERTA
+    // ===================================================================
     const ALERT_CONFIG = {
-      DISTANCIA_MAXIMA: 80,
-      DISTANCIA_CRITICA: 40,
-      TEMPO_ALERTA: 4000,
-      DISTANCIA_PASSAR_RADAR: 10
+      DISTANCIA_MAXIMA: 80,           // 80 metros (alerta começa aqui)
+      DISTANCIA_CRITICA: 40,          // Alerta mais urgente
+      TEMPO_ALERTA: 4000,             // 4 segundos de alerta na tela
+      DISTANCIA_PASSAR_RADAR: 10      // Distância para considerar que já passou
     };
     
+    // ===================================================================
+    // VARIÁVEIS DA BÚSSOLA
+    // ===================================================================
     let lastHeadingTime = 0;
     let lastHeadingLat = 0;
     let lastHeadingLng = 0;
-    let currentHeading = 0;
+    let currentHeading = 0;            // Direção atual em graus (0 = Norte)
     
+    // ===================================================================
+    // URL BASE DA API DA PBH
+    // ===================================================================
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
 
+    // ===================================================================
+    // MAPA DE ÍCONES POR TIPO DE RADAR
+    // ===================================================================
     const iconMap = {
       'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev_v2.png',
       'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das_v2.png',
@@ -439,12 +502,18 @@
       'default': '/imagens_app/ic_radar_cev_v2.png'
     };
 
+    // ===================================================================
+    // TIPOS DE RADAR QUE NÃO GERAM ALERTA (apenas ícone no mapa)
+    // ===================================================================
     const TIPOS_SEM_ALERTA = [
       'Detector de Faixa Preferencial de Ônibus (BUS)',
       'Faixa Preferencial de Ônibus (BUS)',
       'BUS'
     ];
 
+    // ===================================================================
+    // MAPA DE AJUSTE DE NOMES PARA EXIBIÇÃO (mais amigável)
+    // ===================================================================
     const ajusteNomes = {
       'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
       'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
@@ -460,7 +529,10 @@
     };
 
     // ===================================================================
-    // FUNÇÃO: criarIconePersonalizado - Cria ícone para marcadores de rota
+    // FUNÇÃO: criarIconePersonalizado
+    // Descrição: Cria ícone customizado para marcadores de rota
+    // Parâmetros: iconUrl (caminho da imagem), tamanho (px), className (classe CSS)
+    // Retorno: Objeto L.icon do Leaflet
     // ===================================================================
     function criarIconePersonalizado(iconUrl, tamanho, className) {
       return L.icon({
@@ -473,26 +545,35 @@
     }
 
     // ===================================================================
-    // FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de origem e destino
+    // FUNÇÃO: adicionarMarcadoresRota
+    // Descrição: Adiciona os marcadores de ORIGEM e DESTINO da rota
+    //            - ORIGEM: ic_navigator_map.png (início da viagem)
+    //            - DESTINO: ic_icon_chegada.png (final da viagem)
+    // Parâmetros: originLat, originLng, destLat, destLng
     // ===================================================================
     function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
       // Remove marcadores antigos se existirem
       if (startRouteMarker) map.removeLayer(startRouteMarker);
       if (endRouteMarker) map.removeLayer(endRouteMarker);
       
-      // Ícone de PARTIDA (ic_navigator_map.png) - início da rota
+      // ===============================================================
+      // MARCADOR DE PARTIDA (ÍNICIO DA ROTA) - ic_navigator_map.png
+      // ===============================================================
       var startIcon = criarIconePersonalizado('/imagens_app/ic_navigator_map.png', 45, 'route-start-marker');
       startRouteMarker = L.marker([originLat, originLng], { icon: startIcon, zIndexOffset: 900 }).addTo(map);
       startRouteMarker.bindTooltip("Seu local (partida)", { permanent: false, direction: "top", offset: [0, -25] });
       
-      // Ícone de CHEGADA (ic_icon_chegada.png) - final da rota
+      // ===============================================================
+      // MARCADOR DE CHEGADA (FINAL DA ROTA) - ic_icon_chegada.png
+      // ===============================================================
       var endIcon = criarIconePersonalizado('/imagens_app/ic_icon_chegada.png', 45, 'route-end-marker');
       endRouteMarker = L.marker([destLat, destLng], { icon: endIcon, zIndexOffset: 900 }).addTo(map);
       endRouteMarker.bindTooltip("Destino", { permanent: false, direction: "top", offset: [0, -25] });
     }
 
     // ===================================================================
-    // FUNÇÃO: removerMarcadoresRota - Remove os marcadores de rota
+    // FUNÇÃO: removerMarcadoresRota
+    // Descrição: Remove os marcadores de rota da tela
     // ===================================================================
     function removerMarcadoresRota() {
       if (startRouteMarker) {
@@ -505,15 +586,27 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: deveAlertaRadar
+    // Descrição: Verifica se o tipo de radar deve gerar alerta sonoro/visual
+    // Parâmetros: tipo (string com o tipo do radar)
+    // Retorno: boolean (true = deve alertar, false = não alertar)
+    // ===================================================================
     function deveAlertaRadar(tipo) {
       for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {
         if (tipo && tipo.includes(TIPOS_SEM_ALERTA[i])) {
-          return false;
+          return false;   // Não alerta para faixas de ônibus, etc
         }
       }
-      return true;
+      return true;        // Alerta para radares de velocidade, semáforo, etc
     }
 
+    // ===================================================================
+    // FUNÇÃO: criarIconeRadar
+    // Descrição: Cria ícone no formato divIcon para os radares no mapa
+    // Parâmetros: iconeUrl (caminho da imagem), tamanho (px)
+    // Retorno: Objeto L.divIcon do Leaflet
+    // ===================================================================
     function criarIconeRadar(iconeUrl, tamanho = 40) {
       return L.divIcon({
         html: '<img src="' + iconeUrl + '" style="width: ' + tamanho + 'px; height: ' + tamanho + 'px; object-fit: contain; display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" onerror="this.src=\'/imagens_app/ic_radar_cev_v2.png\'" />',
@@ -524,21 +617,31 @@
       });
     }
 
+    // ===================================================================
+    // FUNÇÃO: getIconUrl
+    // Descrição: Retorna a URL do ícone baseado no tipo e velocidade do radar
+    // Parâmetros: tipo (string), velocidade (string)
+    // Retorno: string com o caminho da imagem
+    // ===================================================================
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
       
+      // Radar misto (velocidade + semáforo)
       if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) {
         return iconMap['Controlador Eletrônico de Velocidade'] || '/imagens_app/ic_radar_cev_v2.png';
       }
       
+      // Radar de parada sobre faixa de pedestres
       if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) {
         return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
       }
       
+      // Painel de redução de velocidade
       if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') {
         return iconMap['Controle de Redução de Velocidade (CRV)'];
       }
       
+      // Radar de velocidade - ícone específico por limite (50km/h, 70km/h)
       const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) || 
                                 (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('Redução'));
       
@@ -549,8 +652,10 @@
         return '/imagens_app/ic_radar_cev_v2.png';
       }
       
+      // Busca ícone no mapeamento
       let icone = iconMap[tipoLimpo];
       
+      // Fallback por palavras-chave
       if (!icone) {
         if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
         else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) icone = iconMap['Controle de Redução de Velocidade (CRV)'];
@@ -569,12 +674,21 @@
       return icone;
     }
 
+    // ===================================================================
+    // FUNÇÃO: showNotification
+    // Descrição: Exibe notificação temporária no topo da tela
+    // Parâmetros: message (string com a mensagem)
+    // ===================================================================
     function showNotification(message) {
       var $toast = $("#toast-msg");
       $toast.text(message).addClass("show");
       setTimeout(function() { $toast.removeClass("show"); }, 3500);
     }
 
+    // ===================================================================
+    // FUNÇÃO: hideFullscreenLoading
+    // Descrição: Esconde a tela de loading inicial com animação
+    // ===================================================================
     function hideFullscreenLoading() {
       var el = document.getElementById('loading-fullscreen');
       if (el) { 
@@ -583,8 +697,14 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: calcularDistancia
+    // Descrição: Calcula distância entre dois pontos usando fórmula de Haversine
+    // Parâmetros: lat1, lon1, lat2, lon2 (coordenadas em graus)
+    // Retorno: distância em metros
+    // ===================================================================
     function calcularDistancia(lat1, lon1, lat2, lon2) {
-      var R = 6371e3;
+      var R = 6371e3;               // Raio da Terra em metros
       var p1 = lat1 * Math.PI / 180;
       var p2 = lat2 * Math.PI / 180;
       var dp = (lat2 - lat1) * Math.PI / 180;
@@ -595,6 +715,12 @@
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
+    // ===================================================================
+    // FUNÇÃO: verificarDirecao
+    // Descrição: Verifica se o usuário está se aproximando ou afastando do radar
+    // Parâmetros: uLat, uLng, uHeading, radarLat, radarLng
+    // Retorno: objeto com flags estaAproximando, estaAfastando, anguloRadar, diferenca
+    // ===================================================================
     function verificarDirecao(uLat, uLng, uHeading, radarLat, radarLng) {
       if (!uHeading || uHeading === -1) return { estaAproximando: true, estaAfastando: false, anguloRadar: 0, diferenca: 0 };
       
@@ -606,8 +732,8 @@
       var diff = Math.abs(uHeading - anguloRadarNormalizado);
       diff = Math.min(diff, 360 - diff);
       
-      var estaAproximando = diff < 45;
-      var estaAfastando = diff > 135;
+      var estaAproximando = diff < 45;    // Menos de 45 graus de diferença = aproximando
+      var estaAfastando = diff > 135;      // Mais de 135 graus = afastando
       
       return {
         estaAproximando: estaAproximando,
@@ -617,6 +743,10 @@
       };
     }
 
+    // ===================================================================
+    // FUNÇÃO: fecharAlertaImediatamente
+    // Descrição: Fecha o alerta visual e para o som imediatamente
+    // ===================================================================
     function fecharAlertaImediatamente() {
       $("#alert-container").fadeOut(100);
       clearTimeout(alertTimeout);
@@ -631,6 +761,10 @@
       $(".alert-bar").removeClass("alert-bar-critico");
     }
 
+    // ===================================================================
+    // FUNÇÃO: aplicarTemaMapa
+    // Descrição: Alterna tema claro/escuro baseado no horário (escuro à noite)
+    // ===================================================================
     function aplicarTemaMapa() {
       var hora = new Date().getHours();
       var urlAtual = (hora >= 19 || hora < 6) ? 
@@ -643,6 +777,12 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: buscarCoordenadas
+    // Descrição: Busca coordenadas de um endereço via Nominatim (OpenStreetMap)
+    // Parâmetros: endereco (string)
+    // Retorno: objeto {lat, lng} ou null se não encontrado
+    // ===================================================================
     async function buscarCoordenadas(endereco) {
       try {
         var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + 
@@ -655,6 +795,12 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: atualizarIconeUsuario
+    // Descrição: Atualiza o ícone do usuário baseado no estado de navegação
+    //            - Navegação ativa: ic_navigator_map.png (carro navegando)
+    //            - Sem navegação: ic_gps_marker.png (pino GPS padrão)
+    // ===================================================================
     function atualizarIconeUsuario() {
       if (!userMarker) return;
       
@@ -663,10 +809,10 @@
       var iconClassName;
       
       if (estaEmNavegacao) {
-        userIconUrl = '/imagens_app/ic_navigator_map.png';
+        userIconUrl = '/imagens_app/ic_navigator_map.png';   // Ícone de navegação ativa
         iconClassName = 'user-navigator-marker';
       } else {
-        userIconUrl = '/imagens_app/ic_gps_marker.png';
+        userIconUrl = '/imagens_app/ic_gps_marker.png';      // Ícone padrão de GPS
         iconClassName = 'user-gps-marker';
       }
       
@@ -681,14 +827,26 @@
       userMarker.setIcon(userIcon);
     }
 
+    // ===================================================================
+    // FUNÇÃO: calcularRota
+    // Descrição: Traça rota entre usuário e destino usando OSRM (OpenStreetMap)
+    //            Adiciona os marcadores de ORIGEM e DESTINO automaticamente
+    // Parâmetros: destLat, destLng (coordenadas do destino)
+    // ===================================================================
     function calcularRota(destLat, destLng) {
+      // Remove rota anterior se existir
       if (routingControl) map.removeControl(routingControl);
       
       destinoAtual = { lat: destLat, lng: destLng };
       
-      // Adiciona os marcadores de origem (posição atual) e destino
+      // ===============================================================
+      // ADICIONA OS MARCADORES DE ORIGEM E DESTINO
+      // - ORIGEM: ic_navigator_map.png (ponto de partida)
+      // - DESTINO: ic_icon_chegada.png (ponto de chegada)
+      // ===============================================================
       adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
       
+      // Cria o controle de rota (linha azul no mapa)
       routingControl = L.Routing.control({
         waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
         routeWhileDragging: false,
@@ -697,28 +855,39 @@
         show: false,
         lineOptions: { 
           styles: [
-            { color: '#0044cc', opacity: 0.8, weight: 6 }, 
-            { color: '#00aaff', opacity: 0.9, weight: 3 }
+            { color: '#0044cc', opacity: 0.8, weight: 6 },   // Borda externa
+            { color: '#00aaff', opacity: 0.9, weight: 3 }    // Linha principal
           ] 
         },
-        createMarker: function() { return null; }, // Não criar marcadores automáticos
+        createMarker: function() { return null; },            // Não cria marcadores automáticos
         router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' })
       }).addTo(map);
       
+      // Atualiza o ícone do usuário para o ícone de navegação
       atualizarIconeUsuario();
+      
       showNotification("Navegação iniciada! Siga a rota azul.");
     }
 
+    // ===================================================================
+    // FUNÇÃO: atualizarRota
+    // Descrição: Atualiza a rota com a posição atual do usuário
+    //            Também atualiza o marcador de ORIGEM
+    // ===================================================================
     function atualizarRota() {
       if (destinoAtual && userLat && userLng && routingControl) {
         routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
-        // Atualiza também o marcador de origem
+        // Atualiza também o marcador de origem (partida)
         if (startRouteMarker) {
           startRouteMarker.setLatLng([userLat, userLng]);
         }
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: removerRota
+    // Descrição: Remove a rota ativa e volta o ícone do usuário ao padrão
+    // ===================================================================
     function removerRota() {
       if (routingControl) {
         map.removeControl(routingControl);
@@ -733,6 +902,10 @@
       showNotification("Navegação encerrada");
     }
 
+    // ===================================================================
+    // FUNÇÃO: resetarMapa
+    // Descrição: Reseta o mapa para posição inicial e remove navegação
+    // ===================================================================
     function resetarMapa() {
       map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
       map.setBearing(0);
@@ -743,6 +916,10 @@
       showNotification("Mapa resetado para posição inicial");
     }
 
+    // ===================================================================
+    // FUNÇÃO: fecharTodasBarras
+    // Descrição: Fecha as barras de busca (radares e rotas)
+    // ===================================================================
     function fecharTodasBarras() {
       searchActive = false;
       routeActive = false;
@@ -750,6 +927,12 @@
       $("#search-bar-rota").removeClass('active');
     }
 
+    // ===================================================================
+    // FUNÇÃO: converterSIRGAS2000paraWGS84
+    // Descrição: Converte coordenadas UTM (SIRGAS2000) para Lat/Lon (WGS84)
+    // Parâmetros: xLeste, yNorte (coordenadas UTM)
+    // Retorno: objeto {lat, lng}
+    // ===================================================================
     function converterSIRGAS2000paraWGS84(xLeste, yNorte) {
       var a = 6378137.0;
       var f = 1 / 298.257222101;
@@ -779,9 +962,16 @@
       return { lat: Math.round(lat * 1000000) / 1000000, lng: Math.round(lng * 1000000) / 1000000 };
     }
 
+    // ===================================================================
+    // FUNÇÃO: extrairCoordenadas
+    // Descrição: Extrai coordenadas do registro do radar (suporta múltiplos formatos)
+    // Parâmetros: record (array com os dados do radar)
+    // Retorno: objeto {lat, lng} ou null
+    // ===================================================================
     function extrairCoordenadas(record) {
       var coordenadasEncontradas = null;
       
+      // Tenta extrair do campo 9 (formato padrão)
       if (record[9]) {
         var parts = String(record[9]).replace(/\s+/g, '').split(',').map(Number);
         if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
@@ -789,6 +979,7 @@
         }
       }
       
+      // Se não encontrou, busca em qualquer campo que pareça coordenada
       if (!coordenadasEncontradas) {
         for (var i = 0; i < record.length; i++) {
           if (!record[i] || String(record[i]).length > 40) continue;
@@ -805,15 +996,22 @@
       var v1 = coordenadasEncontradas[0];
       var v2 = coordenadasEncontradas[1];
       
+      // Se os valores são grandes (>1000), provavelmente são UTM (SIRGAS2000)
       if (Math.abs(v1) > 1000 || Math.abs(v2) > 1000) {
         return converterSIRGAS2000paraWGS84(v1, v2);
       }
       
+      // Ajuste para formato (lat, lng) correto
       if (v1 < -30 && v2 > -30) return { lat: v2, lng: v1 };
       
       return { lat: v1, lng: v2 };
     }
 
+    // ===================================================================
+    // FUNÇÃO: atualizarBussola
+    // Descrição: Aplica rotação visual na ponteira da bússola
+    // Parâmetros: headingDegrees (ângulo em graus, 0 = Norte)
+    // ===================================================================
     function atualizarBussola(headingDegrees) {
       var needle = document.getElementById('compass-needle-img');
       if (needle) { 
@@ -821,6 +1019,10 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: inicializarBotaoRotacaoMapa
+    // Descrição: Configura o botão de rotação do mapa (Norte para cima)
+    // ===================================================================
     function inicializarBotaoRotacaoMapa() {
       const rotateBtn = document.getElementById('btn-rotate-map');
       let isRotated = false;
@@ -843,6 +1045,10 @@
       });
     }
 
+    // ===================================================================
+    // FUNÇÃO: inicializarBotaoAlertaToggle
+    // Descrição: Configura botão liga/desliga alerta de radar
+    // ===================================================================
     function inicializarBotaoAlertaToggle() {
       const alertBtn = document.getElementById('btn-alert-toggle');
       const alertIcon = document.getElementById('alert-toggle-icon');
@@ -872,6 +1078,11 @@
       });
     }
 
+    // ===================================================================
+    // FUNÇÃO: receberCoordenadasDoAppInventor
+    // Descrição: Interface para receber coordenadas do App Inventor (GPS externo)
+    // Parâmetros: lat, lng, speed (velocidade em km/h)
+    // ===================================================================
     function receberCoordenadasDoAppInventor(lat, lng, speed) {
       lat = parseFloat(lat);
       lng = parseFloat(lng);
@@ -892,10 +1103,17 @@
       processarNovaPosicao(lat, lng, speed);
     }
 
+    // ===================================================================
+    // FUNÇÃO: processarNovaPosicao
+    // Descrição: Função unificada para processar nova posição do GPS
+    //            Calcula velocidade, direção, atualiza marcadores e alertas
+    // Parâmetros: newLat, newLng, speedKmh, hardwareHeading
+    // ===================================================================
     function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
       var currentTime = Date.now();
       var dist = 0;
 
+      // Calcula velocidade se não veio do GPS
       if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
         dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
         var time = (currentTime - prevTime) / 1000;
@@ -904,13 +1122,15 @@
         dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
       }
       
+      // Limita velocidade máxima
       if (speedKmh > 250) speedKmh = 0;
       $("#speed-display").text(speedKmh);
       
+      // Calcula direção (heading) se disponível
       if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
         currentHeading = hardwareHeading;
       } 
-      else if (dist > 3) { 
+      else if (dist > 3) {  // Calcula baseado no movimento
         var dy = newLat - prevLat;
         var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
         var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
@@ -919,16 +1139,19 @@
         currentHeading = calcHeading;
       }
       
+      // Atualiza bússola
       if (currentHeading > 0 || currentHeading === 0) {
         atualizarBussola(currentHeading);
       }
 
+      // Atualiza variáveis globais
       prevLat = newLat;
       prevLng = newLng;
       prevTime = currentTime;
       userLat = newLat;
       userLng = newLng;
 
+      // Cria ou atualiza marcador do usuário
       if (!userMarker) {
         var defaultIcon = L.icon({
           iconUrl: '/imagens_app/ic_gps_marker.png',
@@ -948,8 +1171,10 @@
         userMarker.setLatLng([newLat, newLng]);
       }
       
+      // Atualiza ícone baseado no estado de navegação
       atualizarIconeUsuario();
       
+      // Atualiza rota se houver destino ativo
       if (destinoAtual) {
         atualizarRota();
         // Atualiza também o marcador de origem da rota
@@ -958,10 +1183,12 @@
         }
       }
       
+      // Se o modo "seguir" estiver ativo, centraliza o mapa
       if (isFollowing) {
         map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
       }
       
+      // Verifica proximidade com radares (apenas se alerta estiver ligado)
       if (alertaHabilitado) {
         verificarProximidade(userLat, userLng, currentHeading);
       } else {
@@ -969,6 +1196,10 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: startGPSTracking
+    // Descrição: Inicia o GPS do navegador (fallback quando não tem App Inventor)
+    // ===================================================================
     function startGPSTracking() {
       if (!navigator.geolocation) {
         hideFullscreenLoading();
@@ -1004,13 +1235,20 @@
       }, 8000);
     }
 
+    // ===================================================================
+    // FUNÇÃO: verificarProximidade
+    // Descrição: Versão melhorada com alerta preciso baseado em distância e direção
+    // Parâmetros: uLat, uLng, uHeading (posição e direção do usuário)
+    // ===================================================================
     function verificarProximidade(uLat, uLng, uHeading) {
       var alertasProximos = [];
       var heading = uHeading || -1;
       
+      // Percorre todos os radares
       radarMarkers.forEach(function(marker) {
         var dados = marker.radarData;
         
+        // Verifica se este tipo de radar deve gerar alerta
         if (!deveAlertaRadar(dados.tipoOriginal)) {
           return;
         }
@@ -1020,6 +1258,7 @@
         if (distance < ALERT_CONFIG.DISTANCIA_MAXIMA) {
           var direcaoInfo = verificarDirecao(uLat, uLng, heading, dados.latitude, dados.longitude);
           
+          // Se já passou do radar (muito próximo e afastando)
           if (distance < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR && direcaoInfo.estaAfastando) {
             if (ultimoRadarAlertado === marker) {
               fecharAlertaImediatamente();
@@ -1028,10 +1267,12 @@
             return;
           }
           
+          // Ignora se estiver afastando e já longe
           if (direcaoInfo.estaAfastando && distance > 30) {
             return;
           }
           
+          // Considera apenas se estiver aproximando
           if (direcaoInfo.estaAproximando) {
             alertasProximos.push({
               distancia: distance,
@@ -1041,21 +1282,25 @@
             });
           }
         } else {
+          // Limpa radar alertado se estiver longe
           if (ultimoRadarAlertado === marker && distance > ALERT_CONFIG.DISTANCIA_MAXIMA) {
             ultimoRadarAlertado = null;
           }
         }
       });
       
+      // Ordena por distância (mais próximo primeiro)
       alertasProximos.sort(function(a, b) {
         return a.distancia - b.distancia;
       });
       
+      // Exibe alerta para o radar mais próximo
       if (alertasProximos.length > 0) {
         var radar = alertasProximos[0];
         var distance = radar.distancia;
         var dados = radar.dados;
         
+        // Evita repetir o mesmo radar
         if (ultimoRadarAlertado === radar.marker) {
           return;
         }
@@ -1066,6 +1311,7 @@
         
         ultimoRadarAlertado = radar.marker;
         
+        // Define prioridade do alerta
         var prioridade = distance < ALERT_CONFIG.DISTANCIA_CRITICA ? "critico" : "normal";
         var titulo = dados.isIA ? "⚠️ Câmera IA!" : "📸 Radar à Frente!";
         
@@ -1085,6 +1331,7 @@
           textoAlerta += ' ⚠️ MUITO PRÓXIMO!';
         }
         
+        // Atualiza elementos visuais do alerta
         $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal, dados.velocidade_maxima));
         $("#alert-text").text(textoAlerta);
         $("#alert-title").text(titulo);
@@ -1098,6 +1345,7 @@
           alertBar.removeClass("alert-bar-critico");
         }
         
+        // Toca som de alerta
         if (alertaHabilitado) {
           var sound = document.getElementById("alert-soud");
           if (sound) {
@@ -1107,6 +1355,7 @@
           }
         }
         
+        // Exibe alerta na tela
         $("#alert-container").stop(true, true).fadeIn(200);
         clearTimeout(alertTimeout);
         alertTimeout = setTimeout(function() { 
@@ -1120,6 +1369,10 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: initMap
+    // Descrição: Inicializa o mapa e configura todos os eventos
+    // ===================================================================
     function initMap() {
       map = L.map('map', {
         center: [userLat, userLng],
@@ -1132,6 +1385,7 @@
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
       
+      // Quando o usuário começa a arrastar o mapa, desativa o modo "seguir"
       map.on('dragstart', function() { 
         isFollowing = false;
         if (returnToGpsTimer) {
@@ -1139,6 +1393,7 @@
         }
       });
       
+      // Quando o usuário para de arrastar o mapa, agenda retorno ao GPS
       map.on('dragend', function() {
         returnToGpsTimer = setTimeout(function() {
           if (!isFollowing && userMarker) {
@@ -1149,9 +1404,15 @@
         }, TEMPO_RETORNO_GPS);
       });
 
+      // ===============================================================
+      // EVENTOS DOS BOTÕES
+      // ===============================================================
+      
+      // Busca radar por texto
       $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
       $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
       
+      // Calcular rota para endereço
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { 
@@ -1174,6 +1435,7 @@
       });
       $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
       
+      // Abre/fecha barra de busca de radares
       $("#btn-search-bar").click(function() {
         if (searchActive) { 
           fecharTodasBarras(); 
@@ -1185,6 +1447,7 @@
         setTimeout(function() { $("#query").focus(); }, 300);
       });
       
+      // Abre/fecha barra de rota
       $("#btn-route-bar").click(function() {
         if (routeActive) { 
           fecharTodasBarras(); 
@@ -1196,6 +1459,7 @@
         setTimeout(function() { $("#route-query").focus(); }, 300);
       });
       
+      // Centraliza no GPS
       $("#btn-center").click(function() {
         fecharTodasBarras();
         isFollowing = true;
@@ -1207,20 +1471,30 @@
         }
       });
 
+      // Reset do mapa
       $("#btn-refresh").click(function() { 
         resetarMapa();
         carregarRadares(); 
       });
       
+      // Zoom in/out
       $("#btn-zoom-in").click(function() { map.zoomIn(); });
       $("#btn-zoom-out").click(function() { map.zoomOut(); });
       
+      // Inicializa botões especiais
       inicializarBotaoRotacaoMapa();
       inicializarBotaoAlertaToggle();
+      
+      // Inicia GPS e carrega radares
       startGPSTracking();
       carregarRadares();
     }
    
+    // ===================================================================
+    // FUNÇÃO: injetarRadaresIA
+    // Descrição: Dados de fallback quando não há API disponível
+    // Retorno: Array com radares de exemplo (formato compatível com API)
+    // ===================================================================
     function injetarRadaresIA() {
       return [
         { lat: -19.919007, lng: -43.938792, end: "Av. Afonso Pena, Próx. à Praça Sete/Sentido Savassi", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
@@ -1235,12 +1509,18 @@
       });
     }
 
+    // ===================================================================
+    // FUNÇÃO: carregarRadares
+    // Descrição: Carrega radares do JSON local ou da API da PBH
+    // ===================================================================
     async function carregarRadares() {
+      // Remove radares existentes
       if (radarMarkers.length > 0) {
         radarMarkers.forEach(function(marker) { map.removeLayer(marker); });
         radarMarkers = [];
       }
       
+      // Tenta carregar do arquivo JSON local
       try {
         var response = await fetch('radares.json?v=' + Date.now());
         if (!response.ok) throw new Error("Arquivo não encontrado");
@@ -1254,6 +1534,7 @@
         console.warn("Falha JSON local:", e); 
       }
       
+      // Tenta carregar da API da PBH
       $("#loading").show().html("<div class='loading-spinner'></div><div>Conectando API PBH...</div>");
       try {
         var metaResponse = await fetch(API_PBH_BASE + 'package_show?id=fiscalizacao-eletronica');
@@ -1281,6 +1562,12 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: parseCSVtoRecords
+    // Descrição: Converte CSV da PBH para o formato interno do sistema
+    // Parâmetros: csvText (string com o conteúdo do CSV)
+    // Retorno: Array de registros formatados
+    // ===================================================================
     function parseCSVtoRecords(csvText) {
       var lines = csvText.split(/\r\n|\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
       if (lines.length < 2) return [];
@@ -1313,6 +1600,11 @@
       return out;
     }
 
+    // ===================================================================
+    // FUNÇÃO: renderizarRadaresNoMapa
+    // Descrição: Adiciona os marcadores de radar no mapa
+    // Parâmetros: records (array de radares), origem (string para notificação)
+    // ===================================================================
     function renderizarRadaresNoMapa(records, origem) {
       var radaresExternos = records || [];
       var todosOsRadares = radaresExternos.concat(injetarRadaresIA());
@@ -1362,6 +1654,11 @@
       }
     }
     
+    // ===================================================================
+    // FUNÇÃO: buscarRadares
+    // Descrição: Busca radares por texto (endereço ou tipo) e centraliza no mapa
+    // Parâmetros: query (string com o texto da busca)
+    // ===================================================================
     function buscarRadares(query) {
       if (!query || query.length < 2) return;
       
@@ -1388,6 +1685,11 @@
       }
     }
 
+    // ===================================================================
+    // FUNÇÃO: showError
+    // Descrição: Trata erros de GPS
+    // Parâmetros: error (objeto de erro do geolocation)
+    // ===================================================================
     function showError(error) {
       if (gpsSource === 'appinventor') return;
       
@@ -1404,6 +1706,9 @@
       }
     }
     
+    // ===================================================================
+    // EVENTO: Desbloqueia áudio no primeiro clique do usuário
+    // ===================================================================
     document.addEventListener('click', function desbloquearAudio() {
       var sound = document.getElementById("alert-soud");
       if (sound) {
@@ -1415,6 +1720,9 @@
       document.removeEventListener('click', desbloquearAudio);
     }, { once: true });
     
+    // ===================================================================
+    // INICIALIZAÇÃO DO APLICATIVO
+    // ===================================================================
     window.onload = initMap;
   </script>
 </body>
