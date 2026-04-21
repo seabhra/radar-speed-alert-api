@@ -534,11 +534,9 @@
     }
 
 // =================================================================== 
-// FUNÇÃO: adicionarMarcadoresRota - Adiciona ícone de chegada
+// FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de saída e chegada
 // ===================================================================
-function adicionarMarcadoresRota(destLat, destLng) {
-
-  function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
 
 // Remove antigos
 if (startRouteMarker) map.removeLayer(startRouteMarker);
@@ -567,7 +565,6 @@ endRouteMarker = L.marker([destLat, destLng], {
   icon: endIcon,
   zIndexOffset: 900
 }).addTo(map);
-}
 }
 
     // ===================================================================
