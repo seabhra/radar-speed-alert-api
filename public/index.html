@@ -542,7 +542,9 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
 if (startRouteMarker) map.removeLayer(startRouteMarker);
 if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-// 🔵 INÍCIO (pode usar ícone menor pra não brigar com o GPS)
+//(pode usar ícone menor pra não brigar com o GPS)
+
+// 🔵 INÍCIO 
 var startIcon = criarIconePersonalizado(
   '/imagens_app/ic_navigator_map.png',
   40,
@@ -787,16 +789,13 @@ function atualizarIconeUsuario() {
     // ===================================================================
     // FUNÇÃO: calcularRota - Traça rota COM ZOOM e ícones
     // ===================================================================
-    // ===================================================================
-// FUNÇÃO: calcularRota - Traça rota COM ZOOM e ícones
-// ===================================================================
-function calcularRota(destLat, destLng) {
+    function calcularRota(destLat, destLng) {
   if (routingControl) map.removeControl(routingControl);
 
   destinoAtual = { lat: destLat, lng: destLng };
 
-  // 🔥 IMPORTANTE: só adiciona marcador de DESTINO
-  adicionarMarcadoresRota(destLat, destLng);
+  // 🔥 IMPORTANTE: adiciona marcadores de SAÍDA e DESTINO
+  adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
 
   routingControl = L.Routing.control({
     waypoints: [
