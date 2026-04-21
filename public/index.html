@@ -464,8 +464,10 @@
     let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
     
     // VARIÁVEIS DOS MARCADORES DE ROTA
-    let startRouteMarker = null;  // Marcador de partida (ic_navigator_map.png)
-    let endRouteMarker = null;    // Marcador de chegada (ic_icon_chegada.png)
+     // Marcador de partida (ic_navigator_map.png)
+      // Marcador de chegada (ic_icon_chegada.png)
+    var startRouteMarker = null;
+    var endRouteMarker = null;
     
     let alertaHabilitado = true;
     let ultimoRadarAlertado = null;
@@ -536,10 +538,25 @@
 // ===================================================================
 function adicionarMarcadoresRota(destLat, destLng) {
 
-// Remove marcador antigo de destino
+  function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+
+// Remove antigos
+if (startRouteMarker) map.removeLayer(startRouteMarker);
 if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-// MARCADOR DE CHEGADA
+// 🔵 INÍCIO (pode usar ícone menor pra não brigar com o GPS)
+var startIcon = criarIconePersonalizado(
+  '/imagens_app/ic_navigator_map.png',
+  40,
+  'route-start-marker'
+);
+
+startRouteMarker = L.marker([originLat, originLng], {
+  icon: startIcon,
+  zIndexOffset: 800
+}).addTo(map);
+
+// 🔴 DESTINO
 var endIcon = criarIconePersonalizado(
   '/imagens_app/ic_icon_chegada.png',
   50,
@@ -550,12 +567,6 @@ endRouteMarker = L.marker([destLat, destLng], {
   icon: endIcon,
   zIndexOffset: 900
 }).addTo(map);
-
-endRouteMarker.bindTooltip("🏁 Destino", {
-  permanent: false,
-  direction: "top",
-  offset: [0, -30]
-});
 }
 
     // ===================================================================
