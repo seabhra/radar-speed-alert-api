@@ -464,8 +464,10 @@
     let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
     
     // VARIÁVEIS DOS MARCADORES DE ROTA
-    let startRouteMarker = null;   // Marcador de partida
-    let endRouteMarker = null;     // Marcador de chegada
+     // Marcador de partida (ic_navigator_map.png)
+      // Marcador de chegada (ic_icon_chegada.png)
+    var startRouteMarker = null;
+    var endRouteMarker = null;
     
     let alertaHabilitado = true;
     let ultimoRadarAlertado = null;
@@ -531,52 +533,41 @@
       });
     }
 
-    // =================================================================== 
-    // FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de saída e chegada
-    // ===================================================================
-    function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
-      // Remove marcadores antigos se existirem
-      if (startRouteMarker) map.removeLayer(startRouteMarker);
-      if (endRouteMarker) map.removeLayer(endRouteMarker);
+// =================================================================== 
+// FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de saída e chegada
+// ===================================================================
+function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
 
-      // Ícone de SAÍDA (localização atual do usuário)
-      var startIcon = criarIconePersonalizado(
-        '/imagens_app/ic_navigator_map.png',
-        40,
-        'route-start-marker'
-      );
+// Remove antigos
+if (startRouteMarker) map.removeLayer(startRouteMarker);
+if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-      startRouteMarker = L.marker([originLat, originLng], {
-        icon: startIcon,
-        zIndexOffset: 800
-      }).addTo(map);
-      
-      // Adiciona tooltip informativo no marcador de saída
-      startRouteMarker.bindTooltip("📍 Ponto de partida", { 
-        permanent: false, 
-        direction: "top", 
-        offset: [0, -20] 
-      });
+//(pode usar ícone menor pra não brigar com o GPS)
 
-      // Ícone de CHEGADA (destino calculado)
-      var endIcon = criarIconePersonalizado(
-        '/imagens_app/ic_icon_chegada.png',
-        50,
-        'route-end-marker'
-      );
+// 🔵 INÍCIO 
+var startIcon = criarIconePersonalizado(
+  '/imagens_app/ic_navigator_map.png',
+  40,
+  'route-start-marker'
+);
 
-      endRouteMarker = L.marker([destLat, destLng], {
-        icon: endIcon,
-        zIndexOffset: 900
-      }).addTo(map);
-      
-      // Adiciona tooltip informativo no marcador de chegada
-      endRouteMarker.bindTooltip("🏁 Ponto de chegada", { 
-        permanent: false, 
-        direction: "top", 
-        offset: [0, -25] 
-      });
-    }
+startRouteMarker = L.marker([originLat, originLng], {
+  icon: startIcon,
+  zIndexOffset: 800
+}).addTo(map);
+
+// 🔴 DESTINO
+var endIcon = criarIconePersonalizado(
+  '/imagens_app/ic_icon_chegada.png',
+  50,
+  'route-end-marker'
+);
+
+endRouteMarker = L.marker([destLat, destLng], {
+  icon: endIcon,
+  zIndexOffset: 900
+}).addTo(map);
+}
 
     // ===================================================================
     // FUNÇÃO: removerMarcadoresRota - Remove os marcadores de rota
@@ -772,74 +763,74 @@
       }
     }
 
-    // ===================================================================
-    // FUNÇÃO: atualizarIconeUsuario - Atualiza ícone do usuário
-    // ===================================================================
-    function atualizarIconeUsuario() {
-      if (!userMarker) return;
-      
-      var estaEmNavegacao = (destinoAtual !== null && routingControl !== null);
-      
-      var userIcon = L.icon({
-        iconUrl: estaEmNavegacao 
-          ? '/imagens_app/ic_navigator_map.png'
-          : '/imagens_app/ic_gps_marker.png',
-        iconSize: [50, 50],
-        iconAnchor: [25, 50],
-        popupAnchor: [0, -50],
-        className: estaEmNavegacao 
-          ? 'user-navigator-marker'
-          : 'user-gps-marker'
-      });
-      
-      userMarker.setIcon(userIcon);
-    }
+  // ===================================================================
+// FUNÇÃO: atualizarIconeUsuario - Atualiza ícone do usuário
+// ===================================================================
+function atualizarIconeUsuario() {
+  if (!userMarker) return;
+  
+  var estaEmNavegacao = (destinoAtual !== null && routingControl !== null);
+  
+  var userIcon = L.icon({
+    iconUrl: estaEmNavegacao 
+      ? '/imagens_app/ic_navigator_map.png'
+      : '/imagens_app/ic_gps_marker.png',
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
+    popupAnchor: [0, -50],
+    className: estaEmNavegacao 
+      ? 'user-navigator-marker'
+      : 'user-gps-marker'
+  });
+  
+  userMarker.setIcon(userIcon);
+}
 
     // ===================================================================
     // FUNÇÃO: calcularRota - Traça rota COM ZOOM e ícones
     // ===================================================================
     function calcularRota(destLat, destLng) {
-      if (routingControl) map.removeControl(routingControl);
+  if (routingControl) map.removeControl(routingControl);
 
-      destinoAtual = { lat: destLat, lng: destLng };
+  destinoAtual = { lat: destLat, lng: destLng };
 
-      // Adiciona os marcadores de SAÍDA (posição atual) e DESTINO
-      adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
+  // 🔥 IMPORTANTE: adiciona marcadores de SAÍDA e DESTINO
+  adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
 
-      routingControl = L.Routing.control({
-        waypoints: [
-          L.latLng(userLat, userLng),
-          L.latLng(destLat, destLng)
-        ],
-        routeWhileDragging: false,
-        addWaypoints: false,
-        language: 'pt-BR',
-        show: false,
-        lineOptions: { 
-          styles: [
-            { color: '#0044cc', opacity: 0.8, weight: 6 }, 
-            { color: '#00aaff', opacity: 0.9, weight: 3 }
-          ] 
-        },
-        // Desabilita a criação automática de marcadores para não conflitar
-        createMarker: function() { return null; },
-        router: L.Routing.osrmv1({
-          serviceUrl: 'https://router.project-osrm.org/route/v1'
-        })
-      }).addTo(map);
+  routingControl = L.Routing.control({
+    waypoints: [
+      L.latLng(userLat, userLng),
+      L.latLng(destLat, destLng)
+    ],
+    routeWhileDragging: false,
+    addWaypoints: false,
+    language: 'pt-BR',
+    show: false,
+    lineOptions: { 
+      styles: [
+        { color: '#0044cc', opacity: 0.8, weight: 6 }, 
+        { color: '#00aaff', opacity: 0.9, weight: 3 }
+      ] 
+    },
 
-      // Ajusta o zoom para mostrar toda a rota
-      var bounds = L.latLngBounds(
-        [userLat, userLng],
-        [destLat, destLng]
-      );
-      
-      map.fitBounds(bounds, { padding: [50, 50] });
+    // ❌ continua sem marcador automático
+    createMarker: function() { return null; },
 
-      atualizarIconeUsuario();
-      showNotification("🚗 Navegação iniciada! Siga a rota azul.");
-    }
-    
+    router: L.Routing.osrmv1({
+      serviceUrl: 'https://router.project-osrm.org/route/v1'
+    })
+  }).addTo(map);
+
+  var bounds = L.latLngBounds(
+    [userLat, userLng],
+    [destLat, destLng]
+  );
+  
+  map.fitBounds(bounds, { padding: [50, 50] });
+
+  atualizarIconeUsuario();
+  showNotification("🚗 Navegação iniciada! Siga a rota azul.");
+}
     // ===================================================================
     // FUNÇÃO: atualizarRota - Atualiza rota com posição atual
     // ===================================================================
@@ -1287,7 +1278,7 @@
       });
 
       // ===============================================================
-      // EVENTO DO BOTÃO DE ROTA - CALCULA ROTA E ADICIONA ÍCONES
+      // EVENTO DO BOTÃO DE ROTA - ZOOM SOMENTE AQUI
       // ===============================================================
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
@@ -1298,7 +1289,7 @@
         $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
         var coords = await buscarCoordenadas(endereco);
         if (coords) {
-          calcularRota(coords.lat, coords.lng);  // ZOOM E ÍCONES SÃO APLICADOS AQUI DENTRO
+          calcularRota(coords.lat, coords.lng);  // ZOOM É APLICADO AQUI DENTRO
           isFollowing = false;
           $("#loading").hide();
           fecharTodasBarras();
