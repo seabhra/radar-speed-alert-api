@@ -542,11 +542,9 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
 if (startRouteMarker) map.removeLayer(startRouteMarker);
 if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-//(pode usar ícone menor pra não brigar com o GPS)
-
-// 🔵 INÍCIO 
+// 🔵 INÍCIO - Ícone de SAÍDA (diferente do GPS normal)
 var startIcon = criarIconePersonalizado(
-  '/imagens_app/ic_navigator_map.png',
+  '/imagens_app/ic_saida_route.png',  // Ícone específico para saída da rota
   40,
   'route-start-marker'
 );
@@ -556,9 +554,9 @@ startRouteMarker = L.marker([originLat, originLng], {
   zIndexOffset: 800
 }).addTo(map);
 
-// 🔴 DESTINO
+// 🔴 DESTINO - Ícone de CHEGADA
 var endIcon = criarIconePersonalizado(
-  '/imagens_app/ic_icon_chegada.png',
+  '/imagens_app/ic_chegada_route.png',  // Ícone específico para chegada da rota
   50,
   'route-end-marker'
 );
@@ -773,7 +771,7 @@ function atualizarIconeUsuario() {
   
   var userIcon = L.icon({
     iconUrl: estaEmNavegacao 
-      ? '/imagens_app/ic_navigator_map.png'
+      ? '/imagens_app/ic_navigator_map.png'  // Mantém o ícone de navegação para o usuário
       : '/imagens_app/ic_gps_marker.png',
     iconSize: [50, 50],
     iconAnchor: [25, 50],
@@ -1278,7 +1276,7 @@ function atualizarIconeUsuario() {
       });
 
       // ===============================================================
-      // EVENTO DO BOTÃO DE ROTA - CORRIGIDO PARA INSERIR ÍCONES
+      // EVENTO DO BOTÃO DE ROTA - ZOOM SOMENTE AQUI
       // ===============================================================
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
@@ -1286,53 +1284,14 @@ function atualizarIconeUsuario() {
           showNotification("Digite um endereço válido."); 
           return; 
         }
-        
         $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
-        
         var coords = await buscarCoordenadas(endereco);
-        
         if (coords) {
-          // 1. Limpa rota e marcadores antigos antes de criar novos
-          if (routingControl) {
-            map.removeControl(routingControl);
-          }
-          removerMarcadoresRota();
-
-          // 2. Configura o Routing Control com a correção do createMarker
-          routingControl = L.Routing.control({
-            waypoints: [
-              L.latLng(userLat, userLng),
-              L.latLng(coords.lat, coords.lng)
-            ],
-            // CRUCIAL: Bloqueia os ícones padrão para usar os seus
-            createMarker: function() { return null; },
-            lineOptions: {
-              styles: [{ color: '#ff8c00', weight: 6, opacity: 0.8 }]
-            },
-            addWaypoints: false,
-            draggableWaypoints: false,
-            fitSelectedRoutes: true,
-            showAlternatives: false
-          }).addTo(map);
-
-          // 3. Quando a rota for encontrada, insere os ícones de partida e chegada
-          routingControl.on('routesfound', function(e) {
-            var summary = e.routes[0].summary;
-            
-            // Chama a sua função de ícones personalizados
-            adicionarMarcadoresRota(userLat, userLng, coords.lat, coords.lng);
-            
-            $("#loading").hide();
-            fecharTodasBarras();
-            showNotification("✅ Rota: " + (summary.totalDistance / 1000).toFixed(1) + " km");
-          });
-
-          routingControl.on('routingerror', function() {
-            $("#loading").hide();
-            showNotification("❌ Erro ao traçar rota.");
-          });
-
+          calcularRota(coords.lat, coords.lng);  // ZOOM É APLICADO AQUI DENTRO
           isFollowing = false;
+          $("#loading").hide();
+          fecharTodasBarras();
+          showNotification("✅ Rota calculada com sucesso!");
         } else {
           $("#loading").hide();
           showNotification("❌ Endereço não encontrado.");
