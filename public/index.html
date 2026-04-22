@@ -633,6 +633,8 @@ endRouteMarker = L.marker([destLat, destLng], {
       
       if (isRadarVelocidade) {
         const vel = parseInt(velocidade) || 0;
+        if (vel === 30) return '/imagens_app/ic_radar_cev_30_v2.png';
+        if (vel === 40) return '/imagens_app/ic_radar_cev_40_v2.png';
         if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
         if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
         return '/imagens_app/ic_radar_cev_v2.png';
