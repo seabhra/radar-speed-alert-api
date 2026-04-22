@@ -1129,124 +1129,118 @@ function atualizarIconeUsuario() {
     }
 
     // ===================================================================
-    // FUNÇÃO: verificarProximidade - Verifica radares próximos
+    // FUNÇÃO: verificarProximidadeRadares - O CORAÇÃO DO ALERTA
     // ===================================================================
-    function verificarProximidade(uLat, uLng, uHeading) {
-      var alertasProximos = [];
-      var heading = uHeading || -1;
-      
-      radarMarkers.forEach(function(marker) {
-        var dados = marker.radarData;
-        
-        if (!deveAlertaRadar(dados.tipoOriginal)) {
-          return;
-        }
-        
-        var distance = calcularDistancia(uLat, uLng, dados.latitude, dados.longitude);
-        
-        if (distance < ALERT_CONFIG.DISTANCIA_MAXIMA) {
-          var direcaoInfo = verificarDirecao(uLat, uLng, heading, dados.latitude, dados.longitude);
-          
-          if (distance < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR && direcaoInfo.estaAfastando) {
-            if (ultimoRadarAlertado === marker) {
-              fecharAlertaImediatamente();
-              ultimoRadarAlertado = null;
+    function verificarProximidadeRadares() {
+        if (!alertaHabilitado || radarMarkers.length === 0) return;
+
+        let radarMaisProximo = null;
+        let menorDistancia = Infinity;
+
+        radarMarkers.forEach(marker => {
+            const rData = marker.radarData;
+            
+            // FILTRO CRÍTICO: Não alerta tipos irrelevantes (como BUS)
+            if (!deveAlertaRadar(rData.tipo)) return;
+
+            const dist = calcularDistancia(userLat, userLng, rData.lat, rData.lng);
+            
+            if (dist < menorDistancia) {
+                menorDistancia = dist;
+                radarMaisProximo = rData;
             }
-            return;
-          }
-          
-          if (direcaoInfo.estaAfastando && distance > 30) {
-            return;
-          }
-          
-          if (direcaoInfo.estaAproximando) {
-            alertasProximos.push({
-              distancia: distance,
-              dados: dados,
-              direcaoInfo: direcaoInfo,
-              marker: marker
-            });
-          }
+        });
+
+        // REFORÇO NA LÓGICA DE ALERTA
+        if (radarMaisProximo && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
+            
+            // 1. Verifica se o usuário está de fato indo em direção ao radar
+            // Reduzi a exigência do ângulo para 60 graus para evitar falso-negativo em curvas
+            const direcao = verificarDirecao(userLat, userLng, currentHeading, radarMaisProximo.lat, radarMaisProximo.lng);
+            
+            // Só dispara se estiver aproximando OU se a velocidade for muito baixa (GPS pode perder o heading)
+            const velocidadeAtual = parseFloat($("#speed-display").text()) || 0;
+            const deveDisparar = direcao.estaAproximando || velocidadeAtual < 5;
+
+            if (deveDisparar) {
+                // Evita repetir o alerta para o mesmo radar seguidamente, a menos que tenha se afastado
+                if (ultimoRadarAlertado !== radarMaisProximo.id) {
+                    dispararAlerta(radarMaisProximo, menorDistancia);
+                } else if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+                    // Se já alertou mas entrou na zona crítica, reforça o visual
+                    $(".alert-bar").addClass("alert-bar-critico");
+                }
+            }
+            
+            // 2. Lógica de Auto-Fechamento: Se passou pelo radar (distância muito pequena ou começou a afastar)
+            if (menorDistancia < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR || direcao.estaAfastando) {
+                fecharAlertaImediatamente();
+                ultimoRadarAlertado = radarMaisProximo.id; // Marca como "visto"
+            }
+
         } else {
-          if (ultimoRadarAlertado === marker && distance > ALERT_CONFIG.DISTANCIA_MAXIMA) {
-            ultimoRadarAlertado = null;
-          }
+            // Se não há nenhum radar no raio de alcance, garante que o alerta suma
+            if ($("#alert-container").is(":visible")) {
+                fecharAlertaImediatamente();
+            }
+            ultimoRadarAlertado = null; 
         }
-      });
-      
-      alertasProximos.sort(function(a, b) {
-        return a.distancia - b.distancia;
-      });
-      
-      if (alertasProximos.length > 0) {
-        var radar = alertasProximos[0];
-        var distance = radar.distancia;
-        var dados = radar.dados;
-        
-        if (ultimoRadarAlertado === radar.marker) {
-          return;
-        }
-        
-        if (ultimoRadarAlertado !== null) {
-          fecharAlertaImediatamente();
-        }
-        
-        ultimoRadarAlertado = radar.marker;
-        
-        var prioridade = distance < ALERT_CONFIG.DISTANCIA_CRITICA ? "critico" : "normal";
-        var titulo = dados.isIA ? "⚠️ Câmera IA!" : "📸 Radar à Frente!";
-        
-        if (prioridade === "critico") {
-          titulo = "🚨 ATENÇÃO MÁXIMA! " + titulo;
-        }
-        
-        var textoAlerta = dados.endereco + ' - Máx: ' + dados.velocidade_maxima + 'km/h';
-        textoAlerta += ' (a ' + Math.round(distance) + 'm';
-        
-        if (radar.direcaoInfo && radar.direcaoInfo.diferenca !== undefined && radar.direcaoInfo.diferenca > 0) {
-          textoAlerta += ' • ' + radar.direcaoInfo.diferenca.toFixed(0) + '° à frente';
-        }
-        textoAlerta += ')';
-        
-        if (distance < 30) {
-          textoAlerta += ' ⚠️ MUITO PRÓXIMO!';
-        }
-        
-        $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal, dados.velocidade_maxima));
-        $("#alert-text").text(textoAlerta);
-        $("#alert-title").text(titulo);
-        
-        var alertBar = $(".alert-bar");
-        if (prioridade === "critico") {
-          alertBar.css("background", "linear-gradient(90deg, #ff0000, #cc0000)");
-          alertBar.addClass("alert-bar-critico");
-        } else {
-          alertBar.css("background", "linear-gradient(90deg, #cc0000, #990000)");
-          alertBar.removeClass("alert-bar-critico");
-        }
-        
-        if (alertaHabilitado) {
-          var sound = document.getElementById("alert-soud");
-          if (sound) {
-            sound.currentTime = 0;
-            sound.volume = prioridade === "critico" ? 0.8 : 0.5;
-            sound.play().catch(function(e) { console.warn("Audio blocked:", e); });
-          }
-        }
-        
-        $("#alert-container").stop(true, true).fadeIn(200);
-        clearTimeout(alertTimeout);
-        alertTimeout = setTimeout(function() { 
-          if (ultimoRadarAlertado === radar.marker) {
-            $("#alert-container").fadeOut(500);
-            $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
-            $(".alert-bar").removeClass("alert-bar-critico");
-            ultimoRadarAlertado = null;
-          }
-        }, ALERT_CONFIG.TEMPO_ALERTA);
-      }
     }
 
+    // ===================================================================
+    // FUNÇÃO: dispararAlerta - Executa som e mostra a barra
+    // ===================================================================
+    function dispararAlerta(radar, distancia) {
+        const som = document.getElementById("alert-soud");
+        const tipoAjustado = ajusteNomes[radar.tipo] || radar.tipo;
+        const velInfo = radar.velocidade ? ` | ${radar.velocidade} km/h` : "";
+
+        // Atualiza interface
+        $("#alert-title").text("ALERTA DE RADAR!");
+        $("#alert-text").text(`${tipoAjustado}${velInfo} - a ${Math.round(distancia)}m`);
+        
+        // Troca o ícone do alerta para o ícone específico do radar
+        const iconeUrl = getIconUrl(radar.tipo, radar.velocidade);
+        $("#alert-icon").attr("src", iconeUrl);
+
+        // Exibe a barra com animação
+        $("#alert-container").fadeIn(200);
+
+        // Toca o áudio (Reinicia se já estiver tocando)
+        if (alertaHabilitado && som) {
+            som.pause();
+            som.currentTime = 0;
+            som.play().catch(e => console.log("Erro ao tocar áudio: Interação do usuário necessária."));
+        }
+
+        // Se for distância crítica (ex: menos de 40m), aplica o pulso vermelho
+        if (distancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+            $(".alert-bar").addClass("alert-bar-critico");
+        } else {
+            $(".alert-bar").removeClass("alert-bar-critico");
+        }
+
+        ultimoRadarAlertado = radar.id;
+    }
+
+    // ===================================================================
+    // REFORÇO NO GPS: Garante que a verificação rode a cada atualização
+    // ===================================================================
+    function onLocationFound(e) {
+        userLat = e.coords.latitude;
+        userLng = e.coords.longitude;
+        currentHeading = e.coords.heading || 0;
+
+        // Atualiza marcador do usuário (supondo que a função exista)
+        atualizarPosicaoUsuario(userLat, userLng, currentHeading);
+
+        // CHAMA A VERIFICAÇÃO DE RADAR A CADA PONTO DO GPS
+        verificarProximidadeRadares();
+        
+        // Atualiza Velocidade no Widget
+        const speedKmh = e.coords.speed ? Math.round(e.coords.speed * 3.6) : 0;
+        $("#speed-display").text(speedKmh);
+    }
     // ===================================================================
     // FUNÇÃO: initMap - Inicializa o mapa e configura eventos
     // ===================================================================
