@@ -468,15 +468,15 @@
   
       [322,"1620","Rodovia MG-262, próximo ao bairro Sobradinho"," Controle de Redução de Velocidade (CRV)","40","Belo Horizonte/Sabará","10038","KBH53038","-19.87015, -43.83908 "],
   
-      [323,"1621","Anel Rodoviário Celso Mello Azevedo, próximo ao bairro Sobradinho","Controle de Redução de Velocidade (CRV)","40","Sabará/Belo Horizonte","10039","KBH53039","-19.87194, -43.83652"],
+      [323,"1621","Anel Rodoviário Celso Mello Azevedo, próximo ao bairro Sobradinho"," Controle de Redução de Velocidade (CRV) ","40","Sabará/Belo Horizonte","10039","KBH53039"," -19.87194, -43.83652"],
   
       [324,"1622","Av. Amazonas, Esquina com Av. Afonso Pena","Verificador de Cinto de Segurança (VCS)","60","Praça Raul Soares/Praça da Estação","10040","KBH53040"," -19.91934, -43.93887"],
   
-      [325,"1623"," Av. Amazonas, Esquina com Av. Afonso Pena"," Verificador de Cinto de Segurança (VCS)", "60","Praça da Estação/Praça Raul Soares","10041","KBH53041","-19.91895, -43.93849"],
+      [325,"1623"," Av. Amazonas, Esquina com Av. Afonso Pena"," Verificador de Cinto de Segurança (VCS) ","60","Praça da Estação/Praça Raul Soares","10041","KBH53041","-19.91895, -43.93849"],
   
-      [326,"1624","Av. Afonso Pena, Esquina com Av. Amazonas "," Controle de Redução de Velocidade (CRV)","60","Rodoviária/Mangabeiras","10042","KBH53042"," -19.91881, -43.93892"],
+  [326,"1624","Av. Afonso Pena, Esquina com Av. Amazonas "," Verificador de Cinto de Segurança (VCS)","60","Rodoviária/Mangabeiras","10042","KBH53042"," -19.91881, -43.93892"],
   
-      [327,"1625"," Av. Afonso Pena, Esquina com Av. Amazonas "," Verificador de Cinto de Segurança (VCS)", "60","Mangabeiras/Rodoviária","10043","KBH53043"," -19.91929, -43.93844"]
+      [327,"1625"," Av. Afonso Pena, Esquina com Av. Amazonas "," Verificador de Cinto de Segurança (VCS)","60","Mangabeiras/Rodoviária","10043","KBH53043"," -19.91907, -43.93853"]
   
   
     ]
