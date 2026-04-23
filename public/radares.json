@@ -472,33 +472,33 @@
   
       [319,"1617","Anel Rodoviário, próximo à Rua Walter Ianni","Controle Eletrônico de Velocidade","70","Vitória/Rio de Janeiro","Único","10035","KBH53035","-19.860565,-43.919338 "],
   
-  [320,"1618"," Anel Rodoviário Celso Mello Azevedo, próximo bairro Jardim Vitória "," Leitor Inteligente de Placas (OCR-P)","60","","Vitória/Rio de Janeiro ","Único","10036","KBH53036"," -19.854480,-43.891282 "],
+  [320,"1618"," Anel Rodoviário Celso Mello Azevedo, próximo bairro Jardim Vitória "," Leitor Inteligente de Placas (OCR-P)","60","","Vitória/Rio de Janeiro ","Único","10036","KBH53036","-19.854480,-43.891282 "],
   
-      [321,"1619","Anel Rodoviário Celso Mello Azevedo, próximo bairro Jardim Vitória "," Leitor de Reconhecimento Facial (OCR-F)","60","Vitória/Rio de Janeiro","10037","KBH53037"," -19.854056,-43.890767"],
+      [321,"1619","Anel Rodoviário Celso Mello Azevedo, próximo bairro Jardim Vitória "," Leitor de Reconhecimento Facial (OCR-F)","60","Vitória/Rio de Janeiro","10037","KBH53037","-19.854056,-43.890767"],
   
       [322,"1620","Rodovia MG-262, próximo ao bairro Sobradinho"," Controle de Redução de Velocidade (CRV)","40","Belo Horizonte/Sabará","10038","KBH53038","-19.87015, -43.83908 "],
   
-      [323,"1621","Anel Rodoviário Celso Mello Azevedo, próximo ao bairro Sobradinho"," Controle de Redução de Velocidade (CRV) ","40","Sabará/Belo Horizonte","10039","KBH53039"," -19.87194, -43.83652"],
+      [323,"1621","Anel Rodoviário Celso Mello Azevedo, próximo ao bairro Sobradinho"," Controle de Redução de Velocidade (CRV) ","40","Sabará/Belo Horizonte","10039","KBH53039","-19.87194, -43.83652"],
   
-      [324,"1622","Av. Amazonas, Esquina com Av. Afonso Pena","Verificador de Cinto de Segurança (VCS)","60","Praça Raul Soares/Praça da Estação","10040","KBH53040"," -19.91934, -43.93887"],
+      [324,"1622","Av. Amazonas, Esquina com Av. Afonso Pena","Verificador de Cinto de Segurança (VCS)","60","Praça Raul Soares/Praça da Estação","10040","KBH53040","-19.91934, -43.93887"],
   
       [325,"1623"," Av. Amazonas, Esquina com Av. Afonso Pena"," Verificador de Cinto de Segurança (VCS) ","60","Praça da Estação/Praça Raul Soares","10041","KBH53041","-19.91895, -43.93849"],
   
-  [326,"1624","Av. Afonso Pena, Esquina com Av. Amazonas "," Verificador de Cinto de Segurança (VCS)","60","Rodoviária/Mangabeiras","10042","KBH53042"," -19.91881, -43.93892"],
+  [326,"1624","Av. Afonso Pena, Esquina com Av. Amazonas"," Verificador de Cinto de Segurança (VCS)","60","Rodoviária/Mangabeiras","10042","KBH53042","-19.91881, -43.93892"],
   
-      [327,"1625"," Av. Afonso Pena, Esquina com Av. Amazonas "," Verificador de Cinto de Segurança (VCS)", "60","Mangabeiras/Rodoviária","10043","KBH53043"," -19.91907, -43.93853"],
+      [327,"1625"," Av. Afonso Pena, Esquina com Av. Amazonas"," Verificador de Cinto de Segurança (VCS)", "60","Mangabeiras/Rodoviária","10043","KBH53043"," -19.91907, -43.93853"],
       
-  [328,"1626"," Av. Tereza Cristina, Sob Viaduto Av. Olinto Meireles "," Controlador Eletrônico de Velocidade (CEV)", "30","Belo Horizonte/Barreiro","10044","KBH53044","-19.97032, -44.01544"],
+  [328,"1626"," Av. Tereza Cristina, Sob Viaduto Av. Olinto Meireles","Controlador Eletrônico de Velocidade (CEV)", "30","Belo Horizonte/Barreiro","10044","KBH53044","-19.97032, -44.01544"],
   
-  [329,"1627"," Av. Denise Cristina da Rocha 635”, “Controlador Eletrônico de Velocidade (CEV)", "50","Belo Horizonte/Ribeirão das Neves","10045","KBH53045","-19.802396,-44.005255"],
+  [329,"1627"," Av. Denise Cristina da Rocha 635", "Controlador Eletrônico de Velocidade (CEV)", "50","Belo Horizonte/Ribeirão das Neves","10045","KBH53045","-19.802396,-44.005255"],
   
-  [330,"1628"," Av. Denise Cristina da Rocha, Esquina com Mário Alexandrino da Rocha”, “Controlador Eletrônico de Velocidade (CEV)", "40","Belo Horizonte/Ribeirão das Neves","10046","KBH53046","-19.79911, -44.01354"],
+  [330,"1628"," Av. Denise Cristina da Rocha, Esquina com Mário Alexandrino da Rocha", "Controlador Eletrônico de Velocidade (CEV)", "40","Belo Horizonte/Ribeirão das Neves","10046","KBH53046","-19.79911, -44.01354"],
   
-  [331,"1629"," Av. Denise Cristina da Rocha, Esquina com Mário Alexandrino da Rocha”, “Controlador Eletrônico de Velocidade (CEV)", "40","Ribeirão das Neves/Belo Horizonte","10047","KBH53047"," -19.79917, -44.01364"],
+  [331,"1629"," Av. Denise Cristina da Rocha, Esquina com Mário Alexandrino da Rocha", "Controlador Eletrônico de Velocidade (CEV)", "40","Ribeirão das Neves/Belo Horizonte","10047","KBH53047","-19.79917, -44.01364"],
   
   [332,"1630","Rua Sergipe, Após Av. Cristóvão Colombo", "Zona Verde de Trânsito (ZVT)", "30","Praça da Liberdade/Savassi","10048","KBH53048","-19.93627, -43.93782"],
   
-  [333,"1631","Rua Aimorés, Após Av. Bernardo Monteiro ", "Zona Verde de Trânsito (ZVT)", "30","Centro/Serra","10049","KBH53049"," -19.93087, -43.92803"]
+  [333,"1631","Rua Aimorés, Após Av. Bernardo Monteiro", "Zona Verde de Trânsito (ZVT)", "30","Centro/Serra","10049","KBH53049","-19.93087, -43.92803"]
   
     ]
   }
