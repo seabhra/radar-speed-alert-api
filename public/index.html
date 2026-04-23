@@ -517,7 +517,7 @@
       'Detector de Tráfego em Local Proibido': 'Zona de Tráfego Proibido (ZTP)',
       'Detector de Invasão de Faixa Exclusiva (DIFEX)': 'Faixa Exclusiva de Ônibus e Táxis (FOT)',
       'Detector de Faixa Preferencial de Ônibus (BUS)': 'Faixa Preferencial de Ônibus (BUS)',
-      'Zona Verde de Trânsito (ZVT)': 'Zona Verde de Trâsnito (ZVT)',
+      'Zona Verde de Trânsito (ZVC)': 'Zona Verde de Trâsnito (ZVT)',
       'Detector de Uso de Celular': 'Radar de Uso de Celular (DUC)',
       'Verificador de Cinto de Segurança (VCS)': 'Radar de Uso de Cinto de Segurança (RCS)',
       'Leitor Inteligente de Placas': 'Leitor de Placas (OCR-P)',
@@ -646,6 +646,7 @@ endRouteMarker = L.marker([destLat, destLng], {
         if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
         else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) icone = iconMap['Controle de Redução de Velocidade (CRV)'];
         else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
+        else if (tipoLimpo.includes('Verde')) icone = iconMap['Zona Verde de Trânsito'];
         else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
         else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
         else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em Local Proibido'];
