@@ -464,8 +464,8 @@
     let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
     
     // VARIÁVEIS DOS MARCADORES DE ROTA
-     // Marcador de partida (ic_navigator_map.png)
-      // Marcador de chegada (ic_icon_chegada.png)
+    // Marcador de partida (ic_navigator_map.png)
+    // Marcador de chegada (ic_icon_chegada.png)
     var startRouteMarker = null;
     var endRouteMarker = null;
     
@@ -485,23 +485,23 @@
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
 
     const iconMap = {
-  'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev_v2.png',
-  'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das_v2.png',
-  'Detector de Tráfego em Local Proibido': '/imagens_app/ic_radar_dtlp_v2.png',
-  'Detector de Conversão em Local Proibido': '/imagens_app/ic_radar_rcp_v2.png',
-  'Detector de Invasão de Faixa Exclusiva - MOVE': '/imagens_app/ic_radar_dife_v2.png',
-  'Detector de Invasão de Faixa Exclusiva (DIFEX)': '/imagens_app/ic_radar_difex_v2.png',
-  'Detector de Parada sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp_v2.png',
-  'Detector de Faixa Preferencial de Ônibus (BUS)': '/imagens_app/ic_radar_fpref_v2.png',
-  'Zona Verde de Trânsito (ZVT)': '/imagens_app/ic_zona_verde.png',  // ✓ Ícone corrigido
-  'Zona Verde de Trânsito (ZVC)': '/imagens_app/ic_zona_verde.png',  // ✓ Adicionado para consistência
-  'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
-  'Controle de Redução de Velocidade (CRV)': '/imagens_app/ic_radar_crv_v2.png',
-  'Verificador de Cinto de Segurança (VCS)': '/imagens_app/ic_radar_cinto_v2.png',
-  'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr_v2.png',
-  'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial_v2.png',
-  'default': '/imagens_app/ic_radar_cev_v2.png'
-};
+      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev_v2.png',
+      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das_v2.png',
+      'Detector de Tráfego em Local Proibido': '/imagens_app/ic_radar_dtlp_v2.png',
+      'Detector de Conversão em Local Proibido': '/imagens_app/ic_radar_rcp_v2.png',
+      'Detector de Invasão de Faixa Exclusiva - MOVE': '/imagens_app/ic_radar_dife_v2.png',
+      'Detector de Invasão de Faixa Exclusiva (DIFEX)': '/imagens_app/ic_radar_difex_v2.png',
+      'Detector de Parada sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp_v2.png',
+      'Detector de Faixa Preferencial de Ônibus (BUS)': '/imagens_app/ic_radar_fpref_v2.png',
+      'Zona Verde de Trânsito (ZVT)': '/imagens_app/ic_zona_verde.png',
+      'Zona Verde de Trânsito (ZVC)': '/imagens_app/ic_zona_verde.png',
+      'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
+      'Controle de Redução de Velocidade (CRV)': '/imagens_app/ic_radar_crv_v2.png',
+      'Verificador de Cinto de Segurança (VCS)': '/imagens_app/ic_radar_cinto_v2.png',
+      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr_v2.png',
+      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial_v2.png',
+      'default': '/imagens_app/ic_radar_cev_v2.png'
+    };
 
     const TIPOS_SEM_ALERTA = [
       'Detector de Faixa Preferencial de Ônibus (BUS)',
@@ -519,7 +519,7 @@
       'Detector de Tráfego em Local Proibido': 'Zona de Tráfego Proibido (ZTP)',
       'Detector de Invasão de Faixa Exclusiva (DIFEX)': 'Faixa Exclusiva de Ônibus e Táxis (FOT)',
       'Detector de Faixa Preferencial de Ônibus (BUS)': 'Faixa Preferencial de Ônibus (BUS)',
-      'Zona Verde de Trânsito (ZVC)': 'Zona Verde de Trâsnito (ZVT)',
+      'Zona Verde de Trânsito (ZVC)': 'Zona Verde de Trânsito (ZVT)',
       'Detector de Uso de Celular': 'Radar de Uso de Celular (DUC)',
       'Verificador de Cinto de Segurança (VCS)': 'Radar de Uso de Cinto de Segurança (RCS)',
       'Leitor Inteligente de Placas': 'Leitor de Placas (OCR-P)',
@@ -539,41 +539,38 @@
       });
     }
 
-// =================================================================== 
-// FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de saída e chegada
-// ===================================================================
-function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+    // =================================================================== 
+    // FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de saída e chegada
+    // ===================================================================
+    function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+      // Remove antigos
+      if (startRouteMarker) map.removeLayer(startRouteMarker);
+      if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-// Remove antigos
-if (startRouteMarker) map.removeLayer(startRouteMarker);
-if (endRouteMarker) map.removeLayer(endRouteMarker);
+      // INÍCIO 
+      var startIcon = criarIconePersonalizado(
+        '/imagens_app/ic_navigator_map.png',
+        40,
+        'route-start-marker'
+      );
 
-//(pode usar ícone menor pra não brigar com o GPS)
+      startRouteMarker = L.marker([originLat, originLng], {
+        icon: startIcon,
+        zIndexOffset: 800
+      }).addTo(map);
 
-// 🔵 INÍCIO 
-var startIcon = criarIconePersonalizado(
-  '/imagens_app/ic_navigator_map.png',
-  40,
-  'route-start-marker'
-);
+      // DESTINO
+      var endIcon = criarIconePersonalizado(
+        '/imagens_app/ic_icon_chegada.png',
+        50,
+        'route-end-marker'
+      );
 
-startRouteMarker = L.marker([originLat, originLng], {
-  icon: startIcon,
-  zIndexOffset: 800
-}).addTo(map);
-
-// 🔴 DESTINO
-var endIcon = criarIconePersonalizado(
-  '/imagens_app/ic_icon_chegada.png',
-  50,
-  'route-end-marker'
-);
-
-endRouteMarker = L.marker([destLat, destLng], {
-  icon: endIcon,
-  zIndexOffset: 900
-}).addTo(map);
-}
+      endRouteMarker = L.marker([destLat, destLng], {
+        icon: endIcon,
+        zIndexOffset: 900
+      }).addTo(map);
+    }
 
     // ===================================================================
     // FUNÇÃO: removerMarcadoresRota - Remove os marcadores de rota
@@ -604,7 +601,8 @@ endRouteMarker = L.marker([destLat, destLng], {
     // ===================================================================
     // FUNÇÃO: criarIconeRadar - Cria ícone padronizado para radares
     // ===================================================================
-    function criarIconeRadar(iconeUrl, tamanho = 40) {
+    function criarIconeRadar(iconeUrl, tamanho) {
+      tamanho = tamanho || 40;
       return L.divIcon({
         html: '<img src="' + iconeUrl + '" style="width: ' + tamanho + 'px; height: ' + tamanho + 'px; object-fit: contain; display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" onerror="this.src=\'/imagens_app/ic_radar_cev_v2.png\'" />',
         iconSize: [tamanho, tamanho],
@@ -614,69 +612,68 @@ endRouteMarker = L.marker([destLat, destLng], {
       });
     }
 
-
-// ===================================================================
-// FUNÇÃO: getIconUrl - Retorna a URL do ícone baseado no tipo
-// ===================================================================
-function getIconUrl(tipo, velocidade) {
-  const tipoLimpo = tipo ? tipo.trim() : "";
-  
-  // Verifica Zona Verde primeiro
-  if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) {
-    return iconMap['Zona Verde de Trânsito (ZVT)'];
-  }
-  
-  if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) {
-    return iconMap['Controlador Eletrônico de Velocidade'] || '/imagens_app/ic_radar_cev_v2.png';
-  }
-  
-  if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) {
-    return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
-  }
-  
-  if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') {
-    return iconMap['Controle de Redução de Velocidade (CRV)'];
-  }
-  
-  // Ícones específicos para radar CEM com velocidade 30 e 40
-  const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) || 
-                            (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('Redução')) ||
-                            tipoLimpo.includes('CEM') ||
-                            tipoLimpo.includes('Controlador Eletrônico');
-  
-  if (isRadarVelocidade) {
-    const vel = parseInt(velocidade) || 0;
-    if (vel === 30) return '/imagens_app/ic_radar_cem_30_v2.png';  // ✓ Ícone para 30km/h
-    if (vel === 40) return '/imagens_app/ic_radar_cem_40_v2.png';  // ✓ Ícone para 40km/h
-    if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
-    if (vel === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
-    if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
-    if (vel === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
-    return '/imagens_app/ic_radar_cev_v2.png';
-  }
-  
-  let icone = iconMap[tipoLimpo];
-  
-  if (!icone) {
-    if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
-    else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) icone = iconMap['Controle de Redução de Velocidade (CRV)'];
-    else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
-    else if (tipoLimpo.includes('Verde')) icone = iconMap['Zona Verde de Trânsito (ZVT)'];
-    else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
-    else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
-    else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em Local Proibido'];
-    else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa Exclusiva - MOVE'];
-    else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres') || tipoLimpo.includes('DPFP')) 
-      icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
-    else if (tipoLimpo.includes('Faixa Exclusiva') || tipoLimpo.includes('DIFEX')) 
-      icone = iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'];
-    else if (tipoLimpo.includes('BUS') || tipoLimpo.includes('Faixa Preferencial')) 
-      icone = iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'];
-  }
-  
-  if (!icone) icone = iconMap['default'];
-  return icone;
-}
+    // ===================================================================
+    // FUNÇÃO: getIconUrl - Retorna a URL do ícone baseado no tipo
+    // ===================================================================
+    function getIconUrl(tipo, velocidade) {
+      var tipoLimpo = tipo ? tipo.trim() : "";
+      
+      // Verifica Zona Verde primeiro
+      if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) {
+        return iconMap['Zona Verde de Trânsito (ZVT)'];
+      }
+      
+      if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) {
+        return iconMap['Controlador Eletrônico de Velocidade'] || '/imagens_app/ic_radar_cev_v2.png';
+      }
+      
+      if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) {
+        return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
+      }
+      
+      if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') {
+        return iconMap['Controle de Redução de Velocidade (CRV)'];
+      }
+      
+      // Ícones específicos para radar CEM com velocidade 30 e 40
+      var isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) || 
+                              (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('Redução')) ||
+                              tipoLimpo.includes('CEM') ||
+                              tipoLimpo.includes('Controlador Eletrônico');
+      
+      if (isRadarVelocidade) {
+        var vel = parseInt(velocidade) || 0;
+        if (vel === 30) return '/imagens_app/ic_radar_cem_30_v2.png';
+        if (vel === 40) return '/imagens_app/ic_radar_cem_40_v2.png';
+        if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
+        if (vel === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
+        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
+        if (vel === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
+        return '/imagens_app/ic_radar_cev_v2.png';
+      }
+      
+      var icone = iconMap[tipoLimpo];
+      
+      if (!icone) {
+        if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
+        else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) icone = iconMap['Controle de Redução de Velocidade (CRV)'];
+        else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
+        else if (tipoLimpo.includes('Verde')) icone = iconMap['Zona Verde de Trânsito (ZVT)'];
+        else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
+        else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
+        else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em Local Proibido'];
+        else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa Exclusiva - MOVE'];
+        else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres') || tipoLimpo.includes('DPFP')) 
+          icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
+        else if (tipoLimpo.includes('Faixa Exclusiva') || tipoLimpo.includes('DIFEX')) 
+          icone = iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'];
+        else if (tipoLimpo.includes('BUS') || tipoLimpo.includes('Faixa Preferencial')) 
+          icone = iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'];
+      }
+      
+      if (!icone) icone = iconMap['default'];
+      return icone;
+    }
 
     // ===================================================================
     // FUNÇÃO: showNotification - Exibe notificação temporária
@@ -785,74 +782,73 @@ function getIconUrl(tipo, velocidade) {
       }
     }
 
-  // ===================================================================
-// FUNÇÃO: atualizarIconeUsuario - Atualiza ícone do usuário
-// ===================================================================
-function atualizarIconeUsuario() {
-  if (!userMarker) return;
-  
-  var estaEmNavegacao = (destinoAtual !== null && routingControl !== null);
-  
-  var userIcon = L.icon({
-    iconUrl: estaEmNavegacao 
-      ? '/imagens_app/ic_navigator_map.png'
-      : '/imagens_app/ic_gps_marker.png',
-    iconSize: [50, 50],
-    iconAnchor: [25, 50],
-    popupAnchor: [0, -50],
-    className: estaEmNavegacao 
-      ? 'user-navigator-marker'
-      : 'user-gps-marker'
-  });
-  
-  userMarker.setIcon(userIcon);
-}
+    // ===================================================================
+    // FUNÇÃO: atualizarIconeUsuario - Atualiza ícone do usuário
+    // ===================================================================
+    function atualizarIconeUsuario() {
+      if (!userMarker) return;
+      
+      var estaEmNavegacao = (destinoAtual !== null && routingControl !== null);
+      
+      var userIcon = L.icon({
+        iconUrl: estaEmNavegacao 
+          ? '/imagens_app/ic_navigator_map.png'
+          : '/imagens_app/ic_gps_marker.png',
+        iconSize: [50, 50],
+        iconAnchor: [25, 50],
+        popupAnchor: [0, -50],
+        className: estaEmNavegacao 
+          ? 'user-navigator-marker'
+          : 'user-gps-marker'
+      });
+      
+      userMarker.setIcon(userIcon);
+    }
 
     // ===================================================================
     // FUNÇÃO: calcularRota - Traça rota COM ZOOM e ícones
     // ===================================================================
     function calcularRota(destLat, destLng) {
-  if (routingControl) map.removeControl(routingControl);
+      if (routingControl) map.removeControl(routingControl);
 
-  destinoAtual = { lat: destLat, lng: destLng };
+      destinoAtual = { lat: destLat, lng: destLng };
 
-  // 🔥 IMPORTANTE: adiciona marcadores de SAÍDA e DESTINO
-  adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
+      // IMPORTANTE: adiciona marcadores de SAÍDA e DESTINO
+      adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
 
-  routingControl = L.Routing.control({
-    waypoints: [
-      L.latLng(userLat, userLng),
-      L.latLng(destLat, destLng)
-    ],
-    routeWhileDragging: false,
-    addWaypoints: false,
-    language: 'pt-BR',
-    show: false,
-    lineOptions: { 
-      styles: [
-      { color: '#ff5500', opacity: 0.95, weight: 7 },
-      { color: '#ffd1b3', opacity: 1.0, weight: 3 }
-      ] 
-    },
+      routingControl = L.Routing.control({
+        waypoints: [
+          L.latLng(userLat, userLng),
+          L.latLng(destLat, destLng)
+        ],
+        routeWhileDragging: false,
+        addWaypoints: false,
+        language: 'pt-BR',
+        show: false,
+        lineOptions: { 
+          styles: [
+            { color: '#ff5500', opacity: 0.95, weight: 7 },
+            { color: '#ffd1b3', opacity: 1.0, weight: 3 }
+          ] 
+        },
+        // Continua sem marcador automático
+        createMarker: function() { return null; },
+        router: L.Routing.osrmv1({
+          serviceUrl: 'https://router.project-osrm.org/route/v1'
+        })
+      }).addTo(map);
 
-    // ❌ continua sem marcador automático
-    createMarker: function() { return null; },
+      var bounds = L.latLngBounds(
+        [userLat, userLng],
+        [destLat, destLng]
+      );
+      
+      map.fitBounds(bounds, { padding: [50, 50] });
 
-    router: L.Routing.osrmv1({
-      serviceUrl: 'https://router.project-osrm.org/route/v1'
-    })
-  }).addTo(map);
+      atualizarIconeUsuario();
+      showNotification("🚗 Navegação iniciada! Siga a rota azul.");
+    }
 
-  var bounds = L.latLngBounds(
-    [userLat, userLng],
-    [destLat, destLng]
-  );
-  
-  map.fitBounds(bounds, { padding: [50, 50] });
-
-  atualizarIconeUsuario();
-  showNotification("🚗 Navegação iniciada! Siga a rota azul.");
-}
     // ===================================================================
     // FUNÇÃO: atualizarRota - Atualiza rota com posição atual
     // ===================================================================
@@ -894,6 +890,16 @@ function atualizarIconeUsuario() {
       removerRota();
       fecharTodasBarras();
       showNotification("Mapa resetado para posição inicial");
+    }
+
+    // ===================================================================
+    // FUNÇÃO: fecharTodasBarras - Fecha barras de busca e rota
+    // ===================================================================
+    function fecharTodasBarras() {
+      searchActive = false;
+      routeActive = false;
+      $("#search-bar-radares").removeClass('active');
+      $("#search-bar-rota").removeClass('active');
     }
 
     // ===================================================================
@@ -980,14 +986,14 @@ function atualizarIconeUsuario() {
     // FUNÇÃO: inicializarBotaoRotacaoMapa - Configura botão de rotação
     // ===================================================================
     function inicializarBotaoRotacaoMapa() {
-      const rotateBtn = document.getElementById('btn-rotate-map');
-      let isRotated = false;
+      var rotateBtn = document.getElementById('btn-rotate-map');
+      var isRotated = false;
 
       if (!rotateBtn) return;
 
       rotateBtn.addEventListener('click', function () {
         if (!isRotated) {
-          const rotationAngle = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 45;
+          var rotationAngle = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 45;
           map.setBearing(rotationAngle);
           showNotification("Mapa rotacionado");
           rotateBtn.classList.add('rotated');
@@ -1005,8 +1011,8 @@ function atualizarIconeUsuario() {
     // FUNÇÃO: inicializarBotaoAlertaToggle - Configura botão liga/desliga alerta
     // ===================================================================
     function inicializarBotaoAlertaToggle() {
-      const alertBtn = document.getElementById('btn-alert-toggle');
-      const alertIcon = document.getElementById('alert-toggle-icon');
+      var alertBtn = document.getElementById('btn-alert-toggle');
+      var alertIcon = document.getElementById('alert-toggle-icon');
       
       if (!alertBtn) return;
       
@@ -1031,6 +1037,20 @@ function atualizarIconeUsuario() {
           fecharAlertaImediatamente();
         }
       });
+    }
+
+    // ===================================================================
+    // FUNÇÃO: atualizarPosicaoUsuario - Atualiza posição do marcador do usuário
+    // ===================================================================
+    function atualizarPosicaoUsuario(lat, lng, heading) {
+      if (!userMarker) return;
+      
+      userMarker.setLatLng([lat, lng]);
+      
+      if (heading !== null && !isNaN(heading) && heading >= 0) {
+        currentHeading = heading;
+        atualizarBussola(currentHeading);
+      }
     }
 
     // ===================================================================
@@ -1105,8 +1125,9 @@ function atualizarIconeUsuario() {
         map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
       }
       
+      // CORREÇÃO: Chama verificarProximidadeRadares (nome correto da função)
       if (alertaHabilitado) {
-        verificarProximidade(userLat, userLng, currentHeading);
+        verificarProximidadeRadares();
       } else {
         fecharAlertaImediatamente();
       }
@@ -1154,115 +1175,118 @@ function atualizarIconeUsuario() {
     // FUNÇÃO: verificarProximidadeRadares - O CORAÇÃO DO ALERTA
     // ===================================================================
     function verificarProximidadeRadares() {
-        if (!alertaHabilitado || radarMarkers.length === 0) return;
+      if (!alertaHabilitado || radarMarkers.length === 0) return;
 
-        let radarMaisProximo = null;
-        let menorDistancia = Infinity;
+      var radarMaisProximo = null;
+      var menorDistancia = Infinity;
 
-        radarMarkers.forEach(marker => {
-            const rData = marker.radarData;
-            
-            // FILTRO CRÍTICO: Não alerta tipos irrelevantes (como BUS)
-            if (!deveAlertaRadar(rData.tipo)) return;
+      radarMarkers.forEach(function(marker) {
+        var rData = marker.radarData;
+        
+        // FILTRO CRÍTICO: Não alerta tipos irrelevantes (como BUS)
+        if (!deveAlertaRadar(rData.tipo)) return;
 
-            const dist = calcularDistancia(userLat, userLng, rData.lat, rData.lng);
-            
-            if (dist < menorDistancia) {
-                menorDistancia = dist;
-                radarMaisProximo = rData;
-            }
-        });
-
-        // REFORÇO NA LÓGICA DE ALERTA
-        if (radarMaisProximo && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
-            
-            // 1. Verifica se o usuário está de fato indo em direção ao radar
-            // Reduzi a exigência do ângulo para 60 graus para evitar falso-negativo em curvas
-            const direcao = verificarDirecao(userLat, userLng, currentHeading, radarMaisProximo.lat, radarMaisProximo.lng);
-            
-            // Só dispara se estiver aproximando OU se a velocidade for muito baixa (GPS pode perder o heading)
-            const velocidadeAtual = parseFloat($("#speed-display").text()) || 0;
-            const deveDisparar = direcao.estaAproximando || velocidadeAtual < 5;
-
-            if (deveDisparar) {
-                // Evita repetir o alerta para o mesmo radar seguidamente, a menos que tenha se afastado
-                if (ultimoRadarAlertado !== radarMaisProximo.id) {
-                    dispararAlerta(radarMaisProximo, menorDistancia);
-                } else if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
-                    // Se já alertou mas entrou na zona crítica, reforça o visual
-                    $(".alert-bar").addClass("alert-bar-critico");
-                }
-            }
-            
-            // 2. Lógica de Auto-Fechamento: Se passou pelo radar (distância muito pequena ou começou a afastar)
-            if (menorDistancia < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR || direcao.estaAfastando) {
-                fecharAlertaImediatamente();
-                ultimoRadarAlertado = radarMaisProximo.id; // Marca como "visto"
-            }
-
-        } else {
-            // Se não há nenhum radar no raio de alcance, garante que o alerta suma
-            if ($("#alert-container").is(":visible")) {
-                fecharAlertaImediatamente();
-            }
-            ultimoRadarAlertado = null; 
+        // CORREÇÃO: Usa campos padronizados (lat, lng em vez de latitude, longitude)
+        var dist = calcularDistancia(userLat, userLng, rData.lat, rData.lng);
+        
+        if (dist < menorDistancia) {
+          menorDistancia = dist;
+          radarMaisProximo = rData;
         }
+      });
+
+      // REFORÇO NA LÓGICA DE ALERTA
+      if (radarMaisProximo && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
+        
+        // 1. Verifica se o usuário está de fato indo em direção ao radar
+        var direcao = verificarDirecao(userLat, userLng, currentHeading, radarMaisProximo.lat, radarMaisProximo.lng);
+        
+        // Só dispara se estiver aproximando OU se a velocidade for muito baixa
+        var velocidadeAtual = parseFloat($("#speed-display").text()) || 0;
+        var deveDisparar = direcao.estaAproximando || velocidadeAtual < 5;
+
+        if (deveDisparar) {
+          // Evita repetir o alerta para o mesmo radar seguidamente
+          if (ultimoRadarAlertado !== radarMaisProximo.id) {
+            dispararAlerta(radarMaisProximo, menorDistancia);
+          } else if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+            // Se já alertou mas entrou na zona crítica, reforça o visual
+            $(".alert-bar").addClass("alert-bar-critico");
+          }
+        }
+        
+        // 2. Lógica de Auto-Fechamento: Se passou pelo radar
+        if (menorDistancia < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR || direcao.estaAfastando) {
+          fecharAlertaImediatamente();
+          ultimoRadarAlertado = radarMaisProximo.id;
+        }
+
+      } else {
+        // Se não há nenhum radar no raio de alcance, garante que o alerta suma
+        if ($("#alert-container").is(":visible")) {
+          fecharAlertaImediatamente();
+        }
+        ultimoRadarAlertado = null; 
+      }
     }
 
     // ===================================================================
     // FUNÇÃO: dispararAlerta - Executa som e mostra a barra
     // ===================================================================
     function dispararAlerta(radar, distancia) {
-        const som = document.getElementById("alert-soud");
-        const tipoAjustado = ajusteNomes[radar.tipo] || radar.tipo;
-        const velInfo = radar.velocidade ? ` | ${radar.velocidade} km/h` : "";
+      var som = document.getElementById("alert-soud");
+      // CORREÇÃO: Usa campo padronizado 'tipo' em vez de 'tipoOriginal'
+      var tipoAjustado = ajusteNomes[radar.tipo] || radar.tipo;
+      // CORREÇÃO: Usa campo padronizado 'velocidade' em vez de 'velocidade_maxima'
+      var velInfo = radar.velocidade ? ' | ' + radar.velocidade + ' km/h' : "";
 
-        // Atualiza interface
-        $("#alert-title").text("ALERTA DE RADAR!");
-        $("#alert-text").text(`${tipoAjustado}${velInfo} - a ${Math.round(distancia)}m`);
-        
-        // Troca o ícone do alerta para o ícone específico do radar
-        const iconeUrl = getIconUrl(radar.tipo, radar.velocidade);
-        $("#alert-icon").attr("src", iconeUrl);
+      // Atualiza interface
+      $("#alert-title").text("ALERTA DE RADAR!");
+      $("#alert-text").text(tipoAjustado + velInfo + ' - a ' + Math.round(distancia) + 'm');
+      
+      // Troca o ícone do alerta para o ícone específico do radar
+      var iconeUrl = getIconUrl(radar.tipo, radar.velocidade);
+      $("#alert-icon").attr("src", iconeUrl);
 
-        // Exibe a barra com animação
-        $("#alert-container").fadeIn(200);
+      // Exibe a barra com animação
+      $("#alert-container").fadeIn(200);
 
-        // Toca o áudio (Reinicia se já estiver tocando)
-        if (alertaHabilitado && som) {
-            som.pause();
-            som.currentTime = 0;
-            som.play().catch(e => console.log("Erro ao tocar áudio: Interação do usuário necessária."));
-        }
+      // Toca o áudio (Reinicia se já estiver tocando)
+      if (alertaHabilitado && som) {
+        som.pause();
+        som.currentTime = 0;
+        som.play().catch(function(e) { console.log("Erro ao tocar áudio: Interação do usuário necessária."); });
+      }
 
-        // Se for distância crítica (ex: menos de 40m), aplica o pulso vermelho
-        if (distancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
-            $(".alert-bar").addClass("alert-bar-critico");
-        } else {
-            $(".alert-bar").removeClass("alert-bar-critico");
-        }
+      // Se for distância crítica, aplica o pulso vermelho
+      if (distancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+        $(".alert-bar").addClass("alert-bar-critico");
+      } else {
+        $(".alert-bar").removeClass("alert-bar-critico");
+      }
 
-        ultimoRadarAlertado = radar.id;
+      ultimoRadarAlertado = radar.id;
     }
 
     // ===================================================================
-    // REFORÇO NO GPS: Garante que a verificação rode a cada atualização
+    // FUNÇÃO: onLocationFound - Handler para evento locationfound do Leaflet
     // ===================================================================
     function onLocationFound(e) {
-        userLat = e.coords.latitude;
-        userLng = e.coords.longitude;
-        currentHeading = e.coords.heading || 0;
+      userLat = e.coords.latitude;
+      userLng = e.coords.longitude;
+      currentHeading = e.coords.heading || 0;
 
-        // Atualiza marcador do usuário (supondo que a função exista)
-        atualizarPosicaoUsuario(userLat, userLng, currentHeading);
+      // Atualiza marcador do usuário
+      atualizarPosicaoUsuario(userLat, userLng, currentHeading);
 
-        // CHAMA A VERIFICAÇÃO DE RADAR A CADA PONTO DO GPS
-        verificarProximidadeRadares();
-        
-        // Atualiza Velocidade no Widget
-        const speedKmh = e.coords.speed ? Math.round(e.coords.speed * 3.6) : 0;
-        $("#speed-display").text(speedKmh);
+      // CHAMA A VERIFICAÇÃO DE RADAR A CADA PONTO DO GPS
+      verificarProximidadeRadares();
+      
+      // Atualiza Velocidade no Widget
+      var speedKmh = e.coords.speed ? Math.round(e.coords.speed * 3.6) : 0;
+      $("#speed-display").text(speedKmh);
     }
+
     // ===================================================================
     // FUNÇÃO: initMap - Inicializa o mapa e configura eventos
     // ===================================================================
@@ -1294,7 +1318,7 @@ function atualizarIconeUsuario() {
       });
 
       // ===============================================================
-      // EVENTO DO BOTÃO DE ROTA - CORRIGIDO PARA INSERIR ÍCONES
+      // EVENTO DO BOTÃO DE ROTA - COM ÍCONES
       // ===============================================================
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
@@ -1314,7 +1338,7 @@ function atualizarIconeUsuario() {
           }
           removerMarcadoresRota();
 
-          // 2. Configura o Routing Control com a correção do createMarker
+          // 2. Configura o Routing Control com createMarker nulo
           routingControl = L.Routing.control({
             waypoints: [
               L.latLng(userLat, userLng),
@@ -1335,8 +1359,11 @@ function atualizarIconeUsuario() {
           routingControl.on('routesfound', function(e) {
             var summary = e.routes[0].summary;
             
-            // Chama a sua função de ícones personalizados
+            // Chama a função de ícones personalizados
             adicionarMarcadoresRota(userLat, userLng, coords.lat, coords.lng);
+            
+            destinoAtual = { lat: coords.lat, lng: coords.lng };
+            atualizarIconeUsuario();
             
             $("#loading").hide();
             fecharTodasBarras();
@@ -1356,13 +1383,6 @@ function atualizarIconeUsuario() {
       });
       
       $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
-
-      function fecharTodasBarras() {
-        searchActive = false;
-        routeActive = false;
-        $("#search-bar-radares").removeClass('active');
-        $("#search-bar-rota").removeClass('active');
-      }
       
       $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
       $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
@@ -1426,8 +1446,8 @@ function atualizarIconeUsuario() {
         { lat: -19.871740, lng: -43.955001, end: "Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
         { lat: -19.835851, lng: -43.907504, end: "Rod. Camilo Teixeira da Costa, 210 – Tupi/Centro", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" },
         { lat: -19.922500, lng: -43.945000, end: "Av. Amazonas, 500 - Centro", tipo: "Detector de Faixa Preferencial de Ônibus (BUS)", vel: "40" }
-      ].map(function(r) { 
-        return [null, null, r.end, r.tipo, r.vel, null, null, null, null, r.lat + ',' + r.lng]; 
+      ].map(function(r, idx) { 
+        return [null, null, r.end, r.tipo, r.vel, null, null, null, null, r.lat + ',' + r.lng, 'ia_' + idx]; 
       });
     }
 
@@ -1497,7 +1517,7 @@ function atualizarIconeUsuario() {
       var idxY = headers.findIndex(function(h) { return h.includes('norte') || h.includes('y'); });
       
       var out = [];
-      dataLines.forEach(function(line) {
+      dataLines.forEach(function(line, idx) {
         var cols = line.split(';').map(function(c) { return c.replace(/^"|"$/g, '').trim(); });
         if (cols.length < 3) return;
         
@@ -1510,7 +1530,8 @@ function atualizarIconeUsuario() {
           coordStr = cols[idxX] + ',' + cols[idxY];
         }
         
-        out.push([null, null, end, tipo, vel, null, null, null, null, coordStr]);
+        // CORREÇÃO: Adiciona ID único para controle de alerta duplicado
+        out.push([null, null, end, tipo, vel, null, null, null, null, coordStr, 'api_' + idx]);
       });
       return out;
     }
@@ -1528,6 +1549,8 @@ function atualizarIconeUsuario() {
         var endereco = record[2] || "Endereço não informado";
         var tipo = (record[3] || "Não Identificado").trim();
         var velocidade = record[4] || "0";
+        // CORREÇÃO: Extrai ID do record (posição 10) para controle de alerta
+        var radarId = record[10] || ('radar_' + i);
         var coordsFinais = extrairCoordenadas(record);
         
         if (!coordsFinais) continue;
@@ -1545,13 +1568,15 @@ function atualizarIconeUsuario() {
           endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + 
           velocidade + ' km/h</div></div>');
         
+        // CORREÇÃO: Campos padronizados para compatibilidade com verificarProximidadeRadares
         radarMarker.radarData = {
-          latitude: coordsFinais.lat,
-          longitude: coordsFinais.lng,
+          id: radarId,
+          lat: coordsFinais.lat,
+          lng: coordsFinais.lng,
           endereco: endereco,
-          velocidade_maxima: velocidade,
-          tipoOriginal: tipo,
+          tipo: tipo,
           tipoExibicao: tipoExibicao,
+          velocidade: velocidade,
           isIA: isIA
         };
         
@@ -1579,7 +1604,8 @@ function atualizarIconeUsuario() {
       
       radarMarkers.forEach(function(marker) {
         var d = marker.radarData;
-        var textoBusca = (d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase();
+        // CORREÇÃO: Usa campo padronizado 'tipo' em vez de 'tipoOriginal'
+        var textoBusca = (d.endereco + ' ' + d.tipo + ' ' + d.tipoExibicao).toLowerCase();
         
         if (textoBusca.includes(q)) {
           encontrou = true;
