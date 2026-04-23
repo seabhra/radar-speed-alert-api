@@ -493,6 +493,7 @@
       'Detector de Invasão de Faixa Exclusiva (DIFEX)': '/imagens_app/ic_radar_difex_v2.png',
       'Detector de Parada sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp_v2.png',
       'Detector de Faixa Preferencial de Ônibus (BUS)': '/imagens_app/ic_radar_fpref_v2.png',
+      'Zona Verde de Trâsnito (ZVT)': '/imagens_app/ic_zona_verde.png',
       'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
       'Controle de Redução de Velocidade (CRV)': '/imagens_app/ic_radar_crv_v2.png',
       'Verificador de Cinto de Segurança (VCS)': '/imagens_app/ic_radar_cinto_v2.png',
@@ -516,6 +517,7 @@
       'Detector de Tráfego em Local Proibido': 'Zona de Tráfego Proibido (ZTP)',
       'Detector de Invasão de Faixa Exclusiva (DIFEX)': 'Faixa Exclusiva de Ônibus e Táxis (FOT)',
       'Detector de Faixa Preferencial de Ônibus (BUS)': 'Faixa Preferencial de Ônibus (BUS)',
+      'Zona Verde de Trânsito (ZVT)': 'Zona Verde de Trâsnito (ZVT)',
       'Detector de Uso de Celular': 'Radar de Uso de Celular (DUC)',
       'Verificador de Cinto de Segurança (VCS)': 'Radar de Uso de Cinto de Segurança (RCS)',
       'Leitor Inteligente de Placas': 'Leitor de Placas (OCR-P)',
@@ -633,8 +635,6 @@ endRouteMarker = L.marker([destLat, destLng], {
       
       if (isRadarVelocidade) {
         const vel = parseInt(velocidade) || 0;
-        if (vel === 30) return '/imagens_app/ic_radar_cev_30_v2.png';
-        if (vel === 40) return '/imagens_app/ic_radar_cev_40_v2.png';
         if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
         if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
         return '/imagens_app/ic_radar_cev_v2.png';
