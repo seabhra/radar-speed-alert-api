@@ -345,8 +345,8 @@
       [331, "1629", "Av. Denise Cristina da Rocha, Esquina com Mário Alexandrino da Rocha", "Controlador Eletrônico de Velocidade (CEV)", "40", "Ribeirão das Neves/Belo Horizonte", "Único", "10047", "KBH53047", "-19.79917,-44.01364"],
       [332, "1630", "Rua Sergipe, Após Av. Cristóvão Colombo", "Zona Verde de Trânsito (ZVT)", "30", "Praça da Liberdade/Savassi", "Único", "10048", "KBH53048", "-19.93627,-43.93782"],
       [333, "1631", "Rua Aimorés, Após Av. Bernardo Monteiro", "Zona Verde de Trânsito (ZVT)", "30", "Centro/Serra", "Único", "10049", "KBH53049", "-19.93087,-43.92803"],
-      [334, "1632","Av. Amazonas, Próximo da Rua Gen. Andrade Neves", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Bairro/Centro","10050","KBH53050", "-19.93061, -43.96239"],
-      [335, "1633","Av. Amazonas, Próximo da Rua Euclides da Cunha", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Centro/Bairro","10051","KBH53051", "-19.92951, -43.95777"]
+      [334, "1632","Av. Amazonas, Próximo da Rua Gen. Andrade Neves", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Bairro/Centro","10050","KBH53050", "-19.92960, -43.95810"],
+      [335, "1633","Av. Amazonas, Próximo da Rua Euclides da Cunha", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Centro/Bairro","10051","KBH53051", "-19.93074, -43.96288"]
       
     ]
   }
