@@ -495,6 +495,7 @@
   'Detector de Faixa Preferencial de Ônibus (BUS)': '/imagens_app/ic_radar_fpref_v2.png',
   'Zona Verde de Trânsito (ZVT)': '/imagens_app/ic_zona_verde.png',  // ✓ Ícone corrigido
   'Zona Verde de Trânsito (ZVC)': '/imagens_app/ic_zona_verde.png',  // ✓ Adicionado para consistência
+  'Zona de Risco de Inundações Recorrentes (ZIR)':'/imagens_app/ic_zona_inunda.png',
   'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
   'Controle de Redução de Velocidade (CRV)': '/imagens_app/ic_radar_crv_v2.png',
   'Verificador de Cinto de Segurança (VCS)': '/imagens_app/ic_radar_cinto_v2.png',
@@ -520,6 +521,7 @@
       'Detector de Invasão de Faixa Exclusiva (DIFEX)': 'Faixa Exclusiva de Ônibus e Táxis (FOT)',
       'Detector de Faixa Preferencial de Ônibus (BUS)': 'Faixa Preferencial de Ônibus (BUS)',
       'Zona Verde de Trânsito (ZVC)': 'Zona Verde de Trâsnito (ZVT)',
+      'Zona de Risco de Inundações Recorrentes (ZIR)':'Zona de Risco - Inundações Recorrentes (ZIR)',
       'Detector de Uso de Celular': 'Radar de Uso de Celular (DUC)',
       'Verificador de Cinto de Segurança (VCS)': 'Radar de Uso de Cinto de Segurança (RCS)',
       'Leitor Inteligente de Placas': 'Leitor de Placas (OCR-P)',
@@ -665,6 +667,7 @@ function getIconUrl(tipo, velocidade) {
     else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
     else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
     else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em Local Proibido'];
+    else if (tipoLimpo.includes('Inundações')) icone = iconMap['Zona de Risco - Inundações Recorrentes (ZIR)'];
     else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa Exclusiva - MOVE'];
     else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres') || tipoLimpo.includes('DPFP')) 
       icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
@@ -1631,3 +1634,5 @@ function atualizarIconeUsuario() {
   </script>
 </body>
 </html>
+
+
