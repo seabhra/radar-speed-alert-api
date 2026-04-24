@@ -353,7 +353,10 @@
       [339, "1637"," Av. Senador Levindo Coelho: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Vale do Jatobá/ Estação Diamante","10055","KBH53055", "-20.01748, -44.03141"],
       [340, "1638"," Av. do Contorno, Próximo à Av. Prudente de Morais: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Gutierrez/ Santo Antônio","10056","KBH53056", "-19.93495, -43.94899"],
       [341, "1639"," Av. do Contorno, Próximo à Av. Prudente de Morais: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Santo Antônio/Gutierrez","10057","KBH53057", "-19.93665, -43.94519"],
-      [342, "1640"," Av. Prudente de Morais, Próximo ao bairro São Bento: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Bairro/Centro","10058","KBH53059", "-19.94871, -43.94759"]
+      [342, "1640"," Av. Prudente de Morais, Próximo ao bairro São Bento: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Bairro/Centro","10058","KBH53059", "-19.94871, -43.94759"],
+      [343, "1641"," Av. Tereza Cristina, Próximo à Via Expressa: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Centro/Barreiro","10059","KBH53059", "-19.92510, -43.98454"],
+      [344, "1641"," Av. Tereza Cristina, Próximo à Rua Bastilha: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Barreiro/Centro","10060","KBH53060", " -19.95372, -44.01372 "]
+
 
     ]
   }
