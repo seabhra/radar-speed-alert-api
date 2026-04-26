@@ -545,7 +545,7 @@
 // =================================================================== 
 // FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de saída e chegada
 // ===================================================================
-function adicionarMarcadoresRota(destLat, destLng) {
+function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   // Remove versões antigas dos marcadores de rota (se existirem)
   if (startRouteMarker) map.removeLayer(startRouteMarker);
   if (endRouteMarker) map.removeLayer(endRouteMarker);
