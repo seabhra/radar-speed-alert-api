@@ -542,52 +542,45 @@
       });
     }
 
-// =================================================================== 
+// ===================================================================
 // FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de saída e chegada
 // ===================================================================
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
-  // Remove versões antigas dos marcadores de rota (se existirem)
   if (startRouteMarker) map.removeLayer(startRouteMarker);
   if (endRouteMarker) map.removeLayer(endRouteMarker);
-  
-  // ✅ MELHORIA: Em vez de destruir o userMarker, apenas o ESCONDE.
-  // Isso evita bugs na referência global e mantém o ícone padrão intacto para quando a rota terminar.
+ 
+  // Oculta o userMarker padrão sem destruí-lo
   if (userMarker) {
     userMarker.setOpacity(0);
-    userMarker.setZIndexOffset(-1000); // Joga para trás caso o opacity falhe
+    userMarker.setZIndexOffset(-1000);
   }
-
-  // 🔵 INÍCIO DA ROTA (Ícone de Iniciar Navegação)
+ 
+  // Ícone de SAÍDA (substitui visualmente o userMarker)
   var startIcon = criarIconePersonalizado(
     '/imagens_app/ic_navigator_map.png',
-    50,  
+    50,
     'route-start-marker user-navigator-marker'
   );
-
   startRouteMarker = L.marker([originLat, originLng], {
     icon: startIcon,
-    zIndexOffset: 1000  
+    zIndexOffset: 1000
   }).addTo(map);
-  
-  // ✅ NÃO sobrescrevemos mais o "userMarker = startRouteMarker". Eles agora são independentes.
-  startRouteMarker.bindTooltip("🚗 Iniciando rota", { 
-    permanent: false, 
-    direction: "top", 
-    offset: [0, -30] 
+  startRouteMarker.bindTooltip("🚗 Navegando para destino", {
+    permanent: false,
+    direction: "top",
+    offset: [0, -30]
   });
-
-  // 🔴 DESTINO (Ícone de Chegada)
+ 
+  // Ícone de CHEGADA
   var endIcon = criarIconePersonalizado(
     '/imagens_app/ic_icon_chegada.png',
     50,
     'route-end-marker'
   );
-
   endRouteMarker = L.marker([destLat, destLng], {
     icon: endIcon,
     zIndexOffset: 900
   }).addTo(map);
-  
   endRouteMarker.bindPopup("<b>📍 DESTINO</b><br>Você chegou ao seu destino!", {
     closeButton: false,
     autoClose: true,
@@ -597,13 +590,14 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
 
 
 // ===================================================================
-// FUNÇÃO: removerMarcadoresRota - Remove apenas os marcadores de destino
+// FUNÇÃO: removerMarcadoresRota - Remove apenas o marcador de destino
 // ===================================================================
 function removerMarcadoresRota() {
   if (endRouteMarker) {
     map.removeLayer(endRouteMarker);
     endRouteMarker = null;
   }
+  // startRouteMarker NÃO é removido aqui — isso é feito em removerRota()
 }
 
     // ===================================================================
@@ -846,19 +840,21 @@ function removerMarcadoresRota() {
     }
 
 // ===================================================================
-// FUNÇÃO: atualizarRota - Atualiza rota com posição atual
+// FUNÇÃO: atualizarRota - Atualiza rota e move o marcador de partida
 // ===================================================================
 function atualizarRota() {
   if (destinoAtual && userLat && userLng && routingControl) {
-    routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
-    
-    // Move o ícone de "Iniciar Rota" junto com o usuário
+    routingControl.setWaypoints([
+      L.latLng(userLat, userLng),
+      L.latLng(destinoAtual.lat, destinoAtual.lng)
+    ]);
+ 
+    // Move o ícone de navegação junto com o usuário
     if (startRouteMarker) {
       startRouteMarker.setLatLng([userLat, userLng]);
     }
-    
-    // ✅ BÔNUS: Também move o userMarker (invisível) junto, para quando a rota terminar,
-    // ele já esteja exatamente na posição correta sem "pular" de volta.
+ 
+    // Mantém o userMarker (invisível) sincronizado para não "pular" ao restaurar
     if (userMarker) {
       userMarker.setLatLng([userLat, userLng]);
     }
@@ -874,24 +870,20 @@ function removerRota() {
     routingControl = null;
   }
   destinoAtual = null;
-  
-  // Remove os marcadores específicos da rota
+ 
   if (startRouteMarker) {
     map.removeLayer(startRouteMarker);
     startRouteMarker = null;
   }
   removerMarcadoresRota();
-  
-  // ✅ CORREÇÃO: Como o userMarker original nunca foi destruído, 
-  // basta restaurar a opacidade e o Z-Index dele. Não precisamos recriar do zero!
+ 
+  // Restaura o userMarker original (nunca foi destruído)
   if (userMarker) {
     userMarker.setOpacity(1);
     userMarker.setZIndexOffset(1000);
-    
-    // Garante que ele esteja na posição atual caso tenha se movido
     userMarker.setLatLng([userLat, userLng]);
   } else {
-    // Fallback de segurança (caso o userMarker nunca tenha sido criado por algum motivo)
+    // Fallback: recria o marcador caso não exista
     var defaultIcon = L.icon({
       iconUrl: '/imagens_app/ic_gps_marker.png',
       iconSize: [50, 50],
@@ -899,20 +891,17 @@ function removerRota() {
       popupAnchor: [0, -50],
       className: 'user-gps-marker'
     });
-    
-    userMarker = L.marker([userLat, userLng], { 
-      icon: defaultIcon, 
-      zIndexOffset: 1000 
+    userMarker = L.marker([userLat, userLng], {
+      icon: defaultIcon,
+      zIndexOffset: 1000
     }).addTo(map);
-    
-    userMarker.bindTooltip("Você está aqui", { 
-      permanent: false, 
-      direction: "top", 
-      offset: [0, -25] 
+    userMarker.bindTooltip("Você está aqui", {
+      permanent: false,
+      direction: "top",
+      offset: [0, -25]
     });
   }
-  
-  // Chama a função para garantir que o ícone volte ao normal (ex: se o usuário estiver em movimento)
+ 
   atualizarIconeUsuario();
   showNotification("Navegação encerrada");
 }
