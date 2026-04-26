@@ -543,58 +543,51 @@
     }
 
 // ===================================================================
-// FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones e ajusta o ZOOM
+// FUNÇÃO: adicionarMarcadoresRota
 // ===================================================================
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+  
+  // Remove antigos
   if (startRouteMarker) map.removeLayer(startRouteMarker);
   if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-  // Oculta o userMarker padrão
-  if (userMarker) {
-    userMarker.setOpacity(0);
-    userMarker.setZIndexOffset(-1000);
-  }
-
-  // Ícone de SAÍDA
+  // 🔵 INÍCIO (NAVEGAÇÃO)
   var startIcon = criarIconePersonalizado(
     '/imagens_app/ic_navigator_map.png',
     50,
-    'route-start-marker user-navigator-marker'
+    'route-start-marker'
   );
+
   startRouteMarker = L.marker([originLat, originLng], {
     icon: startIcon,
     zIndexOffset: 1000
   }).addTo(map);
 
-  // Ícone de CHEGADA
+  startRouteMarker.bindTooltip("🚗 Navegando", { 
+    direction: "top",
+    offset: [0, -30]
+  });
+
+  // 🔴 DESTINO
   var endIcon = criarIconePersonalizado(
     '/imagens_app/ic_icon_chegada.png',
     50,
     'route-end-marker'
   );
+
   endRouteMarker = L.marker([destLat, destLng], {
     icon: endIcon,
     zIndexOffset: 900
   }).addTo(map);
 
-  // --- NOVA LÓGICA DE ZOOM (FIT BOUNDS) ---
-  // Cria um grupo com os dois pontos para calcular a área de visão
-  var group = new L.featureGroup([startRouteMarker, endRouteMarker]);
-  
-  // Ajusta o mapa para mostrar ambos os marcadores com um preenchimento (padding)
-  map.fitBounds(group.getBounds().pad(0.2), {
-    animate: true,
-    duration: 1.5 // tempo da animação em segundos
-  });
-  // ----------------------------------------
+  endRouteMarker.bindPopup("📍 Destino");
 
-  endRouteMarker.bindPopup("<b>📍 DESTINO</b><br>Você chegou ao seu destino!", {
-    closeButton: false,
-    autoClose: true,
-    closeOnClick: true
+  // 🎯 ZOOM INTELIGENTE NA SAÍDA
+  map.setView([originLat, originLng], 17, {
+    animate: true,
+    duration: 1.5
   });
 }
-
 
 // ===================================================================
 // FUNÇÃO: removerMarcadoresRota - Remove apenas o marcador de destino
@@ -851,17 +844,18 @@ function removerMarcadoresRota() {
 // ===================================================================
 function atualizarRota() {
   if (destinoAtual && userLat && userLng && routingControl) {
+
     routingControl.setWaypoints([
       L.latLng(userLat, userLng),
       L.latLng(destinoAtual.lat, destinoAtual.lng)
     ]);
- 
-    // Move o ícone de navegação junto com o usuário
+
+    // Move marcador visual de navegação
     if (startRouteMarker) {
       startRouteMarker.setLatLng([userLat, userLng]);
     }
- 
-    // Mantém o userMarker (invisível) sincronizado para não "pular" ao restaurar
+
+    // Mantém userMarker independente (sem conflito)
     if (userMarker) {
       userMarker.setLatLng([userLat, userLng]);
     }
@@ -876,40 +870,19 @@ function removerRota() {
     map.removeControl(routingControl);
     routingControl = null;
   }
+
   destinoAtual = null;
- 
+
   if (startRouteMarker) {
     map.removeLayer(startRouteMarker);
     startRouteMarker = null;
   }
-  removerMarcadoresRota();
- 
-  // Restaura o userMarker original (nunca foi destruído)
-  if (userMarker) {
-    userMarker.setOpacity(1);
-    userMarker.setZIndexOffset(1000);
-    userMarker.setLatLng([userLat, userLng]);
-  } else {
-    // Fallback: recria o marcador caso não exista
-    var defaultIcon = L.icon({
-      iconUrl: '/imagens_app/ic_gps_marker.png',
-      iconSize: [50, 50],
-      iconAnchor: [25, 50],
-      popupAnchor: [0, -50],
-      className: 'user-gps-marker'
-    });
-    userMarker = L.marker([userLat, userLng], {
-      icon: defaultIcon,
-      zIndexOffset: 1000
-    }).addTo(map);
-    userMarker.bindTooltip("Você está aqui", {
-      permanent: false,
-      direction: "top",
-      offset: [0, -25]
-    });
+
+  if (endRouteMarker) {
+    map.removeLayer(endRouteMarker);
+    endRouteMarker = null;
   }
- 
-  atualizarIconeUsuario();
+
   showNotification("Navegação encerrada");
 }
 
