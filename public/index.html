@@ -547,40 +547,48 @@
 // ===================================================================
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
 
+console.log("ORIGEM:", originLat, originLng);
+console.log("DESTINO:", destLat, destLng);
+
+if (!isCoordenadaValida(destLat, destLng)) {
+  console.error("❌ Destino inválido");
+  return;
+}
+
+if (originLat === destLat && originLng === destLng) {
+  console.warn("⚠️ Origem e destino iguais");
+}
+
 // Remove antigos
 if (startRouteMarker) map.removeLayer(startRouteMarker);
 if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-// 🔵 SAÍDA (separado do userMarker)
-const startIcon = criarIconePersonalizado(
-  '/imagens_app/ic_navigator_map.png',
-  50,
-  'route-start-marker'
-);
+// 🔵 SAÍDA
+startRouteMarker = L.marker([originLat, originLng]).addTo(map);
 
-startRouteMarker = L.marker([originLat, originLng], {
-  icon: startIcon,
-  zIndexOffset: 900
-}).addTo(map);
-
-// 🔴 DESTINO
-const endIcon = criarIconePersonalizado(
-  '/imagens_app/ic_icon_chegada.png',
-  50,
-  'route-end-marker'
-);
-
+// 🔴 DESTINO (FORÇA VISUAL)
 endRouteMarker = L.marker([destLat, destLng], {
-  icon: endIcon,
-  zIndexOffset: 800
+  icon: L.icon({
+    iconUrl: '/imagens_app/ic_icon_chegada.png',
+    iconSize: [60, 60], // maior pra garantir visibilidade
+    iconAnchor: [30, 60]
+  }),
+  zIndexOffset: 2000 // sobe acima de tudo
 }).addTo(map);
 
-// 🔍 DEBUG (te salva horas de vida)
-console.log("Start:", originLat, originLng);
-console.log("End:", destLat, destLng);
+// 🎯 DEBUG VISUAL (genial pra esse tipo de bug)
+L.circle([destLat, destLng], {
+  radius: 30,
+  color: 'red'
+}).addTo(map);
 
-// 🎯 Zoom inicial
-map.setView([originLat, originLng], 16);
+// Zoom que mostra os dois pontos
+const bounds = L.latLngBounds(
+  [originLat, originLng],
+  [destLat, destLng]
+);
+
+map.fitBounds(bounds, { padding: [50, 50] });
 }
 
 // ===================================================================
