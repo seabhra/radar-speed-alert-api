@@ -546,47 +546,41 @@
 // FUNÇÃO: adicionarMarcadoresRota
 // ===================================================================
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
-  
-  // Remove antigos
-  if (startRouteMarker) map.removeLayer(startRouteMarker);
-  if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-  // 🔵 INÍCIO (NAVEGAÇÃO)
-  var startIcon = criarIconePersonalizado(
-    '/imagens_app/ic_navigator_map.png',
-    50,
-    'route-start-marker'
-  );
+// Remove antigos
+if (startRouteMarker) map.removeLayer(startRouteMarker);
+if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-  startRouteMarker = L.marker([originLat, originLng], {
-    icon: startIcon,
-    zIndexOffset: 1000
-  }).addTo(map);
+// 🔵 SAÍDA (separado do userMarker)
+const startIcon = criarIconePersonalizado(
+  '/imagens_app/ic_navigator_map.png',
+  50,
+  'route-start-marker'
+);
 
-  startRouteMarker.bindTooltip("🚗 Navegando", { 
-    direction: "top",
-    offset: [0, -30]
-  });
+startRouteMarker = L.marker([originLat, originLng], {
+  icon: startIcon,
+  zIndexOffset: 900
+}).addTo(map);
 
-  // 🔴 DESTINO
-  var endIcon = criarIconePersonalizado(
-    '/imagens_app/ic_icon_chegada.png',
-    50,
-    'route-end-marker'
-  );
+// 🔴 DESTINO
+const endIcon = criarIconePersonalizado(
+  '/imagens_app/ic_icon_chegada.png',
+  50,
+  'route-end-marker'
+);
 
-  endRouteMarker = L.marker([destLat, destLng], {
-    icon: endIcon,
-    zIndexOffset: 900
-  }).addTo(map);
+endRouteMarker = L.marker([destLat, destLng], {
+  icon: endIcon,
+  zIndexOffset: 800
+}).addTo(map);
 
-  endRouteMarker.bindPopup("📍 Destino");
+// 🔍 DEBUG (te salva horas de vida)
+console.log("Start:", originLat, originLng);
+console.log("End:", destLat, destLng);
 
-  // 🎯 ZOOM INTELIGENTE NA SAÍDA
-  map.setView([originLat, originLng], 17, {
-    animate: true,
-    duration: 1.5
-  });
+// 🎯 Zoom inicial
+map.setView([originLat, originLng], 16);
 }
 
 // ===================================================================
@@ -850,12 +844,12 @@ function atualizarRota() {
       L.latLng(destinoAtual.lat, destinoAtual.lng)
     ]);
 
-    // Move marcador visual de navegação
+    // Move saída
     if (startRouteMarker) {
       startRouteMarker.setLatLng([userLat, userLng]);
     }
 
-    // Mantém userMarker independente (sem conflito)
+    // Move usuário (independente)
     if (userMarker) {
       userMarker.setLatLng([userLat, userLng]);
     }
