@@ -543,19 +543,19 @@
     }
 
 // ===================================================================
-// FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones de saída e chegada
+// FUNÇÃO: adicionarMarcadoresRota - Adiciona ícones e ajusta o ZOOM
 // ===================================================================
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   if (startRouteMarker) map.removeLayer(startRouteMarker);
   if (endRouteMarker) map.removeLayer(endRouteMarker);
- 
-  // Oculta o userMarker padrão sem destruí-lo
+
+  // Oculta o userMarker padrão
   if (userMarker) {
     userMarker.setOpacity(0);
     userMarker.setZIndexOffset(-1000);
   }
- 
-  // Ícone de SAÍDA (substitui visualmente o userMarker)
+
+  // Ícone de SAÍDA
   var startIcon = criarIconePersonalizado(
     '/imagens_app/ic_navigator_map.png',
     50,
@@ -565,12 +565,7 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     icon: startIcon,
     zIndexOffset: 1000
   }).addTo(map);
-  startRouteMarker.bindTooltip("🚗 Navegando para destino", {
-    permanent: false,
-    direction: "top",
-    offset: [0, -30]
-  });
- 
+
   // Ícone de CHEGADA
   var endIcon = criarIconePersonalizado(
     '/imagens_app/ic_icon_chegada.png',
@@ -581,6 +576,18 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     icon: endIcon,
     zIndexOffset: 900
   }).addTo(map);
+
+  // --- NOVA LÓGICA DE ZOOM (FIT BOUNDS) ---
+  // Cria um grupo com os dois pontos para calcular a área de visão
+  var group = new L.featureGroup([startRouteMarker, endRouteMarker]);
+  
+  // Ajusta o mapa para mostrar ambos os marcadores com um preenchimento (padding)
+  map.fitBounds(group.getBounds().pad(0.2), {
+    animate: true,
+    duration: 1.5 // tempo da animação em segundos
+  });
+  // ----------------------------------------
+
   endRouteMarker.bindPopup("<b>📍 DESTINO</b><br>Você chegou ao seu destino!", {
     closeButton: false,
     autoClose: true,
