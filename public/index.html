@@ -177,14 +177,17 @@
         transition: transform 0.3s ease;
     }
     
-    /* Estilos dos marcadores do usuário */
+    /* Estilos dos marcadores do usuário - OTIMIZADO PARA NÃO TREPIDAR */
     .user-gps-marker {
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      transition: none !important;
+      will-change: transform;
     }
     
     .user-navigator-marker {
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-      animation: pulseMarker 1.5s ease-in-out infinite;
+      transition: none !important;
+      will-change: transform;
     }
     
     /* ESTILOS DOS MARCADORES DE ROTA */
@@ -196,12 +199,6 @@
     .route-end-marker {
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
       animation: pulseEnd 1.2s ease-in-out infinite;
-    }
-    
-    @keyframes pulseMarker {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
     }
     
     @keyframes pulseStart {
@@ -478,12 +475,24 @@
     
     const ALERT_CONFIG = {
       DISTANCIA_MAXIMA: 200,
-      DISTANCIA_CRITICA: 100,
-      TEMPO_ALERTA: 8000,
-      DISTANCIA_PASSAR_RADAR: 10
+      DISTANCIA_CRITICA: 80,       // Reduzido para 80m (mais realista)
+      TEMPO_ALERTA: 10000,         // Aumentado para 10s
+      DISTANCIA_PASSAR_RADAR: 30,  // Aumentado para 30m (garante que saiu do raio de erro)
+      ANGULO_APROXIMACAO: 100,     // Aumentado de 45 para 100 graus
+      ANGULO_AFASTANDO: 140,       // Ajustado para 140 graus
+      HISTORICO_TAMANHO: 5,        // Posições para cálculo de tendência
+      SUAVIZACAO_FATOR: 0.6,       // 60% nova posição, 40% anterior
+      DISTANCIA_MINIMA_MOVIMENTO: 2 // Mínimo 2m para mover marcador (tira tremida)
     };
     
     let currentHeading = 0;
+
+    // VARIÁVEIS DE SUAVIZAÇÃO GPS (NOVAS)
+    var posicaoSuavizada = { lat: null, lng: null };
+    var historicoPosicoes = [];
+    var historicoDistanciasRadar = {};
+    var ultimaPosicaoMarcador = { lat: null, lng: null };
+    var animacaoMarcadorAtiva = false;
 
     const iconMap = {
       'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev_v2.png',
@@ -542,64 +551,41 @@
       });
     }
 
-// ===================================================================
-// FUNÇÃO: adicionarMarcadoresRota
-// ===================================================================
-function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+    // ===================================================================
+    // FUNÇÃO: adicionarMarcadoresRota
+    // ===================================================================
+    function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+      if (startRouteMarker) map.removeLayer(startRouteMarker);
+      if (endRouteMarker) map.removeLayer(endRouteMarker);
 
-// Remove antigos
-if (startRouteMarker) map.removeLayer(startRouteMarker);
-if (endRouteMarker) map.removeLayer(endRouteMarker);
+      const startIcon = criarIconePersonalizado('/imagens_app/ic_navigator_map.png', 50, 'route-start-marker');
+      startRouteMarker = L.marker([originLat, originLng], { icon: startIcon, zIndexOffset: 900 }).addTo(map);
 
-// 🔵 SAÍDA (separado do userMarker)
-const startIcon = criarIconePersonalizado(
-  '/imagens_app/ic_navigator_map.png',
-  50,
-  'route-start-marker'
-);
+      const endIcon = criarIconePersonalizado('/imagens_app/ic_icon_chegada.png', 50, 'route-end-marker');
+      endRouteMarker = L.marker([destLat, destLng], { icon: endIcon, zIndexOffset: 800 }).addTo(map);
 
-startRouteMarker = L.marker([originLat, originLng], {
-  icon: startIcon,
-  zIndexOffset: 900
-}).addTo(map);
+      console.log("Start:", originLat, originLng);
+      console.log("End:", destLat, destLng);
+      map.setView([originLat, originLng], 16);
+    }
 
-// 🔴 DESTINO
-const endIcon = criarIconePersonalizado(
-  '/imagens_app/ic_icon_chegada.png',
-  50,
-  'route-end-marker'
-);
-
-endRouteMarker = L.marker([destLat, destLng], {
-  icon: endIcon,
-  zIndexOffset: 800
-}).addTo(map);
-
-// 🔍 DEBUG (te salva horas de vida)
-console.log("Start:", originLat, originLng);
-console.log("End:", destLat, destLng);
-
-// 🎯 Zoom inicial
-map.setView([originLat, originLng], 16);
-}
-
-// ===================================================================
-// FUNÇÃO: removerMarcadoresRota - Remove apenas o marcador de destino
-// ===================================================================
-function removerMarcadoresRota() {
-  if (endRouteMarker) {
-    map.removeLayer(endRouteMarker);
-    endRouteMarker = null;
-  }
-  // startRouteMarker NÃO é removido aqui — isso é feito em removerRota()
-}
+    // ===================================================================
+    // FUNÇÃO: removerMarcadoresRota
+    // ===================================================================
+    function removerMarcadoresRota() {
+      if (endRouteMarker) {
+        map.removeLayer(endRouteMarker);
+        endRouteMarker = null;
+      }
+    }
 
     // ===================================================================
     // FUNÇÃO: deveAlertaRadar - Verifica se o tipo de radar deve gerar alerta
     // ===================================================================
     function deveAlertaRadar(tipo) {
+      if (!tipo) return true;
       for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {
-        if (tipo && tipo.includes(TIPOS_SEM_ALERTA[i])) {
+        if (tipo.includes(TIPOS_SEM_ALERTA[i])) {
           return false;
         }
       }
@@ -609,7 +595,8 @@ function removerMarcadoresRota() {
     // ===================================================================
     // FUNÇÃO: criarIconeRadar - Cria ícone padronizado para radares
     // ===================================================================
-    function criarIconeRadar(iconeUrl, tamanho = 40) {
+    function criarIconeRadar(iconeUrl, tamanho) {
+      tamanho = tamanho || 40;
       return L.divIcon({
         html: '<img src="' + iconeUrl + '" style="width: ' + tamanho + 'px; height: ' + tamanho + 'px; object-fit: contain; display: block; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));" onerror="this.src=\'/imagens_app/ic_radar_cev_v2.png\'" />',
         iconSize: [tamanho, tamanho],
@@ -625,7 +612,6 @@ function removerMarcadoresRota() {
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
       
-      // Verifica Zona Verde primeiro
       if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) {
         return iconMap['Zona Verde de Trânsito (ZVT)'];
       }
@@ -639,9 +625,8 @@ function removerMarcadoresRota() {
       if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') {
         return iconMap['Controle de Redução de Velocidade (CRV)'];
       }
-      // Ícones específicos para radar CEM com velocidade 30 e 40
+      
       const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) || 
-                                (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('Redução')) ||
                                 tipoLimpo.includes('CEM') ||
                                 tipoLimpo.includes('Controlador Eletrônico');
       
@@ -716,24 +701,166 @@ function removerMarcadoresRota() {
     }
 
     // ===================================================================
-    // FUNÇÃO: verificarDirecao - Verifica direção em relação ao radar
+    // NOVAS FUNÇÕES DE SUAVIZAÇÃO E ANÁLISE GPS
     // ===================================================================
-    function verificarDirecao(uLat, uLng, uHeading, radarLat, radarLng) {
-      if (!uHeading || uHeading === -1) return { estaAproximando: true, estaAfastando: false, anguloRadar: 0, diferenca: 0 };
+    
+    // Suaviza coordenadas para remover saltos bruscos do GPS
+    function suavizarPosicao(novaLat, novaLng) {
+      if (posicaoSuavizada.lat === null) {
+        posicaoSuavizada.lat = novaLat;
+        posicaoSuavizada.lng = novaLng;
+        return { lat: novaLat, lng: novaLng };
+      }
+      
+      var fator = ALERT_CONFIG.SUAVIZACAO_FATOR;
+      var latSuavizada = posicaoSuavizada.lat + (novaLat - posicaoSuavizada.lat) * fator;
+      var lngSuavizada = posicaoSuavizada.lng + (novaLng - posicaoSuavizada.lng) * fator;
+      
+      posicaoSuavizada.lat = latSuavizada;
+      posicaoSuavizada.lng = lngSuavizada;
+      
+      return { lat: latSuavizada, lng: lngSuavizada };
+    }
+
+    // Mantém histórico para cálculo de tendência real
+    function adicionarAoHistorico(lat, lng, timestamp) {
+      historicoPosicoes.push({ lat: lat, lng: lng, time: timestamp });
+      if (historicoPosicoes.length > ALERT_CONFIG.HISTORICO_TAMANHO) {
+        historicoPosicoes.shift();
+      }
+    }
+
+    // Calcula se a distância REAL está diminuindo ou aumentando
+    function calcularTendenciaDistancia(radarId, distanciaAtual) {
+      if (!historicoDistanciasRadar[radarId]) {
+        historicoDistanciasRadar[radarId] = [];
+      }
+      
+      historicoDistanciasRadar[radarId].push({ distancia: distanciaAtual, time: Date.now() });
+      
+      if (historicoDistanciasRadar[radarId].length > 5) {
+        historicoDistanciasRadar[radarId].shift();
+      }
+      
+      var historico = historicoDistanciasRadar[radarId];
+      
+      if (historico.length < 2) {
+        return { estaAproximando: true, estaAfastando: false };
+      }
+      
+      var primeiraDistancia = historico[0].distancia;
+      var ultimaDistancia = historico[historico.length - 1].distancia;
+      var diferenca = primeiraDistancia - ultimaDistancia;
+      var variacaoMinima = 5; // Ignora variações menores que 5m (erro GPS)
+      
+      if (diferenca > variacaoMinima) {
+        return { estaAproximando: true, estaAfastando: false, diferenca: diferenca };
+      } else if (diferenca < -variacaoMinima) {
+        return { estaAproximando: false, estaAfastando: true, diferenca: diferenca };
+      }
+      
+      return { estaAproximando: true, estaAfastando: false, diferenca: 0 };
+    }
+
+    // Animação suave do marcador usando requestAnimationFrame (igual Waze)
+    function moverMarcadorSuavemente(targetLat, targetLng) {
+      if (!userMarker) return;
+      
+      if (ultimaPosicaoMarcador.lat === null) {
+        ultimaPosicaoMarcador.lat = targetLat;
+        ultimaPosicaoMarcador.lng = targetLng;
+        userMarker.setLatLng([targetLat, targetLng]);
+        return;
+      }
+      
+      var distanciaUltimoMovimento = calcularDistancia(
+        ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng
+      );
+      
+      // Ignora movimentos minúsculos que causam micro-trepidamentos
+      if (distanciaUltimoMovimento < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) {
+        return;
+      }
+      
+      var inicioLat = ultimaPosicaoMarcador.lat;
+      var inicioLng = ultimaPosicaoMarcador.lng;
+      var duracao = 300; // 300ms de animação fluida
+      var inicioTempo = performance.now();
+      
+      if (animacaoMarcadorAtiva) return; // Não empilha animações
+      animacaoMarcadorAtiva = true;
+      
+      function animarFrame(tempoAtual) {
+        var tempoDecorrido = tempoAtual - inicioTempo;
+        var progresso = Math.min(tempoDecorrido / duracao, 1);
+        
+        // Função de easing (ease-out) para desacelerar no final
+        var fatorEasing = 1 - Math.pow(1 - progresso, 3);
+        
+        var latAtual = inicioLat + (targetLat - inicioLat) * fatorEasing;
+        var lngAtual = inicioLng + (targetLng - inicioLng) * fatorEasing;
+        
+        userMarker.setLatLng([latAtual, lngAtual]);
+        
+        if (progresso < 1) {
+          requestAnimationFrame(animarFrame);
+        } else {
+          ultimaPosicaoMarcador.lat = targetLat;
+          ultimaPosicaoMarcador.lng = targetLng;
+          animacaoMarcadorAtiva = false;
+        }
+      }
+      
+      requestAnimationFrame(animarFrame);
+    }
+
+    function limparHistoricoDistancia(radarId) {
+      if (historicoDistanciasRadar[radarId]) {
+        delete historicoDistanciasRadar[radarId];
+      }
+    }
+
+    // ===================================================================
+    // FUNÇÃO: verificarDirecaoMelhorada - Verificação hibrida de direção
+    // ===================================================================
+    function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, radarId, distanciaAtual) {
+      // Se não tem heading, usa apenas tendência de distância real
+      if (!uHeading || uHeading === -1 || isNaN(uHeading)) {
+        var tendencia = calcularTendenciaDistancia(radarId, distanciaAtual);
+        return {
+          estaAproximando: tendencia.estaAproximando,
+          estaAfastando: tendencia.estaAfastando,
+          usaTendencia: true
+        };
+      }
       
       var deltaX = radarLng - uLng;
       var deltaY = radarLat - uLat;
       var anguloRadar = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
       var anguloRadarNormalizado = (anguloRadar + 360) % 360;
+      
       var diff = Math.abs(uHeading - anguloRadarNormalizado);
       diff = Math.min(diff, 360 - diff);
-      var estaAproximando = diff < 45;
-      var estaAfastando = diff > 135;
+      
+      // Ângulos bem mais permissivos para curvas e ruas diagonais
+      var estaAproximandoPorAngulo = diff < ALERT_CONFIG.ANGULO_APROXIMACAO;
+      var estaAfastandoPorAngulo = diff > ALERT_CONFIG.ANGULO_AFASTANDO;
+      
+      // Verifica a tendência física (se a distância real está caindo)
+      var tendencia = calcularTendenciaDistancia(radarId, distanciaAtual);
+      
+      // Aprova alerta se o ângulo OU a tendência indicarem aproximação
+      var estaAproximando = estaAproximandoPorAngulo || tendencia.estaAproximando;
+      // Afasta apenas se AMBOS concordarem (evita fechar o alerta errado)
+      var estaAfastando = estaAfastandoPorAngulo && tendencia.estaAfastando;
+      
       return {
         estaAproximando: estaAproximando,
         estaAfastando: estaAfastando,
         anguloRadar: anguloRadarNormalizado,
-        diferenca: diff
+        diferenca: diff,
+        tendenciaDistancia: tendencia.diferenca,
+        usaTendencia: false
       };
     }
 
@@ -753,21 +880,6 @@ function removerMarcadoresRota() {
     }
 
     // ===================================================================
-    // FUNÇÃO: buscarCoordenadas - Busca coordenadas via Nominatim
-    // ===================================================================
-    async function buscarCoordenadas(endereco) {
-      try {
-        var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + 
-                  encodeURIComponent(endereco) + '&countrycodes=br&limit=1';
-        var r = await fetch(url);
-        var d = await r.json();
-        return (d && d.length > 0) ? { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) } : null;
-      } catch (e) { 
-        return null; 
-      }
-    }
-
-    // ===================================================================
     // FUNÇÃO: atualizarIconeUsuario - Atualiza ícone do usuário
     // ===================================================================
     function atualizarIconeUsuario() {
@@ -780,8 +892,9 @@ function removerMarcadoresRota() {
           ? '/imagens_app/ic_navigator_map.png'
           : '/imagens_app/ic_gps_marker.png',
         iconSize: [50, 50],
-        iconAnchor: [25, 50],
-        popupAnchor: [0, -50],
+        // AJUSTE PRINCIPAL: Centraliza a ponta do marcador exatamente na via
+        iconAnchor: [25, 45], 
+        popupAnchor: [0, -45],
         className: estaEmNavegacao 
           ? 'user-navigator-marker'
           : 'user-gps-marker'
@@ -797,8 +910,6 @@ function removerMarcadoresRota() {
       if (routingControl) map.removeControl(routingControl);
 
       destinoAtual = { lat: destLat, lng: destLng };
-
-      // Adiciona marcadores de SAÍDA e DESTINO
       adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
 
       routingControl = L.Routing.control({
@@ -822,64 +933,41 @@ function removerMarcadoresRota() {
         })
       }).addTo(map);
 
-      var bounds = L.latLngBounds(
-        [userLat, userLng],
-        [destLat, destLng]
-      );
-      
+      var bounds = L.latLngBounds([userLat, userLng], [destLat, destLng]);
       map.fitBounds(bounds, { padding: [50, 50] });
 
       atualizarIconeUsuario();
       showNotification("🚗 Navegação iniciada! Siga a rota laranja.");
     }
 
-// ===================================================================
-// FUNÇÃO: atualizarRota - Atualiza rota e move o marcador de partida
-// ===================================================================
-function atualizarRota() {
-  if (destinoAtual && userLat && userLng && routingControl) {
-
-    routingControl.setWaypoints([
-      L.latLng(userLat, userLng),
-      L.latLng(destinoAtual.lat, destinoAtual.lng)
-    ]);
-
-    // Move saída
-    if (startRouteMarker) {
-      startRouteMarker.setLatLng([userLat, userLng]);
+    // ===================================================================
+    // FUNÇÃO: atualizarRota - Atualiza rota e move o marcador de partida
+    // ===================================================================
+    function atualizarRota() {
+      if (destinoAtual && userLat && userLng && routingControl) {
+        routingControl.setWaypoints([
+          L.latLng(userLat, userLng),
+          L.latLng(destinoAtual.lat, destinoAtual.lng)
+        ]);
+        if (startRouteMarker) {
+          startRouteMarker.setLatLng([userLat, userLng]);
+        }
+      }
     }
 
-    // Move usuário (independente)
-    if (userMarker) {
-      userMarker.setLatLng([userLat, userLng]);
+    // ===================================================================
+    // FUNÇÃO: removerRota - Remove rota e restaura o ícone padrão
+    // ===================================================================
+    function removerRota() {
+      if (routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+      }
+      destinoAtual = null;
+      if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
+      if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
+      showNotification("Navegação encerrada");
     }
-  }
-}
-
-// ===================================================================
-// FUNÇÃO: removerRota - Remove rota e restaura o ícone padrão do usuário
-// ===================================================================
-function removerRota() {
-  if (routingControl) {
-    map.removeControl(routingControl);
-    routingControl = null;
-  }
-
-  destinoAtual = null;
-
-  if (startRouteMarker) {
-    map.removeLayer(startRouteMarker);
-    startRouteMarker = null;
-  }
-
-  if (endRouteMarker) {
-    map.removeLayer(endRouteMarker);
-    endRouteMarker = null;
-  }
-
-  showNotification("Navegação encerrada");
-}
-
 
     // ===================================================================
     // FUNÇÃO: resetarMapa - Reseta o mapa para posição inicial
@@ -889,17 +977,13 @@ function removerRota() {
       map.setBearing(0);
       document.getElementById('btn-rotate-map')?.classList.remove('rotated');
       
-      // ⚠️ IMPORTANTE: Após refresh, desativa o follow e agenda retorno após 5 segundos
       isFollowing = false;
-      
-      // Cancela timer anterior se existir
       if (refreshDelayTimer) clearTimeout(refreshDelayTimer);
       
-      // Agenda o retorno automático para a posição do usuário após 5 segundos
       refreshDelayTimer = setTimeout(function() {
         if (userMarker && !isFollowing) {
           isFollowing = true;
-          map.flyTo(userMarker.getLatLng(), 17, { duration: 0.8 });
+          map.flyTo(userMarker.getLatLng(), 20, { duration: 0.8 });
           showNotification("📍 Retornando à sua posição atual");
         }
         refreshDelayTimer = null;
@@ -911,48 +995,20 @@ function removerRota() {
     }
 
     // ===================================================================
-    // FUNÇÃO: extrairCoordenadas - Extrai coordenadas do radar
+    // FUNÇÃO: extrairCoordenadas - Lê apenas latitude e longitude prontas
     // ===================================================================
     function extrairCoordenadas(record) {
-      var coordenadasEncontradas = null;
-      
-      if (record[9]) {
-        var parts = String(record[9]).replace(/\s+/g, '').split(',').map(Number);
-        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-          coordenadasEncontradas = parts;
-        }
-      }
-      
-      if (!coordenadasEncontradas) {
-        for (var i = 0; i < record.length; i++) {
-          if (!record[i] || String(record[i]).length > 40) continue;
-          var parts = String(record[i]).replace(/\s+/g, '').split(',').map(Number);
-          if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-            coordenadasEncontradas = parts;
-            break;
-          }
-        }
-      }
-      
-      if (!coordenadasEncontradas) return null;
-      
-      var v1 = coordenadasEncontradas[0];
-      var v2 = coordenadasEncontradas[1];
-      
-      // Verifica se são coordenadas já em WGS84 (latitude entre -90 e 90, longitude entre -180 e 180)
-      if (v1 >= -90 && v1 <= 90 && v2 >= -180 && v2 <= 180) {
-        return { lat: v1, lng: v2 };
-      }
-      
-      // Se for ao contrário (longitude, latitude)
-      if (v2 >= -90 && v2 <= 90 && v1 >= -180 && v1 <= 180) {
-        return { lat: v2, lng: v1 };
-      }
-      
-      // Se não for coordenada válida, retorna null
-      return null;
+      if (!record || record.length < 10) return null;
+      var parts = String(record[9]).replace(/\s+/g, '').split(',');
+      if (parts.length !== 2) return null;
+      var lat = parseFloat(parts[0]);
+      var lng = parseFloat(parts[1]);
+      if (isNaN(lat) || isNaN(lng)) return null;
+      if (lat < -90 || lat > 90) return null;
+      if (lng < -180 || lng > 180) return null;
+      return { lat: lat, lng: lng };
     }
-
+ 
     // ===================================================================
     // FUNÇÃO: atualizarBussola - Aplica rotação na bússola
     // ===================================================================
@@ -964,7 +1020,7 @@ function removerRota() {
     }
 
     // ===================================================================
-    // FUNÇÃO: inicializarBotaoRotacaoMapa - Configura botão de rotação
+    // FUNÇÃO: inicializarBotaoRotacaoMapa
     // ===================================================================
     function inicializarBotaoRotacaoMapa() {
       const rotateBtn = document.getElementById('btn-rotate-map');
@@ -987,7 +1043,7 @@ function removerRota() {
     }
 
     // ===================================================================
-    // FUNÇÃO: inicializarBotaoAlertaToggle - Configura botão liga/desliga alerta
+    // FUNÇÃO: inicializarBotaoAlertaToggle
     // ===================================================================
     function inicializarBotaoAlertaToggle() {
       const alertBtn = document.getElementById('btn-alert-toggle');
@@ -1039,7 +1095,15 @@ function removerRota() {
       var currentTime = Date.now();
       var dist = 0;
       
-      // Cálculo de velocidade baseado na distância percorrida se necessário
+      // Adiciona ao histórico ANTES de suavizar
+      adicionarAoHistorico(newLat, newLng, currentTime);
+      
+      // Suaviza a posição GPS para o marcador deslizar
+      var posSuave = suavizarPosicao(newLat, newLng);
+      var smoothLat = posSuave.lat;
+      var smoothLng = posSuave.lng;
+      
+      // Cálculo de velocidade (usando coordenadas reais para precisão)
       if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
         dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
         var time = (currentTime - prevTime) / 1000;
@@ -1048,71 +1112,74 @@ function removerRota() {
         dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
       }
       
-      // Validação de velocidade máxima
       if (speedKmh > 250) speedKmh = 0;
       $("#speed-display").text(speedKmh);
       
-      // Cálculo do heading (direção) - usa hardware se disponível, senão calcula
+      // Cálculo do heading
       if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
         currentHeading = hardwareHeading;
-      } 
-      else if (dist > 3) { 
+      } else if (dist > 3 && prevLat !== null) {
         var dy = newLat - prevLat;
         var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
-        var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
-        if (calcHeading < 0) calcHeading += 360;
-        if (calcHeading >= 360) calcHeading -= 360;
-        currentHeading = calcHeading;
+        if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) {
+          var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
+          if (calcHeading < 0) calcHeading += 360;
+          if (calcHeading >= 360) calcHeading -= 360;
+          currentHeading = calcHeading;
+        }
       }
       
-      // Atualiza a bússola visual
-      if (currentHeading > 0 || currentHeading === 0) {
+      if (currentHeading !== null && currentHeading !== undefined) {
         atualizarBussola(currentHeading);
       }
 
-      // Atualiza posição anterior para próximo cálculo
       prevLat = newLat;
       prevLng = newLng;
       prevTime = currentTime;
+      
+      // Usamos a posição REAL para lógica de alertas
       userLat = newLat;
       userLng = newLng;
 
-      // Cria ou atualiza o marcador do usuário no mapa
+      // Cria ou atualiza o marcador usando a posição SUAVIZADA
       if (!userMarker) {
         var defaultIcon = L.icon({
           iconUrl: '/imagens_app/ic_gps_marker.png',
           iconSize: [50, 50],
-          iconAnchor: [25, 50],
-          popupAnchor: [0, -50],
+          // AJUSTE PRINCIPAL: Centraliza a ponta do marcador exatamente na via
+          iconAnchor: [25, 45],
+          popupAnchor: [0, -45],
           className: 'user-gps-marker'
         });
-        userMarker = L.marker([newLat, newLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-        userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+        
+        userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
+        userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -45] });
+        
+        ultimaPosicaoMarcador.lat = smoothLat;
+        ultimaPosicaoMarcador.lng = smoothLng;
         
         if (!gpsInitialized) {
           gpsInitialized = true;
           hideFullscreenLoading();
         }
       } else {
-        userMarker.setLatLng([newLat, newLng]);
+        // Move o marcador de forma SUAVE igual ao Waze
+        moverMarcadorSuavemente(smoothLat, smoothLng);
       }
       
       atualizarIconeUsuario();
       
-      // Atualiza rota ativa se existir
       if (destinoAtual) {
         atualizarRota();
         if (startRouteMarker) {
-          startRouteMarker.setLatLng([newLat, newLng]);
+          startRouteMarker.setLatLng([smoothLat, smoothLng]);
         }
       }
       
-      // Segue o usuário se o modo follow estiver ativo
       if (isFollowing) {
-        map.setView([newLat, newLng], map.getZoom(), { animate: true, duration: 0.5 });
+        map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.8 });
       }
       
-      // Verifica proximidade dos radares se alerta estiver habilitado
       if (alertaHabilitado) {
         verificarProximidadeRadares();
       } else {
@@ -1162,68 +1229,88 @@ function removerRota() {
     // FUNÇÃO: verificarProximidadeRadares - LÓGICA PRINCIPAL DE ALERTA
     // ===================================================================
     function verificarProximidadeRadares() {
-      // Não faz nada se alerta estiver desabilitado ou não houver radares
       if (!alertaHabilitado || radarMarkers.length === 0) return;
 
       let radarMaisProximo = null;
       let menorDistancia = Infinity;
 
-      // Itera por todos os radares carregados no mapa
-      radarMarkers.forEach(marker => {
+      radarMarkers.forEach(function(marker) {
         const rData = marker.radarData;
-        
         const radarLat = rData.latitude;
         const radarLng = rData.longitude;
         
-        // Filtra tipos de radar que NÃO devem gerar alerta (ex: BUS, Zona Verde)
         if (!deveAlertaRadar(rData.tipoOriginal)) return;
 
-        // Calcula distância entre usuário e este radar
         const dist = calcularDistancia(userLat, userLng, radarLat, radarLng);
         
-        // Mantém o radar mais próximo dentro do raio de alcance
         if (dist < menorDistancia) {
           menorDistancia = dist;
           radarMaisProximo = rData;
         }
       });
 
-      // SE ENCONTROU RADAR DENTRO DA DISTÂNCIA MÁXIMA (200m)
       if (radarMaisProximo && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
         
-        // Verifica se o usuário está se aproximando do radar (baseado na direção)
-        const direcao = verificarDirecao(userLat, userLng, currentHeading, radarMaisProximo.latitude, radarMaisProximo.longitude);
+        // LÓGICA HÍBRIDA MELHORADA (Tendência + Ângulo)
+        const direcao = verificarDirecaoMelhorada(
+          userLat, userLng, currentHeading, 
+          radarMaisProximo.latitude, radarMaisProximo.longitude,
+          radarMaisProximo.id, menorDistancia
+        );
         
-        // Dispara alerta se estiver se aproximando
-        const deveDisparar = direcao.estaAproximando;
-
-        if (deveDisparar) {
-          // Evita repetir alerta para o mesmo radar
-          if (ultimoRadarAlertado !== radarMaisProximo.id) {
-            dispararAlerta(radarMaisProximo, menorDistancia);
-          } else if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
-            // Se já alertou mas entrou na zona crítica (<100m), reforça visualmente
-            $(".alert-bar").addClass("alert-bar-critico");
-          }
+        // 1. PASSOU PELO RADAR -> FECHAR IMEDIATAMENTE E BLOQUEAR
+        if (menorDistancia <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
+          fecharAlertaImediatamente();
+          ultimoRadarAlertado = radarMaisProximo.id;
+          limparHistoricoDistancia(radarMaisProximo.id);
+          return;
         }
         
-        // Se passou pelo radar (muito perto) ou está se afastando, fecha o alerta
-        if (menorDistancia < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR || direcao.estaAfastando) {
+        // 2. ESTÁ SE AFASTANDO CLARAMENTE -> FECHAR ALERTA
+        if (direcao.estaAfastando) {
           fecharAlertaImediatamente();
-          if (menorDistancia < ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
-            ultimoRadarAlertado = radarMaisProximo.id;
+          limparHistoricoDistancia(radarMaisProximo.id);
+          if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA - 30) {
+            ultimoRadarAlertado = null;
+          }
+          return;
+        }
+        
+        // 3. ESTÁ SE APROXIMANDO -> DISPARAR OU ATUALIZAR
+        if (direcao.estaAproximando) {
+          if (ultimoRadarAlertado !== radarMaisProximo.id) {
+            dispararAlerta(radarMaisProximo, menorDistancia);
+          } else {
+            // Já alertou antes, apenas atualiza a contagem de metros na tela
+            atualizarDistanciaAlerta(menorDistancia);
+            
+            if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+              $(".alert-bar").addClass("alert-bar-critico");
+            }
           }
         }
 
       } else {
-        // Sem radares no raio de alcance → garante que alerta seja fechado
         if ($("#alert-container").is(":visible")) {
           fecharAlertaImediatamente();
         }
-        // Reseta o último radar alertado se estiver realmente longe
-        if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA + 50) {
+        if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA + 80) {
           ultimoRadarAlertado = null;
+          historicoDistanciasRadar = {};
         }
+      }
+    }
+
+    // ===================================================================
+    // FUNÇÃO: atualizarDistanciaAlerta - Atualiza texto de distância
+    // ===================================================================
+    function atualizarDistanciaAlerta(distancia) {
+      if (!$("#alert-container").is(":visible")) return;
+      var distanciaTexto = Math.round(distancia) + " metros";
+      var textoAtual = $("#alert-text").text();
+      var partes = textoAtual.split(" - a ");
+      if (partes.length >= 2) {
+        $("#alert-text").text(partes[0] + " - a " + distanciaTexto);
       }
     }
 
@@ -1231,47 +1318,37 @@ function removerRota() {
     // FUNÇÃO: dispararAlerta - Executa som e mostra a barra de alerta
     // ===================================================================
     function dispararAlerta(radar, distancia) {
-      // Verifica se o radar ainda está dentro do raio antes de disparar
       const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
       
-      // Só dispara se ainda estiver dentro de 200m
-      if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA) {
-        return;
-      }
+      if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA) return;
+      if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
       
       const som = document.getElementById("alert-soud");
       const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
-      const velInfo = radar.velocidade_maxima ? ` | ${radar.velocidade_maxima} km/h` : "";
+      const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
 
-      // Atualiza a interface do alerta
       $("#alert-title").text("🚨 ALERTA DE RADAR! 🚨");
-      $("#alert-text").text(`${tipoAjustado}${velInfo} - a ${Math.round(distanciaAtual)} metros`);
+      $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
       
-      // Troca o ícone do alerta para o ícone específico do tipo de radar
       const iconeUrl = getIconUrl(radar.tipoOriginal, radar.velocidade_maxima);
       $("#alert-icon").attr("src", iconeUrl);
 
-      // Exibe a barra de alerta com animação
       $("#alert-container").fadeIn(200);
 
-      // Toca o áudio se o alerta estiver habilitado
       if (alertaHabilitado && som) {
         som.pause();
         som.currentTime = 0;
-        som.play().catch(e => console.log("Áudio: aguardando interação do usuário."));
+        som.play().catch(function(e) { console.log("Áudio: aguardando interação do usuário."); });
       }
 
-      // Se for distância crítica (menos de 100m), aplica animação de pulso vermelho
       if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
         $(".alert-bar").addClass("alert-bar-critico");
       } else {
         $(".alert-bar").removeClass("alert-bar-critico");
       }
 
-      // Registra o ID do radar alertado para evitar spam de alerta
       ultimoRadarAlertado = radar.id;
       
-      // Configura timeout para fechar o alerta automaticamente após 8 segundos
       clearTimeout(alertTimeout);
       alertTimeout = setTimeout(function() {
         if ($("#alert-container").is(":visible")) {
@@ -1295,7 +1372,6 @@ function removerRota() {
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
       
-      // EVENTOS DO MAPA PARA CONTROLE DE FOLLOW E DELAY
       map.on('dragstart', function() { 
         isFollowing = false;
         if (returnToGpsTimer) clearTimeout(returnToGpsTimer);
@@ -1311,42 +1387,24 @@ function removerRota() {
         }, TEMPO_RETORNO_GPS);
       });
 
-      // EVENTO DO BOTÃO DE ROTA
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
-        if (endereco.length < 5) { 
-          showNotification("Digite um endereço válido."); 
-          return; 
-        }
+        if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
         
         $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
-        
         var coords = await buscarCoordenadas(endereco);
         
         if (coords) {
-          // Limpa rota e marcadores antigos antes de criar novos
-          if (routingControl) {
-            map.removeControl(routingControl);
-          }
+          if (routingControl) { map.removeControl(routingControl); }
           removerMarcadoresRota();
 
-          // Configura o Routing Control
           routingControl = L.Routing.control({
-            waypoints: [
-              L.latLng(userLat, userLng),
-              L.latLng(coords.lat, coords.lng)
-            ],
+            waypoints: [ L.latLng(userLat, userLng), L.latLng(coords.lat, coords.lng) ],
             createMarker: function() { return null; },
-            lineOptions: {
-              styles: [{ color: '#ff8c00', weight: 6, opacity: 0.8 }]
-            },
-            addWaypoints: false,
-            draggableWaypoints: false,
-            fitSelectedRoutes: true,
-            showAlternatives: false
+            lineOptions: { styles: [{ color: '#ff8c00', weight: 6, opacity: 0.8 }] },
+            addWaypoints: false, draggableWaypoints: false, fitSelectedRoutes: true, showAlternatives: false
           }).addTo(map);
 
-          // Quando a rota for encontrada, insere os ícones personalizados
           routingControl.on('routesfound', function(e) {
             var summary = e.routes[0].summary;
             adicionarMarcadoresRota(userLat, userLng, coords.lat, coords.lng);
@@ -1380,10 +1438,7 @@ function removerRota() {
       $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
       
       $("#btn-search-bar").click(function() {
-        if (searchActive) { 
-          fecharTodasBarras(); 
-          return; 
-        }
+        if (searchActive) { fecharTodasBarras(); return; }
         if (routeActive) routeActive = false;
         searchActive = true;
         $("#search-bar-radares").addClass('active');
@@ -1391,10 +1446,7 @@ function removerRota() {
       });
       
       $("#btn-route-bar").click(function() {
-        if (routeActive) { 
-          fecharTodasBarras(); 
-          return; 
-        }
+        if (routeActive) { fecharTodasBarras(); return; }
         if (searchActive) searchActive = false;
         routeActive = true;
         $("#search-bar-rota").addClass('active');
@@ -1412,12 +1464,7 @@ function removerRota() {
         }
       });
 
-      // BOTÃO DE REFRESH COM DELAY DE 5 SEGUNDOS PARA RETORNAR AO GPS
-      $("#btn-refresh").click(function() { 
-        resetarMapa();
-        carregarRadares(); 
-      });
-      
+      $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
       $("#btn-zoom-in").click(function() { map.zoomIn(); });
       $("#btn-zoom-out").click(function() { map.zoomOut(); });
       
@@ -1470,7 +1517,6 @@ function removerRota() {
         console.warn("Falha ao carregar radares.json:", e);
         $("#loading").hide();
         showNotification("⚠️ Arquivo radares.json não encontrado. Usando dados de fallback.");
-        // Fallback para dados de IA
         renderizarRadaresNoMapa(injetarRadaresIA(), "Dados de Fallback (IA)");
       }
     }
@@ -1532,7 +1578,6 @@ function removerRota() {
     // ===================================================================
     function buscarRadares(query) {
       if (!query || query.length < 2) return;
-      
       var encontrou = false;
       var boundsGroup = L.featureGroup();
       var q = query.toLowerCase();
@@ -1540,7 +1585,6 @@ function removerRota() {
       radarMarkers.forEach(function(marker) {
         var d = marker.radarData;
         var textoBusca = (d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase();
-        
         if (textoBusca.includes(q)) {
           encontrou = true;
           boundsGroup.addLayer(marker);
@@ -1561,33 +1605,24 @@ function removerRota() {
     // ===================================================================
     function showError(error) {
       if (gpsSource === 'appinventor') return;
-      
       var msg = "Erro ao obter localização.";
       if (error.code === 1) msg = "❌ Permissão de GPS negada. Habilite nas configurações do navegador.";
       if (error.code === 2) msg = "📡 Sinal GPS indisponível. Verifique se está ao ar livre.";
       if (error.code === 3) msg = "⏱️ Tempo de GPS esgotado. Tentando novamente...";
-      
       showNotification(msg);
       hideFullscreenLoading();
-      
-      if (error.code === 3) { 
-        setTimeout(startGPSTracking, 5000);
-      }
+      if (error.code === 3) { setTimeout(startGPSTracking, 5000); }
     }
     
-    // Desbloqueia áudio no primeiro clique do usuário (política de navegadores)
+    // Desbloqueia áudio no primeiro clique
     document.addEventListener('click', function desbloquearAudio() {
       var sound = document.getElementById("alert-soud");
       if (sound) {
-        sound.play().then(function() { 
-          sound.pause(); 
-          sound.currentTime = 0; 
-        }).catch(function() {});
+        sound.play().then(function() { sound.pause(); sound.currentTime = 0; }).catch(function() {});
       }
       document.removeEventListener('click', desbloquearAudio);
     }, { once: true });
     
-    // Inicializa o aplicativo quando a página terminar de carregar
     window.onload = initMap;
   </script>
 </body>
