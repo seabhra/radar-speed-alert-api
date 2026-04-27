@@ -360,7 +360,14 @@
       [345, "1643"," Av. Vilarinho, Próximo à Av. Cristiano Machado: Em caso de chuva forte evite seguir na direção de Venda Nova", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Centro/Venda Nova","10061","KBH53061", "-19.82593, -43.94374"],
       [346, "1644"," Av. Vilarinho, Próximo à Av. Elias Antônio Issa: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Venda Nova/Centro","10062","KBH53062", "-19.80647, -43.97037 "],
       [347, "1645"," Av. Sicília, Próximo à Rua Palermo: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Castelo/Pampulha","10063","KBH53063", "-19.86249, -43.99160 "],
-      [348, "1646"," Rua Orsi Conceição de Lima, Próximo à Av. Otacílio Negrão de Lima: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Castelo/Pampulha","10064","KBH53064", "-19.85770, -44.00108 "]
+      [348, "1646"," Rua Orsi Conceição de Lima, Próximo à Av. Otacílio Negrão de Lima: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Castelo/Pampulha","10064","KBH53064", "-19.85770, -44.00108 "],
+      [349, "1647","Av. Afonso Pena, Próx. à Praça Sete","Leitor Inteligente de Placas (OCR-P)","60"," Praça Sete/Savassi","10065","KBH53065","-19.919007, -43.938792"],
+      [350, "1648","Av. Afonso Pena, Próx. à Praça Sete","Leitor de Reconhecimento Facial (OCR-F)","60","Mangabeira/Praça Sete","10066","KBH53066","-19.919115, -43.938580"],
+      [351, "1649","Av. Afonso Pena, Próx. à Praça Sete ","Leitor Inteligente de Placas (OCR-P)","60","Mangabeira/Rodoviária","10067","KBH53067","-19.919191, -43.938468"],
+      [352, "1650","Rua Conde Pereira Carneiro,  Esq. Av. Amazonas","Detector de Uso de Celular (DUC)","60"," Gameleira/Centro","10068","KBH53068","-19.931347, -43.985536"],
+      [353, "1651","Av. Mal. Experidião Rosa, Esq. Av. Antônio Carlos","Detector de Uso de Celular (DUC)","60","UFMG/Antônio Carlos","10069","KBH53069","-19.871740, -43.955001"],
+      [354, "1652","Rod. Camilo Teixeira da Costa, 210","Detector de Redução de Velocidade (DRV)","60"," Tupi/Centro","10070","KBH53070","-19.835851, -43.907504"],
+      [355, "1653","Av. Amazonas, 500 ","Detector de Faixa Preferencial de Ônibus (BUS)","40","Praça Raul Soares/Praça Sete","10071","KBH53071","-19.922500, -43.945000"]
 
 
     ]
