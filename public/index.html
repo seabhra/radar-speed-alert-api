@@ -38,7 +38,7 @@
     .btn-search img { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; object-fit: contain; display: block; transform: translate(-50%, -50%); }
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; }
-    .compass-widget { position: absolute; top: 20px; left: 5px; width: 70px; height: 70px; z-index: 500; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .compass-widget { position: absolute; top: 20px; left: 5px; width: 80px; height: 80px; z-index: 500; display: flex; align-items: center; justify-content: center; pointer-events: none; }
     .compass-base { position: absolute; width: 100%; height: 100%; object-fit: contain; z-index: 1; opacity: 0.9; }
     .compass-needle { position: absolute; width: 55%; height: 55%; object-fit: contain; z-index: 2; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
     .map-controls { position: absolute; right: 15px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 10px; z-index: 500; }
@@ -662,17 +662,6 @@
       inicializarBotaoRotacaoMapa(); inicializarBotaoAlertaToggle(); startGPSTracking(); carregarRadares();
     }
    
-    function injetarRadaresIA() {
-      return [
-        { lat: -19.919007, lng: -43.938792, end: "Av. Afonso Pena, Próx. à Praça Sete/Sentido Savassi", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.919115, lng: -43.938580, end: "Av. Afonso Pena, Próx. à Praça Sete", tipo: "Leitor de Reconhecimento Facial (OCR-F)", vel: "60" },
-        { lat: -19.919191, lng: -43.938468, end: "Av. Afonso Pena, Próx. à Praça Sete/sentido Rodoviária", tipo: "Leitor Inteligente de Placas (OCR-P)", vel: "60" },
-        { lat: -19.931347, lng: -43.985536, end: "Rua Conde Pereira Carneiro, sentido Gameleira/Centro", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
-        { lat: -19.871740, lng: -43.955001, end: "Av. Mal. Experidião Rosa, Esquina Av. Antônio Carlos", tipo: "Detector de Uso de Celular (DUC)", vel: "60" },
-        { lat: -19.835851, lng: -43.907504, end: "Rod. Camilo Teixeira da Costa, 210 – Tupi/Centro", tipo: "Detector de Redução de Velocidade (DRV)", vel: "60" },
-        { lat: -19.922500, lng: -43.945000, end: "Av. Amazonas, 500 - Centro", tipo: "Detector de Faixa Preferencial de Ônibus (BUS)", vel: "40" }
-      ].map(function(r) { return [null, null, r.end, r.tipo, r.vel, null, null, null, null, r.lat + ',' + r.lng]; });
-    }
 
     async function carregarRadares() {
       if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
@@ -683,7 +672,10 @@
         var data = await response.json();
         var records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
         if (records.length > 0) { renderizarRadaresNoMapa(records, "radares.json"); } else { throw new Error("Nenhum radar encontrado"); }
-      } catch (e) { console.warn("Falha radares.json:", e); $("#loading").hide(); showNotification("⚠️ Usando dados de fallback."); renderizarRadaresNoMapa(injetarRadaresIA(), "Fallback"); }
+      }
+       catch (e) { console.warn("Falha radares.json:", e); $("#loading").hide(); showNotification("⚠️ Usando dados de fallback."); 
+        
+       }
     }
 
     function renderizarRadaresNoMapa(records, origem) {
