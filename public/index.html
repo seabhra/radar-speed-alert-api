@@ -1125,14 +1125,21 @@
       removerRota(); esconderAlertaVisual(); showNotification("🗺️ Mapa resetado");
     }
 
-    function extrairCoordenadas(record) {
+      function extrairCoordenadas(record) {
       if (!record || record.length < 10) return null;
-      var parts = String(record[9]).replace(/\s+/g, '').split(',');
+      // Pega a string toda e remove ABSOLUTAMENTE TODOS os espaços do mundo
+      var stringLimpa = String(record[9]).replace(/\s+/g, '').trim();
+      
+      var parts = stringLimpa.split(',');
       if (parts.length !== 2) return null;
-      var lat = parseFloat(parts[0]); var lng = parseFloat(parts[1]);
+      
+      var lat = parseFloat(parts[0]); 
+      var lng = parseFloat(parts[1]);
+      
       if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
       return { lat: lat, lng: lng };
     }
+    
     function atualizarBussola(headingDegrees) { var needle = document.getElementById('compass-needle-img'); if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)'; }
 
     function inicializarBotaoRotacaoMapa() {
