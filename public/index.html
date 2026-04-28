@@ -114,7 +114,6 @@
         align-items: center;
     }
 
-    /* Estado ativo da barra de pesquisa */
     .search-container.active {
         max-height: 90px;
         opacity: 1;
@@ -139,7 +138,6 @@
         border-color: var(--accent-color);
     }
 
-    /* Botão de acionar a pesquisa */
     .btn-search {
         position: relative;
         flex-shrink: 0;
@@ -235,7 +233,6 @@
         z-index: 500;
     }
 
-    /* Estilo base para todos os botões redondos do mapa */
     .map-btn {
         width: 50px;
         height: 50px;
@@ -266,14 +263,12 @@
         pointer-events: none;
     }
 
-    /* Botão específico de alertas (Ligar/Desligar) */
     .alert-toggle-btn {
         background: rgba(29, 28, 28, 0.9);
         border: 2px solid rgba(255, 255, 255, 0.08);
         transition: all 0.3s ease;
     }
 
-    /* Estado quando os alertas estão desligados */
     .alert-toggle-btn.alert-off {
         background: rgba(68, 68, 68, 0.9);
         border-color: #888;
@@ -287,7 +282,6 @@
         transition: all 0.3s ease;
     }
 
-    /* Bordas específicas para identificação visual rápida dos botões */
     #btn-route-bar {
         width: 54px;
         height: 54px;
@@ -311,14 +305,12 @@
         transition: transform 0.3s ease;
     }
 
-    /* Estado rotacionado do mapa (3D) */
     #btn-rotate-map.rotated {
         transform: rotate(90deg);
         border-color: var(--accent-color);
         box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
     }
 
-    /* Transição suave ao rotacionar o container do mapa */
     .leaflet-container {
         transition: transform 0.3s ease;
     }
@@ -333,48 +325,28 @@
         will-change: transform;
     }
 
-    /* Marcador de início da rota com animação de pulso */
     .route-start-marker {
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         animation: pulseStart 1s ease-in-out infinite;
     }
 
-    /* Marcador de fim da rota com animação de pulso */
     .route-end-marker {
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         animation: pulseEnd 1.2s ease-in-out infinite;
     }
 
-    /* Animação do marcador de início */
     @keyframes pulseStart {
-        0% {
-            transform: scale(1);
-            opacity: 1;
-        }
-        50% {
-            transform: scale(1.1);
-            opacity: 0.8;
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
     }
 
-    /* Animação do marcador de fim */
     @keyframes pulseEnd {
-        0% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.15);
-        }
-        100% {
-            transform: scale(1);
-        }
+        0% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+        100% { transform: scale(1); }
     }
 
-    /* Ajuste fino para ícones de radar */
     .radar-marker-icon {
         background: transparent !important;
         border: none !important;
@@ -411,7 +383,6 @@
         pointer-events: none;
     }
 
-    /* Números do velocímetro */
     .speed-value {
         position: absolute;
         top: 50%;
@@ -444,31 +415,17 @@
         pointer-events: none;
     }
 
-    /* Animação de entrada do alerta */
     @keyframes slideUp {
-        from {
-            transform: translateY(100%);
-        }
-        to {
-            transform: translateY(0);
-        }
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
     }
 
-    /* Animação de pulso para alertas críticos */
     @keyframes pulse {
-        0% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.02);
-            background: linear-gradient(90deg, #ff2200, #ee0000);
-        }
-        100% {
-            transform: scale(1);
-        }
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); background: linear-gradient(90deg, #ff2200, #ee0000); }
+        100% { transform: scale(1); }
     }
 
-    /* Visual da barra de alerta */
     .alert-bar {
         background: linear-gradient(90deg, #cc0000, #990000);
         color: white;
@@ -481,7 +438,6 @@
         transition: all 0.2s ease;
     }
 
-    /* Classe ativada em alertas de gravidade máxima */
     .alert-bar-critico {
         animation: pulse 0.8s ease-in-out infinite;
     }
@@ -528,7 +484,6 @@
         white-space: nowrap;
     }
 
-    /* Estado visível do Toast */
     .toast-notification.show {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
@@ -551,7 +506,6 @@
         backdrop-filter: blur(5px);
     }
 
-    /* Spinner simples (bolo) */
     .loading-spinner {
         border: 3px solid #333;
         border-top: 3px solid var(--accent-color);
@@ -563,9 +517,7 @@
     }
 
     @keyframes spin {
-        100% {
-            transform: rotate(360deg);
-        }
+        100% { transform: rotate(360deg); }
     }
 
     /* ==========================================
@@ -583,13 +535,11 @@
         transition: opacity 0.5s ease, visibility 0.5s ease;
     }
 
-    /* Classe para esconder a tela de carregamento */
     .loading-fullscreen.fade-out {
         opacity: 0;
         visibility: hidden;
     }
 
-    /* Spinner duplo estilizado */
     .loading-fullscreen .spinner-ring {
         width: 60px;
         height: 60px;
@@ -607,14 +557,12 @@
         border: 4px solid transparent;
     }
 
-    /* Anel externo do spinner */
     .loading-fullscreen .spinner-ring::before {
         border-top-color: var(--accent-color);
         border-right-color: var(--accent-color);
         animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
     }
 
-    /* Anel interno do spinner */
     .loading-fullscreen .spinner-ring::after {
         inset: 10px;
         border-bottom-color: #ff3333;
@@ -623,15 +571,10 @@
     }
 
     @keyframes spinRing {
-        0% {
-            transform: rotate(0deg);
-        }
-        100% {
-            transform: rotate(360deg);
-        }
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
-    /* Textos da tela de carregamento */
     .loading-fullscreen .loading-text {
         font-size: 1.1rem;
         font-weight: 600;
@@ -650,21 +593,14 @@
         animation: pulseText 1.8s ease-in-out infinite;
     }
 
-    /* Animação de piscar do texto secundário */
     @keyframes pulseText {
-        0%,
-        100% {
-            opacity: 0.4;
-        }
-        50% {
-            opacity: 1;
-        }
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
     }
 
     /* ==========================================
        AJUSTES E OCULTAÇÕES DO LEAFLET.js
        ========================================== */
-    /* Oculta os controles padrão do Leaflet para usar os personalizados */
     .leaflet-control-zoom,
     .leaflet-control-attribution,
     .leaflet-routing-container {
@@ -781,10 +717,20 @@
     let refreshDelayTimer = null;
     const TEMPO_REFRESH_DELAY = 5000;
     
+    // ===================================================================
+    // CONFIGURAÇÃO DE ALERTAS - REFINADA FINAL
+    // ===================================================================
     const ALERT_CONFIG = {
-      DISTANCIA_MAXIMA: 200, DISTANCIA_CRITICA: 80, TEMPO_ALERTA: 10000,
-      DISTANCIA_PASSAR_RADAR: 30, ANGULO_APROXIMACAO: 100, ANGULO_AFASTANDO: 140,
-      HISTORICO_TAMANHO: 5, SUAVIZACAO_FATOR: 0.6, DISTANCIA_MINIMA_MOVIMENTO: 2 
+      DISTANCIA_MAXIMA: 300,             // 300m para iniciar alerta (Aumentado)
+      DISTANCIA_CRITICA: 100,            // 100m para alerta crítico
+      TEMPO_ALERTA: 12000,               // 12 segundos timeout visual
+      DISTANCIA_PASSAR_RADAR: 30,        // 30m - considere que passou
+      ANGULO_APROXIMACAO: 100,           // 100° - mais permissivo
+      ANGULO_AFASTANDO: 140,             // 140° para considerar afastando
+      HISTORICO_TAMANHO: 5,              // Posições para cálculo de tendência
+      SUAVIZACAO_FATOR: 0.6,             // 0.6 = 60% posição nova, 40% anterior
+      DISTANCIA_MINIMA_MOVIMENTO: 4,     // Aumentado para 4m (Evita micro-trepidacoes em curvas)
+      DISPAROS_SOM_ANTES_DE_SILENCIAR: 2 // Toca o som 2 vezes antes de calar a buzina
     };
     
     let currentHeading = 0;
@@ -793,6 +739,7 @@
     var historicoDistanciasRadar = {};
     var ultimaPosicaoMarcador = { lat: null, lng: null };
     var animacaoMarcadorAtiva = false;
+    var contagemTocarSom = 0; // Controle de quantas vezes o som tocou
 
     const iconMap = {
       'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev_v2.png',
@@ -927,10 +874,12 @@
       posicaoSuavizada.lng += (novaLng - posicaoSuavizada.lng) * fator;
       return { lat: posicaoSuavizada.lat, lng: posicaoSuavizada.lng };
     }
+    
     function adicionarAoHistorico(lat, lng, timestamp) {
       historicoPosicoes.push({ lat: lat, lng: lng, time: timestamp });
       if (historicoPosicoes.length > ALERT_CONFIG.HISTORICO_TAMANHO) historicoPosicoes.shift();
     }
+    
     function calcularTendenciaDistancia(radarId, distanciaAtual) {
       if (!historicoDistanciasRadar[radarId]) historicoDistanciasRadar[radarId] = [];
       historicoDistanciasRadar[radarId].push({ distancia: distanciaAtual, time: Date.now() });
@@ -943,29 +892,9 @@
       return { estaAproximando: true, estaAfastando: false, diferenca: 0 };
     }
 
-    function moverMarcadorSuavemente(targetLat, targetLng) {
-      var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
-      if (!marcadorParaMover) return;
-      if (ultimaPosicaoMarcador.lat === null) {
-        ultimaPosicaoMarcador.lat = targetLat; ultimaPosicaoMarcador.lng = targetLng;
-        marcadorParaMover.setLatLng([targetLat, targetLng]); return;
-      }
-      var distanciaUltimoMovimento = calcularDistancia(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng);
-      if (distanciaUltimoMovimento < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) return;
-      var inicioLat = ultimaPosicaoMarcador.lat; var inicioLng = ultimaPosicaoMarcador.lng;
-      var duracao = 300; var inicioTempo = performance.now();
-      if (animacaoMarcadorAtiva) return; animacaoMarcadorAtiva = true;
-      function animarFrame(tempoAtual) {
-        var progresso = Math.min((tempoAtual - inicioTempo) / duracao, 1);
-        var fatorEasing = 1 - Math.pow(1 - progresso, 3);
-        marcadorParaMover.setLatLng([inicioLat + (targetLat - inicioLat) * fatorEasing, inicioLng + (targetLng - inicioLng) * fatorEasing]);
-        if (progresso < 1) { requestAnimationFrame(animarFrame); }
-        else { ultimaPosicaoMarcador.lat = targetLat; ultimaPosicaoMarcador.lng = targetLng; animacaoMarcadorAtiva = false; }
-      }
-      requestAnimationFrame(animarFrame);
+    function limparHistoricoDistancia(radarId) { 
+      if (historicoDistanciasRadar[radarId]) delete historicoDistanciasRadar[radarId]; 
     }
-
-    function limparHistoricoDistancia(radarId) { if (historicoDistanciasRadar[radarId]) delete historicoDistanciasRadar[radarId]; }
 
     function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, radarId, distanciaAtual) {
       if (!uHeading || uHeading === -1 || isNaN(uHeading)) { var t = calcularTendenciaDistancia(radarId, distanciaAtual); return { estaAproximando: t.estaAproximando, estaAfastando: t.estaAfastando }; }
@@ -976,6 +905,58 @@
       return { estaAproximando: (diff < ALERT_CONFIG.ANGULO_APROXIMACAO) || tendencia.estaAproximando, estaAfastando: (diff > ALERT_CONFIG.ANGULO_AFASTANDO) && tendencia.estaAfastando };
     }
 
+    // ===================================================================
+    // FUNÇÃO: MOVER MARCADOR SUAVEMENTE (ZERO TREPIDAÇÃO)
+    // ===================================================================
+    function moverMarcadorSuavemente(targetLat, targetLng) {
+      var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
+      if (!marcadorParaMover) return;
+      
+      if (ultimaPosicaoMarcador.lat === null) {
+        ultimaPosicaoMarcador.lat = targetLat; 
+        ultimaPosicaoMarcador.lng = targetLng;
+        marcadorParaMover.setLatLng([targetLat, targetLng]); 
+        return;
+      }
+      
+      var distanciaUltimoMovimento = calcularDistancia(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng);
+      
+      // Ignora movimentos menores que 4 metros (tira a trepidação em cruzamentos/curvas)
+      if (distanciaUltimoMovimento < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) return;
+      
+      var inicioLat = ultimaPosicaoMarcador.lat; 
+      var inicioLng = ultimaPosicaoMarcador.lng;
+      var duracao = 500; // 500ms (bem mais suave e cinematográfico)
+      var inicioTempo = performance.now();
+      
+      if (animacaoMarcadorAtiva) return; 
+      animacaoMarcadorAtiva = true;
+      
+      function animarFrame(tempoAtual) {
+        var progresso = Math.min((tempoAtual - inicioTempo) / duracao, 1);
+        
+        // Easing "In-Out Cúbico" (desacelera no final, ficando realista)
+        var fatorEasing = progresso < 0.5 
+          ? 4 * Math.pow(progresso, 3) 
+          : 1 - Math.pow(-2 * progresso + 2, 3) / 2;
+        
+        marcadorParaMover.setLatLng([
+          inicioLat + (targetLat - inicioLat) * fatorEasing, 
+          inicioLng + (targetLng - inicioLng) * fatorEasing
+        ]);
+        
+        if (progresso < 1) { 
+          requestAnimationFrame(animarFrame); 
+        }
+        else { 
+          ultimaPosicaoMarcador.lat = targetLat; 
+          ultimaPosicaoMarcador.lng = targetLng; 
+          animacaoMarcadorAtiva = false; 
+        }
+      }
+      requestAnimationFrame(animarFrame);
+    }
+
     function aplicarTemaMapa() {
       var hora = new Date().getHours();
       var urlAtual = (hora >= 19 || hora < 6) ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
@@ -984,16 +965,216 @@
 
     function atualizarIconeUsuario() {
       if (!userMarker || estaEmNavegacao) return;
-      var userIcon = L.icon({ iconUrl: '/imagens_app/ic_gps_marker.png', iconSize: [50, 50], iconAnchor: [25, 45], popupAnchor: [0, -45], className: 'user-gps-marker' });
+      // Sincronizado com o Anchor de criação [24, 48]
+      var userIcon = L.icon({ 
+        iconUrl: '/imagens_app/ic_gps_marker.png', 
+        iconSize: [48, 48], 
+        iconAnchor: [24, 48], 
+        popupAnchor: [0, -48], 
+        className: 'user-gps-marker' 
+      });
       userMarker.setIcon(userIcon);
     }
 
     // ===================================================================
-    // FUNÇÃO DE BUSCAR COORDENADAS (OSM NOMINATIM) - RESTAURADA
+    // FUNÇÕES DE ALERTA - SOM E VISUAL SEPARADOS
+    // ===================================================================
+    
+    // Para APENAS o som (não esconde a barra)
+    function fecharAlertaImediatamente() {
+      var sound = document.getElementById("alert-soud");
+      if (sound) {
+        sound.pause();
+        sound.currentTime = 0;
+      }
+      clearTimeout(alertTimeout);
+    }
+
+    // Esconde APENAS a barra visual (reseta cores e zera contador de som)
+    function esconderAlertaVisual() {
+      $("#alert-container").fadeOut(150);
+      $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
+      $(".alert-bar").removeClass("alert-bar-critico");
+      contagemTocarSom = 0; // Zera o contador de sons ao sair da tela
+      fecharAlertaImediatamente(); // Garante que o som também corte
+    }
+
+    // ===================================================================
+    // FUNÇÃO: processarNovaPosicao - CORAÇÃO DO SISTEMA
+    // ===================================================================
+    function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
+      var currentTime = Date.now(); var dist = 0;
+      adicionarAoHistorico(newLat, newLng, currentTime);
+      var posSuave = suavizarPosicao(newLat, newLng);
+      var smoothLat = posSuave.lat; var smoothLng = posSuave.lng;
+      
+      if (speedKmh === 0 && prevLat !== null && prevTime !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); var time = (currentTime - prevTime) / 1000; if (time > 0) speedKmh = Math.round((dist / time) * 3.6); }
+      else if (prevLat !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); }
+      if (speedKmh > 250) speedKmh = 0; $("#speed-display").text(speedKmh);
+      
+      if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) { currentHeading = hardwareHeading; }
+      else if (dist > 3 && prevLat !== null) { var dy = newLat - prevLat; var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180); if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) { var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI); if (calcHeading < 0) calcHeading += 360; if (calcHeading >= 360) calcHeading -= 360; currentHeading = calcHeading; } }
+      if (currentHeading !== null && currentHeading !== undefined) atualizarBussola(currentHeading);
+
+      prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
+
+      if (!userMarker && !estaEmNavegacao) {
+        // Criação inicial com âncora perfeitamente ajustada [24, 48]
+        var defaultIcon = L.icon({ 
+          iconUrl: '/imagens_app/ic_gps_marker.png', 
+          iconSize: [48, 48], 
+          iconAnchor: [24, 48], 
+          popupAnchor: [0, -48], 
+          className: 'user-gps-marker' 
+        });
+        
+        userMarker = L.marker([smoothLat, smoothLng], { 
+          icon: defaultIcon, 
+          zIndexOffset: 1000,
+          rotationAngle: 0,
+          rotationOrigin: '24px 48px' // Centro de rotação na ponta exata
+        }).addTo(map);
+        
+        userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -48] });
+        ultimaPosicaoMarcador.lat = smoothLat; ultimaPosicaoMarcador.lng = smoothLng;
+        if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
+      } else { 
+        moverMarcadorSuavemente(smoothLat, smoothLng); 
+      }
+      
+      atualizarIconeUsuario();
+      if (destinoAtual) { atualizarRota(); }
+      if (isFollowing) { map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.8 }); }
+      
+      // Se desligar o toggle, esconde tudo (som e tela)
+      if (alertaHabilitado) { 
+        verificarProximidadeRadares(); 
+      } else { 
+        esconderAlertaVisual(); 
+      }
+      
+      if (destinoAtual) { verificarChegadaDestino(); }
+    }
+
+    function startGPSTracking() {
+      if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      watchId = navigator.geolocation.watchPosition(
+        function(position) {
+          if (gpsSource !== 'appinventor') gpsSource = 'browser';
+          var newLat = position.coords.latitude; var newLng = position.coords.longitude; var speedKmh = 0;
+          if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
+          processarNovaPosicao(newLat, newLng, speedKmh, position.coords.heading);
+        }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
+      );
+      browserGpsTimeout = setTimeout(function() { if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); } }, 8000);
+    }
+
+    // ===================================================================
+    // LÓGICA DE PROXIMIDADE E DISPARO REFINADA
+    // ===================================================================
+    function verificarProximidadeRadares() {
+      if (!alertaHabilitado || radarMarkers.length === 0) return;
+      let radarMaisProximo = null; let menorDistancia = Infinity;
+      radarMarkers.forEach(function(marker) {
+        const rData = marker.radarData; if (!deveAlertaRadar(rData.tipoOriginal)) return;
+        const dist = calcularDistancia(userLat, userLng, rData.latitude, rData.longitude);
+        if (dist < menorDistancia) { menorDistancia = dist; radarMaisProximo = rData; }
+      });
+      
+      if (radarMaisProximo && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
+        const direcao = verificarDirecaoMelhorada(userLat, userLng, currentHeading, radarMaisProximo.latitude, radarMaisProximo.longitude, radarMaisProximo.id, menorDistancia);
+        
+        // LÓGICA 1: Passou do radar (30m) - ESCONDE TELA E SOM
+        if (menorDistancia <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) { 
+          esconderAlertaVisual(); 
+          ultimoRadarAlertado = radarMaisProximo.id; 
+          limparHistoricoDistancia(radarMaisProximo.id); 
+          return; 
+        }
+        
+        // LÓGICA 2: Está se afastando - PARA O SOM, MAS MANTÉM TELA
+        if (direcao.estaAfastando) { 
+          fecharAlertaImediatamente(); // Corta só o som
+          limparHistoricoDistancia(radarMaisProximo.id); 
+          if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA - 30) ultimoRadarAlertado = null; 
+          return; 
+        }
+        
+        // LÓGICA 3: Está se aproximando - DISPARA
+        if (direcao.estaAproximando) {
+          if (ultimoRadarAlertado !== radarMaisProximo.id) { 
+            dispararAlerta(radarMaisProximo, menorDistancia); 
+          }
+          else { 
+            atualizarDistanciaAlerta(menorDistancia); 
+            if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) $(".alert-bar").addClass("alert-bar-critico"); 
+          }
+        }
+      } else {
+        // Saiu completamente do raio de alcance - ESCONDE TELA
+        if ($("#alert-container").is(":visible")) esconderAlertaVisual();
+        if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA + 80) { 
+          ultimoRadarAlertado = null; 
+          historicoDistanciasRadar = {}; 
+        }
+      }
+    }
+
+    function atualizarDistanciaAlerta(distancia) {
+      if (!$("#alert-container").is(":visible")) return;
+      var textoAtual = $("#alert-text").text(); var partes = textoAtual.split(" - a ");
+      if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
+    }
+
+    function dispararAlerta(radar, distancia) {
+      const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
+      if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
+      
+      const som = document.getElementById("alert-soud"); 
+      const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
+      const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
+      
+      $("#alert-title").text("🚨 ALERTA DE RADAR! 🚨"); 
+      $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
+      $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima)); 
+      
+      // Mostra a tela na primeira vez que entrar nesse radar
+      if (!$("#alert-container").is(":visible")) {
+        $("#alert-container").fadeIn(200);
+        contagemTocarSom = 0; // Zera o contador para o novo radar
+      }
+      
+      // LÓGICA DE TOCAR O SOM (Máximo de vezes definido em config)
+      if (alertaHabilitado && som && contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) {
+        som.pause();
+        som.currentTime = 0;
+        som.play().catch(function(e) {}); 
+        contagemTocarSom++; // Incrementa a contagem
+      }
+      
+      if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) { 
+        $(".alert-bar").addClass("alert-bar-critico"); 
+      } else { 
+        $(".alert-bar").removeClass("alert-bar-critico"); 
+      }
+      
+      ultimoRadarAlertado = radar.id; 
+      
+      // Timeout APENAS PARA ESCONDER A TELA
+      clearTimeout(alertTimeout);
+      alertTimeout = setTimeout(function() { 
+        if ($("#alert-container").is(":visible")) { 
+          esconderAlertaVisual(); 
+        } 
+      }, ALERT_CONFIG.TEMPO_ALERTA);
+    }
+
+    // ===================================================================
+    // FUNÇÕES DE ROTAS E ENDEREÇOS
     // ===================================================================
     async function buscarCoordenadas(endereco) {
       try {
-        // Força busca em Belo Horizonte para evitar confusão com outras cidades
         var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil');
         var response = await fetch(url);
         var data = await response.json();
@@ -1058,9 +1239,15 @@
       removerMarcadoresRota();
       estaEmNavegacao = false;
       if (posicaoSuavizada.lat !== null) { ultimaPosicaoMarcador.lat = posicaoSuavizada.lat; ultimaPosicaoMarcador.lng = posicaoSuavizada.lng; } else { ultimaPosicaoMarcador = { lat: null, lng: null }; }
-      var defaultIcon = L.icon({ iconUrl: '/imagens_app/ic_gps_marker.png', iconSize: [50, 50], iconAnchor: [25, 45], popupAnchor: [0, -45], className: 'user-gps-marker' });
+      var defaultIcon = L.icon({ 
+        iconUrl: '/imagens_app/ic_gps_marker.png', 
+        iconSize: [48, 48], 
+        iconAnchor: [24, 48], 
+        popupAnchor: [0, -48], 
+        className: 'user-gps-marker' 
+      });
       userMarker = L.marker([userLat, userLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-      userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -45] });
+      userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -48] });
       showNotification("Navegação encerrada");
     }
 
@@ -1075,7 +1262,7 @@
         if (marcadorAtivo && !isFollowing) { isFollowing = true; map.flyTo(marcadorAtivo.getLatLng(), 20, { duration: 0.8 }); showNotification("📍 Retornando à sua posição atual"); }
         refreshDelayTimer = null;
       }, TEMPO_REFRESH_DELAY);
-      removerRota(); fecharTodasBarras(); showNotification("🗺️ Mapa resetado - Retornando ao GPS em 5 segundos");
+      removerRota(); esconderAlertaVisual(); showNotification("🗺️ Mapa resetado - Retornando ao GPS em 5 segundos");
     }
 
     function extrairCoordenadas(record) {
@@ -1086,6 +1273,7 @@
       if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
       return { lat: lat, lng: lng };
     }
+    
     function atualizarBussola(headingDegrees) { var needle = document.getElementById('compass-needle-img'); if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)'; }
 
     function inicializarBotaoRotacaoMapa() {
@@ -1100,104 +1288,24 @@
       const alertBtn = document.getElementById('btn-alert-toggle'); const alertIcon = document.getElementById('alert-toggle-icon'); if (!alertBtn) return;
       alertBtn.addEventListener('click', function() {
         alertaHabilitado = !alertaHabilitado;
-        if (alertaHabilitado) { alertBtn.classList.remove('alert-off'); if(alertIcon){ alertIcon.src = "/imagens_app/ic_sound_on.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; }; } showNotification("🔔 Alerta LIGADO"); }
-        else { alertBtn.classList.add('alert-off'); if(alertIcon){ alertIcon.src = "/imagens_app/ic_sound_off.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; }; } showNotification("🔕 Alerta DESLIGADO"); }
-        fecharAlertaImediatamente();
-      });
-    }
-
-    function fecharAlertaImediatamente() {
-      $("#alert-container").fadeOut(100); clearTimeout(alertTimeout);
-      var sound = document.getElementById("alert-soud"); if (sound) { sound.pause(); sound.currentTime = 0; }
-      $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)"); $(".alert-bar").removeClass("alert-bar-critico");
-    }
-
-    function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
-      var currentTime = Date.now(); var dist = 0;
-      adicionarAoHistorico(newLat, newLng, currentTime);
-      var posSuave = suavizarPosicao(newLat, newLng);
-      var smoothLat = posSuave.lat; var smoothLng = posSuave.lng;
-      
-      if (speedKmh === 0 && prevLat !== null && prevTime !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); var time = (currentTime - prevTime) / 1000; if (time > 0) speedKmh = Math.round((dist / time) * 3.6); }
-      else if (prevLat !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); }
-      if (speedKmh > 250) speedKmh = 0; $("#speed-display").text(speedKmh);
-      
-      if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) { currentHeading = hardwareHeading; }
-      else if (dist > 3 && prevLat !== null) { var dy = newLat - prevLat; var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180); if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) { var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI); if (calcHeading < 0) calcHeading += 360; if (calcHeading >= 360) calcHeading -= 360; currentHeading = calcHeading; } }
-      if (currentHeading !== null && currentHeading !== undefined) atualizarBussola(currentHeading);
-
-      prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
-
-      if (!userMarker && !estaEmNavegacao) {
-        var defaultIcon = L.icon({ iconUrl: '/imagens_app/ic_gps_marker.png', iconSize: [50, 50], iconAnchor: [25, 45], popupAnchor: [0, -45], className: 'user-gps-marker' });
-        userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-        userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -45] });
-        ultimaPosicaoMarcador.lat = smoothLat; ultimaPosicaoMarcador.lng = smoothLng;
-        if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
-      } else { moverMarcadorSuavemente(smoothLat, smoothLng); }
-      
-      atualizarIconeUsuario();
-      if (destinoAtual) { atualizarRota(); }
-      if (isFollowing) { map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.8 }); }
-      if (alertaHabilitado) { verificarProximidadeRadares(); } else { fecharAlertaImediatamente(); }
-      if (destinoAtual) { verificarChegadaDestino(); }
-    }
-
-    function startGPSTracking() {
-      if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
-      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-      watchId = navigator.geolocation.watchPosition(
-        function(position) {
-          if (gpsSource !== 'appinventor') gpsSource = 'browser';
-          var newLat = position.coords.latitude; var newLng = position.coords.longitude; var speedKmh = 0;
-          if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
-          processarNovaPosicao(newLat, newLng, speedKmh, position.coords.heading);
-        }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
-      );
-      browserGpsTimeout = setTimeout(function() { if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); } }, 8000);
-    }
-
-    function verificarProximidadeRadares() {
-      if (!alertaHabilitado || radarMarkers.length === 0) return;
-      let radarMaisProximo = null; let menorDistancia = Infinity;
-      radarMarkers.forEach(function(marker) {
-        const rData = marker.radarData; if (!deveAlertaRadar(rData.tipoOriginal)) return;
-        const dist = calcularDistancia(userLat, userLng, rData.latitude, rData.longitude);
-        if (dist < menorDistancia) { menorDistancia = dist; radarMaisProximo = rData; }
-      });
-      if (radarMaisProximo && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
-        const direcao = verificarDirecaoMelhorada(userLat, userLng, currentHeading, radarMaisProximo.latitude, radarMaisProximo.longitude, radarMaisProximo.id, menorDistancia);
-        if (menorDistancia <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) { fecharAlertaImediatamente(); ultimoRadarAlertado = radarMaisProximo.id; limparHistoricoDistancia(radarMaisProximo.id); return; }
-        if (direcao.estaAfastando) { fecharAlertaImediatamente(); limparHistoricoDistancia(radarMaisProximo.id); if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA - 30) ultimoRadarAlertado = null; return; }
-        if (direcao.estaAproximando) {
-          if (ultimoRadarAlertado !== radarMaisProximo.id) { dispararAlerta(radarMaisProximo, menorDistancia); }
-          else { atualizarDistanciaAlerta(menorDistancia); if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) $(".alert-bar").addClass("alert-bar-critico"); }
+        if (alertaHabilitado) { 
+          alertBtn.classList.remove('alert-off'); 
+          if(alertIcon){ alertIcon.src = "/imagens_app/ic_sound_on.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; }; } 
+          showNotification("🔔 Alerta LIGADO"); 
         }
-      } else {
-        if ($("#alert-container").is(":visible")) fecharAlertaImediatamente();
-        if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA + 80) { ultimoRadarAlertado = null; historicoDistanciasRadar = {}; }
-      }
+        else { 
+          alertBtn.classList.add('alert-off'); 
+          if(alertIcon){ alertIcon.src = "/imagens_app/ic_sound_off.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; }; } 
+          showNotification("🔕 Alerta DESLIGADO"); 
+        }
+        // Usa a função visual para garantir que tela e som desliguem juntos
+        esconderAlertaVisual();
+      });
     }
 
-    function atualizarDistanciaAlerta(distancia) {
-      if (!$("#alert-container").is(":visible")) return;
-      var textoAtual = $("#alert-text").text(); var partes = textoAtual.split(" - a ");
-      if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
-    }
-
-    function dispararAlerta(radar, distancia) {
-      const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
-      if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
-      const som = document.getElementById("alert-soud"); const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
-      const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
-      $("#alert-title").text("🚨 ALERTA DE RADAR! 🚨"); $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
-      $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima)); $("#alert-container").fadeIn(200);
-      if (alertaHabilitado && som) { som.pause(); som.currentTime = 0; som.play().catch(function(e) {}); }
-      if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) { $(".alert-bar").addClass("alert-bar-critico"); } else { $(".alert-bar").removeClass("alert-bar-critico"); }
-      ultimoRadarAlertado = radar.id; clearTimeout(alertTimeout);
-      alertTimeout = setTimeout(function() { if ($("#alert-container").is(":visible")) fecharAlertaImediatamente(); }, ALERT_CONFIG.TEMPO_ALERTA);
-    }
-
+    // ===================================================================
+    // INICIALIZAÇÃO PRINCIPAL DO MAPA
+    // ===================================================================
     function initMap() {
       map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
       aplicarTemaMapa(); setInterval(aplicarTemaMapa, 300000);
@@ -1209,7 +1317,6 @@
         }, TEMPO_RETORNO_GPS);
       });
 
-      // BOTÃO DE CALCULAR ROTA CORRIGIDO
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
@@ -1218,7 +1325,7 @@
         var coords = await buscarCoordenadas(endereco);
         
         if (coords) {
-          fecharTodasBarras();
+          esconderAlertaVisual();
           calcularRota(coords.lat, coords.lng);
         } else {
           $("#loading").hide();
@@ -1239,10 +1346,15 @@
       $("#btn-zoom-in").click(function() { map.zoomIn(); });
       $("#btn-zoom-out").click(function() { map.zoomOut(); });
       
-      inicializarBotaoRotacaoMapa(); inicializarBotaoAlertaToggle(); startGPSTracking(); carregarRadares();
+      inicializarBotaoRotacaoMapa(); 
+      inicializarBotaoAlertaToggle(); 
+      startGPSTracking(); 
+      carregarRadares();
     }
-   
 
+    // ===================================================================
+    // CARREGAMENTO DE RADARES (JSON)
+    // ===================================================================
     async function carregarRadares() {
       if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
       $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando radares...</div>");
@@ -1253,9 +1365,7 @@
         var records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
         if (records.length > 0) { renderizarRadaresNoMapa(records, "radares.json"); } else { throw new Error("Nenhum radar encontrado"); }
       }
-       catch (e) { console.warn("Falha radares.json:", e); $("#loading").hide(); showNotification("⚠️ Usando dados de fallback."); 
-        
-       }
+       catch (e) { console.warn("Falha radares.json:", e); $("#loading").hide(); showNotification("⚠️ Usando dados de fallback."); }
     }
 
     function renderizarRadaresNoMapa(records, origem) {
