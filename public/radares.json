@@ -366,7 +366,7 @@
       [351, "1649","Av. Afonso Pena, Próx. à Praça Sete ","Leitor Inteligente de Placas (OCR-P)","60","Mangabeira/Rodoviária","10067","KBH53067","-19.919191, -43.938468"],
       [352, "1650","Rua Conde Pereira Carneiro,  Esq. Av. Amazonas","Detector de Uso de Celular (DUC)","60"," Gameleira/Centro","10068","KBH53068","-19.931347, -43.985536"],
       [353, "1651","Av. Mal. Experidião Rosa, Esq. Av. Antônio Carlos","Detector de Uso de Celular (DUC)","60","UFMG/Antônio Carlos","10069","KBH53069","-19.871740, -43.955001"],
-      [354, "1652","Rod. Camilo Teixeira da Costa, 210","Detector de Redução de Velocidade (DRV)","60"," Tupi/Centro","10070","KBH53070","-19.835851, -43.907504"],
+      [354,"1652","Rod. Camilo Teixeira da Costa, 210","Detector de Redução de Velocidade (DRV)","60","Tupi/Centro","10070","KBH53070","-19.835851,-43.907504"],
       [355, "1653","Av. Amazonas, 500 ","Detector de Faixa Preferencial de Ônibus (BUS)","40","Praça Raul Soares/Praça Sete","10071","KBH53071","-19.922500, -43.945000"]
 
 
