@@ -738,27 +738,30 @@
     var animacaoMarcadorAtiva = false;
     var contagemTocarSom = 0;
 
-    const iconMap = {
-      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev_v2.png',
-      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das_v2.png',
-      'Detector de Tráfego em Local Proibido': '/imagens_app/ic_radar_dtlp_v2.png',
-      'Detector de Conversão em Local Proibido': '/imagens_app/ic_radar_rcp_v2.png',
-      'Detector de Invasão de Faixa Exclusiva - MOVE': '/imagens_app/ic_radar_dife_v2.png',
-      'Detector de Invasão de Faixa Exclusiva (DIFEX)': '/imagens_app/ic_radar_difex_v2.png',
-      'Detector de Parada sobre Faixa de Pedestres (DPFP)': '/imagens_app/ic_radar_dpfp_v2.png',
-      'Detector de Faixa Preferencial de Ônibus (BUS)': '/imagens_app/ic_radar_fpref_v2.png',
-      'Zona Verde de Trânsito (ZVT)': '/imagens_app/ic_zona_verde.png',
-      'Zona Verde de Trânsito (ZVC)': '/imagens_app/ic_zona_verde.png',
+   const iconMap = {
+      'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
+      'Detector de Avanço de Semáforo':'/imagens_app/ic_radar_das_v2.png',
+      'Detector de Tráfego em Local Proibido':'/imagens_app/ic_radar_dtlp_v2.png',
+      'Detector de Conversão em Local Proibido':'/imagens_app/ic_radar_rcp_v2.png',
+      'Detector de Invasão de Faixa Exclusiva - MOVE':'/imagens_app/ic_radar_dife_v2.png',
+      'Detector de Invasão de Faixa Exclusiva (DIFEX)':'/imagens_app/ic_radar_difex_v2.png',
+      'Detector de Parada sobre Faixa de Pedestres (DPFP)':'/imagens_app/ic_radar_dpfp_v2.png',
+      'Detector de Faixa Preferencial de Ônibus (BUS)':'/imagens_app/ic_radar_fpref_v2.png',
+      'Zona Verde de Trânsito (ZVT)':'/imagens_app/ic_zona_verde.png',
+      'Zona Verde de Trânsito (ZVC)':'/imagens_app/ic_zona_verde.png',
       'Zona de Risco de Inundações Recorrentes (ZIR)':'/imagens_app/ic_zona_inunda.png',
       'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
-      'Controle de Redução de Velocidade (CRV)': '/imagens_app/ic_radar_crv_v2.png',
-      'Verificador de Cinto de Segurança (VCS)': '/imagens_app/ic_radar_cinto_v2.png',
-      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr_v2.png',
-      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial_v2.png',
+      'Controle de Redução de Velocidade (CRV)':'/imagens_app/ic_radar_crv_v2.png',
+      'Verificador de Cinto de Segurança (VCS)':'/imagens_app/ic_radar_cinto_v2.png',
+      'Leitor Inteligente de Placas (OCR-P)':'/imagens_app/ic_radar_ocr_v2.png',
+      'Leitor de Reconhecimento Facial (OCR-F)':'/imagens_app/ic_radar_facial_v2.png',
+      'Câmera Olho Vivo (COV)': '/imagens_app/ic_olho_v2.png',
+      'Alerta de Cruzamento Perigoso (CRP)':'/imagens_app/ic_perigo_v2.png',
+      'Alerta de Alto Índice  de Acidente (AIA)':'/imagens_app/ic_acidente_v2.png',
       'default': '/imagens_app/ic_radar_cev_v2.png'
     };
 
-    const TIPOS_SEM_ALERTA = ['Detector de Faixa Preferencial de Ônibus (BUS)', 'Faixa Preferencial de Ônibus (BUS)', 'Zona Verde de Trânsito (ZVT)', 'BUS'];
+    const TIPOS_SEM_ALERTA = ['Detector de Faixa Preferencial de Ônibus (BUS)', 'Faixa Preferencial de Ônibus (BUS)', 'Zona Verde de Trânsito (ZVT)', 'BUS', Câmera Olho Vivo (COV)];
 
     const ajusteNomes = {
       'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
