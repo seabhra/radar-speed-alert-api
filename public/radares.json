@@ -367,7 +367,26 @@
       [352, "1650","Rua Conde Pereira Carneiro,  Esq. Av. Amazonas","Detector de Uso de Celular (DUC)","60"," Gameleira/Centro","10068","KBH53068","-19.931347, -43.985536"],
       [353, "1651","Av. Mal. Experidião Rosa, Esq. Av. Antônio Carlos","Detector de Uso de Celular (DUC)","60","UFMG/Antônio Carlos","10069","KBH53069","-19.871740, -43.955001"],
       [354, "1652","Rod. Camilo Teixeira da Costa, 210","Detector de Redução de Velocidade (DRV)","60"," Tupi/Centro","10070","KBH53070","-19.835851, -43.907504"],
-      [355, "1653","Av. Amazonas, 500 ","Detector de Faixa Preferencial de Ônibus (BUS)","40","Praça Raul Soares/Praça Sete","10071","KBH53071","-19.922500, -43.945000"]
+      [355, "1653","Av. Amazonas, 500 ","Detector de Faixa Preferencial de Ônibus (BUS)","40","Praça Raul Soares/Praça Sete","10071","KBH53071","-19.922500, -43.945000"],
+      [356, "1654","Rua Contagem,  Esq. Rua Minduri"," Câmera Olho Vivo (COV)","60","Santa Inês/Centro","10072","KBH53072","-19.88521, -43.90624"],
+      [357, "1655","Rua Urarirama, Esq. Guarda Custódio "," Alerta de Cruzamento Perigoso (CRP)","60","Santa Inês/Centro","10073","KBH53073","-19.86960, -43.98127 "],
+      [358, "1656","Rua Lídia, Esq. Rua Expedicionário Inocêncio Rosa - Pirajá"," Alerta de Alto Índice  de Acidente (AIA)","60","Nos dois sentidos","10074","KBH53074"," -19.86424, -43.91608"],
+      [359, "1657","Rua Contagem, Esq.  Rua Marcelino Ferreira","Leitor de Reconhecimento Facial (OCR-F)","60","Santa Inês/Sabará","10075","KBH53075","-19.87749, -43.90908"],
+      [360, "1658"," Rua Marcelino Ferreira, Esq.Rua Contagem ","Leitor Inteligente de Placas (OCR-P)","60","Mangabeira/Rodoviária","10076","KBH53076"," -19.87749, -43.90918 "],
+      [361, "1659"," Av. Brasil, Esq. Av. Bernardo Monteiro ","Leitor Inteligente de Placas (OCR-P)","60","Santa Efigênia/Praça da Liberdade","10077","KBH53077"," -19.92811, -43.92862"],
+      [362, "1660"," Av. Brasil, Esq. Av. Bernardo Monteiro "," Leitor de Reconhecimento Facial (OCR-F)","60","Santa Efigênia/Praça da Liberdade","10078","KBH53078"," -19.92814, -43.92882"],
+      [363, "1661"," Av. Brasil, Esq. Av. Bernardo Monteiro ","Câmera Olho Vivo (COV)","60","Santa Efigênia/Praça da Liberdade","10079","KBH53079"," -19.92814, -43.92882"],
+      [364, "1662"," Av. Niquelina, Próx. Rua Cel. Otávio Diniz","Detector de Invasão de Faixa Exclusiva (DIFEX)","60","Paraíso/Santa Efigênia","10080","KBH53080"," -19.91565, -43.90744"],
+      [365, "1663"," Av. Brasil, Esq. Av. Afonso Pena","Leitor Inteligente de Placas (OCR-P)","60","Santa Efigênia/Praça da Liberdade","10081","KBH53081","-19.92976, -43.93177"],
+      [366, "1664"," Av. Brasil, Esq. Av. Afonso Pena "," Leitor de Reconhecimento Facial (OCR-F)","60","Praça da Liberdade/Santa Efigênia","10082","KBH53082","-19.92997, -43.93194"],
+      [367, "1665"," Av. Brasil, Esq. Av. Afonso Pena","Câmera Olho Vivo (COV)","60","Santa Efigênia/Praça da Liberdade","10083","KBH53083","-19.92992, -43.93205"],
+      [368, "1662"," Av. Elísio de Brito, Esq. Av. Itaituba","Câmera Olho Vivo (COV)","60","Boa Vista/São Geraldo","10084","KBH53084","-19.89514, -43.90136"],
+      [369, "1663"," Av. Elísio de Brito, Esq. Av. Itaituba"," Leitor de Reconhecimento Facial (OCR-F)","60","Boa Vista/São Geraldo","10085","KBH53085","-19.89511, -43.90143 "],
+      [370, "1664"," Av. Elísio de Brito, Esq. Av. Itaituba"," Leitor Inteligente de Placas (OCR-P)","60","Boa Vista/São Geraldo","10086","KBH53086","-19.89507, -43.90111 "],
+      [371, "1665","Av. Amazonas, Esq. Rua Guajajaras"," Leitor Inteligente de Placas (OCR-P)","60","Centro/Gutierrez","10087","KBH53087","-19.92358, -43.94681"],
+      [372, "1666","Av. Amazonas, Esq. Rua Guajajaras "," Leitor Inteligente de Placas (OCR-P)","60","Centro/Gutierrez","10088","KBH53088","-19.92348, -43.94661 "],
+      [373, "1667","Av. Amazonas, Esq. Rua Guajajaras "," Leitor Inteligente de Placas (OCR-P)","60","Centro/Gutierrez","10089","KBH53089","-19.92371, -43.94699"]
+  
 
 
     ]
