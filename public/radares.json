@@ -409,7 +409,13 @@
       [394, "1687","Rua Oscar Trompowsky, Próx. Av. Silva Lobo ","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região do Grajaú","1001010","KBH5301010","-19.94339, -43.96310"],
       [395, "1688","Estrada do Cercadinho, Próx. Rua do Grotão ","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região do Jardim América","1001011","KBH5301011","-19.95548, -43.97059"],
       [396, "1689","Rodovia MG-5, Próx. Rua Quatro Mil Trezentos e Dez","Detector de Redução de Velocidade (REV)","40","Goiânia/Centro","1001012","KBH5301012","-19.86005, -43.90535"],
-      [397, "1690","Rodovia MG-5, Próx. Rua Luiz de Abreu","Detector de Redução de Velocidade (REV)","40","Centro/Goiânia","1001013","KBH5301013","-19.86192, -43.90493"]
+      [397, "1690","Rodovia MG-5, Próx. Rua Luiz de Abreu","Detector de Redução de Velocidade (REV)","40","Centro/Goiânia","1001013","KBH5301013","-19.86192, -43.90493"],
+      [396, "1689","Rodovia MG-5, Próx. Rua Quatro Mil Trezentos e Dez","Detector de Redução de Velocidade (REV)","40","Goiânia/Centro","1001012","KBH5301012","-19.86005, -43.90535"],
+      [397, "1690","Rodovia MG-5, Próx. Rua Luiz de Abreu","Detector de Redução de Velocidade (REV)","40","Centro/Goiânia","1001013","KBH5301013"," -19.86192, -43.90493"],
+      [398, "1691","Av. Cristiano Machado, Próx. Estação Floramar"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Floramar","1001014","KBH5301014"," -19.83524, -43.94006"],
+      [399, "1692","Av. Cristiano Machado, Próx. Rua Cel Romão da Mota"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Shopping Estação","1001015","KBH5301015"," -19.82719, -43.94284 "],
+      [400, "1693","Av. Cristiano Machado, Próx. Rua Ouricuri"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Floramar","1001016","KBH5301016","-19.83887, -43.93689"]
+
 
 
     ]
