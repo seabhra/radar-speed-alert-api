@@ -21,9 +21,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
 <style>
-    /* ==========================================
-       VARIÁVEIS GLOBAIS
-       ========================================== */
     :root {
         --bg-color: #0f1115;
         --panel-color: #1a1d24;
@@ -35,9 +32,6 @@
         --btn-size: 50px;
     }
 
-    /* ==========================================
-       RESET E BASE
-       ========================================== */
     * {
         box-sizing: border-box;
         margin: 0;
@@ -55,9 +49,6 @@
         overflow: hidden;
     }
 
-    /* ==========================================
-       CABEÇALHO
-       ========================================== */
     header {
         background-color: var(--panel-color);
         padding: 15px;
@@ -93,9 +84,6 @@
         color: var(--accent-color);
     }
 
-    /* ==========================================
-       BOTÃO MENU (☰ MENU)
-       ========================================== */
     .btn-menu-toggle {
         display: flex;
         flex-direction: column;
@@ -161,9 +149,6 @@
         margin-top: 2px;
     }
 
-    /* ==========================================
-       BARRA RETRÁTIL LATERAL
-       ========================================== */
     .sidebar-controls {
         position: absolute;
         top: 0;
@@ -198,9 +183,6 @@
         transition: opacity 0.15s ease 0s, transform 0.2s ease, border-color 0.2s ease;
     }
 
-    /* ==========================================
-       BARRA DE PESQUISA
-       ========================================== */
     .search-container {
         position: absolute;
         top: 0;
@@ -273,9 +255,6 @@
         transform: translate(-50%, -50%);
     }
 
-    /* ==========================================
-       CONTAINER DO MAPA
-       ========================================== */
     .map-wrapper {
         position: relative;
         flex: 1;
@@ -291,9 +270,6 @@
         z-index: 1;
     }
 
-    /* ==========================================
-       WIDGET DE BÚSSOLA
-       ========================================== */
     .compass-widget {
         position: absolute;
         top: 20px;
@@ -325,9 +301,6 @@
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
-    /* ==========================================
-       BOTÕES DE CONTROLE DO MAPA
-       ========================================== */
     .map-btn {
         width: var(--btn-size);
         height: var(--btn-size);
@@ -401,9 +374,6 @@
         transition: transform 0.3s ease;
     }
 
-    /* ==========================================
-       MARCADORES
-       ========================================== */
     .user-gps-marker,
     .user-navigator-marker {
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
@@ -445,9 +415,6 @@
         display: block !important;
     }
 
-    /* ==========================================
-       WIDGET DE VELOCIDADE
-       ========================================== */
     .speed-widget {
         position: absolute;
         bottom: -15px;
@@ -487,9 +454,6 @@
         min-width: 3ch;
     }
 
-    /* ==========================================
-       SISTEMA DE ALERTAS
-       ========================================== */
     #alert-container {
         position: absolute;
         bottom: 0;
@@ -546,9 +510,6 @@
         opacity: 0.95;
     }
 
-    /* ==========================================
-       TOAST
-       ========================================== */
     .toast-notification {
         position: absolute;
         top: 20px;
@@ -575,9 +536,6 @@
         transform: translateX(-50%) translateY(0);
     }
 
-    /* ==========================================
-       LOADING OVERLAY
-       ========================================== */
     .loading-overlay {
         position: absolute;
         top: 50%;
@@ -606,9 +564,6 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* ==========================================
-       LOADING FULLSCREEN
-       ========================================== */
     .loading-fullscreen {
         position: fixed;
         inset: 0;
@@ -684,9 +639,6 @@
         50% { opacity: 1; }
     }
 
-    /* ==========================================
-       OCULTAÇÕES DO LEAFLET
-       ========================================== */
     .leaflet-control-zoom,
     .leaflet-control-attribution,
     .leaflet-routing-container {
@@ -708,7 +660,6 @@
       <h1>RADAR <span>X9</span> BH</h1>
     </div>
 
-    <!-- BOTÃO MENU NO HEADER -->
     <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
       <div class="menu-hamburger">
         <span></span>
@@ -743,7 +694,6 @@
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
-    <!-- BARRA RETRÁTIL COM TODOS OS BOTÕES -->
     <div class="sidebar-controls" id="sidebar-controls">
       <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)"><img src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar"></button>
       <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar"><img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta"></button>
@@ -814,7 +764,6 @@
     let refreshDelayTimer = null;
     const TEMPO_REFRESH_DELAY = 5000;
     
-    // Estado da barra retrátil
     let sidebarAberta = true;
 
     const ALERT_CONFIG = {
@@ -838,6 +787,9 @@
     var animacaoMarcadorAtiva = false;
     var contagemTocarSom = 0;
 
+    // ===================================================================
+    // MAPEAMENTO DE ÍCONES (Atualizado com ZPV)
+    // ===================================================================
     const iconMap = {
       'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
       'Detector de Avanço de Semáforo':'/imagens_app/ic_radar_das_v2.png',
@@ -895,7 +847,6 @@
         } else {
           sidebar.classList.add('retracted');
           btnMenu.classList.add('active');
-          // Fecha barras de pesquisa se estiverem abertas
           if (searchActive || routeActive) {
             searchActive = false;
             routeActive = false;
@@ -950,35 +901,109 @@
       });
     }
 
+    // ===================================================================
+    // FUNÇÃO getIconUrl CORRIGIDA - Detecção por substring completa
+    // ===================================================================
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
-      if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) return iconMap['Zona Verde de Trânsito (ZVT)'];
-      if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) return iconMap['Controlador Eletrônico de Velocidade'] || '/imagens_app/ic_radar_cev_v2.png';
-      if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
-      if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') return iconMap['Controle de Redução de Velocidade (CRV)'];
+
+      // 1. Zonas Verdes
+      if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) 
+        return iconMap['Zona Verde de Trânsito (ZVT)'];
+
+      // 2. Controlador Eletrônico Misto
+      if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) 
+        return iconMap['Controlador Eletrônico de Velocidade'] || '/imagens_app/ic_radar_cev_v2.png';
+
+      // 3. Parada sobre Faixa de Pedestres (DPFP)
+      if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) 
+        return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
+
+      // 4. CRV exato
+      if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') 
+        return iconMap['Controle de Redução de Velocidade (CRV)'];
+
+      // 5. Radares de Velocidade (por faixa de velocidade)
       const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) || tipoLimpo.includes('CEM') || tipoLimpo.includes('Controlador Eletrônico');
       if (isRadarVelocidade) {
         const vel = parseInt(velocidade) || 0;
-        if (vel === 30) return '/imagens_app/ic_radar_cem_30_v2.png'; if (vel === 40) return '/imagens_app/ic_radar_cem_40_v2.png';
-        if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png'; if (vel === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
-        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png'; if (vel === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
+        if (vel === 30) return '/imagens_app/ic_radar_cem_30_v2.png'; 
+        if (vel === 40) return '/imagens_app/ic_radar_cem_40_v2.png';
+        if (vel === 50) return '/imagens_app/ic_radar_cev_50_v2.png'; 
+        if (vel === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
+        if (vel === 70) return '/imagens_app/ic_radar_cev_70_v2.png'; 
+        if (vel === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
         return '/imagens_app/ic_radar_cev_v2.png';
       }
+
+      // 6. Busca exata no mapa
       let icone = iconMap[tipoLimpo];
+
+      // 7. Fallback por palavras-chave (ORDEM CORRIGIDA - dos mais específicos para os genéricos)
       if (!icone) {
-        if (tipoLimpo.includes('Semáforo')) icone = iconMap['Detector de Avanço de Semáforo'];
-        else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) icone = iconMap['Controle de Redução de Velocidade (CRV)'];
-        else if (tipoLimpo.includes('Celular')) icone = iconMap['Detector de Uso de Celular'];
-        else if (tipoLimpo.includes('Verde')) icone = iconMap['Zona Verde de Trânsito (ZVT)'];
-        else if (tipoLimpo.includes('OCR')) icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
-        else if (tipoLimpo.includes('Facial')) icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
-        else if (tipoLimpo.includes('Conversão')) icone = iconMap['Detector de Conversão em Local Proibido'];
-        else if (tipoLimpo.includes('Inundações')) icone = iconMap['Zona de Risco - Inundações Recorrentes (ZIR)'];
-        else if (tipoLimpo.includes('Invasão')) icone = iconMap['Detector de Invasão de Faixa Exclusiva - MOVE'];
-        else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres') || tipoLimpo.includes('DPFP')) icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
-        else if (tipoLimpo.includes('Faixa Exclusiva') || tipoLimpo.includes('DIFEX')) icone = iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'];
-        else if (tipoLimpo.includes('BUS') || tipoLimpo.includes('Faixa Preferencial')) icone = iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'];
+        if (tipoLimpo.includes('Olho Vivo') || tipoLimpo.includes('COV')) {
+          // Câmera Olho Vivo
+          icone = iconMap['Câmera Olho Vivo (COV)'];
+        }
+        else if (tipoLimpo.includes('Facial')) {
+          // Reconhecimento Facial
+          icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
+        }
+        else if (tipoLimpo.includes('OCR') || tipoLimpo.includes('Placas') || tipoLimpo.includes('Inteligente de Placas')) {
+          // Leitor de Placas
+          icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
+        }
+        else if (tipoLimpo.includes('Celular')) {
+          // Uso de Celular
+          icone = iconMap['Detector de Uso de Celular'];
+        }
+        else if (tipoLimpo.includes('Cinto') || tipoLimpo.includes('VCS')) {
+          // Cinto de Segurança
+          icone = iconMap['Verificador de Cinto de Segurança (VCS)'];
+        }
+        else if (tipoLimpo.includes('Acidente') || tipoLimpo.includes('AIA')) {
+          // Alto Índice de Acidente
+          icone = iconMap['Alerta de Alto Índice  de Acidente (AIA)'];
+        }
+        else if (tipoLimpo.includes('Perigo') || tipoLimpo.includes('ZPV') || tipoLimpo.includes('Violent')) {
+          // Zona de Perigo e Violência
+          icone = iconMap['Zona de Perigo e Violência (ZPV)'];
+        }
+        else if (tipoLimpo.includes('Inundações') || tipoLimpo.includes('ZIR')) {
+          // Zona de Inundação
+          icone = iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'];
+        }
+        else if (tipoLimpo.includes('Semáforo')) {
+          // Avanço de Semáforo
+          icone = iconMap['Detector de Avanço de Semáforo'];
+        }
+        else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) {
+          // Redutor de Velocidade
+          icone = iconMap['Controle de Redução de Velocidade (CRV)'];
+        }
+        else if (tipoLimpo.includes('Verde')) {
+          // Zona Verde
+          icone = iconMap['Zona Verde de Trânsito (ZVT)'];
+        }
+        else if (tipoLimpo.includes('Conversão')) {
+          // Conversão Proibida
+          icone = iconMap['Detector de Conversão em Local Proibido'];
+        }
+        else if (tipoLimpo.includes('Invasão') || tipoLimpo.includes('DIFEX') || tipoLimpo.includes('Faixa Exclusiva')) {
+          // Invasão de Faixa
+          icone = iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'];
+        }
+        else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres')) {
+          // Parada sobre Faixa (genérico)
+          icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
+        }
+        else if (tipoLimpo.includes('BUS') || tipoLimpo.includes('Faixa Preferencial')) {
+          // Faixa de Ônibus
+          icone = iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'];
+        }
       }
+
+      // 8. Último recurso
       if (!icone) icone = iconMap['default'];
       return icone;
     }
@@ -1328,7 +1353,6 @@
         if (routeActive) routeActive = false;
         searchActive = true; $("#search-bar-rota").removeClass('active');
         $("#search-bar-radares").addClass('active');
-        // Se a sidebar estiver recolhida, abre para mostrar a barra de busca
         if (!sidebarAberta) {
           sidebarAberta = true;
           document.getElementById('sidebar-controls').classList.remove('retracted');
