@@ -385,8 +385,22 @@
       [370, "1664"," Av. Elísio de Brito, Esq. Av. Itaituba"," Leitor Inteligente de Placas (OCR-P)","60","Boa Vista/São Geraldo","10086","KBH53086","-19.89507, -43.90111 "],
       [371, "1665","Av. Amazonas, Esq. Rua Guajajaras"," Leitor Inteligente de Placas (OCR-P)","60","Centro/Gutierrez","10087","KBH53087","-19.92358, -43.94681"],
       [372, "1666","Av. Amazonas, Esq. Rua Guajajaras "," Leitor Inteligente de Placas (OCR-P)","60","Centro/Gutierrez","10088","KBH53088","-19.92348, -43.94661 "],
-      [373, "1667","Av. Amazonas, Esq. Rua Guajajaras "," Leitor Inteligente de Placas (OCR-P)","60","Centro/Gutierrez","10089","KBH53089","-19.92371, -43.94699"]
-  
+      [373, "1667","Av. Amazonas, Esq. Rua Guajajaras "," Leitor Inteligente de Placas (OCR-P)","60","Centro/Gutierrez","10089","KBH53089","-19.92371, -43.94699"],
+      [374,"1667","Rodoviária, Próx. Rua Guaicurus"," Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10090","KBH53090","-19.91354, -43.94074"],
+      [375,"1668","Rua Curitiba, Esq. Rua Oiapoque"," Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10091","KBH53091","-19.91360, -43.93990"],
+      [376,"1669","Praça Rio Branco, Esq. Av. Paraná"," Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10092","KBH53092","-19.91509, -43.94080"],
+      [377,"1670","Rua Rio Grande do Sul, Esq. Rua Carijós"," Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10093","KBH53093","-19.91751, -43.94511"],
+      [378,"1671","Rua Rio Grande do Sul, Esq. Rua Tupis"," Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10094","KBH53094"," -19.91998, -43.94578"],
+      [379,"1672","Av. Do Cardoso , Esq. Rua Nossa Senhora de Fátima "," Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10095","KBH53095"," -19.93981, -43.90853"],
+      [380,"1673","Av. Do Cardoso , Esq. Rua São João ","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10096","KBH53096"," -19.93482, -43.90604"],
+      [381,"1674","Av. Do Cardoso , Com Av. Mendes  Sá","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10097","KBH53097"," -19.93286, -43.90672"],
+      [382,"1675","Rua Pedro Lessa, Esq. Rua Itapiranga","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10098","KBH53098"," -19.90499, -43.94888"],
+      [383,"1676","Rua Pedro Lessa, Esq. Rua Mendes de Oliveira","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","10099","KBH53099"," -19.90420, -43.95219"],
+      [384,"1677","Rua Roseiral, Esq. Rua Serra Negra","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","100100","KBH530100"," -19.90140, -43.95123"],
+      [385,"1678","Rua Popular, Esq. Viaduto da República do Congo","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","100101","KBH530101","-19.89992, -43.94714 "],
+      [386,"1679","Rua Principal, Esq. Av. Arthur Bernardes","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","100102","KBH530102"," -19.95110, -43.94588 "],
+      [387,"1680","Rua Principal, Esq. Rua Vila do Bicão","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","100103","KBH530103","-19.95702, -43.94179 "],
+      [388,"1681","Rua Arthuer Bernardes, Com Rua Vila do Bicão","Zona de Perigo e Violência (ZPV)","60","Nas proximidades da região","100104","KBH530104","-19.95464, -43.94539"]  
 
 
     ]
