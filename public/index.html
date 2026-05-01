@@ -788,7 +788,7 @@
     var contagemTocarSom = 0;
 
     // ===================================================================
-    // MAPEAMENTO DE ÍCONES (Atualizado com ZPV)
+    // MAPEAMENTO DE ÍCONES
     // ===================================================================
     const iconMap = {
       'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
@@ -902,7 +902,7 @@
     }
 
     // ===================================================================
-    // FUNÇÃO getIconUrl CORRIGIDA - Detecção por substring completa
+    // FUNÇÃO getIconUrl - Detecção por substring robusta
     // ===================================================================
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
@@ -924,7 +924,7 @@
         return iconMap['Controle de Redução de Velocidade (CRV)'];
 
       // 5. Radares de Velocidade (por faixa de velocidade)
-      const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV')) || tipoLimpo.includes('CEM') || tipoLimpo.includes('Controlador Eletrônico');
+      const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV') && !tipoLimpo.includes('Redução')) || tipoLimpo.includes('CEM') || tipoLimpo.includes('Controlador Eletrônico');
       if (isRadarVelocidade) {
         const vel = parseInt(velocidade) || 0;
         if (vel === 30) return '/imagens_app/ic_radar_cem_30_v2.png'; 
@@ -939,66 +939,53 @@
       // 6. Busca exata no mapa
       let icone = iconMap[tipoLimpo];
 
-      // 7. Fallback por palavras-chave (ORDEM CORRIGIDA - dos mais específicos para os genéricos)
+      // 7. Fallback por palavras-chave (ORDEM: específicos primeiro para evitar conflitos)
       if (!icone) {
         if (tipoLimpo.includes('Olho Vivo') || tipoLimpo.includes('COV')) {
-          // Câmera Olho Vivo
           icone = iconMap['Câmera Olho Vivo (COV)'];
         }
         else if (tipoLimpo.includes('Facial')) {
-          // Reconhecimento Facial
           icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
         }
-        else if (tipoLimpo.includes('OCR') || tipoLimpo.includes('Placas') || tipoLimpo.includes('Inteligente de Placas')) {
-          // Leitor de Placas
+        else if (tipoLimpo.includes('(OCR-P)')) {
+          // Detecta OCR-P de forma exata pela sigla entre parênteses
           icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
         }
-        else if (tipoLimpo.includes('Celular')) {
-          // Uso de Celular
+        else if (tipoLimpo.includes('Celular') || tipoLimpo.includes('(DUC)')) {
           icone = iconMap['Detector de Uso de Celular'];
         }
-        else if (tipoLimpo.includes('Cinto') || tipoLimpo.includes('VCS')) {
-          // Cinto de Segurança
+        else if (tipoLimpo.includes('Cinto') || tipoLimpo.includes('(VCS)')) {
           icone = iconMap['Verificador de Cinto de Segurança (VCS)'];
         }
-        else if (tipoLimpo.includes('Acidente') || tipoLimpo.includes('AIA')) {
-          // Alto Índice de Acidente
+        else if (tipoLimpo.includes('Acidente') || tipoLimpo.includes('(AIA)')) {
           icone = iconMap['Alerta de Alto Índice  de Acidente (AIA)'];
         }
-        else if (tipoLimpo.includes('Perigo') || tipoLimpo.includes('ZPV') || tipoLimpo.includes('Violent')) {
-          // Zona de Perigo e Violência
+        else if (tipoLimpo.includes('Perigo') || tipoLimpo.includes('(ZPV)')) {
           icone = iconMap['Zona de Perigo e Violência (ZPV)'];
         }
-        else if (tipoLimpo.includes('Inundações') || tipoLimpo.includes('ZIR')) {
-          // Zona de Inundação
+        else if (tipoLimpo.includes('Inundações') || tipoLimpo.includes('(ZIR)')) {
           icone = iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'];
         }
         else if (tipoLimpo.includes('Semáforo')) {
-          // Avanço de Semáforo
           icone = iconMap['Detector de Avanço de Semáforo'];
         }
-        else if (tipoLimpo.includes('Redutor') || tipoLimpo.includes('Redução')) {
-          // Redutor de Velocidade
+        else if (tipoLimpo.includes('Redução') || tipoLimpo.includes('Redutor') || tipoLimpo.includes('(DRV)') || tipoLimpo.includes('(CRV)')) {
+          // Pegou DRV (Detector de Redução de Velocidade) e CRV
           icone = iconMap['Controle de Redução de Velocidade (CRV)'];
         }
         else if (tipoLimpo.includes('Verde')) {
-          // Zona Verde
           icone = iconMap['Zona Verde de Trânsito (ZVT)'];
         }
         else if (tipoLimpo.includes('Conversão')) {
-          // Conversão Proibida
           icone = iconMap['Detector de Conversão em Local Proibido'];
         }
         else if (tipoLimpo.includes('Invasão') || tipoLimpo.includes('DIFEX') || tipoLimpo.includes('Faixa Exclusiva')) {
-          // Invasão de Faixa
           icone = iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'];
         }
         else if (tipoLimpo.includes('Parada') || tipoLimpo.includes('Pedestres')) {
-          // Parada sobre Faixa (genérico)
           icone = iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
         }
         else if (tipoLimpo.includes('BUS') || tipoLimpo.includes('Faixa Preferencial')) {
-          // Faixa de Ônibus
           icone = iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'];
         }
       }
@@ -1281,12 +1268,34 @@
       removerRota(); esconderAlertaVisual(); showNotification("Mapa resetado");
     }
 
+    // ===================================================================
+    // FUNÇÃO extrairCoordenadas CORRIGIDA
+    // Lida com: "-19.919, -43.938" (vírgula sep) e "-19.919,-43.938" (sem espaço)
+    // ===================================================================
     function extrairCoordenadas(record) {
       if (!record || record.length < 10) return null;
-      var stringLimpa = String(record[9]).replace(/\s+/g, '').trim();
+      
+      var stringOriginal = String(record[9]).trim();
+      
+      // Remove espaços ao redor, mas preserva a vírgula central
+      var stringLimpa = stringOriginal.replace(/\s*,\s*/g, ',').trim();
+      
+      // Se NÃO tiver ponto mas tiver vírgula (ex: "-19,919,-43,938"), 
+      // substitui a primeira vírgula por ponto (decimal) e a segunda por vírgula (separador)
+      if (!stringLimpa.includes('.') && stringLimpa.includes(',')) {
+        var primeiraVirgula = stringLimpa.indexOf(',');
+        if (primeiraVirgula !== -1) {
+          stringLimpa = stringLimpa.substring(0, primeiraVirgula) + '.' + stringLimpa.substring(primeiraVirgula + 1);
+        }
+        // Agora a string fica "-19.919,-43.938" que o split(',') resolve
+      }
+      
       var parts = stringLimpa.split(',');
       if (parts.length !== 2) return null;
-      var lat = parseFloat(parts[0]); var lng = parseFloat(parts[1]);
+      
+      var lat = parseFloat(parts[0]); 
+      var lng = parseFloat(parts[1]);
+      
       if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
       return { lat: lat, lng: lng };
     }
