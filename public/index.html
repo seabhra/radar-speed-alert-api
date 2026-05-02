@@ -864,64 +864,8 @@
     function criarIconePersonalizado(iconUrl, tamanho, className) {
       return L.icon({ iconUrl: iconUrl, iconSize: [tamanho, tamanho], iconAnchor: [tamanho/2, tamanho], popupAnchor: [0, -tamanho/2], className: className });
     }
-// ===================================================================
-// FUNÇÃO: adicionarMarcadoresRota - Configura ícones de saída e chegada
-// ===================================================================
-function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
-  // Remove marcadores antigos
-  if (startRouteMarker) map.removeLayer(startRouteMarker);
-  if (endRouteMarker) map.removeLayer(endRouteMarker);
-  
-  // Remove userMarker padrão para evitar duplicidade
-  if (userMarker) {
-    map.removeLayer(userMarker);
-    userMarker = null;
-  }
-  
-  // Ativa modo navegação
-  estaEmNavegacao = true;
-  ultimaPosicaoMarcador = { lat: null, lng: null };
-  
-  // 🔵 ÍCONE DE SAÍDA (substitui userMarker)
-  var startIcon = criarIconePersonalizado(
-    '/imagens_app/ic_navigator_map.png',
-    50,
-    'route-start-marker user-navigator-marker'
-  );
-  
-  startRouteMarker = L.marker([originLat, originLng], {
-    icon: startIcon,
-    zIndexOffset: 1000
-  }).addTo(map);
-  
-  // startRouteMarker AGORA É o userMarker durante navegação
-  userMarker = startRouteMarker;
-  
-  startRouteMarker.bindTooltip("🚗 Navegando para destino", {
-    permanent: false,
-    direction: "top",
-    offset: [0, -30]
-  });
-  
-  // 🔴 ÍCONE DE CHEGADA
-  var endIcon = criarIconePersonalizado(
-    '/imagens_app/ic_icon_chegada.png',
-    50,
-    'route-end-marker'
-  );
-  
-  endRouteMarker = L.marker([destLat, destLng], {
-    icon: endIcon,
-    zIndexOffset: 900
-  }).addTo(map);
-  
-  endRouteMarker.bindPopup("<b>📍 DESTINO</b><br>Você chegou ao seu destino!", {
-    closeButton: false,
-    autoClose: true,
-    closeOnClick: true
-  });
-}
 
+    
 
     // ===================================================================
     // FUNÇÃO getIconUrl - Detecção por substring robusta
