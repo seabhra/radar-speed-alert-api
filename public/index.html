@@ -738,7 +738,6 @@
     let userLat = -19.919055;
     let userLng = -43.938641;
     let tileLayer;
-    let routingControl = null;
     let searchActive = false;
     let routeActive = false;
     let prevLat = null;
@@ -749,14 +748,17 @@
     let gpsSource = 'none';
     let gpsInitialized = false;
     let browserGpsTimeout = null;
-    let destinoAtual = null;
     let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
     
+    // ===================================================================
+    // VARIÁVEIS GLOBAIS DE CONTROLE DE NAVEGAÇÃO
+    // ===================================================================
     var estaEmNavegacao = false;
     var startRouteMarker = null;
     var endRouteMarker = null;
+    var routingControl = null;
+    var destinoAtual = null;
 
-    
     let alertaHabilitado = true;
     let ultimoRadarAlertado = null;
     let returnToGpsTimer = null;
@@ -865,7 +867,18 @@
       return L.icon({ iconUrl: iconUrl, iconSize: [tamanho, tamanho], iconAnchor: [tamanho/2, tamanho], popupAnchor: [0, -tamanho/2], className: className });
     }
 
-    
+    function criarIconeRadar(iconUrl, tamanho) {
+      return L.icon({ iconUrl: iconUrl, iconSize: [tamanho, tamanho], iconAnchor: [tamanho/2, tamanho/2], popupAnchor: [0, -tamanho/2], className: 'radar-marker-icon' });
+    }
+
+    function deveAlertaRadar(tipoOriginal) {
+      if (!tipoOriginal) return false;
+      var tipoLimpo = tipoOriginal.trim();
+      for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {
+        if (tipoLimpo === TIPOS_SEM_ALERTA[i]) return false;
+      }
+      return true;
+    }
 
     // ===================================================================
     // FUNÇÃO getIconUrl - Detecção por substring robusta
@@ -873,23 +886,18 @@
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
 
-      // 1. Zonas Verdes
       if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) 
         return iconMap['Zona Verde de Trânsito (ZVT)'];
 
-      // 2. Controlador Eletrônico Misto
       if (tipoLimpo.includes('Controlador Eletrônico Misto') || tipoLimpo.includes('CEM')) 
         return iconMap['Controlador Eletrônico de Velocidade'] || '/imagens_app/ic_radar_cev_v2.png';
 
-      // 3. Parada sobre Faixa de Pedestres (DPFP)
       if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) 
         return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'] || '/imagens_app/ic_radar_dpfp_v2.png';
 
-      // 4. CRV exato
       if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)') 
         return iconMap['Controle de Redução de Velocidade (CRV)'];
 
-      // 5. Radares de Velocidade (por faixa de velocidade)
       const isRadarVelocidade = (tipoLimpo.includes('Velocidade') && !tipoLimpo.includes('CRV') && !tipoLimpo.includes('Redução')) || tipoLimpo.includes('CEM') || tipoLimpo.includes('Controlador Eletrônico');
       if (isRadarVelocidade) {
         const vel = parseInt(velocidade) || 0;
@@ -902,10 +910,8 @@
         return '/imagens_app/ic_radar_cev_v2.png';
       }
 
-      // 6. Busca exata no mapa
       let icone = iconMap[tipoLimpo];
 
-      // 7. Fallback por palavras-chave (ORDEM: específicos primeiro para evitar conflitos)
       if (!icone) {
         if (tipoLimpo.includes('Olho Vivo') || tipoLimpo.includes('COV')) {
           icone = iconMap['Câmera Olho Vivo (COV)'];
@@ -914,7 +920,6 @@
           icone = iconMap['Leitor de Reconhecimento Facial (OCR-F)'];
         }
         else if (tipoLimpo.includes('(OCR-P)')) {
-          // Detecta OCR-P de forma exata pela sigla entre parênteses
           icone = iconMap['Leitor Inteligente de Placas (OCR-P)'];
         }
         else if (tipoLimpo.includes('Celular') || tipoLimpo.includes('(DUC)')) {
@@ -936,7 +941,6 @@
           icone = iconMap['Detector de Avanço de Semáforo'];
         }
         else if (tipoLimpo.includes('Redução') || tipoLimpo.includes('Redutor') || tipoLimpo.includes('(DRV)') || tipoLimpo.includes('(CRV)')) {
-          // Pegou DRV (Detector de Redução de Velocidade) e CRV
           icone = iconMap['Controle de Redução de Velocidade (CRV)'];
         }
         else if (tipoLimpo.includes('Verde')) {
@@ -956,7 +960,6 @@
         }
       }
 
-      // 8. Último recurso
       if (!icone) icone = iconMap['default'];
       return icone;
     }
@@ -998,25 +1001,55 @@
       return { estaAproximando: true, estaAfastando: false, diferenca: 0 };
     }
 
+    // ===================================================================
+    // FUNÇÃO: moverMarcadorSuavemente
+    // Decide qual marcador mover: startRouteMarker (navegação) ou userMarker (normal)
+    // ===================================================================
     function moverMarcadorSuavemente(targetLat, targetLng) {
       var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
+      
       if (!marcadorParaMover) return;
+      
       if (ultimaPosicaoMarcador.lat === null) {
-        ultimaPosicaoMarcador.lat = targetLat; ultimaPosicaoMarcador.lng = targetLng;
-        marcadorParaMover.setLatLng([targetLat, targetLng]); return;
+        ultimaPosicaoMarcador.lat = targetLat;
+        ultimaPosicaoMarcador.lng = targetLng;
+        marcadorParaMover.setLatLng([targetLat, targetLng]);
+        return;
       }
-      var distanciaUltimoMovimento = calcularDistancia(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng);
-      if (distanciaUltimoMovimento < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) return;
-      var inicioLat = ultimaPosicaoMarcador.lat; var inicioLng = ultimaPosicaoMarcador.lng;
-      var duracao = 500; var inicioTempo = performance.now();
-      if (animacaoMarcadorAtiva) return; animacaoMarcadorAtiva = true;
+      
+      var distanciaUltimoMovimento = calcularDistancia(
+        ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng
+      );  
+      if (distanciaUltimoMovimento < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) {
+        return;
+      }  
+      var inicioLat = ultimaPosicaoMarcador.lat;
+      var inicioLng = ultimaPosicaoMarcador.lng;
+      var duracao = 300; 
+      var inicioTempo = performance.now();
+      
+      if (animacaoMarcadorAtiva) return; 
+      animacaoMarcadorAtiva = true;
+      
       function animarFrame(tempoAtual) {
-        var progresso = Math.min((tempoAtual - inicioTempo) / duracao, 1);
-        var fatorEasing = progresso < 0.5 ? 4 * Math.pow(progresso, 3) : 1 - Math.pow(-2 * progresso + 2, 3) / 2;
-        marcadorParaMover.setLatLng([inicioLat + (targetLat - inicioLat) * fatorEasing, inicioLng + (targetLng - inicioLng) * fatorEasing]);
-        if (progresso < 1) { requestAnimationFrame(animarFrame); }
-        else { ultimaPosicaoMarcador.lat = targetLat; ultimaPosicaoMarcador.lng = targetLng; animacaoMarcadorAtiva = false; }
-      }
+        var tempoDecorrido = tempoAtual - inicioTempo;
+        var progresso = Math.min(tempoDecorrido / duracao, 1);
+        var fatorEasing = 1 - Math.pow(1 - progresso, 3);
+        
+        var latAtual = inicioLat + (targetLat - inicioLat) * fatorEasing;
+        var lngAtual = inicioLng + (targetLng - inicioLng) * fatorEasing;
+        
+        marcadorParaMover.setLatLng([latAtual, lngAtual]);
+        
+        if (progresso < 1) {
+          requestAnimationFrame(animarFrame);
+        } else {
+          ultimaPosicaoMarcador.lat = targetLat;
+          ultimaPosicaoMarcador.lng = targetLng;
+          animacaoMarcadorAtiva = false;
+        }
+      }  
+      
       requestAnimationFrame(animarFrame);
     }
 
@@ -1062,38 +1095,272 @@
     }
 
     // ===================================================================
-    // PROCESSAR NOVA POSIÇÃO
+    // FUNÇÃO: adicionarMarcadoresRota - Configura saída e chegada
+    // ===================================================================
+    function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+      // Remove antigos se existirem
+      if (startRouteMarker) map.removeLayer(startRouteMarker);
+      if (endRouteMarker) map.removeLayer(endRouteMarker);
+
+      // Remove o marcador de GPS normal temporariamente
+      if (userMarker) {
+        map.removeLayer(userMarker);
+        userMarker = null;
+      }
+
+      // Define que estamos em navegação (afeta a animação suave do GPS)
+      estaEmNavegacao = true;
+      // Reseta a posição da animação para não "teleportar" do ponto antigo
+      ultimaPosicaoMarcador = { lat: null, lng: null };
+
+      // 🔵 INÍCIO (Substitui o userMarker durante a rota)
+      var startIcon = criarIconePersonalizado(
+        '/imagens_app/ic_navigator_map.png',
+        50,
+        'route-start-marker user-navigator-marker'
+      );
+
+      startRouteMarker = L.marker([originLat, originLng], {
+        icon: startIcon,
+        zIndexOffset: 1000
+      }).addTo(map);
+      
+      startRouteMarker.bindTooltip("🚗 Navegando para destino", { 
+        permanent: false, 
+        direction: "top", 
+        offset: [0, -45] 
+      });
+
+      // 🔴 DESTINO
+      var endIcon = criarIconePersonalizado(
+        '/imagens_app/ic_icon_chegada.png',
+        50,
+        'route-end-marker'
+      );
+
+      endRouteMarker = L.marker([destLat, destLng], {
+        icon: endIcon,
+        zIndexOffset: 900
+      }).addTo(map);
+      
+      endRouteMarker.bindPopup("<b>📍 DESTINO</b><br>Você chegou ao seu destino!", {
+        closeButton: false,
+        autoClose: true,
+        closeOnClick: true
+      });
+    }
+
+    // ===================================================================
+    // FUNÇÃO: removerMarcadoresRota - Remove apenas o marcador de destino
+    // ===================================================================
+    function removerMarcadoresRota() {
+      if (endRouteMarker) {
+        map.removeLayer(endRouteMarker);
+        endRouteMarker = null;
+      }
+    }
+
+    // ===================================================================
+    // FUNÇÃO: atualizarRota - Atualiza rota e move o marcador de partida
+    // ===================================================================
+    function atualizarRota() {
+      if (destinoAtual && userLat && userLng && routingControl) {
+        routingControl.setWaypoints([
+          L.latLng(userLat, userLng),
+          L.latLng(destinoAtual.lat, destinoAtual.lng)
+        ]);
+
+        // Move o marcador de partida (navegação)
+        if (startRouteMarker) {
+          startRouteMarker.setLatLng([userLat, userLng]);
+        }
+      }
+    }
+
+    // ===================================================================
+    // FUNÇÃO: verificarChegadaDestino - Timer que encerra a rota ao chegar
+    // ===================================================================
+    function verificarChegadaDestino() {
+      if (!destinoAtual) return;
+
+      var distanciaDestino = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
+
+      // Se chegou a menos de 30 metros do destino
+      if (distanciaDestino <= 30) {
+        showNotification("🎉 Você chegou ao seu destino!");
+        
+        // Abre o popup de chegada no mapa
+        if (endRouteMarker) {
+          endRouteMarker.openPopup();
+        }
+
+        // Aguarda 4 segundos para o usuário ler o popup, depois reseta
+        setTimeout(function() {
+          finalizarERestaurarRota();
+        }, 4000);
+      }
+    }
+
+    // ===================================================================
+    // FUNÇÃO: finalizarERestaurarRota - Restaura o ícone padrão
+    // ===================================================================
+    function finalizarERestaurarRota() {
+      if (!map) return;
+
+      // 1. Remove a linha de rota
+      if (routingControl) {
+        map.removeControl(routingControl);
+        routingControl = null;
+      }
+      destinoAtual = null;
+
+      // 2. Remove o marcador de navegação (azul)
+      if (startRouteMarker) {
+        map.removeLayer(startRouteMarker);
+        startRouteMarker = null;
+      }
+
+      // 3. Remove o marcador de chegada (vermelho)
+      removerMarcadoresRota();
+
+      // 4. Desativa o modo navegação
+      estaEmNavegacao = false;
+      // Reseta posição da animação para o ponto atual exato
+      if (posicaoSuavizada && posicaoSuavizada.lat !== null) {
+        ultimaPosicaoMarcador.lat = posicaoSuavizada.lat;
+        ultimaPosicaoMarcador.lng = posicaoSuavizada.lng;
+      } else {
+        ultimaPosicaoMarcador = { lat: null, lng: null };
+      }
+
+      // 5. Recria o marcador padrão do usuário (ic_gps_marker.png)
+      var defaultIcon = L.icon({
+        iconUrl: '/imagens_app/ic_gps_marker.png',
+        iconSize: [48, 48],
+        iconAnchor: [24, 48],
+        popupAnchor: [0, -48],
+        className: 'user-gps-marker'
+      });
+      
+      userMarker = L.marker([userLat, userLng], { 
+        icon: defaultIcon, 
+        zIndexOffset: 1000 
+      }).addTo(map);
+      
+      userMarker.bindTooltip("Você está aqui", { 
+        permanent: false, 
+        direction: "top", 
+        offset: [0, -48] 
+      });
+
+      showNotification("Navegação encerrada");
+    }
+
+    // ===================================================================
+    // FUNÇÃO: removerRota - Usada ao clicar em Resetar/Fechar manualmente
+    // ===================================================================
+    function removerRota() {
+      finalizarERestaurarRota();
+    }
+
+    // ===================================================================
+    // FUNÇÃO: processarNovaPosicao (AJUSTADA para navegação)
     // ===================================================================
     function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
       if(!map) return;
-      var currentTime = Date.now(); var dist = 0;
+      var currentTime = Date.now();
+      var dist = 0;
+      
       adicionarAoHistorico(newLat, newLng, currentTime);
       var posSuave = suavizarPosicao(newLat, newLng);
-      var smoothLat = posSuave.lat; var smoothLng = posSuave.lng;
+      var smoothLat = posSuave.lat;
+      var smoothLng = posSuave.lng;
       
-      if (speedKmh === 0 && prevLat !== null && prevTime !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); var time = (currentTime - prevTime) / 1000; if (time > 0) speedKmh = Math.round((dist / time) * 3.6); }
-      else if (prevLat !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); }
-      if (speedKmh > 250) speedKmh = 0; $("#speed-display").text(speedKmh);
+      // Cálculo de velocidade por distância quando speedKmh = 0
+      if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
+        dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
+        var time = (currentTime - prevTime) / 1000;
+        if (time > 0) speedKmh = Math.round((dist / time) * 3.6);
+      } else if (prevLat !== null) {
+        dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
+      }
       
-      if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) { currentHeading = hardwareHeading; }
-      else if (dist > 3 && prevLat !== null) { var dy = newLat - prevLat; var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180); if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) { var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI); if (calcHeading < 0) calcHeading += 360; if (calcHeading >= 360) calcHeading -= 360; currentHeading = calcHeading; } }
+      if (speedKmh > 250) speedKmh = 0;
+      $("#speed-display").text(speedKmh);
+      
+      // Cálculo de heading (bússola)
+      if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
+        currentHeading = hardwareHeading;
+      } else if (dist > 3 && prevLat !== null) {
+        var dy = newLat - prevLat;
+        var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
+        if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) {
+          var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
+          if (calcHeading < 0) calcHeading += 360;
+          if (calcHeading >= 360) calcHeading -= 360;
+          currentHeading = calcHeading;
+        }
+      }
+      
       if (currentHeading !== null && currentHeading !== undefined) atualizarBussola(currentHeading);
 
-      prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
+      prevLat = newLat;
+      prevLng = newLng;
+      prevTime = currentTime;
+      userLat = newLat;
+      userLng = newLng;
 
+      // Cria ou atualiza o marcador
       if (!userMarker && !estaEmNavegacao) {
-        var defaultIcon = L.icon({ iconUrl: '/imagens_app/ic_gps_marker.png', iconSize: [48, 48], iconAnchor: [24, 48], popupAnchor: [0, -48], className: 'user-gps-marker' });
-        userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000, rotationAngle: 0, rotationOrigin: '24px 48px' }).addTo(map);
-        userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -48] });
-        ultimaPosicaoMarcador.lat = smoothLat; ultimaPosicaoMarcador.lng = smoothLng;
-        if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
-      } else { moverMarcadorSuavemente(smoothLat, smoothLng); }
+        var defaultIcon = L.icon({
+          iconUrl: '/imagens_app/ic_gps_marker.png',
+          iconSize: [48, 48],
+          iconAnchor: [24, 48],
+          popupAnchor: [0, -48],
+          className: 'user-gps-marker'
+        });
+        userMarker = L.marker([smoothLat, smoothLng], {
+          icon: defaultIcon,
+          zIndexOffset: 1000,
+          rotationAngle: 0,
+          rotationOrigin: '24px 48px'
+        }).addTo(map);
+        userMarker.bindTooltip("Você está aqui", {
+          permanent: false,
+          direction: "top",
+          offset: [0, -48]
+        });
+        ultimaPosicaoMarcador.lat = smoothLat;
+        ultimaPosicaoMarcador.lng = smoothLng;
+        if (!gpsInitialized) {
+          gpsInitialized = true;
+          hideFullscreenLoading();
+        }
+      } else {
+        // Move de forma SUAVE - decide qual marcador mover automaticamente
+        moverMarcadorSuavemente(smoothLat, smoothLng);
+      }
       
       atualizarIconeUsuario();
-      if (destinoAtual) { atualizarRota(); }
-      if (isFollowing) { map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.8 }); }
-      if (alertaHabilitado) { verificarProximidadeRadares(); } else { esconderAlertaVisual(); }
-      if (destinoAtual) { verificarChegadaDestino(); }
+
+      if (destinoAtual) {
+        atualizarRota();
+      }
+      
+      if (isFollowing) {
+        map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.8 });
+      }
+      
+      if (alertaHabilitado) {
+        verificarProximidadeRadares();
+      } else {
+        esconderAlertaVisual();
+      }
+
+      // Verifica se chegou no destino da rota
+      if (destinoAtual) {
+        verificarChegadaDestino();
+      }
     }
 
     function startGPSTracking() {
@@ -1102,22 +1369,31 @@
       watchId = navigator.geolocation.watchPosition(
         function(position) {
           if (gpsSource !== 'appinventor') gpsSource = 'browser';
-          var newLat = position.coords.latitude; var newLng = position.coords.longitude; var speedKmh = 0;
+          var newLat = position.coords.latitude;
+          var newLng = position.coords.longitude;
+          var speedKmh = 0;
           if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
           processarNovaPosicao(newLat, newLng, speedKmh, position.coords.heading);
         }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
       );
-      browserGpsTimeout = setTimeout(function() { if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); } }, 8000);
+      browserGpsTimeout = setTimeout(function() {
+        if (!gpsInitialized && gpsSource === 'none') {
+          showNotification("Aguardando GPS do app...");
+          hideFullscreenLoading();
+        }
+      }, 8000);
     }
 
     // ===================================================================
-    // PROXIMIDADE E DISPARO
+    // PROXIMIDADE E DISPARO DE RADAR
     // ===================================================================
     function verificarProximidadeRadares() {
       if (!alertaHabilitado || radarMarkers.length === 0) return;
-      let radarMaisProximo = null; let menorDistancia = Infinity;
+      let radarMaisProximo = null;
+      let menorDistancia = Infinity;
       radarMarkers.forEach(function(marker) {
-        const rData = marker.radarData; if (!deveAlertaRadar(rData.tipoOriginal)) return;
+        const rData = marker.radarData;
+        if (!deveAlertaRadar(rData.tipoOriginal)) return;
         const dist = calcularDistancia(userLat, userLng, rData.latitude, rData.longitude);
         if (dist < menorDistancia) { menorDistancia = dist; radarMaisProximo = rData; }
       });
@@ -1137,17 +1413,20 @@
 
     function atualizarDistanciaAlerta(distancia) {
       if (!$("#alert-container").is(":visible")) return;
-      var textoAtual = $("#alert-text").text(); var partes = textoAtual.split(" - a ");
+      var textoAtual = $("#alert-text").text();
+      var partes = textoAtual.split(" - a ");
       if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
     }
 
     function dispararAlerta(radar, distancia) {
       const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
       if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
-      const som = document.getElementById("alert-soud"); const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
+      const som = document.getElementById("alert-soud");
+      const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
       const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
-      $("#alert-title").text("ALERTA DE RADAR!"); $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
-      $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima)); 
+      $("#alert-title").text("ALERTA DE RADAR!");
+      $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
+      $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
       if (!$("#alert-container").is(":visible")) {
         $("#alert-container").fadeIn(200);
         contagemTocarSom = 0;
@@ -1156,7 +1435,8 @@
         som.pause(); som.currentTime = 0; som.play().catch(function(e) {}); contagemTocarSom++;
       }
       if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) { $(".alert-bar").addClass("alert-bar-critico"); } else { $(".alert-bar").removeClass("alert-bar-critico"); }
-      ultimoRadarAlertado = radar.id; clearTimeout(alertTimeout);
+      ultimoRadarAlertado = radar.id;
+      clearTimeout(alertTimeout);
       alertTimeout = setTimeout(function() { if ($("#alert-container").is(":visible")) esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
     }
 
@@ -1177,112 +1457,137 @@
       if (!map) return;
       if (routingControl) map.removeControl(routingControl);
       destinoAtual = { lat: destLat, lng: destLng };
+
+      // Adiciona marcadores de início e fim da rota
       adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
+
       routingControl = L.Routing.control({
-        waypoints: [ L.latLng(userLat, userLng), L.latLng(destLat, destLng) ],
-        routeWhileDragging: false, addWaypoints: false, language: 'pt-BR', show: false,
-        lineOptions: { styles: [{ color: '#ff5500', opacity: 0.95, weight: 7 }, { color: '#ffd1b3', opacity: 1.0, weight: 3 }] },
+        waypoints: [
+          L.latLng(userLat, userLng),
+          L.latLng(destLat, destLng)
+        ],
+        routeWhileDragging: false,
+        addWaypoints: false,
+        language: 'pt-BR',
+        show: false,
+        lineOptions: {
+          styles: [
+            { color: '#ff5500', opacity: 0.95, weight: 7 },
+            { color: '#ffd1b3', opacity: 1.0, weight: 3 }
+          ]
+        },
         createMarker: function() { return null; },
         router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' })
       }).addTo(map);
-      routingControl.on('routesfound', function(e) { var summary = e.routes[0].summary; map.fitBounds(L.latLngBounds([userLat, userLng], [destLat, destLng]), { padding: [50, 50] }); $("#loading").hide(); showNotification("Rota: " + (summary.totalDistance / 1000).toFixed(1) + " km"); });
-      routingControl.on('routingerror', function() { $("#loading").hide(); showNotification("Erro ao traçar rota."); });
+
+      routingControl.on('routesfound', function(e) {
+        var summary = e.routes[0].summary;
+        map.fitBounds(L.latLngBounds([userLat, userLng], [destLat, destLng]), { padding: [50, 50] });
+        $("#loading").hide();
+        showNotification("Rota: " + (summary.totalDistance / 1000).toFixed(1) + " km");
+      });
+
+      routingControl.on('routingerror', function() {
+        $("#loading").hide();
+        showNotification("Erro ao traçar rota.");
+      });
+
       showNotification("Navegação iniciada!");
     }
-
-    function atualizarRota() {
-      if (!map || !destinoAtual || !userLat || !userLng || !routingControl) return;
-      routingControl.setWaypoints([ L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng) ]);
-    }
-
-    function verificarChegadaDestino() {
-      if (!destinoAtual) return;
-      var distanciaDestino = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
-      if (distanciaDestino <= 30) {
-        showNotification("Você chegou ao seu destino!");
-        if (endRouteMarker) endRouteMarker.openPopup();
-        setTimeout(function() { finalizarERestaurarRota(); }, 4000);
-      }
-    }
-
-    function finalizarERestaurarRota() {
-      if (!map) return;
-      if (routingControl) { map.removeControl(routingControl); routingControl = null; }
-      destinoAtual = null;
-      if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
-      removerMarcadoresRota();
-      estaEmNavegacao = false;
-      if (posicaoSuavizada.lat !== null) { ultimaPosicaoMarcador.lat = posicaoSuavizada.lat; ultimaPosicaoMarcador.lng = posicaoSuavizada.lng; } else { ultimaPosicaoMarcador = { lat: null, lng: null }; }
-      var defaultIcon = L.icon({ iconUrl: '/imagens_app/ic_gps_marker.png', iconSize: [48, 48], iconAnchor: [24, 48], popupAnchor: [0, -48], className: 'user-gps-marker' });
-      userMarker = L.marker([userLat, userLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-      userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -48] });
-      showNotification("Navegação encerrada");
-    }
-
-    function removerRota() { finalizarERestaurarRota(); }
 
     function resetarMapa() {
       if (!map) return;
       map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
-      map.setBearing(0); document.getElementById('btn-rotate-map')?.classList.remove('rotated');
-      isFollowing = false; if (refreshDelayTimer) clearTimeout(refreshDelayTimer);
+      map.setBearing(0);
+      document.getElementById('btn-rotate-map')?.classList.remove('rotated');
+      isFollowing = false;
+      if (refreshDelayTimer) clearTimeout(refreshDelayTimer);
       refreshDelayTimer = setTimeout(function() {
         var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
-        if (marcadorAtivo && !isFollowing) { isFollowing = true; map.flyTo(marcadorAtivo.getLatLng(), 20, { duration: 0.8 }); showNotification("Retornando à sua posição atual"); }
+        if (marcadorAtivo && !isFollowing) {
+          isFollowing = true;
+          map.flyTo(marcadorAtivo.getLatLng(), 20, { duration: 0.8 });
+          showNotification("Retornando à sua posição atual");
+        }
         refreshDelayTimer = null;
       }, TEMPO_REFRESH_DELAY);
-      removerRota(); esconderAlertaVisual(); showNotification("Mapa resetado");
+      removerRota();
+      esconderAlertaVisual();
+      showNotification("Mapa resetado");
     }
 
     // ===================================================================
-    // FUNÇÃO extrairCoordenadas CORRIGIDA
-    // Lida com: "-19.919, -43.938" (vírgula sep) e "-19.919,-43.938" (sem espaço)
+    // FUNÇÃO extrairCoordenadas
     // ===================================================================
     function extrairCoordenadas(record) {
       if (!record || record.length < 10) return null;
       
       var stringOriginal = String(record[9]).trim();
-      
-      // Remove espaços ao redor, mas preserva a vírgula central
       var stringLimpa = stringOriginal.replace(/\s*,\s*/g, ',').trim();
       
-      // Se NÃO tiver ponto mas tiver vírgula (ex: "-19,919,-43,938"), 
-      // substitui a primeira vírgula por ponto (decimal) e a segunda por vírgula (separador)
       if (!stringLimpa.includes('.') && stringLimpa.includes(',')) {
         var primeiraVirgula = stringLimpa.indexOf(',');
         if (primeiraVirgula !== -1) {
           stringLimpa = stringLimpa.substring(0, primeiraVirgula) + '.' + stringLimpa.substring(primeiraVirgula + 1);
         }
-        // Agora a string fica "-19.919,-43.938" que o split(',') resolve
       }
       
       var parts = stringLimpa.split(',');
       if (parts.length !== 2) return null;
       
-      var lat = parseFloat(parts[0]); 
+      var lat = parseFloat(parts[0]);
       var lng = parseFloat(parts[1]);
       
       if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
       return { lat: lat, lng: lng };
     }
 
-    function atualizarBussola(headingDegrees) { var needle = document.getElementById('compass-needle-img'); if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)'; }
+    function atualizarBussola(headingDegrees) {
+      var needle = document.getElementById('compass-needle-img');
+      if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
+    }
 
     function inicializarBotaoRotacaoMapa() {
-      const rotateBtn = document.getElementById('btn-rotate-map'); let isRotated = false; if (!rotateBtn) return;
+      const rotateBtn = document.getElementById('btn-rotate-map');
+      let isRotated = false;
+      if (!rotateBtn) return;
       rotateBtn.addEventListener('click', function () {
         if (!map) return;
-        if (!isRotated) { map.setBearing((currentHeading > 0 && currentHeading < 360) ? currentHeading : 45); showNotification("Mapa rotacionado"); rotateBtn.classList.add('rotated'); isRotated = true; }
-        else { map.setBearing(0); showNotification("Mapa resetado (Norte para cima)"); rotateBtn.classList.remove('rotated'); isRotated = false; }
+        if (!isRotated) {
+          map.setBearing((currentHeading > 0 && currentHeading < 360) ? currentHeading : 45);
+          showNotification("Mapa rotacionado");
+          rotateBtn.classList.add('rotated');
+          isRotated = true;
+        } else {
+          map.setBearing(0);
+          showNotification("Mapa resetado (Norte para cima)");
+          rotateBtn.classList.remove('rotated');
+          isRotated = false;
+        }
       });
     }
 
     function inicializarBotaoAlertaToggle() {
-      const alertBtn = document.getElementById('btn-alert-toggle'); const alertIcon = document.getElementById('alert-toggle-icon'); if (!alertBtn) return;
+      const alertBtn = document.getElementById('btn-alert-toggle');
+      const alertIcon = document.getElementById('alert-toggle-icon');
+      if (!alertBtn) return;
       alertBtn.addEventListener('click', function() {
         alertaHabilitado = !alertaHabilitado;
-        if (alertaHabilitado) { alertBtn.classList.remove('alert-off'); if(alertIcon){ alertIcon.src = "/imagens_app/ic_sound_on.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; }; } showNotification("Alerta LIGADO"); }
-        else { alertBtn.classList.add('alert-off'); if(alertIcon){ alertIcon.src = "/imagens_app/ic_sound_off.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; }; } showNotification("Alerta DESLIGADO"); }
+        if (alertaHabilitado) {
+          alertBtn.classList.remove('alert-off');
+          if(alertIcon){
+            alertIcon.src = "/imagens_app/ic_sound_on.png";
+            alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
+          }
+          showNotification("Alerta LIGADO");
+        } else {
+          alertBtn.classList.add('alert-off');
+          if(alertIcon){
+            alertIcon.src = "/imagens_app/ic_sound_off.png";
+            alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
+          }
+          showNotification("Alerta DESLIGADO");
+        }
         esconderAlertaVisual();
       });
     }
@@ -1298,27 +1603,53 @@
         return;
       }
 
-      map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
-      aplicarTemaMapa(); setInterval(aplicarTemaMapa, 300000);
+      map = L.map('map', {
+        center: [userLat, userLng],
+        zoom: 17,
+        zoomControl: false,
+        rotate: true,
+        bearing: 0
+      });
       
-      map.on('dragstart', function() { isFollowing = false; if (returnToGpsTimer) clearTimeout(returnToGpsTimer); });
+      aplicarTemaMapa();
+      setInterval(aplicarTemaMapa, 300000);
+      
+      map.on('dragstart', function() {
+        isFollowing = false;
+        if (returnToGpsTimer) clearTimeout(returnToGpsTimer);
+      });
+
       map.on('dragend', function() {
         returnToGpsTimer = setTimeout(function() {
-          if (!isFollowing) { var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker; if (marcadorAtivo) { isFollowing = true; map.setView(marcadorAtivo.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 }); showNotification("Voltando à sua posição atual"); } }
+          if (!isFollowing) {
+            var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
+            if (marcadorAtivo) {
+              isFollowing = true;
+              map.setView(marcadorAtivo.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 });
+              showNotification("Voltando à sua posição atual");
+            }
+          }
         }, TEMPO_RETORNO_GPS);
       });
 
+      // Botão calcular rota
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
         $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
         var coords = await buscarCoordenadas(endereco);
-        if (coords) { esconderAlertaVisual(); calcularRota(coords.lat, coords.lng); } else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
+        if (coords) { esconderAlertaVisual(); calcularRota(coords.lat, coords.lng); }
+        else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
       });
       
       $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
 
-      function fecharTodasBarras() { searchActive = false; routeActive = false; $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").removeClass('active'); }
+      function fecharTodasBarras() {
+        searchActive = false;
+        routeActive = false;
+        $("#search-bar-radares").removeClass('active');
+        $("#search-bar-rota").removeClass('active');
+      }
 
       $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
       $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
@@ -1326,7 +1657,8 @@
       $("#btn-search-bar").click(function() {
         if (searchActive) { fecharTodasBarras(); return; }
         if (routeActive) routeActive = false;
-        searchActive = true; $("#search-bar-rota").removeClass('active');
+        searchActive = true;
+        $("#search-bar-rota").removeClass('active');
         $("#search-bar-radares").addClass('active');
         if (!sidebarAberta) {
           sidebarAberta = true;
@@ -1339,7 +1671,8 @@
       $("#btn-route-bar").click(function() {
         if (routeActive) { fecharTodasBarras(); return; }
         if (searchActive) searchActive = false;
-        routeActive = true; $("#search-bar-radares").removeClass('active');
+        routeActive = true;
+        $("#search-bar-radares").removeClass('active');
         $("#search-bar-rota").addClass('active');
         if (!sidebarAberta) {
           sidebarAberta = true;
@@ -1349,61 +1682,129 @@
         setTimeout(function() { $("#route-query").focus(); }, 300);
       });
 
-      $("#btn-center").click(function() { fecharTodasBarras(); isFollowing = true; var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker; if (marcadorAtivo) { map.flyTo(marcadorAtivo.getLatLng(), 17, { duration: 0.5 }); showNotification("Centralizando na sua posição"); } else { showNotification("Aguardando sinal GPS..."); } });
+      $("#btn-center").click(function() {
+        fecharTodasBarras();
+        isFollowing = true;
+        var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
+        if (marcadorAtivo) {
+          map.flyTo(marcadorAtivo.getLatLng(), 17, { duration: 0.5 });
+          showNotification("Centralizando na sua posição");
+        } else {
+          showNotification("Aguardando sinal GPS...");
+        }
+      });
+
       $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
       $("#btn-zoom-in").click(function() { if(map) map.zoomIn(); });
       $("#btn-zoom-out").click(function() { if(map) map.zoomOut(); });
       
-      inicializarBotaoRotacaoMapa(); inicializarBotaoAlertaToggle(); startGPSTracking(); carregarRadares();
+      inicializarBotaoRotacaoMapa();
+      inicializarBotaoAlertaToggle();
+      startGPSTracking();
+      carregarRadares();
     }
 
     async function carregarRadares() {
       if (!map) return;
-      if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
+      if (radarMarkers.length > 0) {
+        radarMarkers.forEach(function(marker) { map.removeLayer(marker); });
+        radarMarkers = [];
+      }
       $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando radares...</div>");
       try {
         var response = await fetch('radares.json?v=' + Date.now());
         if (!response.ok) throw new Error("Arquivo não encontrado");
         var data = await response.json();
         var records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-        if (records.length > 0) { renderizarRadaresNoMapa(records, "radares.json"); } else { throw new Error("Nenhum radar encontrado"); }
-      } catch (e) { console.warn("Falha radares.json:", e); $("#loading").hide(); showNotification("Usando dados de fallback."); }
+        if (records.length > 0) {
+          renderizarRadaresNoMapa(records, "radares.json");
+        } else {
+          throw new Error("Nenhum radar encontrado");
+        }
+      } catch (e) {
+        console.warn("Falha radares.json:", e);
+        $("#loading").hide();
+        showNotification("Usando dados de fallback.");
+      }
     }
 
     function renderizarRadaresNoMapa(records, origem) {
       if (!map) return;
-      var radaresExternos = records || []; var contador = 0;
+      var radaresExternos = records || [];
+      var contador = 0;
       for (var i = 0; i < radaresExternos.length; i++) {
-        var record = radaresExternos[i]; var endereco = record[2] || "Endereço não informado";
-        var tipo = (record[3] || "Não Identificado").trim(); var velocidade = record[4] || "0";
-        var coordsFinais = extrairCoordenadas(record); if (!coordsFinais) continue;
-        var iconeUrl = getIconUrl(tipo, velocidade); var iconeRadar = criarIconeRadar(iconeUrl, 40);
+        var record = radaresExternos[i];
+        var endereco = record[2] || "Endereço não informado";
+        var tipo = (record[3] || "Não Identificado").trim();
+        var velocidade = record[4] || "0";
+        var coordsFinais = extrairCoordenadas(record);
+        if (!coordsFinais) continue;
+        var iconeUrl = getIconUrl(tipo, velocidade);
+        var iconeRadar = criarIconeRadar(iconeUrl, 40);
         var radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
-        var tipoExibicao = ajusteNomes[tipo] || tipo; var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
+        var tipoExibicao = ajusteNomes[tipo] || tipo;
+        var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
         var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
         radarMarker.bindPopup('<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' + tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' + endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div></div>');
-        radarMarker.radarData = { id: i, latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco: endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA };
-        radarMarkers.push(radarMarker); contador++;
+        radarMarker.radarData = {
+          id: i,
+          latitude: coordsFinais.lat,
+          longitude: coordsFinais.lng,
+          endereco: endereco,
+          velocidade_maxima: velocidade,
+          tipoOriginal: tipo,
+          tipoExibicao: tipoExibicao,
+          isIA: isIA
+        };
+        radarMarkers.push(radarMarker);
+        contador++;
       }
       $("#loading").hide();
-      if (contador > 0) { showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)'); } else { showNotification("Nenhum radar encontrado."); }
+      if (contador > 0) {
+        showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
+      } else {
+        showNotification("Nenhum radar encontrado.");
+      }
     }
     
     function buscarRadares(query) {
-      if (!query || query.length < 2) return; var encontrou = false; var boundsGroup = L.featureGroup(); var q = query.toLowerCase();
-      radarMarkers.forEach(function(marker) { var d = marker.radarData; if ((d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase().includes(q)) { encontrou = true; boundsGroup.addLayer(marker); marker.openPopup(); } });
-      if (encontrou) { if(map) map.fitBounds(boundsGroup.getBounds().pad(0.2)); isFollowing = false; } else { showNotification("Nenhum radar encontrado para: " + query); }
+      if (!query || query.length < 2) return;
+      var encontrou = false;
+      var boundsGroup = L.featureGroup();
+      var q = query.toLowerCase();
+      radarMarkers.forEach(function(marker) {
+        var d = marker.radarData;
+        if ((d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase().includes(q)) {
+          encontrou = true;
+          boundsGroup.addLayer(marker);
+          marker.openPopup();
+        }
+      });
+      if (encontrou) {
+        if(map) map.fitBounds(boundsGroup.getBounds().pad(0.2));
+        isFollowing = false;
+      } else {
+        showNotification("Nenhum radar encontrado para: " + query);
+      }
     }
 
     function showError(error) {
-      if (gpsSource === 'appinventor') return; var msg = "Erro ao obter localização.";
-      if (error.code === 1) msg = "Permissão de GPS negada."; if (error.code === 2) msg = "Sinal GPS indisponível."; if (error.code === 3) msg = "Tempo esgotado. Tentando novamente...";
-      showNotification(msg); hideFullscreenLoading(); if (error.code === 3) { setTimeout(startGPSTracking, 5000); }
+      if (gpsSource === 'appinventor') return;
+      var msg = "Erro ao obter localização.";
+      if (error.code === 1) msg = "Permissão de GPS negada.";
+      if (error.code === 2) msg = "Sinal GPS indisponível.";
+      if (error.code === 3) msg = "Tempo esgotado. Tentando novamente...";
+      showNotification(msg);
+      hideFullscreenLoading();
+      if (error.code === 3) { setTimeout(startGPSTracking, 5000); }
     }
     
+    // Desbloqueio de áudio para dispositivos móveis
     document.addEventListener('click', function desbloquearAudio() {
       var sound = document.getElementById("alert-soud");
-      if (sound) { sound.play().then(function() { sound.pause(); sound.currentTime = 0; }).catch(function() {}); }
+      if (sound) {
+        sound.play().then(function() { sound.pause(); sound.currentTime = 0; }).catch(function() {});
+      }
       document.removeEventListener('click', desbloquearAudio);
     }, { once: true });
     
