@@ -414,8 +414,9 @@
       [397, "1690","Rodovia MG-5, Próx. Rua Luiz de Abreu","Detector de Redução de Velocidade (REV)","40","Centro/Goiânia","1001013","KBH5301013"," -19.86192, -43.90493"],
       [398, "1691","Av. Cristiano Machado, Próx. Estação Floramar"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Floramar","1001014","KBH5301014"," -19.83524, -43.94006"],
       [399, "1692","Av. Cristiano Machado, Próx. Rua Cel Romão da Mota"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Shopping Estação","1001015","KBH5301015"," -19.82719, -43.94284 "],
-      [400, "1693","Av. Cristiano Machado, Próx. Rua Ouricuri"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Floramar","1001016","KBH5301016","-19.83887, -43.93689"]
-
+      [400, "1693","Av. Cristiano Machado, Próx. Rua Ouricuri"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Floramar","1001016","KBH5301016","-19.83887, -43.93689"],
+      [401, "1694","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM"," Controlador Eletrônico de Velocidade (CEV)","110","BH/Confins","1001017","KBH5301017","-19.78398, -43.94889"],
+      [402, "1695","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM"," Controlador Eletrônico de Velocidade (CEV)","110","Confins/BH","1001018","KBH5301018","-19.78384, -43.94903"]
 
 
     ]
