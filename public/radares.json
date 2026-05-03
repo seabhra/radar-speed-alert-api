@@ -435,7 +435,14 @@
       [418, "1711","Av. Cristiano Machado,10795 ","Controlador Eletrônico de Velocidade (CEV)","70","Venda Nova/Centro","1001034","KBH5301034","-19.830278, -43.941623"],
       [419, "1712","Av. Cristiano Machado, 10680 ","Controlador Eletrônico de Velocidade (CEV)","70","Centro/Venda Nova","1001035","KBH5301035","-19.829524, -43.941715"],
       [420, "1713","Av. Cristiano Machado,11222 ","Controlador Eletrônico de Velocidade (CEV)","70","Venda Nova/Centro","1001036","KBH5301036","-19.825217, -43.944058 "],
-      [421, "1714","Av. Cristiano Machado, Próx. Rua Joaquim Clemente","Controlador Eletrônico de Velocidade (CEV)","70","Venda Nova/Centro","1001037","KBH5301037","-19.819305, -43.946850"]
+      [421, "1714","Av. Cristiano Machado, Próx. Rua Joaquim Clemente","Controlador Eletrônico de Velocidade (CEV)","70","Venda Nova/Centro","1001037","KBH5301037","-19.819305, -43.946850"],
+      [422, "1715","Av. Juscelino Kubitschek - Via Expressa, 2560","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001038","KBH5301038","-19.932845, -44.019740"],
+      [423, "1716"," Av. Juscelino Kubitschek ","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001039","KBH5301039","-19.932750, -44.019816"],
+      [424, "1717","Av. Juscelino Kubitschek - Via Expressa, 5450","Controlador Eletrônico de Velocidade (CEV)","60","BH/Contagem","1001040","KBH5301040","-19.931658, -44.014256 "],
+      [425, "1718"," Av. Juscelino Kubitschek, Próx. Av. Mamoré, 49 ","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001041","KBH5301041","-19.934761, -44.004476"],
+      [426, "1719","Av. Juscelino Kubitschek - Via Expressa, 4369","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001042","KBH5301042"," -19.924004, -43.982507"],
+      [427, "1720"," Av. Juscelino Kubitschek - Via Expressa, 1990","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001043","KBH5301043","-19.922776, -43.974044"]
+
    
 
     ]
