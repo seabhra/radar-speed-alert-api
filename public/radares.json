@@ -415,9 +415,28 @@
       [398, "1691","Av. Cristiano Machado, Próx. Estação Floramar"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Floramar","1001014","KBH5301014"," -19.83524, -43.94006"],
       [399, "1692","Av. Cristiano Machado, Próx. Rua Cel Romão da Mota"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Shopping Estação","1001015","KBH5301015"," -19.82719, -43.94284 "],
       [400, "1693","Av. Cristiano Machado, Próx. Rua Ouricuri"," Controlador Eletrônico de Velocidade (CEV)","70","Centro/Floramar","1001016","KBH5301016","-19.83887, -43.93689"],
-      [401, "1694","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM"," Controlador Eletrônico de Velocidade (CEV)","110","BH/Confins","1001017","KBH5301017","-19.78398, -43.94889"],
-      [402, "1695","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM"," Controlador Eletrônico de Velocidade (CEV)","110","Confins/BH","1001018","KBH5301018","-19.78384, -43.94903"]
-
+      [401, "1694","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","110","BH/Confins","1001017","KBH5301017","-19.78398, -43.94889"],
+      [402, "1695","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","110","Confins/BH","1001018","KBH5301018","-19.78384, -43.94903"],
+      [403, "1696","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","110","BH/Confins","1001019","KBH5301019","-19.80026, -43.94974"],
+      [404, "1697","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","110","Confins/BH","1001020","KBH5301020","-19.80030, -43.95000"],
+      [405, "1698","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","110","BH/Confins","1001021","KBH5301021","19.77087, -43.94838"],
+      [406, "1699","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","110","Confins/BH","1001022","KBH5301022","-19.77094, -43.94861"],
+      [407, "1700","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","60","BH/Pedro Leopoldo","1001023","KBH5301023","-19.75986, -43.94848 "],
+      [408, "1701","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","60","Pedro Leopoldo/BH","1001024","KBH5301024","-19.75741, -43.95140"],
+      [409, "1702","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","60","Confins/BH","1001025","KBH5301025","-19.75829, -43.94783"],
+      [410, "1703","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","100","BH/Confins","1001026","KBH5301026","-19.73611, -43.94582"],
+      [411, "1704","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","100","Confins/BH","1001027","KBH5301027","-19.68509, -43.90511"],
+      [412, "1705","Rodovia MG-10 Linha Verde BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","100","BH/Confins","1001028","KBH5301029","-19.67670, -43.90783"],
+      [413, "1706","Rodovia LMG-800 BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","100","BH/Confins","1001029","KBH5301029","-19.66188, -43.93449"],
+      [414, "1707","Rodovia LMG-800 BH-Confins, Próx. Posto da PM","Controlador Eletrônico de Velocidade (CEV)","100","Confins/BH","1001030","KBH5301030","-19.66214, -43.93475"],
+      [415, "1708","Av. Cristiano Machado, 9313","Controlador Eletrônico de Velocidade (CEV)","60","Guarani/Centro","1001031","KBH5301031","-19.850683, -43.933894 "],
+      [416, "1709","Av. Cristiano Machado,9954","Controlador Eletrônico de Velocidade (CEV)","70","Centro/Floramar","1001032","KBH5301032","-19.840252, -43.935902"],
+      [417, "1710","Av. Cristiano Machado, 10307 ","Controlador Eletrônico de Velocidade (CEV)","70","Suzana/Centro","1001033","KBH5301033","-19.836942, -43.939748"],
+      [418, "1711","Av. Cristiano Machado,10795 ","Controlador Eletrônico de Velocidade (CEV)","70","Venda Nova/Centro","1001034","KBH5301034","-19.830278, -43.941623"],
+      [419, "1712","Av. Cristiano Machado, 10680 ","Controlador Eletrônico de Velocidade (CEV)","70","Centro/Venda Nova","1001035","KBH5301035","-19.829524, -43.941715"],
+      [420, "1713","Av. Cristiano Machado,11222 ","Controlador Eletrônico de Velocidade (CEV)","70","Venda Nova/Centro","1001036","KBH5301036","-19.825217, -43.944058 "],
+      [421, "1714","Av. Cristiano Machado, Próx. Rua Joaquim Clemente","Controlador Eletrônico de Velocidade (CEV)","70","Venda Nova/Centro","1001037","KBH5301037","-19.819305, -43.946850"]
+   
 
     ]
   }
