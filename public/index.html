@@ -373,19 +373,30 @@ crossorigin="anonymous"></script>
         height: 54px;
     }
 
+    /* ===================================================================
+       ✅ CORREÇÃO: CSS do botão de rotação REESCRITO
+       Antes: transform: rotate(90deg) girava a DIV inteira, conflitando
+              com a rotação real do mapa via plugin leaflet-rotate.
+       Agora: Usa mudança de cor/borda/brilho como feedback visual,
+              sem interferir na transformação do container.
+    =================================================================== */
     #btn-rotate-map {
-        transition: transform 0.3s ease, border-color 0.2s ease;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
     }
 
     #btn-rotate-map.rotated {
-        transform: rotate(90deg);
         border-color: var(--accent-color);
-        box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
+        background-color: rgba(0, 255, 136, 0.08);
     }
 
-    .leaflet-container {
-        transition: transform 0.3s ease;
+    #btn-rotate-map.rotated img {
+        filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5));
     }
+
+    /* ✅ REMOVIDO: .leaflet-container { transition: transform ... }
+       Isso CONFLITAVA com o plugin leaflet-rotate que gerencia
+       a transformação do container internamente. */
 
     .user-gps-marker,
     .user-navigator-marker {
@@ -793,7 +804,14 @@ crossorigin="anonymous"></script>
       DISPAROS_SOM_ANTES_DE_SILENCIAR: 2
     };
 
+    // ===================================================================
+    // ✅ NOVO: Variáveis para controle de rotação do mapa
+    // ===================================================================
     let currentHeading = 0;
+    let mapaRotacionado = false;       // Estado do botão (toggle)
+    let bussolaHardwareDisponivel = false; // Se deviceorientation funcionou
+    let ultimaAtualizacaoRotacao = 0; // Throttle para não chamar setBearing a cada frame
+
     var posicaoSuavizada = { lat: null, lng: null };
     var historicoPosicoes = [];
     var historicoDistanciasRadar = {};
@@ -802,8 +820,7 @@ crossorigin="anonymous"></script>
     var contagemTocarSom = 0;
 
     // ===================================================================
-    // ✅ CORREÇÃO: MAPEAMENTO DE ÍCONES — expandido com TODAS as variantes
-    //    de "Controlador Eletrônico" para cobrir variações do CSV
+    // MAPEAMENTO DE ÍCONES
     // ===================================================================
     const iconMap = {
       'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
@@ -932,7 +949,6 @@ crossorigin="anonymous"></script>
       });
     }
 
-    // ✅ CORREÇÃO: criarIconeRadar agora aceita fallbackUrl
     function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
       return L.icon({
         iconUrl: iconUrl,
@@ -953,21 +969,10 @@ crossorigin="anonymous"></script>
       return true;
     }
 
-    // ===================================================================
-    // ✅ CORREÇÃO MAJOR: Função getIconUrl REESCRITA
-    //    Problema: A lógica antiga tinha um bloco isRadarVelocidade que
-    //    interceptava ANTES da busca por velocidade específica, e quando
-    //    não encontrava velocidade válida retornava genérico SEM cair
-    //    nas verificações de substring abaixo.
-    //    Solução: Verifica velocidade PRIMEIRO (para qualquer tipo que
-    //    contenha "Velocidade" ou "CEV" ou "CEM"), depois faz fallback
-    //    por substring, e por último busca no iconMap.
-    // ===================================================================
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
       if (!tipoLimpo) return iconMap['default'];
 
-      // --- 1. Tipos especiais que NÃO são velocidade ---
       if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC'))
         return iconMap['Zona Verde de Trânsito (ZVT)'];
 
@@ -981,9 +986,6 @@ crossorigin="anonymous"></script>
           tipoLimpo === 'Controle de Redução de Velocidade')
         return iconMap['Controle de Redução de Velocidade (CRV)'];
 
-      // --- 2. Radares de VELOCIDADE — verifica velocidade PRIMEIRO ---
-      //    Isso cobre: "Controlador Eletrônico de Velocidade",
-      //    "Controlador Eletrônico Misto (CEM)", e qualquer variação
       var isRadarVelocidade =
         tipoLimpo.includes('Velocidade') ||
         tipoLimpo.includes('CEV') ||
@@ -991,12 +993,9 @@ crossorigin="anonymous"></script>
         tipoLimpo.includes('Controlador Eletrônico');
 
       if (isRadarVelocidade) {
-        // ✅ CORREÇÃO: Tratamento robusto da velocidade do CSV
-        //    Pode vir como "60", "60 km/h", "60km/h", "N/A", vazio, etc.
         var velStr = String(velocidade || '').trim();
         var velNum = parseInt(velStr.replace(/[^0-9]/g, ''), 10);
 
-        // ✅ Somente velocidades que REALMENTE existem como arquivos no servidor
         if (velNum === 40) return '/imagens_app/ic_radar_cev_40_v2.png';
         if (velNum === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
         if (velNum === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
@@ -1004,14 +1003,11 @@ crossorigin="anonymous"></script>
         if (velNum === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
         if (velNum === 100) return '/imagens_app/ic_radar_cev_100_v2.png';
 
-        // Velocidade não mapeada → ícone genérico CEV
         return '/imagens_app/ic_radar_cev_v2.png';
       }
 
-      // --- 3. Busca EXATA no iconMap (antes das substrings) ---
       if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
 
-      // --- 4. Busca por SUBSTRING para cobrir variações do CSV ---
       var substrings = [
         { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
         { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
@@ -1036,18 +1032,13 @@ crossorigin="anonymous"></script>
         }
       }
 
-      // --- 5. Último recurso ---
       return iconMap['default'];
     }
 
-    // ===================================================================
-    // ✅ CORREÇÃO: Patch global para ícones de radar com fallback
-    //    Intercepta imagens que falharam e substitui pelo fallback
-    // ===================================================================
+    // Patch global para ícones de radar com fallback
     document.addEventListener('error', function(e) {
       var target = e.target;
       if (target && target.tagName === 'IMG') {
-        // Verifica se é um ícone de radar (dentro de .radar-marker-icon)
         var parent = target.closest('.radar-marker-icon');
         if (parent) {
           var fallback = target.getAttribute('data-fallback');
@@ -1113,9 +1104,6 @@ crossorigin="anonymous"></script>
       return { estaAproximando: true, estaAfastando: false, diferenca: 0 };
     }
 
-    // ===================================================================
-    // FUNÇÃO: moverMarcadorSuavemente
-    // ===================================================================
     function moverMarcadorSuavemente(targetLat, targetLng) {
       var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
       if (!marcadorParaMover) return;
@@ -1273,9 +1261,6 @@ crossorigin="anonymous"></script>
       });
     }
 
-    // ===================================================================
-    // FUNÇÃO: removerMarcadoresRota
-    // ===================================================================
     function removerMarcadoresRota() {
       if (endRouteMarker) {
         map.removeLayer(endRouteMarker);
@@ -1283,9 +1268,6 @@ crossorigin="anonymous"></script>
       }
     }
 
-    // ===================================================================
-    // FUNÇÃO: atualizarRota
-    // ===================================================================
     function atualizarRota() {
       if (destinoAtual && userLat && userLng && routingControl) {
         routingControl.setWaypoints([
@@ -1298,9 +1280,6 @@ crossorigin="anonymous"></script>
       }
     }
 
-    // ===================================================================
-    // FUNÇÃO: verificarChegadaDestino
-    // ===================================================================
     function verificarChegadaDestino() {
       if (!destinoAtual) return;
       var distanciaDestino = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
@@ -1311,9 +1290,6 @@ crossorigin="anonymous"></script>
       }
     }
 
-    // ===================================================================
-    // FUNÇÃO: finalizarERestaurarRota
-    // ===================================================================
     function finalizarERestaurarRota() {
       if (!map) return;
       if (routingControl) { map.removeControl(routingControl); routingControl = null; }
@@ -1349,6 +1325,92 @@ crossorigin="anonymous"></script>
     function removerRota() { finalizarERestaurarRota(); }
 
     // ===================================================================
+    // ✅ NOVO: Atualizar rotação do mapa em tempo real
+    //    Só chama setBearing se o mapa estiver em modo rotacionado
+    //    e respeita um throttle de 200ms para performance
+    // ===================================================================
+    function atualizarRotacaoMapa() {
+      if (!mapaRotacionado || !map) return;
+
+      // Throttle: não atualiza mais que 5x por segundo
+      var agora = Date.now();
+      if (agora - ultimaAtualizacaoRotacao < 200) return;
+      ultimaAtualizacaoRotacao = agora;
+
+      // Verifica se o método setBearing existe (plugin carregado)
+      if (typeof map.setBearing === 'function') {
+        map.setBearing(currentHeading);
+      }
+    }
+
+    // ===================================================================
+    // ✅ NOVO: Inicializar bússola hardware (deviceorientation)
+    //    Captura o heading real do dispositivo via giroscópio/magnetômetro
+    //    Precisa ser ativado por gesto do usuário em iOS 13+
+    // ===================================================================
+    function inicializarBussolaHardware() {
+      // iOS 13+ requer requestPermission explícito
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        // Será ativado no primeiro toque do botão de rotação
+        console.log('[Radar X9] Bússola iOS detectada — permissão será solicitada ao tocar no botão de rotação');
+        return;
+      }
+
+      // Android e navegadores desktop — bind direto
+      if (typeof DeviceOrientationEvent !== 'undefined') {
+        window.addEventListener('deviceorientation', function(event) {
+          // event.alpha: 0-360° (rotação em torno do eixo Z, bússola)
+          // event.webkitCompassHeading: iOS específico, já compensado
+          if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
+            currentHeading = event.webkitCompassHeading;
+            bussolaHardwareDisponivel = true;
+          } else if (event.alpha !== null && event.absolute === true) {
+            // Android com event.absolute = true significa dados calibrados
+            currentHeading = event.alpha;
+            bussolaHardwareDisponivel = true;
+          }
+          // Atualiza a rotação do mapa se estiver ativa
+          atualizarRotacaoMapa();
+        }, true);
+
+        console.log('[Radar X9] deviceorientation listener registrado (Android/Desktop)');
+      } else {
+        console.warn('[Radar X9] deviceorientation API não disponível neste navegador');
+      }
+    }
+
+    // ===================================================================
+    // ✅ NOVO: Solicitar permissão de bússola iOS (chamado no clique)
+    // ===================================================================
+    async function solicitarPermissaoBussolaIOS() {
+      if (typeof DeviceOrientationEvent !== 'undefined' &&
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        try {
+          var resposta = await DeviceOrientationEvent.requestPermission();
+          if (resposta === 'granted') {
+            window.addEventListener('deviceorientation', function(event) {
+              if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
+                currentHeading = event.webkitCompassHeading;
+                bussolaHardwareDisponivel = true;
+              }
+              atualizarRotacaoMapa();
+            }, true);
+            console.log('[Radar X9] Permissão de bússola iOS concedida');
+            return true;
+          } else {
+            console.warn('[Radar X9] Permissão de bússola iOS negada:', resposta);
+            return false;
+          }
+        } catch (erro) {
+          console.error('[Radar X9] Erro ao solicitar permissão de bússola iOS:', erro);
+          return false;
+        }
+      }
+      return false;
+    }
+
+    // ===================================================================
     // FUNÇÃO: processarNovaPosicao
     // ===================================================================
     function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
@@ -1372,9 +1434,18 @@ crossorigin="anonymous"></script>
       if (speedKmh > 250) speedKmh = 0;
       $("#speed-display").text(speedKmh);
 
+      // ===================================================================
+      // ✅ CORREÇÃO: Lógica de heading prioriza bússola hardware
+      //    1. Se bússola hardware já está ativa → NÃO sobrescreve com GPS
+      //    2. Se bússola não disponível → usa GPS heading ou cálculo
+      // ===================================================================
       if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
-        currentHeading = hardwareHeading;
-      } else if (dist > 3 && prevLat !== null) {
+        // GPS forneceu heading — só usa se bússola hardware não está ativa
+        if (!bussolaHardwareDisponivel) {
+          currentHeading = hardwareHeading;
+        }
+      } else if (!bussolaHardwareDisponivel && dist > 3 && prevLat !== null) {
+        // Fallback: calcular heading pelo deslocamento GPS
         var dy = newLat - prevLat;
         var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
         if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) {
@@ -1385,7 +1456,13 @@ crossorigin="anonymous"></script>
         }
       }
 
-      if (currentHeading !== null && currentHeading !== undefined) atualizarBussola(currentHeading);
+      // Atualiza bússola visual sempre
+      if (currentHeading !== null && currentHeading !== undefined) {
+        atualizarBussola(currentHeading);
+      }
+
+      // ✅ Atualiza rotação do mapa se estiver ativa
+      atualizarRotacaoMapa();
 
       prevLat = newLat;
       prevLng = newLng;
@@ -1562,11 +1639,21 @@ crossorigin="anonymous"></script>
       showNotification("Navegação iniciada!");
     }
 
+    // ===================================================================
+    // ✅ CORREÇÃO: resetarMapa também reseta a rotação
+    // ===================================================================
     function resetarMapa() {
       if (!map) return;
+
+      // Reseta rotação do mapa via API do plugin
+      mapaRotacionado = false;
+      if (typeof map.setBearing === 'function') {
+        map.setBearing(0);
+      }
+      var rotateBtn = document.getElementById('btn-rotate-map');
+      if (rotateBtn) rotateBtn.classList.remove('rotated');
+
       map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
-      map.setBearing(0);
-      document.getElementById('btn-rotate-map')?.classList.remove('rotated');
       isFollowing = false;
       if (refreshDelayTimer) clearTimeout(refreshDelayTimer);
       refreshDelayTimer = setTimeout(function() {
@@ -1583,9 +1670,6 @@ crossorigin="anonymous"></script>
       showNotification("Mapa resetado");
     }
 
-    // ===================================================================
-    // FUNÇÃO extrairCoordenadas
-    // ===================================================================
     function extrairCoordenadas(record) {
       if (!record || record.length < 10) return null;
       var stringOriginal = String(record[9]).trim();
@@ -1609,22 +1693,65 @@ crossorigin="anonymous"></script>
       if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
     }
 
+    // ===================================================================
+    // ✅ CORREÇÃO MAJOR: Botão de rotação REESCRITO
+    //    - Usa variável global mapaRotacionado em vez de escopo local
+    //    - Solicita permissão de bússola iOS no primeiro clique
+    //    - Mostra informações úteis sobre a fonte do heading
+    //    - Remove transform:rotate do botão (não interfere no mapa)
+    // ===================================================================
     function inicializarBotaoRotacaoMapa() {
       const rotateBtn = document.getElementById('btn-rotate-map');
-      let isRotated = false;
       if (!rotateBtn) return;
-      rotateBtn.addEventListener('click', function () {
-        if (!map) return;
-        if (!isRotated) {
-          map.setBearing((currentHeading > 0 && currentHeading < 360) ? currentHeading : 45);
-          showNotification("Mapa rotacionado");
+
+      // Verificação de segurança: o plugin leaflet-rotate foi carregado?
+      if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') {
+        console.error('[Radar X9] ERRO: leaflet-rotate NÃO carregou! map.setBearing não existe.');
+        console.error('[Radar X9] Verifique se o script leaflet-rotate-src.js foi carregado antes deste código.');
+        rotateBtn.style.opacity = '0.3';
+        rotateBtn.style.pointerEvents = 'none';
+        rotateBtn.title = 'Rotação indisponível (plugin não carregou)';
+        showNotification('Plugin de rotação não carregou. Verifique a conexão.');
+        return;
+      }
+
+      rotateBtn.addEventListener('click', async function () {
+        if (!map || typeof map.setBearing !== 'function') return;
+
+        // Se for iOS, solicitar permissão de bússola no primeiro clique
+        if (!bussolaHardwareDisponivel) {
+          var permissaoConcedida = await solicitarPermissaoBussolaIOS();
+          if (permissaoConcedida) {
+            showNotification('Bússola ativada! Mapa segue sua direção.');
+          }
+        }
+
+        if (!mapaRotacionado) {
+          // --- ATIVAR rotação ---
+          mapaRotacionado = true;
+
+          // Usa heading atual (bússola ou calculado), ou 0 se nenhum disponível
+          var anguloRotacao = (currentHeading > 0 && currentHeading < 360)
+            ? currentHeading
+            : 0;
+
+          map.setBearing(anguloRotacao);
           rotateBtn.classList.add('rotated');
-          isRotated = true;
+
+          // Feedback contextual
+          if (bussolaHardwareDisponivel) {
+            showNotification('Mapa rotacionado — bússola ativa');
+          } else if (currentHeading > 0) {
+            showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)');
+          } else {
+            showNotification('Mapa rotacionado — aguardando direção...');
+          }
         } else {
+          // --- DESATIVAR rotação ---
+          mapaRotacionado = false;
           map.setBearing(0);
-          showNotification("Mapa resetado (Norte para cima)");
           rotateBtn.classList.remove('rotated');
-          isRotated = false;
+          showNotification('Mapa resetado (Norte para cima)');
         }
       });
     }
@@ -1665,6 +1792,9 @@ crossorigin="anonymous"></script>
         return;
       }
 
+      // ===================================================================
+      // ✅ Mapa inicializado com rotate: true e bearing: 0
+      // ===================================================================
       map = L.map('map', {
         center: [userLat, userLng],
         zoom: 17,
@@ -1673,8 +1803,18 @@ crossorigin="anonymous"></script>
         bearing: 0
       });
 
+      // Verificação imediata se o plugin de rotação carregou
+      if (typeof map.setBearing !== 'function') {
+        console.warn('[Radar X9] AVISO: map.setBearing não existe após criação. O plugin leaflet-rotate pode não ter carregado.');
+      } else {
+        console.log('[Radar X9] leaflet-rotate carregado com sucesso. map.setBearing disponível.');
+      }
+
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
+
+      // ✅ Inicializa bússola hardware
+      inicializarBussolaHardware();
 
       map.on('dragstart', function() {
         isFollowing = false;
@@ -1766,7 +1906,7 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // ✅ CORREÇÃO: carregarRadares com diagnóstico detalhado
+    // CARREGAR RADARES
     // ===================================================================
     async function carregarRadares() {
       if (!map) return;
@@ -1793,9 +1933,6 @@ crossorigin="anonymous"></script>
       }
     }
 
-    // ===================================================================
-    // ✅ CORREÇÃO: renderizarRadaresNoMapa com diagnóstico e fallback de ícone
-    // ===================================================================
     function renderizarRadaresNoMapa(records, origem) {
       if (!map) return;
       var radaresExternos = records || [];
@@ -1815,23 +1952,19 @@ crossorigin="anonymous"></script>
         var iconeUrl = getIconUrl(tipo, velocidade);
         var fallbackUrl = '/imagens_app/ic_radar_cev_v2.png';
 
-        // ✅ Diagnóstico: registra qual ícone foi selecionado para radares de velocidade
         var velNum = parseInt(String(velocidade).replace(/[^0-9]/g, ''), 10);
         if (tipo.includes('Velocidade') || tipo.includes('CEV') || tipo.includes('CEM') || tipo.includes('Controlador Eletrônico')) {
           if (velNum === 70) radares70++;
           if (velNum === 100) radares100++;
-          // Verifica se o ícone é específico de velocidade ou genérico
           if (iconeUrl === fallbackUrl && velNum > 0) {
             console.warn("[Radar X9] Radar " + velNum + " km/h usando ícone GENÉRICO. Tipo:", tipo, "| Vel:", velocidade);
             falhasIcone++;
           }
         }
 
-        // ✅ CORREÇÃO: Cria ícone com data-fallback para o patch global
         var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
         var radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
 
-        // ✅ CORREÇÃO: Injeta data-fallback no elemento img após adicionar ao DOM
         setTimeout(function() {
           var imgEl = radarMarker.getElement()?.querySelector('img');
           if (imgEl) {
@@ -1870,7 +2003,6 @@ crossorigin="anonymous"></script>
 
       $("#loading").hide();
 
-      // ✅ Diagnóstico no console
       console.log("[Radar X9] Radares renderizados:", contador);
       console.log("[Radar X9] Radares de 70 km/h:", radares70);
       console.log("[Radar X9] Radares de 100 km/h:", radares100);
