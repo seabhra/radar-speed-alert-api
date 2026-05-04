@@ -374,11 +374,10 @@ crossorigin="anonymous"></script>
     }
 
     /* ===================================================================
-       ✅ CORREÇÃO: CSS do botão de rotação REESCRITO
-       Antes: transform: rotate(90deg) girava a DIV inteira, conflitando
-              com a rotação real do mapa via plugin leaflet-rotate.
-       Agora: Usa mudança de cor/borda/brilho como feedback visual,
-              sem interferir na transformação do container.
+       ✅ CSS do botão de rotação — feedback visual + rotação do ícone
+       Quando o mapa está rotacionado, o ícone do botão GIRA junto,
+       dando feedback visual imediato da direção atual.
+       A DIV do botão NÃO é rotacionada (evita conflito com o mapa).
     =================================================================== */
     #btn-rotate-map {
         transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
@@ -392,11 +391,14 @@ crossorigin="anonymous"></script>
 
     #btn-rotate-map.rotated img {
         filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5));
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    filter 0.3s ease;
     }
 
-    /* ✅ REMOVIDO: .leaflet-container { transition: transform ... }
-       Isso CONFLITAVA com o plugin leaflet-rotate que gerencia
-       a transformação do container internamente. */
+    #btn-rotate-map:not(.rotated) img {
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                    filter 0.3s ease;
+    }
 
     .user-gps-marker,
     .user-navigator-marker {
@@ -708,6 +710,9 @@ crossorigin="anonymous"></script>
     <div id="map"></div>
     <div class="toast-notification" id="toast-msg"></div>
 
+    <!-- ===================================================================
+         Bússola original: apenas base + ponteira, sem setas adicionais
+    =================================================================== -->
     <div class="compass-widget">
       <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src='https://cdn-icons-png.flaticon.com/512/2838/2838773.png'" alt="Bússola" class="compass-base">
       <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'" alt="Ponteira" class="compass-needle" id="compass-needle-img">
@@ -719,7 +724,7 @@ crossorigin="anonymous"></script>
     </div>
 
     <div class="sidebar-controls" id="sidebar-controls">
-      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)"><img src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar"></button>
+      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)"><img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar"></button>
       <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar"><img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta"></button>
       <button class="map-btn" id="btn-search-bar" title="Buscar Radares"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca"></button>
       <button class="map-btn" id="btn-route-bar" title="Navegar / Rota"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
@@ -792,7 +797,7 @@ crossorigin="anonymous"></script>
     let sidebarAberta = true;
 
     const ALERT_CONFIG = {
-      DISTANCIA_MAXIMA: 300,
+      DISTANCIA_MAXIMA: 200,
       DISTANCIA_CRITICA: 100,
       TEMPO_ALERTA: 12000,
       DISTANCIA_PASSAR_RADAR: 30,
@@ -805,12 +810,12 @@ crossorigin="anonymous"></script>
     };
 
     // ===================================================================
-    // ✅ NOVO: Variáveis para controle de rotação do mapa
+    // Variáveis para controle de rotação do mapa
     // ===================================================================
     let currentHeading = 0;
-    let mapaRotacionado = false;       // Estado do botão (toggle)
-    let bussolaHardwareDisponivel = false; // Se deviceorientation funcionou
-    let ultimaAtualizacaoRotacao = 0; // Throttle para não chamar setBearing a cada frame
+    let mapaRotacionado = false;
+    let bussolaHardwareDisponivel = false;
+    let ultimaAtualizacaoRotacao = 0;
 
     var posicaoSuavizada = { lat: null, lng: null };
     var historicoPosicoes = [];
@@ -1325,9 +1330,9 @@ crossorigin="anonymous"></script>
     function removerRota() { finalizarERestaurarRota(); }
 
     // ===================================================================
-    // ✅ NOVO: Atualizar rotação do mapa em tempo real
-    //    Só chama setBearing se o mapa estiver em modo rotacionado
-    //    e respeita um throttle de 200ms para performance
+    // Atualizar rotação do mapa em tempo real
+    //    Só chama setBearing (direção) se o mapa estiver em modo rotacionado
+    //    e respeita um throttle (acelerador) de 200ms para performance
     // ===================================================================
     function atualizarRotacaoMapa() {
       if (!mapaRotacionado || !map) return;
@@ -1341,10 +1346,19 @@ crossorigin="anonymous"></script>
       if (typeof map.setBearing === 'function') {
         map.setBearing(currentHeading);
       }
+
+      // ===================================================================
+      // ✅ NOVO: Gira o ícone do botão de rotação junto com o mapa
+      //    Só rotaciona o <img> interno, nunca a DIV do botão
+      // ===================================================================
+      var rotateBtnIcon = document.getElementById('rotate-btn-icon');
+      if (rotateBtnIcon) {
+        rotateBtnIcon.style.transform = 'rotate(' + currentHeading + 'deg)';
+      }
     }
 
     // ===================================================================
-    // ✅ NOVO: Inicializar bússola hardware (deviceorientation)
+    // Inicializar bússola hardware (deviceorientation)
     //    Captura o heading real do dispositivo via giroscópio/magnetômetro
     //    Precisa ser ativado por gesto do usuário em iOS 13+
     // ===================================================================
@@ -1352,7 +1366,6 @@ crossorigin="anonymous"></script>
       // iOS 13+ requer requestPermission explícito
       if (typeof DeviceOrientationEvent !== 'undefined' &&
           typeof DeviceOrientationEvent.requestPermission === 'function') {
-        // Será ativado no primeiro toque do botão de rotação
         console.log('[Radar X9] Bússola iOS detectada — permissão será solicitada ao tocar no botão de rotação');
         return;
       }
@@ -1381,7 +1394,7 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // ✅ NOVO: Solicitar permissão de bússola iOS (chamado no clique)
+    // Solicitar permissão de bússola iOS (chamado no clique)
     // ===================================================================
     async function solicitarPermissaoBussolaIOS() {
       if (typeof DeviceOrientationEvent !== 'undefined' &&
@@ -1435,7 +1448,7 @@ crossorigin="anonymous"></script>
       $("#speed-display").text(speedKmh);
 
       // ===================================================================
-      // ✅ CORREÇÃO: Lógica de heading prioriza bússola hardware
+      // Lógica de heading prioriza bússola hardware
       //    1. Se bússola hardware já está ativa → NÃO sobrescreve com GPS
       //    2. Se bússola não disponível → usa GPS heading ou cálculo
       // ===================================================================
@@ -1461,7 +1474,7 @@ crossorigin="anonymous"></script>
         atualizarBussola(currentHeading);
       }
 
-      // ✅ Atualiza rotação do mapa se estiver ativa
+      // Atualiza rotação do mapa se estiver ativa
       atualizarRotacaoMapa();
 
       prevLat = newLat;
@@ -1640,7 +1653,7 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // ✅ CORREÇÃO: resetarMapa também reseta a rotação
+    // resetarMapa também reseta a rotação
     // ===================================================================
     function resetarMapa() {
       if (!map) return;
@@ -1650,6 +1663,15 @@ crossorigin="anonymous"></script>
       if (typeof map.setBearing === 'function') {
         map.setBearing(0);
       }
+
+      // ===================================================================
+      // ✅ NOVO: Reseta a rotação visual do ícone do botão também
+      // ===================================================================
+      var rotateBtnIcon = document.getElementById('rotate-btn-icon');
+      if (rotateBtnIcon) {
+        rotateBtnIcon.style.transform = 'rotate(0deg)';
+      }
+
       var rotateBtn = document.getElementById('btn-rotate-map');
       if (rotateBtn) rotateBtn.classList.remove('rotated');
 
@@ -1688,17 +1710,19 @@ crossorigin="anonymous"></script>
       return { lat: lat, lng: lng };
     }
 
+    // ===================================================================
+    // Atualiza apenas a ponteira da bússola original (sem setas extras)
+    // ===================================================================
     function atualizarBussola(headingDegrees) {
       var needle = document.getElementById('compass-needle-img');
       if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
     }
 
     // ===================================================================
-    // ✅ CORREÇÃO MAJOR: Botão de rotação REESCRITO
-    //    - Usa variável global mapaRotacionado em vez de escopo local
+    // Botão de rotação — com ícone girando junto com o mapa
+    //    - Usa variável global mapaRotacionado
     //    - Solicita permissão de bússola iOS no primeiro clique
-    //    - Mostra informações úteis sobre a fonte do heading
-    //    - Remove transform:rotate do botão (não interfere no mapa)
+    //    - O <img> do botão gira via transform (não a DIV)
     // ===================================================================
     function inicializarBotaoRotacaoMapa() {
       const rotateBtn = document.getElementById('btn-rotate-map');
@@ -1738,6 +1762,15 @@ crossorigin="anonymous"></script>
           map.setBearing(anguloRotacao);
           rotateBtn.classList.add('rotated');
 
+          // ===================================================================
+          // ✅ NOVO: Gira o ícone do botão para refletir o ângulo atual
+          //    Usa transform no <img>, nunca na DIV (evita conflito)
+          // ===================================================================
+          var rotateBtnIcon = document.getElementById('rotate-btn-icon');
+          if (rotateBtnIcon) {
+            rotateBtnIcon.style.transform = 'rotate(' + anguloRotacao + 'deg)';
+          }
+
           // Feedback contextual
           if (bussolaHardwareDisponivel) {
             showNotification('Mapa rotacionado — bússola ativa');
@@ -1751,6 +1784,15 @@ crossorigin="anonymous"></script>
           mapaRotacionado = false;
           map.setBearing(0);
           rotateBtn.classList.remove('rotated');
+
+          // ===================================================================
+          // ✅ NOVO: Reseta o ícone do botão para 0° ao desativar
+          // ===================================================================
+          var rotateBtnIcon = document.getElementById('rotate-btn-icon');
+          if (rotateBtnIcon) {
+            rotateBtnIcon.style.transform = 'rotate(0deg)';
+          }
+
           showNotification('Mapa resetado (Norte para cima)');
         }
       });
@@ -1793,7 +1835,7 @@ crossorigin="anonymous"></script>
       }
 
       // ===================================================================
-      // ✅ Mapa inicializado com rotate: true e bearing: 0
+      // Mapa inicializado com rotate: true e bearing: 0
       // ===================================================================
       map = L.map('map', {
         center: [userLat, userLng],
@@ -1813,7 +1855,7 @@ crossorigin="anonymous"></script>
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
 
-      // ✅ Inicializa bússola hardware
+      // Inicializa bússola hardware
       inicializarBussolaHardware();
 
       map.on('dragstart', function() {
