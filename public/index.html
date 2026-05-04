@@ -34,6 +34,9 @@ crossorigin="anonymous"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
   
 <style>
+    /* ===================================================================
+       VARIÁVEIS DE TEMA (cores globais do app)
+    =================================================================== */
     :root {
         --bg-color: #0f1115;
         --panel-color: #1a1d24;
@@ -45,6 +48,9 @@ crossorigin="anonymous"></script>
         --btn-size: 50px;
     }
 
+    /* ===================================================================
+       RESET GLOBAL — remove paddings/margins padrão do navegador
+    =================================================================== */
     * {
         box-sizing: border-box;
         margin: 0;
@@ -52,6 +58,9 @@ crossorigin="anonymous"></script>
         -webkit-tap-highlight-color: transparent;
     }
 
+    /* ===================================================================
+       BODY — layout principal em coluna, tela cheia, sem scroll
+    =================================================================== */
     body {
         font-family: 'Inter', sans-serif;
         background-color: var(--bg-color);
@@ -62,6 +71,9 @@ crossorigin="anonymous"></script>
         overflow: hidden;
     }
 
+    /* ===================================================================
+       HEADER — barra superior com logo, título e botão menu
+    =================================================================== */
     header {
         background-color: var(--panel-color);
         padding: 15px;
@@ -97,6 +109,10 @@ crossorigin="anonymous"></script>
         color: var(--accent-color);
     }
 
+    /* ===================================================================
+       BOTÃO MENU TOGGLE — hamburger animado com label "MENU"
+       Ao clicar, as 3 barras viram um "X" via transform
+    =================================================================== */
     .btn-menu-toggle {
         display: flex;
         flex-direction: column;
@@ -139,6 +155,7 @@ crossorigin="anonymous"></script>
         transform-origin: center;
     }
 
+    /* Animação do X quando o menu está ativo */
     .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
         transform: translateY(6.5px) rotate(45deg);
     }
@@ -162,6 +179,10 @@ crossorigin="anonymous"></script>
         margin-top: 2px;
     }
 
+    /* ===================================================================
+       SIDEBAR CONTROLS — barra vertical à direita com botões de mapa
+       Pode ser retraída via classe .retracted (translateX para fora)
+    =================================================================== */
     .sidebar-controls {
         position: absolute;
         top: 0;
@@ -183,6 +204,7 @@ crossorigin="anonymous"></script>
         transform: translateX(calc(var(--sidebar-width) + 10px));
     }
 
+    /* Botões dentro da sidebar — visibilidade controlada pela retração */
     .sidebar-controls .map-btn {
         width: var(--btn-size);
         height: var(--btn-size);
@@ -196,6 +218,11 @@ crossorigin="anonymous"></script>
         transition: opacity 0.15s ease 0s, transform 0.2s ease, border-color 0.2s ease;
     }
 
+    /* ===================================================================
+       BARRAS DE BUSCA — search-container para radares e rotas
+       Max-height: 0 quando fechada, 90px quando .active
+       Desliza para baixo com transição suave
+    =================================================================== */
     .search-container {
         position: absolute;
         top: 0;
@@ -223,6 +250,7 @@ crossorigin="anonymous"></script>
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     }
 
+    /* Input de busca — cantos arredondados, fundo preto */
     .search-container input {
         flex: 1;
         padding: 14px 20px;
@@ -239,6 +267,7 @@ crossorigin="anonymous"></script>
         border-color: var(--accent-color);
     }
 
+    /* Botão circular de buscar dentro da barra */
     .btn-search {
         position: relative;
         flex-shrink: 0;
@@ -268,6 +297,10 @@ crossorigin="anonymous"></script>
         transform: translate(-50%, -50%);
     }
 
+    /* ===================================================================
+       MAP-WRAPPER — container flexível que segura o mapa e overlays
+       Ocupa todo o espaço restante abaixo do header
+    =================================================================== */
     .map-wrapper {
         position: relative;
         flex: 1;
@@ -276,6 +309,7 @@ crossorigin="anonymous"></script>
         width: 100%;
     }
 
+    /* Mapa Leaflet — preenche todo o wrapper */
     #map {
         width: 100%;
         height: 100%;
@@ -283,6 +317,11 @@ crossorigin="anonymous"></script>
         z-index: 1;
     }
 
+    /* ===================================================================
+       BUSSOLA WIDGET — posição fixa no canto superior esquerdo
+       Apenas base + ponteira, sem elementos extras
+       pointer-events: none para não interceptar toques no mapa
+    =================================================================== */
     .compass-widget {
         position: absolute;
         top: 20px;
@@ -296,6 +335,7 @@ crossorigin="anonymous"></script>
         pointer-events: none;
     }
 
+    /* Imagem de fundo da bússola (círculo com pontos cardeais) */
     .compass-base {
         position: absolute;
         width: 100%;
@@ -305,6 +345,8 @@ crossorigin="anonymous"></script>
         opacity: 0.9;
     }
 
+    /* Ponteira da bússola — gira via JS (transform: rotate)
+       Transição suave com cubic-bezier para movimento natural */
     .compass-needle {
         position: absolute;
         width: 55%;
@@ -314,6 +356,10 @@ crossorigin="anonymous"></script>
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
+    /* ===================================================================
+       MAP-BTN — estilo base para todos os botões redondos do mapa
+       Fundo semi-transparente escuro, borda sutil, efeito hover/active
+    =================================================================== */
     .map-btn {
         width: var(--btn-size);
         height: var(--btn-size);
@@ -338,6 +384,7 @@ crossorigin="anonymous"></script>
         transform: scale(0.92);
     }
 
+    /* Ícone dentro dos botões — tamanho fixo, sem interação de ponteiro */
     .map-btn img {
         width: 30px;
         height: 30px;
@@ -345,6 +392,10 @@ crossorigin="anonymous"></script>
         pointer-events: none;
     }
 
+    /* ===================================================================
+       BOTÃO ALERTA TOGGLE — estados LIGADO/DESLIGADO
+       Quando .alert-off: fundo avermelhado, ícone com filtro vermelho
+    =================================================================== */
     .alert-toggle-btn {
         background: rgba(29, 28, 28, 0.9);
         border: 2px solid rgba(255, 255, 255, 0.08);
@@ -364,42 +415,69 @@ crossorigin="anonymous"></script>
         transition: all 0.3s ease;
     }
 
+    /* Borda verde especial nos botões dentro da sidebar */
     .sidebar-controls .map-btn {
         border: 1px solid rgba(0, 255, 136, 0.35);
     }
 
+    /* Botão de rota um pouco maior que os demais */
     #btn-route-bar {
         width: 54px;
         height: 54px;
     }
 
     /* ===================================================================
-       ✅ CSS do botão de rotação — feedback visual + rotação do ícone
-       Quando o mapa está rotacionado, o ícone do botão GIRA junto,
-       dando feedback visual imediato da direção atual.
-       A DIV do botão NÃO é rotacionada (evita conflito com o mapa).
+       ✅ CSS do botão de rotação REESCRITO
+       Antes: transform: rotate(90deg) girava a DIV inteira, conflitando
+              com a rotação real do mapa via plugin leaflet-rotate.
+       Agora: Usa mudança de cor/borda/brilho como feedback visual,
+              sem interferir na transformação do container.
+       
+       ✅ NOVO: O <img> interno do botão agora GIRA junto com o mapa
+              quando .rotated está ativo, refletindo o bearing atual.
+              A DIV do botão NÃO é rotacionada (evita conflito).
     =================================================================== */
     #btn-rotate-map {
+        /* Transição apenas de cores/sombra — NÃO inclui transform
+           para não conflitar com o scale do :active do .map-btn */
         transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
     }
 
+    /* Estado ativado: borda verde brilhante + fundo levemente iluminado */
     #btn-rotate-map.rotated {
         border-color: var(--accent-color);
         box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
         background-color: rgba(0, 255, 136, 0.08);
     }
 
+    /* ✅ NOVO: Quando rotacionado, o ícone interno ganha:
+       - filter: brilho + sombra verde (feedback visual)
+       - transition: de transform (para girar suavemente) E de filter
+       O transform: rotate(Xdeg) é aplicado via JS inline style */
     #btn-rotate-map.rotated img {
         filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5));
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                     filter 0.3s ease;
     }
 
+    /* ✅ NOVO: Quando NÃO rotacionado, o ícone também precisa de
+       transition de transform para que o retorno a 0° seja suave */
     #btn-rotate-map:not(.rotated) img {
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
                     filter 0.3s ease;
     }
 
+    /* ✅ REMOVIDO: .leaflet-container { transition: transform ... }
+       Isso CONFLITAVA com o plugin leaflet-rotate que gerencia
+       a transformação do container internamente. */
+
+    /* ===================================================================
+       MARCADORES DE USUÁRIO E NAVEGAÇÃO
+       user-gps-marker: ponto azul padrão do GPS
+       user-navigator-marker: ícone de navegação (seta) durante rota
+       route-start-marker: animação pulse ao iniciar rota
+       route-end-marker: animação pulse no destino
+    =================================================================== */
     .user-gps-marker,
     .user-navigator-marker {
         filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
@@ -429,6 +507,10 @@ crossorigin="anonymous"></script>
         100% { transform: scale(1); }
     }
 
+    /* ===================================================================
+       MARCADORES DE RADAR — fundo transparente, sem borda do Leaflet
+       O ícone SVG/PNG é que contém a arte visual do radar
+    =================================================================== */
     .radar-marker-icon {
         background: transparent !important;
         border: none !important;
@@ -441,6 +523,10 @@ crossorigin="anonymous"></script>
         display: block !important;
     }
 
+    /* ===================================================================
+       SPEED WIDGET — mostrador de velocidade no canto inferior esquerdo
+       Posicionado com offset negativo para ficar parcialmente fora da tela
+    =================================================================== */
     .speed-widget {
         position: absolute;
         bottom: -15px;
@@ -453,6 +539,7 @@ crossorigin="anonymous"></script>
         justify-content: center;
     }
 
+    /* Imagem de fundo do velocímetro */
     .speed-bg {
         position: absolute;
         inset: 0;
@@ -462,6 +549,8 @@ crossorigin="anonymous"></script>
         pointer-events: none;
     }
 
+    /* Número da velocidade — centralizado sobre o velocímetro
+       Usa fonte Rajdhani para estilo painel digital */
     .speed-value {
         position: absolute;
         top: 50%;
@@ -480,6 +569,11 @@ crossorigin="anonymous"></script>
         min-width: 3ch;
     }
 
+    /* ===================================================================
+       ALERT CONTAINER — barra de alerta de radar na parte inferior
+       Inicialmente oculta (display:none), aparece via fadeIn no JS
+       Animação slideUp para entrada suave de baixo para cima
+    =================================================================== */
     #alert-container {
         position: absolute;
         bottom: 0;
@@ -496,12 +590,14 @@ crossorigin="anonymous"></script>
         to { transform: translateY(0); }
     }
 
+    /* Animação de pulso para alerta crítico (distância muito curta) */
     @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.02); background: linear-gradient(90deg, #ff2200, #ee0000); }
         100% { transform: scale(1); }
     }
 
+    /* Barra de alerta — gradiente vermelho escuro, borda superior brilhante */
     .alert-bar {
         background: linear-gradient(90deg, #cc0000, #990000);
         color: white;
@@ -514,6 +610,7 @@ crossorigin="anonymous"></script>
         transition: all 0.2s ease;
     }
 
+    /* Estado crítico: pulsação contínua para chamar atenção */
     .alert-bar-critico {
         animation: pulse 0.8s ease-in-out infinite;
     }
@@ -536,6 +633,11 @@ crossorigin="anonymous"></script>
         opacity: 0.95;
     }
 
+    /* ===================================================================
+       TOAST NOTIFICATION — mensagem temporária no topo central
+       Opacidade 0 inicial, .show ativa visibilidade + translação
+       pointer-events: none para não bloquear interação com o mapa
+    =================================================================== */
     .toast-notification {
         position: absolute;
         top: 20px;
@@ -562,6 +664,10 @@ crossorigin="anonymous"></script>
         transform: translateX(-50%) translateY(0);
     }
 
+    /* ===================================================================
+       LOADING OVERLAY — mini-loading centralizado sobre o mapa
+       Usado durante busca de endereços e carregamento de radares
+    =================================================================== */
     .loading-overlay {
         position: absolute;
         top: 50%;
@@ -576,6 +682,7 @@ crossorigin="anonymous"></script>
         backdrop-filter: blur(5px);
     }
 
+    /* Spinner circular simples */
     .loading-spinner {
         border: 3px solid #333;
         border-top: 3px solid var(--accent-color);
@@ -590,6 +697,11 @@ crossorigin="anonymous"></script>
         100% { transform: rotate(360deg); }
     }
 
+    /* ===================================================================
+       LOADING FULLSCREEN — tela de carregamento inicial do app
+       Cobre toda a tela, fade-out via classe .fade-out após init
+       Spinner duplo com anéis contra-rotativos (verde + vermelho)
+    =================================================================== */
     .loading-fullscreen {
         position: fixed;
         inset: 0;
@@ -607,6 +719,7 @@ crossorigin="anonymous"></script>
         visibility: hidden;
     }
 
+    /* Anel duplo do spinner fullscreen */
     .loading-fullscreen .spinner-ring {
         width: 60px;
         height: 60px;
@@ -624,12 +737,14 @@ crossorigin="anonymous"></script>
         border: 4px solid transparent;
     }
 
+    /* Anel externo — verde, gira no sentido horário */
     .loading-fullscreen .spinner-ring::before {
         border-top-color: var(--accent-color);
         border-right-color: var(--accent-color);
         animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
     }
 
+    /* Anel interno — vermelho, gira no sentido anti-horário */
     .loading-fullscreen .spinner-ring::after {
         inset: 10px;
         border-bottom-color: #ff3333;
@@ -642,6 +757,7 @@ crossorigin="anonymous"></script>
         100% { transform: rotate(360deg); }
     }
 
+    /* Texto "Iniciando Radar X9" */
     .loading-fullscreen .loading-text {
         font-size: 1.1rem;
         font-weight: 600;
@@ -653,6 +769,7 @@ crossorigin="anonymous"></script>
         color: var(--accent-color);
     }
 
+    /* Subtexto "Sincronizando satélites..." com pulso de opacidade */
     .loading-fullscreen .loading-sub {
         margin-top: 8px;
         font-size: 0.8rem;
@@ -665,6 +782,11 @@ crossorigin="anonymous"></script>
         50% { opacity: 1; }
     }
 
+    /* ===================================================================
+       CONTROLES DO LEAFLET ESCONDIDOS — não usamos os padrões
+       Zoom é controlado pelos botões personalizados da sidebar
+       Attribution e routing container são ocultados por completo
+    =================================================================== */
     .leaflet-control-zoom,
     .leaflet-control-attribution,
     .leaflet-routing-container {
@@ -674,12 +796,18 @@ crossorigin="anonymous"></script>
 </head>
 <body>
 
+  <!-- ===================================================================
+       TELA DE CARREGAMENTO INICIAL — desaparece após GPS/mapa pronto
+  =================================================================== -->
   <div class="loading-fullscreen" id="loading-fullscreen">
     <div class="spinner-ring"></div>
     <div class="loading-text">Iniciando <span>Radar X9</span></div>
     <div class="loading-sub">Sincronizando satélites...</div>
   </div>
 
+  <!-- ===================================================================
+       HEADER — logo + título + botão menu toggle
+  =================================================================== -->
   <header>
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
@@ -696,35 +824,58 @@ crossorigin="anonymous"></script>
     </button>
   </header>
 
+  <!-- ===================================================================
+       MAP-WRAPPER — contém o mapa + todos os overlays (bússola, busca,
+       velocímetro, sidebar, alerta, loading, toast)
+  =================================================================== -->
   <div class="map-wrapper">
+
+    <!-- Barra de busca de radares (oculta por padrão) -->
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
       <button class="btn-search" id="btn-search-radar" title="Buscar"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca"></button>
     </div>
 
+    <!-- Barra de busca de rotas (oculta por padrão) -->
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
       <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
     </div>
 
+    <!-- Container do mapa Leaflet -->
     <div id="map"></div>
+
+    <!-- Toast de notificações temporárias -->
     <div class="toast-notification" id="toast-msg"></div>
 
     <!-- ===================================================================
-         Bússola original: apenas base + ponteira, sem setas adicionais
+         BUSSOLA ORIGINAL — apenas base + ponteira, sem setas adicionais
+         Base: círculo com pontos cardeais (não gira)
+         Ponteira: agulha que gira conforme o heading do dispositivo
     =================================================================== -->
     <div class="compass-widget">
       <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src='https://cdn-icons-png.flaticon.com/512/2838/2838773.png'" alt="Bússola" class="compass-base">
       <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'" alt="Ponteira" class="compass-needle" id="compass-needle-img">
     </div>
 
+    <!-- Velocímetro — widget de velocidade no canto inferior esquerdo -->
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
+    <!-- ===================================================================
+         SIDEBAR DE CONTROLES — botões à direita do mapa
+         Ordem: Rotação | Alerta | Busca | Rota | Centro | Refresh | Zoom+ | Zoom-
+    =================================================================== -->
     <div class="sidebar-controls" id="sidebar-controls">
-      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)"><img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar"></button>
+
+      <!-- ✅ NOVO: id="rotate-btn-icon" adicionado ao <img> para poder
+           girar apenas o ícone via JS sem afetar a DIV do botão -->
+      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
+        <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
+      </button>
+
       <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar"><img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta"></button>
       <button class="map-btn" id="btn-search-bar" title="Buscar Radares"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca"></button>
       <button class="map-btn" id="btn-route-bar" title="Navegar / Rota"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
@@ -734,6 +885,7 @@ crossorigin="anonymous"></script>
       <button class="map-btn" id="btn-zoom-out" title="Diminuir Zoom"><img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out"></button>
     </div>
 
+    <!-- Barra de alerta de radar (oculta, aparece via JS) -->
     <div id="alert-container">
       <div class="alert-bar">
         <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
@@ -744,12 +896,14 @@ crossorigin="anonymous"></script>
       </div>
     </div>
 
+    <!-- Loading centralizado (busca de endereços, carregamento de radares) -->
     <div class="loading-overlay" id="loading" style="display:none;">
       <div class="loading-spinner"></div>
       <div style="margin-top:10px; color:#fff;">Processando...</div>
     </div>
   </div>
 
+  <!-- Áudio de alerta — preload para tocar instantaneamente -->
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
   
@@ -796,6 +950,9 @@ crossorigin="anonymous"></script>
 
     let sidebarAberta = true;
 
+    // ===================================================================
+    // CONFIGURAÇÃO DE ALERTAS — distâncias, tempos, ângulos
+    // ===================================================================
     const ALERT_CONFIG = {
       DISTANCIA_MAXIMA: 200,
       DISTANCIA_CRITICA: 100,
@@ -810,13 +967,18 @@ crossorigin="anonymous"></script>
     };
 
     // ===================================================================
-    // Variáveis para controle de rotação do mapa
+    // ✅ NOVO: Variáveis para controle de rotação do mapa
+    //    currentHeading: ângulo atual em graus (0-360)
+    //    mapaRotacionado: estado toggle do botão de rotação
+    //    bussolaHardwareDisponivel: se deviceorientation funcionou
+    //    ultimaAtualizacaoRotacao: throttle para não chamar setBearing a cada frame
     // ===================================================================
     let currentHeading = 0;
     let mapaRotacionado = false;
     let bussolaHardwareDisponivel = false;
     let ultimaAtualizacaoRotacao = 0;
 
+    // Variáveis de suavização GPS e análise de direção
     var posicaoSuavizada = { lat: null, lng: null };
     var historicoPosicoes = [];
     var historicoDistanciasRadar = {};
@@ -825,7 +987,7 @@ crossorigin="anonymous"></script>
     var contagemTocarSom = 0;
 
     // ===================================================================
-    // MAPEAMENTO DE ÍCONES
+    // MAPEAMENTO DE ÍCONES — tipo de radar → caminho da imagem
     // ===================================================================
     const iconMap = {
       'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
@@ -870,6 +1032,7 @@ crossorigin="anonymous"></script>
       'default': '/imagens_app/ic_radar_cev_v2.png'
     };
 
+    // Tipos de radar que NÃO disparam alerta sonoro/visual
     const TIPOS_SEM_ALERTA = [
       'Detector de Faixa Preferencial de Ônibus (BUS)',
       'Detector de Faixa Preferencial de Ônibus',
@@ -883,6 +1046,7 @@ crossorigin="anonymous"></script>
       'Câmera Olho Vivo'
     ];
 
+    // Ajuste de nomes para exibição amigável no popup e alerta
     const ajusteNomes = {
       'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
       'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
@@ -944,6 +1108,8 @@ crossorigin="anonymous"></script>
     // ===================================================================
     // FUNÇÕES AUXILIARES
     // ===================================================================
+
+    // Cria ícone Leaflet personalizado (usado para GPS e marcadores de rota)
     function criarIconePersonalizado(iconUrl, tamanho, className) {
       return L.icon({
         iconUrl: iconUrl,
@@ -954,6 +1120,7 @@ crossorigin="anonymous"></script>
       });
     }
 
+    // Cria ícone de radar com fallback (tenta carregar, se falhar usa genérico)
     function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
       return L.icon({
         iconUrl: iconUrl,
@@ -965,6 +1132,7 @@ crossorigin="anonymous"></script>
       });
     }
 
+    // Verifica se o tipo de radar deve disparar alerta
     function deveAlertaRadar(tipoOriginal) {
       if (!tipoOriginal) return false;
       var tipoLimpo = tipoOriginal.trim();
@@ -974,6 +1142,11 @@ crossorigin="anonymous"></script>
       return true;
     }
 
+    // ===================================================================
+    // getIconUrl — resolve o ícone correto baseado no tipo + velocidade
+    // Radares de velocidade têm ícones específicos por faixa (40,50,60,70,80,100)
+    // Demais tipos usam o mapeamento do iconMap ou busca por substring
+    // ===================================================================
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
       if (!tipoLimpo) return iconMap['default'];
@@ -991,6 +1164,7 @@ crossorigin="anonymous"></script>
           tipoLimpo === 'Controle de Redução de Velocidade')
         return iconMap['Controle de Redução de Velocidade (CRV)'];
 
+      // Radares de velocidade — ícone por faixa de velocidade
       var isRadarVelocidade =
         tipoLimpo.includes('Velocidade') ||
         tipoLimpo.includes('CEV') ||
@@ -1013,6 +1187,7 @@ crossorigin="anonymous"></script>
 
       if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
 
+      // Busca por substring para tipos que não bateram exato
       var substrings = [
         { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
         { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
@@ -1040,7 +1215,7 @@ crossorigin="anonymous"></script>
       return iconMap['default'];
     }
 
-    // Patch global para ícones de radar com fallback
+    // Patch global para ícones de radar com fallback — intercepta erros de imagem
     document.addEventListener('error', function(e) {
       var target = e.target;
       if (target && target.tagName === 'IMG') {
@@ -1056,17 +1231,20 @@ crossorigin="anonymous"></script>
       }
     }, true);
 
+    // Exibe notificação temporária (toast) no topo do mapa
     function showNotification(message) {
       var $toast = $("#toast-msg");
       $toast.text(message).addClass("show");
       setTimeout(function() { $toast.removeClass("show"); }, 3500);
     }
 
+    // Esconde a tela de carregamento fullscreen com fade-out
     function hideFullscreenLoading() {
       var el = document.getElementById('loading-fullscreen');
       if (el) { el.classList.add('fade-out'); setTimeout(function() { el.remove(); }, 600); }
     }
 
+    // Calcula distância entre dois pontos GPS (fórmula de Haversine)
     function calcularDistancia(lat1, lon1, lat2, lon2) {
       var R = 6371e3;
       var p1 = lat1 * Math.PI / 180;
@@ -1080,6 +1258,8 @@ crossorigin="anonymous"></script>
     // ===================================================================
     // SUAVIZAÇÃO E ANÁLISE GPS
     // ===================================================================
+
+    // Suaviza posição GPS para evitar pulos bruscos do marcador
     function suavizarPosicao(novaLat, novaLng) {
       if (posicaoSuavizada.lat === null) {
         posicaoSuavizada.lat = novaLat;
@@ -1092,11 +1272,13 @@ crossorigin="anonymous"></script>
       return { lat: posicaoSuavizada.lat, lng: posicaoSuavizada.lng };
     }
 
+    // Adiciona posição ao histórico circular (usado para análise de direção)
     function adicionarAoHistorico(lat, lng, timestamp) {
       historicoPosicoes.push({ lat: lat, lng: lng, time: timestamp });
       if (historicoPosicoes.length > ALERT_CONFIG.HISTORICO_TAMANHO) historicoPosicoes.shift();
     }
 
+    // Calcula tendência de distância para um radar (aproximando vs afastando)
     function calcularTendenciaDistancia(radarId, distanciaAtual) {
       if (!historicoDistanciasRadar[radarId]) historicoDistanciasRadar[radarId] = [];
       historicoDistanciasRadar[radarId].push({ distancia: distanciaAtual, time: Date.now() });
@@ -1109,6 +1291,7 @@ crossorigin="anonymous"></script>
       return { estaAproximando: true, estaAfastando: false, diferenca: 0 };
     }
 
+    // Move o marcador de posição suavemente via requestAnimationFrame
     function moverMarcadorSuavemente(targetLat, targetLng) {
       var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
       if (!marcadorParaMover) return;
@@ -1153,10 +1336,13 @@ crossorigin="anonymous"></script>
       requestAnimationFrame(animarFrame);
     }
 
+    // Limpa histórico de distâncias de um radar (quando passa ou afasta)
     function limparHistoricoDistancia(radarId) {
       if (historicoDistanciasRadar[radarId]) delete historicoDistanciasRadar[radarId];
     }
 
+    // Verifica se o usuário está se aproximando ou afastando de um radar
+    // Combina heading GPS com tendência de distância para precisão
     function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, radarId, distanciaAtual) {
       if (!uHeading || uHeading === -1 || isNaN(uHeading)) {
         var t = calcularTendenciaDistancia(radarId, distanciaAtual);
@@ -1174,6 +1360,10 @@ crossorigin="anonymous"></script>
       };
     }
 
+    // ===================================================================
+    // aplicarTemaMapa — alterna entre tema claro (dia) e escuro (noite)
+    // Verifica a hora atual e troca o tileLayer do CartoDB
+    // ===================================================================
     function aplicarTemaMapa() {
       if (!map) return;
       var hora = new Date().getHours();
@@ -1187,6 +1377,7 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // Atualiza o ícone do marcador de usuário (caso tenha sido alterado durante navegação)
     function atualizarIconeUsuario() {
       if (!userMarker || estaEmNavegacao) return;
       var userIcon = L.icon({
@@ -1200,14 +1391,17 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // ALERTAS
+    // ALERTAS — controle de som e barra visual
     // ===================================================================
+
+    // Para o som imediatamente e limpa o timeout do alerta
     function fecharAlertaImediatamente() {
       var sound = document.getElementById("alert-soud");
       if (sound) { sound.pause(); sound.currentTime = 0; }
       clearTimeout(alertTimeout);
     }
 
+    // Esconde a barra de alerta visual e reseta todos os estados
     function esconderAlertaVisual() {
       $("#alert-container").fadeOut(150);
       $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
@@ -1218,6 +1412,7 @@ crossorigin="anonymous"></script>
 
     // ===================================================================
     // FUNÇÃO: adicionarMarcadoresRota
+    // Remove marcador de GPS padrão e adiciona marcadores de início/fim de rota
     // ===================================================================
     function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
       if (startRouteMarker) map.removeLayer(startRouteMarker);
@@ -1266,6 +1461,7 @@ crossorigin="anonymous"></script>
       });
     }
 
+    // Remove apenas o marcador de destino (mantém o de início)
     function removerMarcadoresRota() {
       if (endRouteMarker) {
         map.removeLayer(endRouteMarker);
@@ -1273,6 +1469,7 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // Atualiza o waypoint de início da rota conforme o usuário se move
     function atualizarRota() {
       if (destinoAtual && userLat && userLng && routingControl) {
         routingControl.setWaypoints([
@@ -1285,6 +1482,7 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // Verifica se o usuário chegou ao destino (distância < 30m)
     function verificarChegadaDestino() {
       if (!destinoAtual) return;
       var distanciaDestino = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
@@ -1295,6 +1493,7 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // Finaliza a navegação e restaura o marcador de GPS padrão
     function finalizarERestaurarRota() {
       if (!map) return;
       if (routingControl) { map.removeControl(routingControl); routingControl = null; }
@@ -1330,9 +1529,12 @@ crossorigin="anonymous"></script>
     function removerRota() { finalizarERestaurarRota(); }
 
     // ===================================================================
-    // Atualizar rotação do mapa em tempo real
+    // ✅ NOVO: Atualizar rotação do mapa em tempo real
     //    Só chama setBearing (direção) se o mapa estiver em modo rotacionado
     //    e respeita um throttle (acelerador) de 200ms para performance
+    //
+    //    ✅ NOVO: Também gira o ícone do botão de rotação junto com o mapa
+    //    Aplica transform:rotate no <img> interno (nunca na DIV do botão)
     // ===================================================================
     function atualizarRotacaoMapa() {
       if (!mapaRotacionado || !map) return;
@@ -1347,10 +1549,8 @@ crossorigin="anonymous"></script>
         map.setBearing(currentHeading);
       }
 
-      // ===================================================================
       // ✅ NOVO: Gira o ícone do botão de rotação junto com o mapa
-      //    Só rotaciona o <img> interno, nunca a DIV do botão
-      // ===================================================================
+      //    Só rotaciona o <img> interno via id, nunca a DIV (evita conflito)
       var rotateBtnIcon = document.getElementById('rotate-btn-icon');
       if (rotateBtnIcon) {
         rotateBtnIcon.style.transform = 'rotate(' + currentHeading + 'deg)';
@@ -1358,7 +1558,7 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // Inicializar bússola hardware (deviceorientation)
+    // ✅ NOVO: Inicializar bússola hardware (deviceorientation)
     //    Captura o heading real do dispositivo via giroscópio/magnetômetro
     //    Precisa ser ativado por gesto do usuário em iOS 13+
     // ===================================================================
@@ -1366,6 +1566,7 @@ crossorigin="anonymous"></script>
       // iOS 13+ requer requestPermission explícito
       if (typeof DeviceOrientationEvent !== 'undefined' &&
           typeof DeviceOrientationEvent.requestPermission === 'function') {
+        // Será ativado no primeiro toque do botão de rotação
         console.log('[Radar X9] Bússola iOS detectada — permissão será solicitada ao tocar no botão de rotação');
         return;
       }
@@ -1394,7 +1595,7 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // Solicitar permissão de bússola iOS (chamado no clique)
+    // ✅ NOVO: Solicitar permissão de bússola iOS (chamado no clique)
     // ===================================================================
     async function solicitarPermissaoBussolaIOS() {
       if (typeof DeviceOrientationEvent !== 'undefined' &&
@@ -1425,6 +1626,9 @@ crossorigin="anonymous"></script>
 
     // ===================================================================
     // FUNÇÃO: processarNovaPosicao
+    // Central de processamento GPS — chamada a cada atualização de posição
+    // Calcula velocidade, heading, suaviza posição, atualiza marcador,
+    // verifica radares, atualiza bússola e rotação do mapa
     // ===================================================================
     function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
       if (!map) return;
@@ -1436,6 +1640,7 @@ crossorigin="anonymous"></script>
       var smoothLat = posSuave.lat;
       var smoothLng = posSuave.lng;
 
+      // Calcula velocidade pelo GPS ou pelo deslocamento entre pontos
       if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
         dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
         var time = (currentTime - prevTime) / 1000;
@@ -1444,11 +1649,12 @@ crossorigin="anonymous"></script>
         dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
       }
 
+      // Sanitiza velocidade (valores acima de 250 são erros de GPS)
       if (speedKmh > 250) speedKmh = 0;
       $("#speed-display").text(speedKmh);
 
       // ===================================================================
-      // Lógica de heading prioriza bússola hardware
+      // ✅ CORREÇÃO: Lógica de heading prioriza bússola hardware
       //    1. Se bússola hardware já está ativa → NÃO sobrescreve com GPS
       //    2. Se bússola não disponível → usa GPS heading ou cálculo
       // ===================================================================
@@ -1469,12 +1675,12 @@ crossorigin="anonymous"></script>
         }
       }
 
-      // Atualiza bússola visual sempre
+      // Atualiza bússola visual sempre (ponteira gira)
       if (currentHeading !== null && currentHeading !== undefined) {
         atualizarBussola(currentHeading);
       }
 
-      // Atualiza rotação do mapa se estiver ativa
+      // ✅ Atualiza rotação do mapa se estiver ativa
       atualizarRotacaoMapa();
 
       prevLat = newLat;
@@ -1483,6 +1689,7 @@ crossorigin="anonymous"></script>
       userLat = newLat;
       userLng = newLng;
 
+      // Cria marcador de usuário na primeira posição recebida
       if (!userMarker && !estaEmNavegacao) {
         var defaultIcon = L.icon({
           iconUrl: '/imagens_app/ic_gps_marker.png',
@@ -1529,6 +1736,10 @@ crossorigin="anonymous"></script>
       if (destinoAtual) verificarChegadaDestino();
     }
 
+    // ===================================================================
+    // startGPSTracking — inicia watchPosition do navegador
+    // Fallback para "Aguardando GPS do app..." após 8 segundos sem sinal
+    // ===================================================================
     function startGPSTracking() {
       if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
       if (watchId !== null) navigator.geolocation.clearWatch(watchId);
@@ -1553,6 +1764,8 @@ crossorigin="anonymous"></script>
     // ===================================================================
     // PROXIMIDADE E DISPARO DE RADAR
     // ===================================================================
+
+    // Verifica todos os radares e dispara alerta para o mais próximo dentro da DISTANCIA_MAXIMA
     function verificarProximidadeRadares() {
       if (!alertaHabilitado || radarMarkers.length === 0) return;
       let radarMaisProximo = null;
@@ -1577,6 +1790,7 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // Atualiza o texto de distância na barra de alerta sem recriá-la
     function atualizarDistanciaAlerta(distancia) {
       if (!$("#alert-container").is(":visible")) return;
       var textoAtual = $("#alert-text").text();
@@ -1584,6 +1798,7 @@ crossorigin="anonymous"></script>
       if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
     }
 
+    // Dispara o alerta completo: barra visual + som
     function dispararAlerta(radar, distancia) {
       const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
       if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
@@ -1609,6 +1824,8 @@ crossorigin="anonymous"></script>
     // ===================================================================
     // ROTAS E ENDEREÇOS
     // ===================================================================
+
+    // Busca coordenadas de um endereço via Nominatim (OpenStreetMap)
     async function buscarCoordenadas(endereco) {
       try {
         var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil');
@@ -1619,6 +1836,7 @@ crossorigin="anonymous"></script>
       } catch (e) { console.error("Erro ao buscar coordenadas:", e); return null; }
     }
 
+    // Calcula e exibe rota entre posição atual e destino
     function calcularRota(destLat, destLng) {
       if (!map) return;
       if (routingControl) map.removeControl(routingControl);
@@ -1653,7 +1871,8 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // resetarMapa também reseta a rotação
+    // ✅ CORREÇÃO: resetarMapa também reseta a rotação do mapa
+    //    E agora também reseta a rotação visual do ícone do botão
     // ===================================================================
     function resetarMapa() {
       if (!map) return;
@@ -1664,9 +1883,7 @@ crossorigin="anonymous"></script>
         map.setBearing(0);
       }
 
-      // ===================================================================
       // ✅ NOVO: Reseta a rotação visual do ícone do botão também
-      // ===================================================================
       var rotateBtnIcon = document.getElementById('rotate-btn-icon');
       if (rotateBtnIcon) {
         rotateBtnIcon.style.transform = 'rotate(0deg)';
@@ -1692,6 +1909,7 @@ crossorigin="anonymous"></script>
       showNotification("Mapa resetado");
     }
 
+    // Extrai coordenadas lat,lng de um registro do JSON (campo index 9)
     function extrairCoordenadas(record) {
       if (!record || record.length < 10) return null;
       var stringOriginal = String(record[9]).trim();
@@ -1711,7 +1929,8 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // Atualiza apenas a ponteira da bússola original (sem setas extras)
+    // atualizarBussola — gira a ponteira da bússola original
+    // Aplica transform:rotate apenas no <img> da ponteira
     // ===================================================================
     function atualizarBussola(headingDegrees) {
       var needle = document.getElementById('compass-needle-img');
@@ -1719,10 +1938,15 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // Botão de rotação — com ícone girando junto com o mapa
-    //    - Usa variável global mapaRotacionado
+    // ✅ CORREÇÃO MAJOR: Botão de rotação REESCRITO
+    //    - Usa variável global mapaRotacionado em vez de escopo local
     //    - Solicita permissão de bússola iOS no primeiro clique
-    //    - O <img> do botão gira via transform (não a DIV)
+    //    - Mostra informações úteis sobre a fonte do heading
+    //    - Remove transform:rotate do botão (não interfere no mapa)
+    //
+    //    ✅ NOVO: Ao ativar, gira o ícone do botão para o ângulo atual
+    //    Ao desativar, reseta o ícone para 0°
+    //    O <img> com id="rotate-btn-icon" é rotacionado via inline style
     // ===================================================================
     function inicializarBotaoRotacaoMapa() {
       const rotateBtn = document.getElementById('btn-rotate-map');
@@ -1762,16 +1986,14 @@ crossorigin="anonymous"></script>
           map.setBearing(anguloRotacao);
           rotateBtn.classList.add('rotated');
 
-          // ===================================================================
           // ✅ NOVO: Gira o ícone do botão para refletir o ângulo atual
-          //    Usa transform no <img>, nunca na DIV (evita conflito)
-          // ===================================================================
+          //    Aplica transform no <img>, nunca na DIV (evita conflito)
           var rotateBtnIcon = document.getElementById('rotate-btn-icon');
           if (rotateBtnIcon) {
             rotateBtnIcon.style.transform = 'rotate(' + anguloRotacao + 'deg)';
           }
 
-          // Feedback contextual
+          // Feedback contextual sobre a fonte do heading
           if (bussolaHardwareDisponivel) {
             showNotification('Mapa rotacionado — bússola ativa');
           } else if (currentHeading > 0) {
@@ -1785,9 +2007,7 @@ crossorigin="anonymous"></script>
           map.setBearing(0);
           rotateBtn.classList.remove('rotated');
 
-          // ===================================================================
           // ✅ NOVO: Reseta o ícone do botão para 0° ao desativar
-          // ===================================================================
           var rotateBtnIcon = document.getElementById('rotate-btn-icon');
           if (rotateBtnIcon) {
             rotateBtnIcon.style.transform = 'rotate(0deg)';
@@ -1798,6 +2018,9 @@ crossorigin="anonymous"></script>
       });
     }
 
+    // ===================================================================
+    // BOTÃO ALERTA TOGGLE — liga/desliga alertas sonoros e visuais
+    // ===================================================================
     function inicializarBotaoAlertaToggle() {
       const alertBtn = document.getElementById('btn-alert-toggle');
       const alertIcon = document.getElementById('alert-toggle-icon');
@@ -1835,7 +2058,8 @@ crossorigin="anonymous"></script>
       }
 
       // ===================================================================
-      // Mapa inicializado com rotate: true e bearing: 0
+      // ✅ Mapa inicializado com rotate: true e bearing: 0
+      //    O plugin leaflet-rotate adiciona o método setBearing ao mapa
       // ===================================================================
       map = L.map('map', {
         center: [userLat, userLng],
@@ -1853,16 +2077,19 @@ crossorigin="anonymous"></script>
       }
 
       aplicarTemaMapa();
+      // Verifica troca de tema a cada 5 minutos (dia/noite)
       setInterval(aplicarTemaMapa, 300000);
 
-      // Inicializa bússola hardware
+      // ✅ Inicializa bússola hardware (deviceorientation)
       inicializarBussolaHardware();
 
+      // Ao arrastar o mapa, desativa o seguimento automático
       map.on('dragstart', function() {
         isFollowing = false;
         if (returnToGpsTimer) clearTimeout(returnToGpsTimer);
       });
 
+      // Ao soltar o mapa, agenda retorno automático à posição do GPS
       map.on('dragend', function() {
         returnToGpsTimer = setTimeout(function() {
           if (!isFollowing) {
@@ -1876,6 +2103,9 @@ crossorigin="anonymous"></script>
         }, TEMPO_RETORNO_GPS);
       });
 
+      // ===================================================================
+      // EVENTOS DOS BOTÕES DE BUSCA E ROTA
+      // ===================================================================
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
@@ -1887,6 +2117,7 @@ crossorigin="anonymous"></script>
 
       $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
 
+      // Fecha ambas as barras de busca
       function fecharTodasBarras() {
         searchActive = false;
         routeActive = false;
@@ -1897,6 +2128,7 @@ crossorigin="anonymous"></script>
       $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
       $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
 
+      // Abre/fecha barra de busca de radares
       $("#btn-search-bar").click(function() {
         if (searchActive) { fecharTodasBarras(); return; }
         if (routeActive) routeActive = false;
@@ -1911,6 +2143,7 @@ crossorigin="anonymous"></script>
         setTimeout(function() { $("#query").focus(); }, 300);
       });
 
+      // Abre/fecha barra de busca de rotas
       $("#btn-route-bar").click(function() {
         if (routeActive) { fecharTodasBarras(); return; }
         if (searchActive) searchActive = false;
@@ -1925,6 +2158,7 @@ crossorigin="anonymous"></script>
         setTimeout(function() { $("#route-query").focus(); }, 300);
       });
 
+      // Centraliza na posição do GPS
       $("#btn-center").click(function() {
         fecharTodasBarras();
         isFollowing = true;
@@ -1937,18 +2171,25 @@ crossorigin="anonymous"></script>
         }
       });
 
+      // Reset do mapa (volta ao centro original, reseta rota e rotação)
       $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
+      // Zoom in/out personalizado
       $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
       $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
 
+      // ===================================================================
+      // Inicializa os botões especiais (rotação e alerta toggle)
+      // ===================================================================
       inicializarBotaoRotacaoMapa();
       inicializarBotaoAlertaToggle();
+
+      // Inicia rastreamento GPS e carrega base de radares
       startGPSTracking();
       carregarRadares();
     }
 
     // ===================================================================
-    // CARREGAR RADARES
+    // CARREGAR RADARES — busca radares.json e renderiza no mapa
     // ===================================================================
     async function carregarRadares() {
       if (!map) return;
@@ -1975,6 +2216,10 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // ===================================================================
+    // renderizarRadaresNoMapa — itera os registros e cria marcadores
+    // Loga estatísticas e avisa sobre ícones genéricos (possível ausência)
+    // ===================================================================
     function renderizarRadaresNoMapa(records, origem) {
       if (!map) return;
       var radaresExternos = records || [];
@@ -1994,6 +2239,7 @@ crossorigin="anonymous"></script>
         var iconeUrl = getIconUrl(tipo, velocidade);
         var fallbackUrl = '/imagens_app/ic_radar_cev_v2.png';
 
+        // Estatísticas para debug de ícones por velocidade
         var velNum = parseInt(String(velocidade).replace(/[^0-9]/g, ''), 10);
         if (tipo.includes('Velocidade') || tipo.includes('CEV') || tipo.includes('CEM') || tipo.includes('Controlador Eletrônico')) {
           if (velNum === 70) radares70++;
@@ -2007,6 +2253,7 @@ crossorigin="anonymous"></script>
         var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
         var radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
 
+        // Configura fallback no <img> do marcador após renderizar
         setTimeout(function() {
           var imgEl = radarMarker.getElement()?.querySelector('img');
           if (imgEl) {
@@ -2014,6 +2261,7 @@ crossorigin="anonymous"></script>
           }
         }, 100);
 
+        // Monta popup com tipo ajustado, endereço e velocidade
         var tipoExibicao = ajusteNomes[tipo] || tipo;
         var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
         var tituloPopup = isIA
@@ -2029,6 +2277,7 @@ crossorigin="anonymous"></script>
           '</div>'
         );
 
+        // Armazena dados do radar no marcador para uso no alerta de proximidade
         radarMarker.radarData = {
           id: i,
           latitude: coordsFinais.lat,
@@ -2045,6 +2294,7 @@ crossorigin="anonymous"></script>
 
       $("#loading").hide();
 
+      // Log de estatísticas para debug
       console.log("[Radar X9] Radares renderizados:", contador);
       console.log("[Radar X9] Radares de 70 km/h:", radares70);
       console.log("[Radar X9] Radares de 100 km/h:", radares100);
@@ -2066,6 +2316,9 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // ===================================================================
+    // buscarRadares — filtra radares por texto e ajusta o zoom do mapa
+    // ===================================================================
     function buscarRadares(query) {
       if (!query || query.length < 2) return;
       var encontrou = false;
@@ -2087,6 +2340,9 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // ===================================================================
+    // showError — callback de erro do watchPosition
+    // ===================================================================
     function showError(error) {
       if (gpsSource === 'appinventor') return;
       var msg = "Erro ao obter localização.";
@@ -2098,7 +2354,11 @@ crossorigin="anonymous"></script>
       if (error.code === 3) { setTimeout(startGPSTracking, 5000); }
     }
 
+    // ===================================================================
     // Desbloqueio de áudio para dispositivos móveis
+    // Navegadores exigem interação do usuário antes de reproduzir áudio
+    // Este listener toca e pausa o som no primeiro clique para desbloquear
+    // ===================================================================
     document.addEventListener('click', function desbloquearAudio() {
       var sound = document.getElementById("alert-soud");
       if (sound) {
@@ -2107,6 +2367,9 @@ crossorigin="anonymous"></script>
       document.removeEventListener('click', desbloquearAudio);
     }, { once: true });
 
+    // ===================================================================
+    // PONTO DE ENTRADA — inicializa o mapa quando a página carrega
+    // ===================================================================
     window.onload = initMap;
   </script>
 </body>
