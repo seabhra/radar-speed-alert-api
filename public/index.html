@@ -962,7 +962,7 @@ crossorigin="anonymous"></script>
     const ALERT_CONFIG = {
       DISTANCIA_MAXIMA: 200,
       DISTANCIA_CRITICA: 100,
-      TEMPO_ALERTA: 18000,
+      TEMPO_ALERTA: 12000,
       DISTANCIA_PASSAR_RADAR: 30,
       ANGULO_APROXIMACAO: 100,
       ANGULO_AFASTANDO: 140,
@@ -1040,8 +1040,11 @@ crossorigin="anonymous"></script>
     const iconMap = {
       'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
       'Controlador Eletrônico de Velocidade (CEV)':'/imagens_app/ic_radar_cev_v2.png',
-      'Controlador Eletrônico Misto (CEM)':'/imagens_app/ic_radar_cev_v2.png',
-      'Controlador Eletrônico Misto':'/imagens_app/ic_radar_cev_v2.png',
+      'Controlador Eletrônico Misto (CEV + DAS)':'/imagens_app/ic_radar_cem_v2.png',
+      'Controlador Eletrônico Misto (DAS + DCP)':'/imagens_app/ic_radar_cem_v2.png',
+      'Controlador Eletrônico Misto (DAS + DIF)':'/imagens_app/ic_radar_cem_v2.png',
+      'Controlador Eletrônico Misto (CEM)':'/imagens_app/ic_radar_cem_v2.png',
+      'Controlador Eletrônico Misto':'/imagens_app/ic_radar_cem_v2.png',
       'Detector de Avanço de Semáforo (DAS)':'/imagens_app/ic_radar_das_v2.png',
       'Detector de Avanço de Semáforo':'/imagens_app/ic_radar_das_v2.png',
       'Detector de Tráfego em Local Proibido':'/imagens_app/ic_radar_dtlp_v2.png',
@@ -1096,6 +1099,12 @@ crossorigin="anonymous"></script>
     const ajusteNomes = {
       'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
       'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
+      'Controlador Eletrônico Misto (CEV + DAS)': 'Radar Misto Velocidade+Semáforo (CEM)',
+      'Controlador Eletrônico Misto (DAS + DCP)': 'Radar Misto Semáforo+Conversão (CEM)',
+      'Controlador Eletrônico Misto (DAS + DIF)': 'Radar Misto Semáforo+Faixa (CEM)',
+      'Controlador Eletrônico Misto (CEV + DAS)': 'Radar Misto Velocidade+Semáforo (CEM)',
+      'Controlador Eletrônico Misto (DAS + DCP)': 'Radar Misto Semáforo+Conversão (CEM)',
+      'Controlador Eletrônico Misto (DAS + DIF)': 'Radar Misto Semáforo+Faixa (CEM)',
       'Controlador Eletrônico Misto (CEM)': 'Radar Misto Velocidade+Semáforo (CEM)',
       'Controlador Eletrônico Misto': 'Radar Misto Velocidade+Semáforo (CEM)',
       'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
@@ -1176,7 +1185,13 @@ crossorigin="anonymous"></script>
       if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
       if (tipoLimpo.includes('Semáforo') || tipoLimpo.includes('(DAS)')) return iconMap['Detector de Avanço de Semáforo (DAS)'];
       if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)' || tipoLimpo === 'Controle de Redução de Velocidade') return iconMap['Controle de Redução de Velocidade (CRV)'];
-      var isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('CEM') || tipoLimpo.includes('Controlador Eletrônico');
+      // Verifica se é radar misto (CEM) primeiro
+      var isRadarMisto = tipoLimpo.includes('Misto') || tipoLimpo.includes('CEM');
+      if (isRadarMisto) {
+        return '/imagens_app/ic_radar_cem_v2.png';
+      }
+
+      var isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('Controlador Eletrônico');
       if (isRadarVelocidade) {
         var velNum = parseInt(String(velocidade || '').trim().replace(/[^0-9]/g, ''), 10);
         if (velNum === 40) return '/imagens_app/ic_radar_cev_40_v2.png';
@@ -2042,7 +2057,7 @@ crossorigin="anonymous"></script>
     if (needle) {
         needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
     }
-}
+
     // ===================================================================
     // Atualizar rotação do mapa (modo manual, não navegação)
     // ===================================================================
@@ -2155,7 +2170,7 @@ crossorigin="anonymous"></script>
 
       if (alertaHabilitado) { verificarProximidadeRadares(); } else { fecharAlertaImediatamente(); }
       if (destinoAtual) { verificarChegadaDestino(); }
-    }
+    }}
 
     function startGPSTracking() {
       if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
