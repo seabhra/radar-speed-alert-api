@@ -915,7 +915,6 @@ crossorigin="anonymous"></script>
   </div>
 
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
-
   <script>
     // ===================================================================
     // VARIÁVEIS GLOBAIS
@@ -1181,15 +1180,67 @@ crossorigin="anonymous"></script>
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
       if (!tipoLimpo) return iconMap['default'];
-      if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) return iconMap['Zona Verde de Trânsito (ZVT)'];
-      if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
-      if (tipoLimpo.includes('Semáforo') || tipoLimpo.includes('(DAS)')) return iconMap['Detector de Avanço de Semáforo (DAS)'];
-      if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)' || tipoLimpo === 'Controle de Redução de Velocidade') return iconMap['Controle de Redução de Velocidade (CRV)'];
-      // Verifica se é radar misto (CEM) primeiro
-      var isRadarMisto = tipoLimpo.includes('Misto') || tipoLimpo.includes('CEM');
-      if (isRadarMisto) {
+
+      // ✅ 1º: Verifica se é radar MISTO (CEM) - PRIORIDADE MÁXIMA
+      // Deve vir antes de 'Semáforo', 'Velocidade', etc. porque CEM contém essas palavras
+      if (tipoLimpo.includes('Misto') || tipoLimpo.includes('CEM')) {
         return '/imagens_app/ic_radar_cem_v2.png';
       }
+
+      // 2º: Zona Verde
+      if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) return iconMap['Zona Verde de Trânsito (ZVT)'];
+
+      // 3º: Zona de Perigo
+      if (tipoLimpo.includes('Perigo') || tipoLimpo.includes('ZPV')) return iconMap['Zona de Perigo e Violência (ZPV)'];
+
+      // 4º: Parada sobre Faixa de Pedestres
+      if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
+
+      // 5º: Semáforo (DAS) - agora vem DEPOIS do CEM
+      if (tipoLimpo.includes('Semáforo') || tipoLimpo.includes('(DAS)')) return iconMap['Detector de Avanço de Semáforo (DAS)'];
+
+      // 6º: Controle de Redução de Velocidade
+      if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)' || tipoLimpo === 'Controle de Redução de Velocidade') return iconMap['Controle de Redução de Velocidade (CRV)'];
+
+      // 7º: Radar de Velocidade (CEV) - agora vem DEPOIS do CEM
+      var isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('Controlador Eletrônico');
+      if (isRadarVelocidade) {
+        var velNum = parseInt(String(velocidade || '').trim().replace(/[^0-9]/g, ''), 10);
+        if (velNum === 40) return '/imagens_app/ic_radar_cev_40_v2.png';
+        if (velNum === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
+        if (velNum === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
+        if (velNum === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
+        if (velNum === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
+        if (velNum === 100) return '/imagens_app/ic_radar_cev_100_v2.png';
+        if (velNum === 110) return '/imagens_app/ic_radar_cev_110_v2.png';
+        return '/imagens_app/ic_radar_cev_v2.png';
+      }
+
+      // 8º: Busca exata no iconMap
+      if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
+
+      // 9º: Busca por substrings (fallback)
+      var substrings = [
+        { keys: ['Olho Vivo', 'COV'], icon: iconMap['Câmera Olho Vivo (COV)'] },
+        { keys: ['Facial'], icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
+        { keys: ['OCR-P', 'Placas'], icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
+        { keys: ['Celular', 'DUC'], icon: iconMap['Detector de Uso de Celular'] },
+        { keys: ['Cinto', 'VCS'], icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
+        { keys: ['Acidente', 'AIA'], icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
+        { keys: ['Perigo', 'ZPV'], icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
+        { keys: ['Inundaç', 'ZIR'], icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
+        { keys: ['Redução', 'Redutor', 'DRV', 'CRV'], icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
+        { keys: ['Conversão'], icon: iconMap['Detector de Conversão em Local Proibido'] },
+        { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
+        { keys: ['Tráfego Proibido', 'DTLP'], icon: iconMap['Detector de Tráfego em Local Proibido'] },
+        { keys: ['BUS', 'Faixa Preferencial'], icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
+      ];
+      for (var s = 0; s < substrings.length; s++) {
+        var entry = substrings[s];
+        for (var k = 0; k < entry.keys.length; k++) { if (tipoLimpo.includes(entry.keys[k])) return entry.icon; }
+      }
+      return iconMap['default'];
+    }
 
       var isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('Controlador Eletrônico');
       if (isRadarVelocidade) {
@@ -1200,6 +1251,7 @@ crossorigin="anonymous"></script>
         if (velNum === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
         if (velNum === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
         if (velNum === 100) return '/imagens_app/ic_radar_cev_100_v2.png';
+        if (velNum === 110) return '/imagens_app/ic_radar_cev_110_v2.png';
         return '/imagens_app/ic_radar_cev_v2.png';
       }
       if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
@@ -1223,8 +1275,7 @@ crossorigin="anonymous"></script>
         for (var k = 0; k < entry.keys.length; k++) { if (tipoLimpo.includes(entry.keys[k])) return entry.icon; }
       }
       return iconMap['default'];
-    }
-
+    
     document.addEventListener('error', function(e) {
       var target = e.target;
       if (target && target.tagName === 'IMG') {
@@ -2057,7 +2108,7 @@ crossorigin="anonymous"></script>
     if (needle) {
         needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
     }
-
+}
     // ===================================================================
     // Atualizar rotação do mapa (modo manual, não navegação)
     // ===================================================================
@@ -2170,7 +2221,7 @@ crossorigin="anonymous"></script>
 
       if (alertaHabilitado) { verificarProximidadeRadares(); } else { fecharAlertaImediatamente(); }
       if (destinoAtual) { verificarChegadaDestino(); }
-    }}
+    }
 
     function startGPSTracking() {
       if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
