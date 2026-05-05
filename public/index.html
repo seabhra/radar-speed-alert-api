@@ -182,8 +182,6 @@ crossorigin="anonymous"></script>
     /* ===================================================================
        SIDEBAR CONTROLS — barra vertical à direita com botões de mapa
        Pode ser retraída via classe .retracted (translateX para fora)
-       ✅ NOVO: Quando modoNavegacaoAtivo, a sidebar é escondida
-              automaticamente para dar mais visão ao mapa estilo Waze
     =================================================================== */
     .sidebar-controls {
         position: absolute;
@@ -337,7 +335,6 @@ crossorigin="anonymous"></script>
         pointer-events: none;
     }
 
-    /* Imagem de fundo da bússola (círculo com pontos cardeais) */
     .compass-base {
         position: absolute;
         width: 100%;
@@ -347,8 +344,6 @@ crossorigin="anonymous"></script>
         opacity: 0.9;
     }
 
-    /* Ponteira da bússola — gira via JS (transform: rotate)
-       Transição suave com cubic-bezier para movimento natural */
     .compass-needle {
         position: absolute;
         width: 55%;
@@ -360,7 +355,6 @@ crossorigin="anonymous"></script>
 
     /* ===================================================================
        MAP-BTN — estilo base para todos os botões redondos do mapa
-       Fundo semi-transparente escuro, borda sutil, efeito hover/active
     =================================================================== */
     .map-btn {
         width: var(--btn-size);
@@ -386,7 +380,6 @@ crossorigin="anonymous"></script>
         transform: scale(0.92);
     }
 
-    /* Ícone dentro dos botões — tamanho fixo, sem interação de ponteiro */
     .map-btn img {
         width: 30px;
         height: 30px;
@@ -396,7 +389,6 @@ crossorigin="anonymous"></script>
 
     /* ===================================================================
        BOTÃO ALERTA TOGGLE — estados LIGADO/DESLIGADO
-       Quando .alert-off: fundo avermelhado, ícone com filtro vermelho
     =================================================================== */
     .alert-toggle-btn {
         background: rgba(29, 28, 28, 0.9);
@@ -417,21 +409,17 @@ crossorigin="anonymous"></script>
         transition: all 0.3s ease;
     }
 
-    /* Borda verde especial nos botões dentro da sidebar */
     .sidebar-controls .map-btn {
         border: 1px solid rgba(0, 255, 136, 0.35);
     }
 
-    /* Botão de rota um pouco maior que os demais */
     #btn-route-bar {
         width: 54px;
         height: 54px;
     }
 
     /* ===================================================================
-       ✅ CSS do botão de rotação — feedback visual + ícone girante
-       A DIV do botão NÃO é rotacionada (evita conflito com leaflet-rotate)
-       O <img> interno gira via JS inline style quando .rotated está ativo
+       CSS do botão de rotação — feedback visual + ícone girante
     =================================================================== */
     #btn-rotate-map {
         transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
@@ -454,11 +442,6 @@ crossorigin="anonymous"></script>
 
     /* ===================================================================
        MARCADORES DE USUÁRIO E NAVEGAÇÃO
-       ✅ Usamos L.divIcon — o className aplica-se ao <div> container
-       background: transparent e border: none removem estilo padrão do Leaflet
-       filter e animation aplicam-se ao <img> dentro do divIcon
-       transition: none evita que o Leaflet anime a posição (feita via JS)
-       will-change: transform otimiza a renderização da movimentação
     =================================================================== */
     .user-gps-marker,
     .user-navigator-marker {
@@ -473,10 +456,6 @@ crossorigin="anonymous"></script>
         will-change: transform;
     }
 
-    /* ===================================================================
-       route-start-marker — ícone de saída da rota (navigator_map)
-       Animação pulse para destacar o início da navegação
-    =================================================================== */
     .route-start-marker {
         background: transparent !important;
         border: none !important;
@@ -487,10 +466,6 @@ crossorigin="anonymous"></script>
         animation: pulseStart 1s ease-in-out infinite;
     }
 
-    /* ===================================================================
-       route-end-marker — ícone de chegada da rota (ic_icon_chegada)
-       Animação pulse diferente para o destino
-    =================================================================== */
     .route-end-marker {
         background: transparent !important;
         border: none !important;
@@ -501,7 +476,6 @@ crossorigin="anonymous"></script>
         animation: pulseEnd 1.2s ease-in-out infinite;
     }
 
-    /* Animações de pulso para marcadores de rota */
     @keyframes pulseStart {
         0% { transform: scale(1); opacity: 1; }
         50% { transform: scale(1.1); opacity: 0.8; }
@@ -515,7 +489,7 @@ crossorigin="anonymous"></script>
     }
 
     /* ===================================================================
-       MARCADORES DE RADAR — fundo transparente, sem borda do Leaflet
+       MARCADORES DE RADAR
     =================================================================== */
     .radar-marker-icon {
         background: transparent !important;
@@ -530,8 +504,7 @@ crossorigin="anonymous"></script>
     }
 
     /* ===================================================================
-       SPEED WIDGET — mostrador de velocidade no canto inferior esquerdo
-       Posicionado com offset negativo para ficar parcialmente fora da tela
+       SPEED WIDGET
     =================================================================== */
     .speed-widget {
         position: absolute;
@@ -573,51 +546,7 @@ crossorigin="anonymous"></script>
     }
 
     /* ===================================================================
-       ✅ NOVO: Controles de zoom flutuantes estilo Waze
-       Aparecem no canto inferior direito APENAS durante a navegação
-       Substituem os botões de zoom da sidebar quando em modo rota
-       Inicialmente ocultos (display:none), ativados via JS
-    =================================================================== */
-    .controles-zoom-flutuantes {
-        position: absolute;
-        right: 16px;
-        bottom: 120px;
-        display: none;
-        flex-direction: column;
-        gap: 8px;
-        z-index: 1000;
-    }
-
-    /* Quando em navegação, os controles aparecem */
-    .controles-zoom-flutuantes.visivel {
-        display: flex;
-    }
-
-    /* Estilo dos botões flutuantes — fundo branco, sombra, circular */
-    .controles-zoom-flutuantes button {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.95);
-        border: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        font-size: 20px;
-        font-weight: bold;
-        color: #333;
-        cursor: pointer;
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .controles-zoom-flutuantes button:active {
-        transform: scale(0.9);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    /* ===================================================================
-       ALERT CONTAINER — barra de alerta de radar na parte inferior
+       ALERT CONTAINER
     =================================================================== */
     #alert-container {
         position: absolute;
@@ -676,7 +605,7 @@ crossorigin="anonymous"></script>
     }
 
     /* ===================================================================
-       TOAST NOTIFICATION — mensagem temporária no topo central
+       TOAST NOTIFICATION
     =================================================================== */
     .toast-notification {
         position: absolute;
@@ -705,7 +634,7 @@ crossorigin="anonymous"></script>
     }
 
     /* ===================================================================
-       LOADING OVERLAY — mini-loading centralizado sobre o mapa
+       LOADING OVERLAY
     =================================================================== */
     .loading-overlay {
         position: absolute;
@@ -736,7 +665,7 @@ crossorigin="anonymous"></script>
     }
 
     /* ===================================================================
-       LOADING FULLSCREEN — tela de carregamento inicial do app
+       LOADING FULLSCREEN
     =================================================================== */
     .loading-fullscreen {
         position: fixed;
@@ -860,14 +789,10 @@ crossorigin="anonymous"></script>
     <div id="map"></div>
     <div class="toast-notification" id="toast-msg"></div>
 
-    <!-- Bússola original: base + ponteira -->
     <div class="compass-widget">
       <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src='https://cdn-icons-png.flaticon.com/512/2838/2838773.png'" alt="Bússola" class="compass-base">
       <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'" alt="Ponteira" class="compass-needle" id="compass-needle-img">
     </div>
-
-    
-    <!-- speed de velocidade -->
 
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
@@ -888,16 +813,6 @@ crossorigin="anonymous"></script>
       <button class="map-btn" id="btn-zoom-out" title="Diminuir Zoom"><img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out"></button>
     </div>
 
-    <!-- ===================================================================
-         ✅ NOVO: Controles de zoom flutuantes estilo Waze
-         Aparecem apenas durante a navegação (ativados via JS)
-         Substituem os botões zoom+/- da sidebar nesse modo
-    =================================================================== -->
-    <div class="controles-zoom-flutuantes" id="controles-zoom-flutuantes">
-      <button id="btn-nav-zoom-in" title="Aumentar Zoom">+</button>
-      <button id="btn-nav-zoom-out" title="Diminuir Zoom">−</button>
-    </div>
-
     <div id="alert-container">
       <div class="alert-bar">
         <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
@@ -914,9 +829,6 @@ crossorigin="anonymous"></script>
     </div>
   </div>
 
-  <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
- 
- 
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
   <script>
@@ -941,9 +853,6 @@ crossorigin="anonymous"></script>
     let browserGpsTimeout = null;
     let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
 
-    // ===================================================================
-    // VARIÁVEIS GLOBAIS DE CONTROLE DE NAVEGAÇÃO 3D
-    // ===================================================================
     var modoNavegacaoAtivo = false;
     var estaEmNavegacao = false;
     var startRouteMarker = null;
@@ -963,21 +872,12 @@ crossorigin="anonymous"></script>
     let sidebarAberta = true;
 
     const ALERT_CONFIG = {
-      DISTANCIA_MAXIMA: 200,
-      DISTANCIA_CRITICA: 100,
-      TEMPO_ALERTA: 12000,
-      DISTANCIA_PASSAR_RADAR: 30,
-      ANGULO_APROXIMACAO: 100,
-      ANGULO_AFASTANDO: 140,
-      HISTORICO_TAMANHO: 5,
-      SUAVIZACAO_FATOR: 0.6,
-      DISTANCIA_MINIMA_MOVIMENTO: 2,
+      DISTANCIA_MAXIMA: 200, DISTANCIA_CRITICA: 100, TEMPO_ALERTA: 12000,
+      DISTANCIA_PASSAR_RADAR: 30, ANGULO_APROXIMACAO: 100, ANGULO_AFASTANDO: 140,
+      HISTORICO_TAMANHO: 5, SUAVIZACAO_FATOR: 0.6, DISTANCIA_MINIMA_MOVIMENTO: 2,
       DISPAROS_SOM_ANTES_DE_SILENCIAR: 2
     };
 
-    // ===================================================================
-    // Variáveis para controle de rotação do mapa
-    // ===================================================================
     let currentHeading = 0;
     let mapaRotacionado = false;
     let bussolaHardwareDisponivel = false;
@@ -990,20 +890,15 @@ crossorigin="anonymous"></script>
     var animacaoMarcadorAtiva = false;
     var contagemTocarSom = 0;
 
-    // ===================================================================
-    // CONTROLE DE NAVEGAÇÃO 3D ESTILO WAZE — SISTEMA COMPLETO
-    // ===================================================================
     var hardwareHeading = null;
     var rotacaoAtual = 0;
 
-    // CONTROLE DE ROTAÇÃO E PITCH (3D)
     var pitchAtual = 0;
     var PITCH_PADRAO = 55;
     var PITCH_PARADO = 45;
     var PITCH_MOVIMENTO = 60;
     var PITCH_ALTA_VELOCIDADE = 65;
 
-    // CONTROLE DE ZOOM DINÂMICO
     var zoomNavegacao = 19;
     var zoomAtualNavegacao = 19;
     var ZOOM_PARADO = 19;
@@ -1012,7 +907,6 @@ crossorigin="anonymous"></script>
     var ZOOM_RAPIDO = 16;
     var ZOOM_MUITO_RAPIDO = 15;
 
-    // CONTROLE DE ESTABILIDADE (suavização pesada para navegação 3D)
     var posicaoSuavizadaGPS = { lat: null, lng: null };
     var headingSuavizado = 0;
     var FATOR_SUAVIZACAO_POSICAO = 0.15;
@@ -1020,16 +914,13 @@ crossorigin="anonymous"></script>
     var headingAnterior = null;
     var contadorFramesEstaveis = 0;
 
-    // CONTROLE DE SNAP À ROTA (ícone dentro da linha)
     var pontosRota = [];
     var indicePontoMaisProximo = 0;
     var DISTANCIA_MAXIMA_SNAP = 50;
     var estaFazendoSnap = true;
 
-    // OFFSET DO CARRO NA TELA (posição vertical)
     var OFFSET_CARRO_VERTICAL = 0.35;
 
-    // VELOCIDADE E MOVIMENTO
     var velocidadeAtual = 0;
     var estaEmMovimento = false;
     var headingRota = 0;
@@ -1037,9 +928,6 @@ crossorigin="anonymous"></script>
     var timeoutZoomPanoramico = null;
     var ultimaVelocidadeZoom = 0;
 
-    // ===================================================================
-    // MAPEAMENTO DE ÍCONES
-    // ===================================================================
     const iconMap = {
       'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
       'Controlador Eletrônico de Velocidade (CEV)':'/imagens_app/ic_radar_cev_v2.png',
@@ -1087,16 +975,10 @@ crossorigin="anonymous"></script>
     };
 
     const TIPOS_SEM_ALERTA = [
-      'Detector de Faixa Preferencial de Ônibus (BUS)',
-      'Detector de Faixa Preferencial de Ônibus',
-      'Faixa Preferencial de Ônibus (BUS)',
-      'Faixa Preferencial de Ônibus',
-      'Zona Verde de Trânsito (ZVT)',
-      'Zona Verde de Trânsito (ZVC)',
-      'Zona Verde de Trânsito',
-      'BUS',
-      'Câmera Olho Vivo (COV)',
-      'Câmera Olho Vivo'
+      'Detector de Faixa Preferencial de Ônibus (BUS)', 'Detector de Faixa Preferencial de Ônibus',
+      'Faixa Preferencial de Ônibus (BUS)', 'Faixa Preferencial de Ônibus',
+      'Zona Verde de Trânsito (ZVT)', 'Zona Verde de Trânsito (ZVC)', 'Zona Verde de Trânsito', 'BUS',
+      'Câmera Olho Vivo (COV)', 'Câmera Olho Vivo'
     ];
 
     const ajusteNomes = {
@@ -1136,9 +1018,6 @@ crossorigin="anonymous"></script>
       'Leitor de Reconhecimento Facial (OCR-F)': 'Reconhecimento Facial (OCR-F)'
     };
 
-    // ===================================================================
-    // BOTÃO MENU - BARRA RETRÁTIL
-    // ===================================================================
     (function() {
       var btnMenu = document.getElementById('btn-menu-toggle');
       var sidebar = document.getElementById('sidebar-controls');
@@ -1160,15 +1039,8 @@ crossorigin="anonymous"></script>
       });
     })();
 
-    // ===================================================================
-    // FUNÇÕES AUXILIARES
-    // ===================================================================
     function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
-      return L.icon({
-        iconUrl: iconUrl, iconSize: [tamanho, tamanho],
-        iconAnchor: [tamanho / 2, tamanho / 2], popupAnchor: [0, -tamanho / 2],
-        className: 'radar-marker-icon', iconUrlFallback: fallbackUrl || '/imagens_app/ic_radar_cev_v2.png'
-      });
+      return L.icon({ iconUrl: iconUrl, iconSize: [tamanho, tamanho], iconAnchor: [tamanho / 2, tamanho / 2], popupAnchor: [0, -tamanho / 2], className: 'radar-marker-icon', iconUrlFallback: fallbackUrl || '/imagens_app/ic_radar_cev_v2.png' });
     }
 
     function deveAlertaRadar(tipoOriginal) {
@@ -1181,7 +1053,7 @@ crossorigin="anonymous"></script>
     function getIconUrl(tipo, velocidade) {
       const tipoLimpo = tipo ? tipo.trim() : "";
       if (!tipoLimpo) return iconMap['default'];
-      if (tipoLimpo.includes('Misto') || tipoLimpo.includes('CEM')) { return '/imagens_app/ic_radar_cem_v2.png'; }
+      if (tipoLimpo.includes('Misto') || tipoLimpo.includes('CEM')) return '/imagens_app/ic_radar_cem_v2.png';
       if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) return iconMap['Zona Verde de Trânsito (ZVT)'];
       if (tipoLimpo.includes('Perigo') || tipoLimpo.includes('ZPV')) return iconMap['Zona de Perigo e Violência (ZPV)'];
       if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
@@ -1319,9 +1191,9 @@ crossorigin="anonymous"></script>
       headingAnterior = null; contadorFramesEstaveis = 0; pontosRota = []; indicePontoMaisProximo = 0;
       destinoAtual = { lat: destLat, lng: destLng }; modoNavegacaoAtivo = true; estaEmNavegacao = true; isFollowing = true;
       adicionarMarcadoresRota3D(userLat, userLng, destLat, destLng);
-      var sidebar = document.getElementById('sidebar-controls'); if (sidebar) sidebar.classList.add('retracted');
-      sidebarAberta = false; var btnMenu = document.getElementById('btn-menu-toggle'); if (btnMenu) btnMenu.classList.add('active');
-      document.getElementById('controles-zoom-flutuantes').classList.add('visivel');
+      
+      // Sidebar permanece visível durante a navegação
+
       routingControl = L.Routing.control({
         waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
         routeWhileDragging: false, addWaypoints: false, draggableWaypoints: false,
@@ -1424,9 +1296,9 @@ crossorigin="anonymous"></script>
       var ri = document.getElementById('rotate-btn-icon'); if (ri) ri.style.transform = 'rotate(0deg)';
       var rb = document.getElementById('btn-rotate-map'); if (rb) rb.classList.remove('rotated');
       mapaRotacionado = false;
-      document.getElementById('controles-zoom-flutuantes').classList.remove('visivel');
-      var sb = document.getElementById('sidebar-controls'); if (sb) sb.classList.remove('retracted');
-      sidebarAberta = true; var bm = document.getElementById('btn-menu-toggle'); if (bm) bm.classList.remove('active');
+      
+      // Sidebar permanece visível, sem alteração
+
       map.flyTo([userLat, userLng], 17, { duration: 1 });
       if (posicaoSuavizada && posicaoSuavizada.lat !== null) { ultimaPosicaoMarcador.lat = posicaoSuavizada.lat; ultimaPosicaoMarcador.lng = posicaoSuavizada.lng; } else { ultimaPosicaoMarcador = { lat: null, lng: null }; }
       var di = L.divIcon({ html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50] });
@@ -1439,9 +1311,6 @@ crossorigin="anonymous"></script>
     function calcularHeadingPorMovimento() { if (!ultimaPosicaoMarcador.lat) return headingSuavizado; return calcularBearing(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, userLat, userLng); }
     function suavizarRotacao(nr) { var d = nr - rotacaoAtual; while (d > 180) d -= 360; while (d < -180) d += 360; rotacaoAtual += d * 0.2; while (rotacaoAtual < 0) rotacaoAtual += 360; while (rotacaoAtual >= 360) rotacaoAtual -= 360; return rotacaoAtual; }
 
-    // ===================================================================
-    // FUNÇÕES LEGADAS
-    // ===================================================================
     function adicionarMarcadoresRota(oL, oN, dL, dN) { adicionarMarcadoresRota3D(oL, oN, dL, dN); }
     function atualizarRota() { if (modoNavegacaoAtivo) atualizarRota3D(); else if (destinoAtual && routingControl && userLat && userLng) routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]); }
     function verificarChegadaDestino() { verificarChegadaDestino3D(); }
@@ -1450,15 +1319,12 @@ crossorigin="anonymous"></script>
     function iniciarNavegacaoWaze(dL, dN) { iniciarNavegacao3D(dL, dN); }
     function finalizarNavegacaoWaze() { finalizarNavegacao3D(); }
 
-    // ===================================================================
-    // ROTAS E ENDEREÇOS
-    // ===================================================================
     async function buscarCoordenadas(endereco) {
       try { var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil'); var r = await fetch(url); var d = await r.json(); if (d && d.length > 0) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) }; return null; } catch (e) { console.error("Erro:", e); return null; }
     }
 
     // ===================================================================
-    // ✅ RESET TOTAL — Volta ao estado exato de abertura
+    // RESET TOTAL
     // ===================================================================
     function fecharTodasBarras() {
       searchActive = false;
@@ -1467,6 +1333,20 @@ crossorigin="anonymous"></script>
       document.getElementById('search-bar-rota').classList.remove('active');
       document.getElementById('query').value = '';
       document.getElementById('route-query').value = '';
+    }
+
+    // ✅ Recria o marcador GPS antes de centralizar (garante visibilidade)
+    function garantirMarcadorGPSVisivel() {
+      if (!map) return;
+      var latParaMarcador = userLat || posicaoCentralOriginal.lat;
+      var lngParaMarcador = userLng || posicaoCentralOriginal.lng;
+      if (!userMarker || !map.hasLayer(userMarker)) {
+        if (userMarker && map.hasLayer(userMarker)) { map.removeLayer(userMarker); userMarker = null; }
+        var di = L.divIcon({ html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50] });
+        userMarker = L.marker([latParaMarcador, lngParaMarcador], { icon: di, zIndexOffset: 1000 }).addTo(map);
+        userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+        ultimaPosicaoMarcador = { lat: latParaMarcador, lng: lngParaMarcador };
+      }
     }
 
     function resetarTotalMapa() {
@@ -1483,8 +1363,14 @@ crossorigin="anonymous"></script>
       velocidadeAtual = 0; currentHeading = 0; rotacaoAtual = 0;
       var sb = document.getElementById('sidebar-controls'); if (sb) sb.classList.remove('retracted');
       sidebarAberta = true; var bm = document.getElementById('btn-menu-toggle'); if (bm) bm.classList.remove('active');
+      
+      // Remove marcador antigo para recriar limpo
       if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
       ultimaPosicaoMarcador = { lat: null, lng: null };
+      
+      // Recria o marcador GPS ANTES de mover o mapa
+      garantirMarcadorGPSVisivel();
+      
       map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
       isFollowing = false;
       esconderAlertaVisual();
@@ -1674,10 +1560,6 @@ crossorigin="anonymous"></script>
         }, TEMPO_RETORNO_GPS);
       });
 
-      // ===================================================================
-      // EVENTOS DOS BOTÕES — CORRIGIDO: classe DOM, nunca jQuery
-      // ===================================================================
-      
       $("#btn-calc-route").click(async function() {
         var endereco = document.getElementById('route-query').value.trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
@@ -1691,61 +1573,47 @@ crossorigin="anonymous"></script>
       $("#btn-search-radar").click(function() { buscarRadares(document.getElementById('query').value); });
       $("#query").keypress(function(e) { if (e.which == 13) buscarRadares(document.getElementById('query').value); });
 
-      // ✅ Botão Buscar Radares — 100% DOM puro
       $("#btn-search-bar").click(function() {
         var barraRadares = document.getElementById('search-bar-radares');
         var barraRota = document.getElementById('search-bar-rota');
         var sidebar = document.getElementById('sidebar-controls');
         var btnMenu = document.getElementById('btn-menu-toggle');
-        
         if (searchActive) { fecharTodasBarras(); return; }
         if (routeActive) routeActive = false;
         searchActive = true;
         barraRota.classList.remove('active');
         barraRadares.classList.add('active');
-        
-        if (!sidebarAberta) {
-          sidebarAberta = true;
-          sidebar.classList.remove('retracted');
-          btnMenu.classList.remove('active');
-        }
+        if (!sidebarAberta) { sidebarAberta = true; sidebar.classList.remove('retracted'); btnMenu.classList.remove('active'); }
         setTimeout(function() { document.getElementById('query').focus(); }, 300);
       });
 
-      // ✅ Botão Navegar/Rota — 100% DOM puro
       $("#btn-route-bar").click(function() {
         var barraRadares = document.getElementById('search-bar-radares');
         var barraRota = document.getElementById('search-bar-rota');
         var sidebar = document.getElementById('sidebar-controls');
         var btnMenu = document.getElementById('btn-menu-toggle');
-        
         if (routeActive) { fecharTodasBarras(); return; }
         if (searchActive) searchActive = false;
         routeActive = true;
         barraRadares.classList.remove('active');
         barraRota.classList.add('active');
-        
-        if (!sidebarAberta) {
-          sidebarAberta = true;
-          sidebar.classList.remove('retracted');
-          btnMenu.classList.remove('active');
-        }
+        if (!sidebarAberta) { sidebarAberta = true; sidebar.classList.remove('retracted'); btnMenu.classList.remove('active'); }
         setTimeout(function() { document.getElementById('route-query').focus(); }, 300);
       });
 
-      // ✅ Botão Centralizar — Reset total
-      $("#btn-center").click(function() { resetarTotalMapa(); showNotification("Centralizando na sua posição..."); });
+      // ✅ Botão Centralizar — Garante marcador GPS visível
+      $("#btn-center").click(function() {
+        resetarTotalMapa();
+        isFollowing = true;
+        showNotification("Centralizando na sua posição...");
+      });
 
-      // ✅ Botão Refresh — Reset total + recarregar radares
+      // ✅ Botão Refresh
       $("#btn-refresh").click(function() { resetarTotalMapa(); carregarRadares(); });
 
-      // Zoom sidebar
+      // Zoom sidebar (funciona em todos os modos agora)
       $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
       $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
-
-      // Zoom flutuante navegação 3D
-      $("#btn-nav-zoom-in").click(function() { if (modoNavegacaoAtivo) { zoomAtualNavegacao = Math.min(zoomAtualNavegacao + 1, 20); map.setZoom(zoomAtualNavegacao); } });
-      $("#btn-nav-zoom-out").click(function() { if (modoNavegacaoAtivo) { zoomAtualNavegacao = Math.max(zoomAtualNavegacao - 1, 14); map.setZoom(zoomAtualNavegacao); } });
 
       inicializarBotaoRotacaoMapa();
       inicializarBotaoAlertaToggle();
