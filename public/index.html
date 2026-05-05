@@ -862,9 +862,12 @@ crossorigin="anonymous"></script>
 
     <!-- Bússola original: base + ponteira -->
     <div class="compass-widget">
-      <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src=''" alt="Bússola" class="compass-base">
-      <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src=''" alt="Ponteira" class="compass-needle" id="compass-needle-img">
+      <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src='https://cdn-icons-png.flaticon.com/512/2838/2838773.png'" alt="Bússola" class="compass-base">
+      <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'" alt="Ponteira" class="compass-needle" id="compass-needle-img">
     </div>
+
+    
+    <!-- speed de velocidade -->
 
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
@@ -1358,7 +1361,6 @@ crossorigin="anonymous"></script>
       sidebarAberta = false;
       var btnMenu = document.getElementById('btn-menu-toggle');
       if (btnMenu) btnMenu.classList.add('active');
-      document.getElementById('controles-zoom-flutuantes').classList.add('visivel');
 
       // Cria rota com callback para capturar pontos
       routingControl = L.Routing.control({
@@ -1880,7 +1882,6 @@ crossorigin="anonymous"></script>
       mapaRotacionado = false;
 
       // Esconde controles flutuantes e mostra sidebar
-      document.getElementById('controles-zoom-flutuantes').classList.remove('visivel');
       var sidebar = document.getElementById('sidebar-controls');
       if (sidebar) sidebar.classList.remove('retracted');
       sidebarAberta = true;
@@ -2331,24 +2332,9 @@ crossorigin="anonymous"></script>
 
       $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
 
-      // Zoom in/out da sidebar: desabilitados durante navegação 3D
-      $("#btn-zoom-in").click(function() { if (map && !modoNavegacaoAtivo) map.zoomIn(); });
-      $("#btn-zoom-out").click(function() { if (map && !modoNavegacaoAtivo) map.zoomOut(); });
-
-      // Botões de zoom flutuantes estilo Waze (ativos durante navegação)
-      $("#btn-nav-zoom-in").click(function() {
-        if (modoNavegacaoAtivo) {
-          zoomAtualNavegacao = Math.min(zoomAtualNavegacao + 1, 20);
-          map.setZoom(zoomAtualNavegacao);
-        }
-      });
-
-      $("#btn-nav-zoom-out").click(function() {
-        if (modoNavegacaoAtivo) {
-          zoomAtualNavegacao = Math.max(zoomAtualNavegacao - 1, 14);
-          map.setZoom(zoomAtualNavegacao);
-        }
-      });
+      // Zoom in/out da sidebar: funcionam em TODOS os modos (normal e navegação 3D)
+      $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
+      $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
 
       inicializarBotaoRotacaoMapa();
       inicializarBotaoAlertaToggle();
