@@ -915,6 +915,10 @@ crossorigin="anonymous"></script>
   </div>
 
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
+ 
+ 
+  <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
+
   <script>
     // ===================================================================
     // VARIÁVEIS GLOBAIS
@@ -961,7 +965,7 @@ crossorigin="anonymous"></script>
     const ALERT_CONFIG = {
       DISTANCIA_MAXIMA: 200,
       DISTANCIA_CRITICA: 100,
-      TEMPO_ALERTA: 12000,
+      TEMPO_ALERTA: 18000,
       DISTANCIA_PASSAR_RADAR: 30,
       ANGULO_APROXIMACAO: 100,
       ANGULO_AFASTANDO: 140,
@@ -1101,9 +1105,6 @@ crossorigin="anonymous"></script>
       'Controlador Eletrônico Misto (CEV + DAS)': 'Radar Misto Velocidade+Semáforo (CEM)',
       'Controlador Eletrônico Misto (DAS + DCP)': 'Radar Misto Semáforo+Conversão (CEM)',
       'Controlador Eletrônico Misto (DAS + DIF)': 'Radar Misto Semáforo+Faixa (CEM)',
-      'Controlador Eletrônico Misto (CEV + DAS)': 'Radar Misto Velocidade+Semáforo (CEM)',
-      'Controlador Eletrônico Misto (DAS + DCP)': 'Radar Misto Semáforo+Conversão (CEM)',
-      'Controlador Eletrônico Misto (DAS + DIF)': 'Radar Misto Semáforo+Faixa (CEM)',
       'Controlador Eletrônico Misto (CEM)': 'Radar Misto Velocidade+Semáforo (CEM)',
       'Controlador Eletrônico Misto': 'Radar Misto Velocidade+Semáforo (CEM)',
       'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
@@ -1181,8 +1182,7 @@ crossorigin="anonymous"></script>
       const tipoLimpo = tipo ? tipo.trim() : "";
       if (!tipoLimpo) return iconMap['default'];
 
-      // ✅ 1º: Verifica se é radar MISTO (CEM) - PRIORIDADE MÁXIMA
-      // Deve vir antes de 'Semáforo', 'Velocidade', etc. porque CEM contém essas palavras
+      // 1º: Verifica se é radar MISTO (CEM) - PRIORIDADE MÁXIMA
       if (tipoLimpo.includes('Misto') || tipoLimpo.includes('CEM')) {
         return '/imagens_app/ic_radar_cem_v2.png';
       }
@@ -1242,40 +1242,6 @@ crossorigin="anonymous"></script>
       return iconMap['default'];
     }
 
-      var isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('Controlador Eletrônico');
-      if (isRadarVelocidade) {
-        var velNum = parseInt(String(velocidade || '').trim().replace(/[^0-9]/g, ''), 10);
-        if (velNum === 40) return '/imagens_app/ic_radar_cev_40_v2.png';
-        if (velNum === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
-        if (velNum === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
-        if (velNum === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
-        if (velNum === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
-        if (velNum === 100) return '/imagens_app/ic_radar_cev_100_v2.png';
-        if (velNum === 110) return '/imagens_app/ic_radar_cev_110_v2.png';
-        return '/imagens_app/ic_radar_cev_v2.png';
-      }
-      if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
-      var substrings = [
-        { keys: ['Olho Vivo', 'COV'], icon: iconMap['Câmera Olho Vivo (COV)'] },
-        { keys: ['Facial'], icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
-        { keys: ['OCR-P', 'Placas'], icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
-        { keys: ['Celular', 'DUC'], icon: iconMap['Detector de Uso de Celular'] },
-        { keys: ['Cinto', 'VCS'], icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
-        { keys: ['Acidente', 'AIA'], icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
-        { keys: ['Perigo', 'ZPV'], icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
-        { keys: ['Inundaç', 'ZIR'], icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
-        { keys: ['Redução', 'Redutor', 'DRV', 'CRV'], icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
-        { keys: ['Conversão'], icon: iconMap['Detector de Conversão em Local Proibido'] },
-        { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
-        { keys: ['Tráfego Proibido', 'DTLP'], icon: iconMap['Detector de Tráfego em Local Proibido'] },
-        { keys: ['BUS', 'Faixa Preferencial'], icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
-      ];
-      for (var s = 0; s < substrings.length; s++) {
-        var entry = substrings[s];
-        for (var k = 0; k < entry.keys.length; k++) { if (tipoLimpo.includes(entry.keys[k])) return entry.icon; }
-      }
-      return iconMap['default'];
-    
     document.addEventListener('error', function(e) {
       var target = e.target;
       if (target && target.tagName === 'IMG') {
@@ -1340,7 +1306,6 @@ crossorigin="anonymous"></script>
 
     // ===================================================================
     // moverMarcadorSuavemente — Animação suave estilo Waze
-    // Escolhe startRouteMarker ou userMarker baseado no estado
     // ===================================================================
     function moverMarcadorSuavemente(targetLat, targetLng) {
       var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
@@ -1392,124 +1357,57 @@ crossorigin="anonymous"></script>
     // ===================================================================
     // ===================================================================
 
-    // ===================================================================
-    // iniciarNavegacao3D — Inicia navegação completa com zoom/pitch/rotação
-    // ===================================================================
     function iniciarNavegacao3D(destLat, destLng) {
-      if (!userLat || !userLng) {
-        showNotification("⏳ Aguardando sinal GPS...");
-        return;
-      }
-
-      // Remove rota anterior
+      if (!userLat || !userLng) { showNotification("⏳ Aguardando sinal GPS..."); return; }
       if (routingControl) { removerRota3D(); }
-
-      // Reseta controles de estabilidade
       posicaoSuavizadaGPS = { lat: userLat, lng: userLng };
       headingSuavizado = hardwareHeading || 0;
       headingAnterior = null;
       contadorFramesEstaveis = 0;
       pontosRota = [];
       indicePontoMaisProximo = 0;
-
-      // Define estado
       destinoAtual = { lat: destLat, lng: destLng };
       modoNavegacaoAtivo = true;
       estaEmNavegacao = true;
       isFollowing = true;
-
-      // Cria marcadores com rotação sincronizada
       adicionarMarcadoresRota3D(userLat, userLng, destLat, destLng);
-
-      // Esconde sidebar e mostra controles flutuantes
       var sidebar = document.getElementById('sidebar-controls');
       if (sidebar) sidebar.classList.add('retracted');
       sidebarAberta = false;
       var btnMenu = document.getElementById('btn-menu-toggle');
       if (btnMenu) btnMenu.classList.add('active');
-
-      // Cria rota com callback para capturar pontos
+      document.getElementById('controles-zoom-flutuantes').classList.add('visivel');
       routingControl = L.Routing.control({
-        waypoints: [
-          L.latLng(userLat, userLng),
-          L.latLng(destLat, destLng)
-        ],
-        routeWhileDragging: false,
-        addWaypoints: false,
-        draggableWaypoints: false,
-        fitSelectedRoutes: false,
-        show: false,
-        lineOptions: {
-          styles: [
-            { color: '#4FC3F7', weight: 8, opacity: 0.9, lineCap: 'round', lineJoin: 'round' },
-            { color: '#B3E5FC', weight: 3, opacity: 1.0, lineCap: 'round', lineJoin: 'round' }
-          ]
-        },
+        waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
+        routeWhileDragging: false, addWaypoints: false, draggableWaypoints: false,
+        fitSelectedRoutes: false, show: false,
+        lineOptions: { styles: [{ color: '#4FC3F7', weight: 8, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }, { color: '#B3E5FC', weight: 3, opacity: 1.0, lineCap: 'round', lineJoin: 'round' }] },
         createMarker: function() { return null; }
       }).addTo(map);
-
-      // Quando rota é calculada
       routingControl.on('routesfound', function(e) {
         var route = e.routes[0];
-
-        // Guarda todos os pontos da rota para snap
-        pontosRota = route.coordinates.map(function(coord) {
-          return { lat: coord.lat, lng: coord.lng };
-        });
-
-        // Calcula heading inicial da rota
-        if (pontosRota.length >= 2) {
-          headingRota = calcularBearing(
-            pontosRota[0].lat, pontosRota[0].lng,
-            pontosRota[1].lat, pontosRota[1].lng
-          );
-          headingSuavizado = headingRota;
-          rotacaoAtual = headingRota;
-        }
-
-        // Configuração inicial 3D
+        pontosRota = route.coordinates.map(function(coord) { return { lat: coord.lat, lng: coord.lng }; });
+        if (pontosRota.length >= 2) { headingRota = calcularBearing(pontosRota[0].lat, pontosRota[0].lng, pontosRota[1].lat, pontosRota[1].lng); headingSuavizado = headingRota; rotacaoAtual = headingRota; }
         configurarVistaInicial3D();
-
         var distanciaKm = (route.summary.totalDistance / 1000).toFixed(1);
         var tempoMin = Math.round(route.summary.totalTime / 60);
         $("#loading").hide();
         showNotification("🚗 " + distanciaKm + " km • " + tempoMin + " min");
       });
-
-      routingControl.on('routingerror', function() {
-        $("#loading").hide();
-        showNotification("Erro ao traçar rota.");
-      });
-
+      routingControl.on('routingerror', function() { $("#loading").hide(); showNotification("Erro ao traçar rota."); });
       showNotification("🚀 Navegação 3D iniciada");
     }
 
-    // ===================================================================
-    // configurarVistaInicial3D — Setup inicial da câmera 3D
-    // ===================================================================
-    function configurarVistaInicial3D() {
-      zoomAtualNavegacao = ZOOM_PARADO;
-      pitchAtual = PITCH_PARADO;
-      aplicarConfiguracaoCamera3D();
-      aguardarMovimentoParaZoom3D();
-    }
+    function configurarVistaInicial3D() { zoomAtualNavegacao = ZOOM_PARADO; pitchAtual = PITCH_PARADO; aplicarConfiguracaoCamera3D(); aguardarMovimentoParaZoom3D(); }
 
-    // ===================================================================
-    // aplicarConfiguracaoCamera3D — Aplica rotação, pitch e zoom
-    // ===================================================================
     function aplicarConfiguracaoCamera3D() {
       var centro = calcularCentroMapaComOffset();
       map.setZoom(zoomAtualNavegacao, { animate: false });
       map.panTo([centro.lat, centro.lng], { animate: true, duration: 0.5, easeLinearity: 0.5 });
-      if (typeof map.setBearing === 'function') {
-        map.setBearing(headingSuavizado);
-      }
+      if (typeof map.setBearing === 'function') { map.setBearing(headingSuavizado); }
       aplicarPitch3D();
     }
 
-    // ===================================================================
-    // calcularCentroMapaComOffset — Carro fica em posição inferior
-    // ===================================================================
     function calcularCentroMapaComOffset() {
       var latCarro = posicaoSuavizadaGPS.lat || userLat;
       var lngCarro = posicaoSuavizadaGPS.lng || userLng;
@@ -1517,609 +1415,259 @@ crossorigin="anonymous"></script>
       var offsetMetros = alturaTelaMetros * (OFFSET_CARRO_VERTICAL - 0.5);
       var headingRad = (headingSuavizado - 180) * Math.PI / 180;
       var offsetLat = (offsetMetros * Math.cos(headingRad)) / 111320;
-      var offsetLng = (offsetMetros * Math.sin(headingRad)) /
-                      (111320 * Math.cos(latCarro * Math.PI / 180));
-      return {
-        lat: latCarro + offsetLat,
-        lng: lngCarro + offsetLng
-      };
+      var offsetLng = (offsetMetros * Math.sin(headingRad)) / (111320 * Math.cos(latCarro * Math.PI / 180));
+      return { lat: latCarro + offsetLat, lng: lngCarro + offsetLng };
     }
 
-    // ===================================================================
-    // calcularAlturaTelaEmMetros — Altura visível do mapa por zoom
-    // ===================================================================
-    function calcularAlturaTelaEmMetros(zoom) {
-      var metrosPorZoom = { 15: 3200, 16: 1600, 17: 800, 18: 400, 19: 200, 20: 100 };
-      return metrosPorZoom[zoom] || 200;
-    }
+    function calcularAlturaTelaEmMetros(zoom) { var metrosPorZoom = { 15: 3200, 16: 1600, 17: 800, 18: 400, 19: 200, 20: 100 }; return metrosPorZoom[zoom] || 200; }
 
-    // ===================================================================
-    // aplicarPitch3D — Inclinação 3D do mapa via CSS transform
-    // ===================================================================
     function aplicarPitch3D() {
       var mapContainer = document.querySelector('.leaflet-map-pane');
-      if (mapContainer) {
-        mapContainer.style.transform = 'perspective(1000px) rotateX(' + pitchAtual + 'deg)';
-        mapContainer.style.transformOrigin = 'center center';
-        mapContainer.style.transformStyle = 'preserve-3d';
-      }
+      if (mapContainer) { mapContainer.style.transform = 'perspective(1000px) rotateX(' + pitchAtual + 'deg)'; mapContainer.style.transformOrigin = 'center center'; mapContainer.style.transformStyle = 'preserve-3d'; }
       var mapDiv = document.getElementById('map');
-      if (mapDiv) {
-        mapDiv.style.perspective = '1000px';
-        var tilePane = mapDiv.querySelector('.leaflet-tile-pane');
-        if (tilePane) {
-          tilePane.style.transform = 'rotateX(' + pitchAtual + 'deg)';
-          tilePane.style.transformOrigin = 'center 70%';
-        }
-      }
+      if (mapDiv) { mapDiv.style.perspective = '1000px'; var tilePane = mapDiv.querySelector('.leaflet-tile-pane'); if (tilePane) { tilePane.style.transform = 'rotateX(' + pitchAtual + 'deg)'; tilePane.style.transformOrigin = 'center 70%'; } }
     }
 
-    // ===================================================================
-    // adicionarMarcadoresRota3D — Marcadores com rotação sincronizada
-    // ===================================================================
     function adicionarMarcadoresRota3D(originLat, originLng, destLat, destLng) {
       if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
       if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
       if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
-
       estaEmNavegacao = true;
       ultimaPosicaoMarcador = { lat: null, lng: null };
-
-      // Ícone de navegação 3D (rotacionável)
       var startIcon = L.divIcon({
-        html: '<div id="icone-navegacao-3d" class="icone-navegacao-container">' +
-              '  <img src="/imagens_app/ic_navigator_map.png" ' +
-              '       onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" ' +
-              '       style="width:50px;height:50px;transform-origin:center center;" ' +
-              '       id="img-navegacao-3d" ' +
-              '       alt="navegacao">' +
-              '</div>',
-        className: 'route-start-marker-3d',
-        iconSize: [50, 50],
-        iconAnchor: [25, 25],
-        popupAnchor: [0, -25]
+        html: '<div id="icone-navegacao-3d" class="icone-navegacao-container"><img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;transform-origin:center center;" id="img-navegacao-3d" alt="navegacao"></div>',
+        className: 'route-start-marker-3d', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25]
       });
-
-      startRouteMarker = L.marker([originLat, originLng], {
-        icon: startIcon,
-        zIndexOffset: 2000,
-        rotationAngle: 0
-      }).addTo(map);
-
+      startRouteMarker = L.marker([originLat, originLng], { icon: startIcon, zIndexOffset: 2000, rotationAngle: 0 }).addTo(map);
       window.iconeNavegacao3D = document.getElementById('img-navegacao-3d');
-
-      // Ícone de chegada
       var endIcon = L.divIcon({
-        html: '<img src="/imagens_app/ic_icon_chegada.png" ' +
-              '     onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" ' +
-              '     style="width:50px;height:50px;">',
-        className: 'route-end-marker-3d',
-        iconSize: [50, 50],
-        iconAnchor: [25, 50],
-        popupAnchor: [0, -50]
+        html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+        className: 'route-end-marker-3d', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50]
       });
-
-      endRouteMarker = L.marker([destLat, destLng], {
-        icon: endIcon,
-        zIndexOffset: 1500
-      }).addTo(map);
-
-      endRouteMarker.bindPopup("<b>📍 DESTINO</b><br>Você chegou!", {
-        closeButton: false, autoClose: true, closeOnClick: true
-      });
+      endRouteMarker = L.marker([destLat, destLng], { icon: endIcon, zIndexOffset: 1500 }).addTo(map);
+      endRouteMarker.bindPopup("<b>📍 DESTINO</b><br>Você chegou!", { closeButton: false, autoClose: true, closeOnClick: true });
     }
 
-    // ===================================================================
-    // snapPosicaoARota — Mantém ícone DENTRO da linha da rota
-    // ===================================================================
     function snapPosicaoARota(lat, lng) {
-      if (!pontosRota || pontosRota.length < 2) {
-        return { lat: lat, lng: lng, heading: headingSuavizado };
-      }
-
-      var pontoMaisProximo = null;
-      var menorDistancia = Infinity;
-      var indiceMaisProximo = 0;
-      var segmentoHeading = headingSuavizado;
-
+      if (!pontosRota || pontosRota.length < 2) { return { lat: lat, lng: lng, heading: headingSuavizado }; }
+      var pontoMaisProximo = null, menorDistancia = Infinity, indiceMaisProximo = 0, segmentoHeading = headingSuavizado;
       for (var i = 0; i < pontosRota.length - 1; i++) {
-        var p1 = pontosRota[i];
-        var p2 = pontosRota[i + 1];
+        var p1 = pontosRota[i], p2 = pontosRota[i + 1];
         var projecao = projetarPontoNaLinha(lat, lng, p1.lat, p1.lng, p2.lat, p2.lng);
         var distancia = calcularDistancia(lat, lng, projecao.lat, projecao.lng);
-
-        if (distancia < menorDistancia) {
-          menorDistancia = distancia;
-          pontoMaisProximo = projecao;
-          indiceMaisProximo = i;
-          segmentoHeading = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
-        }
+        if (distancia < menorDistancia) { menorDistancia = distancia; pontoMaisProximo = projecao; indiceMaisProximo = i; segmentoHeading = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng); }
       }
-
-      if (menorDistancia > DISTANCIA_MAXIMA_SNAP) {
-        estaFazendoSnap = false;
-        return {
-          lat: lat, lng: lng,
-          heading: hardwareHeading || calcularHeadingPorMovimento()
-        };
-      }
-
-      estaFazendoSnap = true;
-      indicePontoMaisProximo = indiceMaisProximo;
-
+      if (menorDistancia > DISTANCIA_MAXIMA_SNAP) { estaFazendoSnap = false; return { lat: lat, lng: lng, heading: hardwareHeading || calcularHeadingPorMovimento() }; }
+      estaFazendoSnap = true; indicePontoMaisProximo = indiceMaisProximo;
       var fatorSnap = Math.min(menorDistancia / 20, 1);
-      var latFinal = pontoMaisProximo.lat * (1 - fatorSnap * 0.7) + lat * (fatorSnap * 0.7);
-      var lngFinal = pontoMaisProximo.lng * (1 - fatorSnap * 0.7) + lng * (fatorSnap * 0.7);
-
-      return { lat: latFinal, lng: lngFinal, heading: segmentoHeading };
+      return { lat: pontoMaisProximo.lat * (1 - fatorSnap * 0.7) + lat * (fatorSnap * 0.7), lng: pontoMaisProximo.lng * (1 - fatorSnap * 0.7) + lng * (fatorSnap * 0.7), heading: segmentoHeading };
     }
 
-    // ===================================================================
-    // projetarPontoNaLinha — Projeta GPS na linha do segmento da rota
-    // ===================================================================
     function projetarPontoNaLinha(px, py, x1, y1, x2, y2) {
-      var A = px - x1;
-      var B = py - y1;
-      var C = x2 - x1;
-      var D = y2 - y1;
-      var dot = A * C + B * D;
-      var lenSq = C * C + D * D;
-      var param = -1;
+      var A = px - x1, B = py - y1, C = x2 - x1, D = y2 - y1, dot = A * C + B * D, lenSq = C * C + D * D, param = -1;
       if (lenSq !== 0) { param = dot / lenSq; }
-      var xx, yy;
-      if (param < 0) { xx = x1; yy = y1; }
-      else if (param > 1) { xx = x2; yy = y2; }
-      else { xx = x1 + param * C; yy = y1 + param * D; }
-      return { lat: xx, lng: yy };
+      if (param < 0) return { lat: x1, lng: y1 };
+      if (param > 1) return { lat: x2, lng: y2 };
+      return { lat: x1 + param * C, lng: y1 + param * D };
     }
 
-    // ===================================================================
-    // processarNovaPosicao3D — Processamento GPS com estabilidade total
-    // ===================================================================
     function processarNovaPosicao3D(newLat, newLng, speedKmh, hwHeading) {
-      var currentTime = Date.now();
-
-      // Atualiza variáveis
-      velocidadeAtual = speedKmh || 0;
-      hardwareHeading = hwHeading;
-
-      // 1. SUAVIZAÇÃO PESADA DA POSIÇÃO
-      if (posicaoSuavizadaGPS.lat === null) {
-        posicaoSuavizadaGPS = { lat: newLat, lng: newLng };
-      } else {
-        posicaoSuavizadaGPS.lat = posicaoSuavizadaGPS.lat * (1 - FATOR_SUAVIZACAO_POSICAO) +
-                                   newLat * FATOR_SUAVIZACAO_POSICAO;
-        posicaoSuavizadaGPS.lng = posicaoSuavizadaGPS.lng * (1 - FATOR_SUAVIZACAO_POSICAO) +
-                                   newLng * FATOR_SUAVIZACAO_POSICAO;
+      velocidadeAtual = speedKmh || 0; hardwareHeading = hwHeading;
+      if (posicaoSuavizadaGPS.lat === null) { posicaoSuavizadaGPS = { lat: newLat, lng: newLng }; } else {
+        posicaoSuavizadaGPS.lat = posicaoSuavizadaGPS.lat * (1 - FATOR_SUAVIZACAO_POSICAO) + newLat * FATOR_SUAVIZACAO_POSICAO;
+        posicaoSuavizadaGPS.lng = posicaoSuavizadaGPS.lng * (1 - FATOR_SUAVIZACAO_POSICAO) + newLng * FATOR_SUAVIZACAO_POSICAO;
       }
-
-      var latSuave = posicaoSuavizadaGPS.lat;
-      var lngSuave = posicaoSuavizadaGPS.lng;
-
-      // 2. SNAP À ROTA
-      var posicaoSnapped;
-      if (modoNavegacaoAtivo && pontosRota.length > 0) {
-        posicaoSnapped = snapPosicaoARota(latSuave, lngSuave);
-        latSuave = posicaoSnapped.lat;
-        lngSuave = posicaoSnapped.lng;
-      }
-
-      // 3. HEADING SUAVIZADO
+      var latSuave = posicaoSuavizadaGPS.lat, lngSuave = posicaoSuavizadaGPS.lng, posicaoSnapped;
+      if (modoNavegacaoAtivo && pontosRota.length > 0) { posicaoSnapped = snapPosicaoARota(latSuave, lngSuave); latSuave = posicaoSnapped.lat; lngSuave = posicaoSnapped.lng; }
       var headingNovo;
-      if (modoNavegacaoAtivo && posicaoSnapped && estaFazendoSnap) {
-        headingNovo = posicaoSnapped.heading;
-      } else if (hwHeading !== null && hwHeading >= 0 && velocidadeAtual > 5) {
-        headingNovo = hwHeading;
-      } else if (ultimaPosicaoMarcador.lat !== null && velocidadeAtual > 2) {
-        headingNovo = calcularBearing(
-          ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng,
-          newLat, newLng
-        );
-      } else {
-        headingNovo = headingSuavizado;
-      }
-
+      if (modoNavegacaoAtivo && posicaoSnapped && estaFazendoSnap) { headingNovo = posicaoSnapped.heading; }
+      else if (hwHeading !== null && hwHeading >= 0 && velocidadeAtual > 5) { headingNovo = hwHeading; }
+      else if (ultimaPosicaoMarcador.lat !== null && velocidadeAtual > 2) { headingNovo = calcularBearing(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, newLat, newLng); }
+      else { headingNovo = headingSuavizado; }
       headingSuavizado = suavizarHeading(headingSuavizado, headingNovo);
-
-      // 4. ATUALIZA MARCADOR DE NAVEGAÇÃO
-      if (modoNavegacaoAtivo && startRouteMarker) {
-        startRouteMarker.setLatLng([latSuave, lngSuave]);
-        atualizarRotacaoIconeNavegacao(headingSuavizado);
-      }
-
-      // 5. ATUALIZA POSIÇÃO DO USUÁRIO
-      userLat = newLat;
-      userLng = newLng;
-
-      // 6. ATUALIZA CÂMERA 3D
-      if (modoNavegacaoAtivo && isFollowing) {
-        atualizarCamera3D();
-      }
-
-      // 7. ATUALIZA ROTA
-      if (destinoAtual && routingControl) {
-        atualizarRota3D();
-      }
-
-      // 8. VERIFICA CHEGADA
-      if (destinoAtual) {
-        verificarChegadaDestino3D();
-      }
-
+      if (modoNavegacaoAtivo && startRouteMarker) { startRouteMarker.setLatLng([latSuave, lngSuave]); atualizarRotacaoIconeNavegacao(headingSuavizado); }
+      userLat = newLat; userLng = newLng;
+      if (modoNavegacaoAtivo && isFollowing) { atualizarCamera3D(); }
+      if (destinoAtual && routingControl) { atualizarRota3D(); }
+      if (destinoAtual) { verificarChegadaDestino3D(); }
       ultimaPosicaoMarcador = { lat: newLat, lng: newLng };
     }
 
-    // ===================================================================
-    // suavizarHeading — Suavização exponencial do heading (evita giros bruscos)
-    // ===================================================================
     function suavizarHeading(headingAtual, headingNovo) {
       var diferenca = headingNovo - headingAtual;
-      while (diferenca > 180) diferenca -= 360;
-      while (diferenca < -180) diferenca += 360;
-      var headingResultado = headingAtual + diferenca * FATOR_SUAVIZACAO_HEADING;
-      while (headingResultado < 0) headingResultado += 360;
-      while (headingResultado >= 360) headingResultado -= 360;
-      return headingResultado;
+      while (diferenca > 180) diferenca -= 360; while (diferenca < -180) diferenca += 360;
+      var r = headingAtual + diferenca * FATOR_SUAVIZACAO_HEADING;
+      while (r < 0) r += 360; while (r >= 360) r -= 360; return r;
     }
 
-    // ===================================================================
-    // atualizarRotacaoIconeNavegacao — Roda ícone na direção do segmento
-    // ===================================================================
     function atualizarRotacaoIconeNavegacao(heading) {
-      var img = window.iconeNavegacao3D;
-      if (!img) {
-        img = document.getElementById('img-navegacao-3d');
-        window.iconeNavegacao3D = img;
-      }
-      if (img) {
-        var headingProximoSegmento = obterHeadingProximoSegmento();
-        var rotacaoFinal = headingProximoSegmento - headingSuavizado;
-        while (rotacaoFinal > 180) rotacaoFinal -= 360;
-        while (rotacaoFinal < -180) rotacaoFinal += 360;
-        img.style.transform = 'rotate(' + rotacaoFinal + 'deg)';
-      }
+      var img = window.iconeNavegacao3D; if (!img) { img = document.getElementById('img-navegacao-3d'); window.iconeNavegacao3D = img; }
+      if (img) { var h = obterHeadingProximoSegmento(), rot = h - headingSuavizado; while (rot > 180) rot -= 360; while (rot < -180) rot += 360; img.style.transform = 'rotate(' + rot + 'deg)'; }
     }
 
-    // ===================================================================
-    // obterHeadingProximoSegmento — Heading do segmento atual da rota
-    // ===================================================================
-    function obterHeadingProximoSegmento() {
-      if (!pontosRota || pontosRota.length < 2) return headingSuavizado;
-      var idx = Math.min(indicePontoMaisProximo, pontosRota.length - 2);
-      var p1 = pontosRota[idx];
-      var p2 = pontosRota[idx + 1];
-      return calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
-    }
+    function obterHeadingProximoSegmento() { if (!pontosRota || pontosRota.length < 2) return headingSuavizado; var idx = Math.min(indicePontoMaisProximo, pontosRota.length - 2); return calcularBearing(pontosRota[idx].lat, pontosRota[idx].lng, pontosRota[idx + 1].lat, pontosRota[idx + 1].lng); }
 
-    // ===================================================================
-    // atualizarCamera3D — Atualiza zoom, pitch, centro e rotação
-    // ===================================================================
     function atualizarCamera3D() {
-      // Ajusta zoom baseado na velocidade
-      var zoomDesejado = calcularZoomPorVelocidade();
-
-      // Ajusta pitch baseado na velocidade
-      var pitchDesejado = calcularPitchPorVelocidade();
-
-      // Transição suave do zoom (só muda se diferença >= 1)
-      if (Math.abs(zoomDesejado - zoomAtualNavegacao) >= 1) {
-        zoomAtualNavegacao = zoomDesejado;
-        map.setZoom(zoomAtualNavegacao, { animate: true, duration: 1.5 });
-      }
-
-      // Transição suave do pitch
-      if (Math.abs(pitchDesejado - pitchAtual) >= 2) {
-        pitchAtual = pitchAtual * 0.8 + pitchDesejado * 0.2;
-        aplicarPitch3D();
-      }
-
-      // Calcula centro com offset (carro abaixo do centro)
+      var zoomDesejado = calcularZoomPorVelocidade(), pitchDesejado = calcularPitchPorVelocidade();
+      if (Math.abs(zoomDesejado - zoomAtualNavegacao) >= 1) { zoomAtualNavegacao = zoomDesejado; map.setZoom(zoomAtualNavegacao, { animate: true, duration: 1.5 }); }
+      if (Math.abs(pitchDesejado - pitchAtual) >= 2) { pitchAtual = pitchAtual * 0.8 + pitchDesejado * 0.2; aplicarPitch3D(); }
       var centro = calcularCentroMapaComOffset();
-
-      // Move mapa suavemente
-      map.panTo([centro.lat, centro.lng], {
-        animate: true, duration: 0.4, easeLinearity: 0.6
-      });
-
-      // Aplica rotação do mapa
-      if (velocidadeAtual > 3 || contadorFramesEstaveis > 30) {
-        if (typeof map.setBearing === 'function') {
-          map.setBearing(headingSuavizado);
-        }
-      }
-
+      map.panTo([centro.lat, centro.lng], { animate: true, duration: 0.4, easeLinearity: 0.6 });
+      if (velocidadeAtual > 3 || contadorFramesEstaveis > 30) { if (typeof map.setBearing === 'function') { map.setBearing(headingSuavizado); } }
       contadorFramesEstaveis++;
     }
 
-    // ===================================================================
-    // calcularZoomPorVelocidade — Zoom dinâmico Waze
-    // ===================================================================
-    function calcularZoomPorVelocidade() {
-      if (velocidadeAtual < 5) return ZOOM_PARADO;
-      if (velocidadeAtual < 30) return ZOOM_LENTO;
-      if (velocidadeAtual < 60) return ZOOM_MEDIO;
-      if (velocidadeAtual < 90) return ZOOM_RAPIDO;
-      return ZOOM_MUITO_RAPIDO;
-    }
+    function calcularZoomPorVelocidade() { if (velocidadeAtual < 5) return ZOOM_PARADO; if (velocidadeAtual < 30) return ZOOM_LENTO; if (velocidadeAtual < 60) return ZOOM_MEDIO; if (velocidadeAtual < 90) return ZOOM_RAPIDO; return ZOOM_MUITO_RAPIDO; }
+    function calcularPitchPorVelocidade() { if (velocidadeAtual < 5) return PITCH_PARADO; if (velocidadeAtual < 40) return PITCH_PADRAO; if (velocidadeAtual < 80) return PITCH_MOVIMENTO; return PITCH_ALTA_VELOCIDADE; }
 
-    // ===================================================================
-    // calcularPitchPorVelocidade — Inclinação 3D dinâmica
-    // ===================================================================
-    function calcularPitchPorVelocidade() {
-      if (velocidadeAtual < 5) return PITCH_PARADO;
-      if (velocidadeAtual < 40) return PITCH_PADRAO;
-      if (velocidadeAtual < 80) return PITCH_MOVIMENTO;
-      return PITCH_ALTA_VELOCIDADE;
-    }
-
-    // ===================================================================
-    // aguardarMovimentoParaZoom3D — Detecta partida para ativar zoom dinâmico
-    // ===================================================================
     function aguardarMovimentoParaZoom3D() {
-      var movimentoDetectado = false;
-      var checkMovimento = setInterval(function() {
-        if (!modoNavegacaoAtivo) { clearInterval(checkMovimento); return; }
-        if (velocidadeAtual > 5 && !movimentoDetectado) {
-          movimentoDetectado = true;
-          clearInterval(checkMovimento);
-          showNotification("🚗 Partida detectada!");
-          iniciarZoomDinamico3D();
-        }
-      }, 500);
+      var mov = false;
+      var chk = setInterval(function() { if (!modoNavegacaoAtivo) { clearInterval(chk); return; } if (velocidadeAtual > 5 && !mov) { mov = true; clearInterval(chk); showNotification("🚗 Partida detectada!"); iniciarZoomDinamico3D(); } }, 500);
     }
 
-    // ===================================================================
-    // iniciarZoomDinamico3D — Loop de atualização da câmera 3D
-    // ===================================================================
     function iniciarZoomDinamico3D() {
       if (intervaloZoomDinamico) clearInterval(intervaloZoomDinamico);
-      intervaloZoomDinamico = setInterval(function() {
-        if (!modoNavegacaoAtivo) {
-          clearInterval(intervaloZoomDinamico);
-          intervaloZoomDinamico = null;
-          return;
-        }
-        // A câmera 3D já é atualizada em processarNovaPosicao3D
-        // Aqui fazemos um ajuste fino periódico
-        atualizarCamera3D();
-      }, 1000);
+      intervaloZoomDinamico = setInterval(function() { if (!modoNavegacaoAtivo) { clearInterval(intervaloZoomDinamico); intervaloZoomDinamico = null; return; } atualizarCamera3D(); }, 1000);
     }
 
-    // ===================================================================
-    // atualizarRota3D — Recalcula rota a partir da posição suavizada
-    // ===================================================================
-    function atualizarRota3D() {
-      if (!destinoAtual || !routingControl) return;
-      var latOrigem = posicaoSuavizadaGPS.lat || userLat;
-      var lngOrigem = posicaoSuavizadaGPS.lng || userLng;
-      routingControl.setWaypoints([
-        L.latLng(latOrigem, lngOrigem),
-        L.latLng(destinoAtual.lat, destinoAtual.lng)
-      ]);
-    }
+    function atualizarRota3D() { if (!destinoAtual || !routingControl) return; var lo = posicaoSuavizadaGPS.lat || userLat, ln = posicaoSuavizadaGPS.lng || userLng; routingControl.setWaypoints([L.latLng(lo, ln), L.latLng(destinoAtual.lat, destinoAtual.lng)]); }
 
-    // ===================================================================
-    // verificarChegadaDestino3D — Verifica se chegou ao destino
-    // ===================================================================
-    function verificarChegadaDestino3D() {
-      if (!destinoAtual) return;
-      var distancia = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
-      if (distancia <= 30) {
-        showNotification("🎉 Você chegou ao destino!");
-        if (endRouteMarker) { endRouteMarker.openPopup(); }
-        setTimeout(function() { finalizarNavegacao3D(); }, 4000);
-      }
-    }
+    function verificarChegadaDestino3D() { if (!destinoAtual) return; var d = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng); if (d <= 30) { showNotification("🎉 Você chegou ao destino!"); if (endRouteMarker) endRouteMarker.openPopup(); setTimeout(function() { finalizarNavegacao3D(); }, 4000); } }
 
-    // ===================================================================
-    // finalizarNavegacao3D — Restaura tudo ao estado normal
-    // ===================================================================
     function finalizarNavegacao3D() {
-      modoNavegacaoAtivo = false;
-      estaEmNavegacao = false;
-      estaEmMovimento = false;
-      velocidadeAtual = 0;
-
-      // Para o loop de zoom dinâmico
+      modoNavegacaoAtivo = false; estaEmNavegacao = false; estaEmMovimento = false; velocidadeAtual = 0;
       if (intervaloZoomDinamico) { clearInterval(intervaloZoomDinamico); intervaloZoomDinamico = null; }
-
-      // Remove rota
       if (routingControl) { map.removeControl(routingControl); routingControl = null; }
-      destinoAtual = null;
-      pontosRota = [];
-
-      // Remove marcadores de rota
+      destinoAtual = null; pontosRota = [];
       if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
       if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
       window.iconeNavegacao3D = null;
-
-      // Reseta rotação e pitch
-      rotacaoAtual = 0;
-      headingSuavizado = 0;
-      pitchAtual = 0;
+      rotacaoAtual = 0; headingSuavizado = 0; pitchAtual = 0;
       if (typeof map.setBearing === 'function') { map.setBearing(0); }
       aplicarPitch3D();
+      var rotateBtnIcon = document.getElementById('rotate-btn-icon'); if (rotateBtnIcon) { rotateBtnIcon.style.transform = 'rotate(0deg)'; }
+      var rotateBtn = document.getElementById('btn-rotate-map'); if (rotateBtn) rotateBtn.classList.remove('rotated');
+      mapaRotacionado = false;
+      document.getElementById('controles-zoom-flutuantes').classList.remove('visivel');
+      var sidebar = document.getElementById('sidebar-controls'); if (sidebar) sidebar.classList.remove('retracted');
+      sidebarAberta = true; var btnMenu = document.getElementById('btn-menu-toggle'); if (btnMenu) btnMenu.classList.remove('active');
+      map.flyTo([userLat, userLng], 17, { duration: 1 });
+      if (posicaoSuavizada && posicaoSuavizada.lat !== null) { ultimaPosicaoMarcador.lat = posicaoSuavizada.lat; ultimaPosicaoMarcador.lng = posicaoSuavizada.lng; } else { ultimaPosicaoMarcador = { lat: null, lng: null }; }
+      var defaultIcon = L.divIcon({ html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50] });
+      userMarker = L.marker([userLat, userLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
+      userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+      showNotification("🗺️ Navegação encerrada");
+    }
 
-      // Reseta ícone do botão de rotação manual
+    function removerRota3D() { finalizarNavegacao3D(); }
+    function calcularHeadingPorMovimento() { if (!ultimaPosicaoMarcador.lat) return headingSuavizado; return calcularBearing(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, userLat, userLng); }
+    function suavizarRotacao(novaRotacao) { var d = novaRotacao - rotacaoAtual; while (d > 180) d -= 360; while (d < -180) d += 360; rotacaoAtual += d * 0.2; while (rotacaoAtual < 0) rotacaoAtual += 360; while (rotacaoAtual >= 360) rotacaoAtual -= 360; return rotacaoAtual; }
+    function calcularOffsetCentroMapa() { var f = Math.min(velocidadeAtual / 100, 1); return { lat: (30 + f * 100) / 111320, lng: 0 }; }
+
+    // ===================================================================
+    // FUNÇÕES LEGADAS MANTIDAS PARA COMPATIBILIDADE
+    // ===================================================================
+    function adicionarMarcadoresRota(oL, oN, dL, dN) { adicionarMarcadoresRota3D(oL, oN, dL, dN); }
+    function atualizarRota() { if (modoNavegacaoAtivo) { atualizarRota3D(); } else if (destinoAtual && routingControl && userLat && userLng) { routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]); } }
+    function verificarChegadaDestino() { verificarChegadaDestino3D(); }
+    function finalizarERestaurarRota() { finalizarNavegacao3D(); }
+    function removerRota() { finalizarNavegacao3D(); }
+    function iniciarNavegacaoWaze(dL, dN) { iniciarNavegacao3D(dL, dN); }
+    function finalizarNavegacaoWaze() { finalizarNavegacao3D(); }
+
+    // ===================================================================
+    // ROTAS E ENDEREÇOS
+    // ===================================================================
+    async function buscarCoordenadas(endereco) {
+      try { var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil'); var r = await fetch(url); var d = await r.json(); if (d && d.length > 0) return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) }; return null; } catch (e) { console.error("Erro ao buscar coordenadas:", e); return null; }
+    }
+
+    // ===================================================================
+    // ✅ RESET TOTAL — Volta o mapa ao estado exato de abertura
+    // ===================================================================
+    function fecharTodasBarras() {
+      searchActive = false;
+      routeActive = false;
+      document.getElementById('search-bar-radares').classList.remove('active');
+      document.getElementById('search-bar-rota').classList.remove('active');
+      document.getElementById('query').value = '';
+      document.getElementById('route-query').value = '';
+    }
+
+    function resetarTotalMapa() {
+      if (!map) return;
+
+      // 1. Fecha navegação 3D por completo
+      if (modoNavegacaoAtivo) { finalizarNavegacao3D(); }
+
+      // 2. Fecha barras de busca e rota, limpa campos
+      fecharTodasBarras();
+
+      // 3. Reseta rotação manual
+      mapaRotacionado = false;
+      if (typeof map.setBearing === 'function') { map.setBearing(0); }
       var rotateBtnIcon = document.getElementById('rotate-btn-icon');
       if (rotateBtnIcon) { rotateBtnIcon.style.transform = 'rotate(0deg)'; }
       var rotateBtn = document.getElementById('btn-rotate-map');
       if (rotateBtn) rotateBtn.classList.remove('rotated');
-      mapaRotacionado = false;
 
-      // Esconde controles flutuantes e mostra sidebar
+      // 4. Reseta variáveis de posição suave
+      posicaoSuavizada = { lat: null, lng: null };
+      posicaoSuavizadaGPS = { lat: null, lng: null };
+      historicoPosicoes = [];
+      historicoDistanciasRadar = {};
+      prevLat = null; prevLng = null; prevTime = null;
+      velocidadeAtual = 0; currentHeading = 0; rotacaoAtual = 0;
+
+      // 5. Garante sidebar aberta
       var sidebar = document.getElementById('sidebar-controls');
       if (sidebar) sidebar.classList.remove('retracted');
       sidebarAberta = true;
       var btnMenu = document.getElementById('btn-menu-toggle');
       if (btnMenu) btnMenu.classList.remove('active');
 
-      // Restaura zoom padrão
-      map.flyTo([userLat, userLng], 17, { duration: 1 });
+      // 6. Remove marcador GPS antigo e recria no centro original
+      if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
+      ultimaPosicaoMarcador = { lat: null, lng: null };
 
-      // Reseta posição da animação
-      if (posicaoSuavizada && posicaoSuavizada.lat !== null) {
-        ultimaPosicaoMarcador.lat = posicaoSuavizada.lat;
-        ultimaPosicaoMarcador.lng = posicaoSuavizada.lng;
-      } else {
-        ultimaPosicaoMarcador = { lat: null, lng: null };
-      }
+      // 7. Volta o mapa para a posição e zoom inicial de abertura
+      map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
+      isFollowing = false;
 
-      // Recria marcador GPS padrão
-      var defaultIcon = L.divIcon({
-        html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-        className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50]
-      });
-      userMarker = L.marker([userLat, userLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-      userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+      // 8. Esconde alertas
+      esconderAlertaVisual();
+      ultimoRadarAlertado = null;
 
-      showNotification("🗺️ Navegação encerrada");
-    }
+      // 9. Cancela timers pendentes
+      if (returnToGpsTimer) clearTimeout(returnToGpsTimer);
+      if (refreshDelayTimer) clearTimeout(refreshDelayTimer);
 
-    // ===================================================================
-    // removerRota3D — Alias para finalizar
-    // ===================================================================
-    function removerRota3D() {
-      finalizarNavegacao3D();
-    }
-
-    // ===================================================================
-    // calcularHeadingPorMovimento — Calcula heading pelo deslocamento
-    // ===================================================================
-    function calcularHeadingPorMovimento() {
-      if (!ultimaPosicaoMarcador.lat) return headingSuavizado;
-      return calcularBearing(
-        ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng,
-        userLat, userLng
-      );
-    }
-
-    // ===================================================================
-    // suavizarRotacao — Para modo manual de rotação (fora de navegação)
-    // ===================================================================
-    function suavizarRotacao(novaRotacao) {
-      var diferenca = novaRotacao - rotacaoAtual;
-      while (diferenca > 180) diferenca -= 360;
-      while (diferenca < -180) diferenca += 360;
-      rotacaoAtual += diferenca * 0.2;
-      while (rotacaoAtual < 0) rotacaoAtual += 360;
-      while (rotacaoAtual >= 360) rotacaoAtual -= 360;
-      return rotacaoAtual;
-    }
-
-    // ===================================================================
-    // calcularOffsetCentroMapa — Offset para modo normal (fora de navegação)
-    // ===================================================================
-    function calcularOffsetCentroMapa() {
-      var fatorVelocidade = Math.min(velocidadeAtual / 100, 1);
-      var offsetMetros = 30 + (fatorVelocidade * 100);
-      var offsetLat = offsetMetros / 111320;
-      return { lat: offsetLat, lng: 0 };
-    }
-
-    // ===================================================================
-    // FUNÇÕES LEGADAS MANTIDAS PARA COMPATIBILIDADE
-    // ===================================================================
-
-    // adicionarMarcadoresRota — Redireciona para versão 3D
-    function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
-      adicionarMarcadoresRota3D(originLat, originLng, destLat, destLng);
-    }
-
-    // atualizarRota — Redireciona para versão 3D
-    function atualizarRota() {
-      if (modoNavegacaoAtivo) { atualizarRota3D(); }
-      else if (destinoAtual && routingControl && userLat && userLng) {
-        routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
-      }
-    }
-
-    // verificarChegadaDestino — Redireciona para versão 3D
-    function verificarChegadaDestino() {
-      verificarChegadaDestino3D();
-    }
-
-    // finalizarERestaurarRota — Redireciona para versão 3D
-    function finalizarERestaurarRota() {
-      finalizarNavegacao3D();
-    }
-
-    // removerRota — Redireciona para versão 3D
-    function removerRota() {
-      finalizarNavegacao3D();
-    }
-
-    // iniciarNavegacaoWaze — Redireciona para versão 3D completa
-    function iniciarNavegacaoWaze(destLat, destLng) {
-      iniciarNavegacao3D(destLat, destLng);
-    }
-
-    // finalizarNavegacaoWaze — Redireciona para versão 3D
-    function finalizarNavegacaoWaze() {
-      finalizarNavegacao3D();
-    }
-
-    // ===================================================================
-    // ROTAS E ENDEREÇOS
-    // ===================================================================
-    async function buscarCoordenadas(endereco) {
-      try {
-        var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil');
-        var response = await fetch(url); var data = await response.json();
-        if (data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-        return null;
-      } catch (e) { console.error("Erro ao buscar coordenadas:", e); return null; }
+      showNotification("Mapa resetado ao início");
     }
 
     function resetarMapa() {
-      if (!map) return;
-      mapaRotacionado = false;
-      if (typeof map.setBearing === 'function') { map.setBearing(0); }
-      var rotateBtnIcon = document.getElementById('rotate-btn-icon');
-      if (rotateBtnIcon) { rotateBtnIcon.style.transform = 'rotate(0deg)'; }
-      var rotateBtn = document.getElementById('btn-rotate-map');
-      if (rotateBtn) rotateBtn.classList.remove('rotated');
-      map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
-      isFollowing = false;
-      if (refreshDelayTimer) clearTimeout(refreshDelayTimer);
-      refreshDelayTimer = setTimeout(function() {
-        var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
-        if (marcadorAtivo && !isFollowing) { isFollowing = true; map.flyTo(marcadorAtivo.getLatLng(), 20, { duration: 0.8 }); showNotification("Retornando à sua posição atual"); }
-        refreshDelayTimer = null;
-      }, TEMPO_REFRESH_DELAY);
-      finalizarNavegacao3D();
-      esconderAlertaVisual();
-      showNotification("Mapa resetado");
+      resetarTotalMapa();
+      carregarRadares();
     }
 
     function extrairCoordenadas(record) {
       if (!record || record.length < 10) return null;
-      var stringOriginal = String(record[9]).trim();
-      var stringLimpa = stringOriginal.replace(/\s*,\s*/g, ',').trim();
-      if (!stringLimpa.includes('.') && stringLimpa.includes(',')) { var pv = stringLimpa.indexOf(','); if (pv !== -1) { stringLimpa = stringLimpa.substring(0, pv) + '.' + stringLimpa.substring(pv + 1); } }
-      var parts = stringLimpa.split(','); if (parts.length !== 2) return null;
-      var lat = parseFloat(parts[0]); var lng = parseFloat(parts[1]);
+      var s = String(record[9]).trim().replace(/\s*,\s*/g, ',').trim();
+      if (!s.includes('.') && s.includes(',')) { var p = s.indexOf(','); if (p !== -1) s = s.substring(0, p) + '.' + s.substring(p + 1); }
+      var parts = s.split(','); if (parts.length !== 2) return null;
+      var lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
       if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
       return { lat: lat, lng: lng };
     }
 
-    function atualizarBussola(headingDegrees) {
-    var needle = document.getElementById('compass-needle-img');
-    if (needle) {
-        needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
-    }
-}
-    // ===================================================================
-    // Atualizar rotação do mapa (modo manual, não navegação)
-    // ===================================================================
+    // ✅ CORRIGIDO: aspa simples em vez de aspa dupla no seletor
+    function atualizarBussola(headingDegrees) { var needle = document.getElementById('compass-needle-img'); if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)'; }
+
     function atualizarRotacaoMapa() {
       if (!mapaRotacionado || !map || modoNavegacaoAtivo) return;
-      var agora = Date.now();
-      if (agora - ultimaAtualizacaoRotacao < 200) return;
-      ultimaAtualizacaoRotacao = agora;
+      var agora = Date.now(); if (agora - ultimaAtualizacaoRotacao < 200) return; ultimaAtualizacaoRotacao = agora;
       if (typeof map.setBearing === 'function') { map.setBearing(currentHeading); }
-      var rotateBtnIcon = document.getElementById('rotate-btn-icon');
-      if (rotateBtnIcon) { rotateBtnIcon.style.transform = 'rotate(' + currentHeading + 'deg)'; }
+      var ri = document.getElementById('rotate-btn-icon'); if (ri) { ri.style.transform = 'rotate(' + currentHeading + 'deg)'; }
     }
 
     function inicializarBussolaHardware() {
@@ -2141,84 +1689,38 @@ crossorigin="anonymous"></script>
     }
 
     // ===================================================================
-    // processarNovaPosicao — Gateway que direciona para modo normal ou 3D
+    // processarNovaPosicao — Gateway normal vs 3D
     // ===================================================================
     function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
       if (!map) return;
-
-      // Se em navegação 3D, usa o processador completo
       if (modoNavegacaoAtivo) {
         processarNovaPosicao3D(newLat, newLng, speedKmh, hardwareHeading);
-        // Atualiza velocidade no display
         $("#speed-display").text(speedKmh || 0);
-        // Atualiza bússola
-        if (headingSuavizado !== null && headingSuavizado !== undefined) {
-          atualizarBussola(headingSuavizado);
-        }
-        // Verifica radares mesmo em navegação 3D
+        if (headingSuavizado !== null && headingSuavizado !== undefined) { atualizarBussola(headingSuavizado); }
         if (alertaHabilitado) { verificarProximidadeRadares(); } else { fecharAlertaImediatamente(); }
         return;
       }
-
-      // ===== MODO NORMAL (fora de navegação) =====
-      var currentTime = Date.now();
-      var dist = 0;
-
+      var currentTime = Date.now(), dist = 0;
       adicionarAoHistorico(newLat, newLng, currentTime);
-      var posSuave = suavizarPosicao(newLat, newLng);
-      var smoothLat = posSuave.lat;
-      var smoothLng = posSuave.lng;
-
-      if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
-        dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
-        var time = (currentTime - prevTime) / 1000;
-        if (time > 0) speedKmh = Math.round((dist / time) * 3.6);
-      } else if (prevLat !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); }
-
+      var posSuave = suavizarPosicao(newLat, newLng), smoothLat = posSuave.lat, smoothLng = posSuave.lng;
+      if (speedKmh === 0 && prevLat !== null && prevTime !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); var time = (currentTime - prevTime) / 1000; if (time > 0) speedKmh = Math.round((dist / time) * 3.6); } else if (prevLat !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); }
       if (speedKmh > 250) speedKmh = 0;
       $("#speed-display").text(speedKmh);
-
       velocidadeAtual = speedKmh || 0;
-
-      // Lógica de heading — prioriza bússola hardware
-      if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
-        if (!bussolaHardwareDisponivel) { currentHeading = hardwareHeading; }
-      } else if (!bussolaHardwareDisponivel && dist > 3 && prevLat !== null) {
-        var dy = newLat - prevLat; var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
-        if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) {
-          var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
-          if (calcHeading < 0) calcHeading += 360;
-          if (calcHeading >= 360) calcHeading -= 360;
-          currentHeading = calcHeading;
-        }
-      }
-
+      if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) { if (!bussolaHardwareDisponivel) { currentHeading = hardwareHeading; } }
+      else if (!bussolaHardwareDisponivel && dist > 3 && prevLat !== null) { var dy = newLat - prevLat, dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180); if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) { var ch = (Math.atan2(dx, dy) * 180 / Math.PI); if (ch < 0) ch += 360; if (ch >= 360) ch -= 360; currentHeading = ch; } }
       if (currentHeading !== null && currentHeading !== undefined) { atualizarBussola(currentHeading); }
       atualizarRotacaoMapa();
-
-      prevLat = newLat; prevLng = newLng; prevTime = currentTime;
-      userLat = newLat; userLng = newLng;
-
+      prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
       if (!userMarker && !estaEmNavegacao) {
-        var defaultIcon = L.divIcon({
-          html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-          className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50]
-        });
-        userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
+        var di = L.divIcon({ html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50] });
+        userMarker = L.marker([smoothLat, smoothLng], { icon: di, zIndexOffset: 1000 }).addTo(map);
         userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
         ultimaPosicaoMarcador.lat = smoothLat; ultimaPosicaoMarcador.lng = smoothLng;
         if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
-      } else {
-        moverMarcadorSuavemente(smoothLat, smoothLng);
-      }
-
+      } else { moverMarcadorSuavemente(smoothLat, smoothLng); }
       if (destinoAtual && routingControl) { atualizarRota(); }
-
-      // View do mapa — modo normal
-      if (isFollowing) {
-        map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.8 });
-      }
-
+      if (isFollowing) { map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.8 }); }
       if (alertaHabilitado) { verificarProximidadeRadares(); } else { fecharAlertaImediatamente(); }
       if (destinoAtual) { verificarChegadaDestino(); }
     }
@@ -2229,10 +1731,9 @@ crossorigin="anonymous"></script>
       watchId = navigator.geolocation.watchPosition(
         function(position) {
           if (gpsSource !== 'appinventor') gpsSource = 'browser';
-          var newLat = position.coords.latitude; var newLng = position.coords.longitude;
-          var speedKmh = 0;
-          if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
-          processarNovaPosicao(newLat, newLng, speedKmh, position.coords.heading);
+          var nL = position.coords.latitude, nN = position.coords.longitude, sK = 0;
+          if (position.coords.speed !== null && position.coords.speed >= 0) sK = Math.round(position.coords.speed * 3.6);
+          processarNovaPosicao(nL, nN, sK, position.coords.heading);
         }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
       );
       browserGpsTimeout = setTimeout(function() { if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); } }, 8000);
@@ -2243,29 +1744,29 @@ crossorigin="anonymous"></script>
     // ===================================================================
     function verificarProximidadeRadares() {
       if (!alertaHabilitado || radarMarkers.length === 0) return;
-      let radarMaisProximo = null; let menorDistancia = Infinity;
-      radarMarkers.forEach(function(marker) { const rData = marker.radarData; if (!deveAlertaRadar(rData.tipoOriginal)) return; const dist = calcularDistancia(userLat, userLng, rData.latitude, rData.longitude); if (dist < menorDistancia) { menorDistancia = dist; radarMaisProximo = rData; } });
+      let radarMaisProximo = null, menorDistancia = Infinity;
+      radarMarkers.forEach(function(m) { const r = m.radarData; if (!deveAlertaRadar(r.tipoOriginal)) return; const d = calcularDistancia(userLat, userLng, r.latitude, r.longitude); if (d < menorDistancia) { menorDistancia = d; radarMaisProximo = r; } });
       if (radarMaisProximo && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
-        const direcao = verificarDirecaoMelhorada(userLat, userLng, currentHeading, radarMaisProximo.latitude, radarMaisProximo.longitude, radarMaisProximo.id, menorDistancia);
+        const dir = verificarDirecaoMelhorada(userLat, userLng, currentHeading, radarMaisProximo.latitude, radarMaisProximo.longitude, radarMaisProximo.id, menorDistancia);
         if (menorDistancia <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) { esconderAlertaVisual(); ultimoRadarAlertado = radarMaisProximo.id; limparHistoricoDistancia(radarMaisProximo.id); return; }
-        if (direcao.estaAfastando) { fecharAlertaImediatamente(); limparHistoricoDistancia(radarMaisProximo.id); if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA - 30) ultimoRadarAlertado = null; return; }
-        if (direcao.estaAproximando) { if (ultimoRadarAlertado !== radarMaisProximo.id) { dispararAlerta(radarMaisProximo, menorDistancia); } else { atualizarDistanciaAlerta(menorDistancia); if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) $(".alert-bar").addClass("alert-bar-critico"); } }
+        if (dir.estaAfastando) { fecharAlertaImediatamente(); limparHistoricoDistancia(radarMaisProximo.id); if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA - 30) ultimoRadarAlertado = null; return; }
+        if (dir.estaAproximando) { if (ultimoRadarAlertado !== radarMaisProximo.id) { dispararAlerta(radarMaisProximo, menorDistancia); } else { atualizarDistanciaAlerta(menorDistancia); if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) $(".alert-bar").addClass("alert-bar-critico"); } }
       } else { if ($("#alert-container").is(":visible")) esconderAlertaVisual(); if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA + 80) { ultimoRadarAlertado = null; historicoDistanciasRadar = {}; } }
     }
 
-    function atualizarDistanciaAlerta(distancia) { if (!$("#alert-container").is(":visible")) return; var textoAtual = $("#alert-text").text(); var partes = textoAtual.split(" - a "); if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros"); }
+    function atualizarDistanciaAlerta(distancia) { if (!$("#alert-container").is(":visible")) return; var t = $("#alert-text").text(), p = t.split(" - a "); if (p.length >= 2) $("#alert-text").text(p[0] + " - a " + Math.round(distancia) + " metros"); }
 
     function dispararAlerta(radar, distancia) {
-      const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
-      if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
+      const dA = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
+      if (dA > ALERT_CONFIG.DISTANCIA_MAXIMA || dA <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
       const som = document.getElementById("alert-soud");
-      const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
-      const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
-      $("#alert-title").text("ALERTA DE RADAR!"); $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
+      const tA = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
+      const vI = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
+      $("#alert-title").text("ALERTA DE RADAR!"); $("#alert-text").text(tA + vI + " - a " + Math.round(dA) + " metros");
       $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
       if (!$("#alert-container").is(":visible")) { $("#alert-container").fadeIn(200); contagemTocarSom = 0; }
-      if (alertaHabilitado && som && contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) { som.pause(); som.currentTime = 0; som.play().catch(function(e) {}); contagemTocarSom++; }
-      if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) { $(".alert-bar").addClass("alert-bar-critico"); } else { $(".alert-bar").removeClass("alert-bar-critico"); }
+      if (alertaHabilitado && som && contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) { som.pause(); som.currentTime = 0; som.play().catch(function() {}); contagemTocarSom++; }
+      if (dA <= ALERT_CONFIG.DISTANCIA_CRITICA) { $(".alert-bar").addClass("alert-bar-critico"); } else { $(".alert-bar").removeClass("alert-bar-critico"); }
       ultimoRadarAlertado = radar.id;
       clearTimeout(alertTimeout);
       alertTimeout = setTimeout(function() { if ($("#alert-container").is(":visible")) esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
@@ -2275,22 +1776,19 @@ crossorigin="anonymous"></script>
     // BOTÃO DE ROTAÇÃO
     // ===================================================================
     function inicializarBotaoRotacaoMapa() {
-      const rotateBtn = document.getElementById('btn-rotate-map');
-      if (!rotateBtn) return;
-      if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') {
-        rotateBtn.style.opacity = '0.3'; rotateBtn.style.pointerEvents = 'none'; showNotification('Plugin de rotação não carregou.'); return;
-      }
-      rotateBtn.addEventListener('click', async function () {
+      const rb = document.getElementById('btn-rotate-map');
+      if (!rb) return;
+      if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') { rb.style.opacity = '0.3'; rb.style.pointerEvents = 'none'; showNotification('Plugin de rotação não carregou.'); return; }
+      rb.addEventListener('click', async function() {
         if (!map || typeof map.setBearing !== 'function' || modoNavegacaoAtivo) return;
         if (!bussolaHardwareDisponivel) { await solicitarPermissaoBussolaIOS(); }
         if (!mapaRotacionado) {
-          mapaRotacionado = true;
-          var anguloRotacao = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 0;
-          map.setBearing(anguloRotacao); rotateBtn.classList.add('rotated');
-          var ri = document.getElementById('rotate-btn-icon'); if (ri) { ri.style.transform = 'rotate(' + anguloRotacao + 'deg)'; }
-          if (bussolaHardwareDisponivel) { showNotification('Mapa rotacionado — bússola ativa'); } else if (currentHeading > 0) { showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)'); } else { showNotification('Mapa rotacionado — aguardando direção...'); }
+          mapaRotacionado = true; var a = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 0;
+          map.setBearing(a); rb.classList.add('rotated');
+          var ri = document.getElementById('rotate-btn-icon'); if (ri) { ri.style.transform = 'rotate(' + a + 'deg)'; }
+          if (bussolaHardwareDisponivel) showNotification('Mapa rotacionado — bússola ativa'); else if (currentHeading > 0) showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)'); else showNotification('Mapa rotacionado — aguardando direção...');
         } else {
-          mapaRotacionado = false; map.setBearing(0); rotateBtn.classList.remove('rotated');
+          mapaRotacionado = false; map.setBearing(0); rb.classList.remove('rotated');
           var ri = document.getElementById('rotate-btn-icon'); if (ri) { ri.style.transform = 'rotate(0deg)'; }
           showNotification('Mapa resetado (Norte para cima)');
         }
@@ -2301,13 +1799,12 @@ crossorigin="anonymous"></script>
     // BOTÃO ALERTA TOGGLE
     // ===================================================================
     function inicializarBotaoAlertaToggle() {
-      const alertBtn = document.getElementById('btn-alert-toggle');
-      const alertIcon = document.getElementById('alert-toggle-icon');
-      if (!alertBtn) return;
-      alertBtn.addEventListener('click', function() {
+      const ab = document.getElementById('btn-alert-toggle'), ai = document.getElementById('alert-toggle-icon');
+      if (!ab) return;
+      ab.addEventListener('click', function() {
         alertaHabilitado = !alertaHabilitado;
-        if (alertaHabilitado) { alertBtn.classList.remove('alert-off'); if (alertIcon) { alertIcon.src = "/imagens_app/ic_sound_on.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; }; } showNotification("Alerta LIGADO"); }
-        else { alertBtn.classList.add('alert-off'); if (alertIcon) { alertIcon.src = "/imagens_app/ic_sound_off.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; }; } showNotification("Alerta DESLIGADO"); }
+        if (alertaHabilitado) { ab.classList.remove('alert-off'); if (ai) { ai.src = "/imagens_app/ic_sound_on.png"; ai.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; }; } showNotification("Alerta LIGADO"); }
+        else { ab.classList.add('alert-off'); if (ai) { ai.src = "/imagens_app/ic_sound_off.png"; ai.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; }; } showNotification("Alerta DESLIGADO"); }
         esconderAlertaVisual();
       });
     }
@@ -2329,13 +1826,8 @@ crossorigin="anonymous"></script>
             var m = estaEmNavegacao ? startRouteMarker : userMarker;
             if (m) {
               isFollowing = true;
-              if (modoNavegacaoAtivo) {
-                // Em navegação 3D, recentra com offset
-                var centro = calcularCentroMapaComOffset();
-                map.flyTo([centro.lat, centro.lng], zoomAtualNavegacao, { duration: 0.8 });
-              } else {
-                map.setView(m.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 });
-              }
+              if (modoNavegacaoAtivo) { var c = calcularCentroMapaComOffset(); map.flyTo([c.lat, c.lng], zoomAtualNavegacao, { duration: 0.8 }); }
+              else { map.setView(m.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 }); }
               showNotification("Voltando à sua posição atual");
             }
           }
@@ -2346,7 +1838,6 @@ crossorigin="anonymous"></script>
       // EVENTOS DOS BOTÕES
       // ===================================================================
 
-      // Botão "Traçar Rota" — chama sistema 3D completo
       $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
@@ -2357,9 +1848,6 @@ crossorigin="anonymous"></script>
       });
 
       $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
-
-      function fecharTodasBarras() { searchActive = false; routeActive = false; $("#search-bar-radares").classList.remove('active'); $("#search-bar-rota").classList.remove('active'); }
-
       $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
       $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
 
@@ -2367,7 +1855,7 @@ crossorigin="anonymous"></script>
         if (searchActive) { fecharTodasBarras(); return; }
         if (routeActive) routeActive = false;
         searchActive = true;
-        $("#search-bar-rota").removeClass('active'); $("#search-bar-radares").addClass('active');
+        $("#search-bar-rota").classList.remove('active'); $("#search-bar-radares").classList.add('active');
         if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
         setTimeout(function() { $("#query").focus(); }, 300);
       });
@@ -2376,31 +1864,30 @@ crossorigin="anonymous"></script>
         if (routeActive) { fecharTodasBarras(); return; }
         if (searchActive) searchActive = false;
         routeActive = true;
-        $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").addClass('active');
+        $("#search-bar-radares").classList.remove('active'); $("#search-bar-rota").classList.add('active');
         if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
         setTimeout(function() { $("#route-query").focus(); }, 300);
       });
 
+      // ✅ BOTÃO CENTRALIZAR — Agora reseta TUDO e volta ao início
       $("#btn-center").click(function() {
-        fecharTodasBarras(); isFollowing = true;
-        var m = estaEmNavegacao ? startRouteMarker : userMarker;
-        if (m) {
-          if (modoNavegacaoAtivo) {
-            var centro = calcularCentroMapaComOffset();
-            map.flyTo([centro.lat, centro.lng], zoomAtualNavegacao, { duration: 0.5 });
-          } else {
-            map.flyTo(m.getLatLng(), 17, { duration: 0.5 });
-          }
-          showNotification("Centralizando na sua posição");
-        }
-        else { showNotification("Aguardando sinal GPS..."); }
+        resetarTotalMapa();
+        showNotification("Centralizando na sua posição...");
       });
 
-      $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
+      // ✅ BOTÃO REFRESH — Reseta TUDO, volta ao início E recarrega radares
+      $("#btn-refresh").click(function() {
+        resetarTotalMapa();
+        carregarRadares();
+      });
 
-      // Zoom in/out da sidebar: funcionam em TODOS os modos (normal e navegação 3D)
+      // Zoom in/out da sidebar: funcionam em todos os modos
       $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
       $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
+
+      // Zoom flutuante navegação 3D
+      $("#btn-nav-zoom-in").click(function() { if (modoNavegacaoAtivo) { zoomAtualNavegacao = Math.min(zoomAtualNavegacao + 1, 20); map.setZoom(zoomAtualNavegacao); } });
+      $("#btn-nav-zoom-out").click(function() { if (modoNavegacaoAtivo) { zoomAtualNavegacao = Math.max(zoomAtualNavegacao - 1, 14); map.setZoom(zoomAtualNavegacao); } });
 
       inicializarBotaoRotacaoMapa();
       inicializarBotaoAlertaToggle();
@@ -2413,7 +1900,7 @@ crossorigin="anonymous"></script>
     // ===================================================================
     async function carregarRadares() {
       if (!map) return;
-      if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
+      if (radarMarkers.length > 0) { radarMarkers.forEach(function(m) { map.removeLayer(m); }); radarMarkers = []; }
       $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando radares...</div>");
       try {
         var response = await fetch('radares.json?v=' + Date.now());
@@ -2454,7 +1941,7 @@ crossorigin="anonymous"></script>
     function buscarRadares(query) {
       if (!query || query.length < 2) return;
       var encontrou = false; var boundsGroup = L.featureGroup(); var q = query.toLowerCase();
-      radarMarkers.forEach(function(marker) { var d = marker.radarData; if ((d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase().includes(q)) { encontrou = true; boundsGroup.addLayer(marker); marker.openPopup(); } });
+      radarMarkers.forEach(function(m) { var d = m.radarData; if ((d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase().includes(q)) { encontrou = true; boundsGroup.addLayer(m); m.openPopup(); } });
       if (encontrou) { if (map) map.fitBounds(boundsGroup.getBounds().pad(0.2)); isFollowing = false; } else { showNotification("Nenhum radar encontrado para: " + query); }
     }
 
@@ -2474,8 +1961,10 @@ crossorigin="anonymous"></script>
       if (sound) { sound.play().then(function() { sound.pause(); sound.currentTime = 0; }).catch(function() {}); }
       document.removeEventListener('click', desbloquearAudio);
     }, { once: true });
+
     window.onload = initMap;
   </script>
+    
 
 </body>
 </html>
