@@ -434,7 +434,11 @@
       [426, "1719","Av. Juscelino Kubitschek - Via Expressa, 4369","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001042","KBH5301042"," -19.924004, -43.982507"],
       [427, "1720"," Av. Juscelino Kubitschek - Via Expressa, 1990","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001043","KBH5301043","-19.922776, -43.974044"],
       [428, "1721","Av. Antônio Carlos,  Esq. Av. Mal. Experidião Rosa","Detector de Uso de Celular (DUC)","60"," UFMG/Centro","1001044"," KBH5301044"," -19.87137, -43.95507"],
-      [429, "1722"," Av. Antônio Carlos, Esq. Av. Maj. Delfino de Paula","Detector de Uso de Celular (DUC)","60","UFMG/Centro","1001045"," KBH5301044","-19.87491, -43.95370"]
+      [429, "1722"," Av. Antônio Carlos, Esq. Av. Maj. Delfino de Paula","Detector de Uso de Celular (DUC)","60","UFMG/Centro","1001045"," KBH5301044","-19.87491, -43.95370"],
+      [430, "1723","Rodovia BR-356, Próx. Anel Rodoviário ","Controlador Eletrônico de Velocidade (CEV)","80","BH Shopping/Rio de Janeiro","1001046","KBH5301046"," -19.99547, -43.96078"],
+      [431, "1724","Anel Rodoviário, Próx. Rodovia BR-356","Controlador Eletrônico de Velocidade (CEV)","70","Rio de Janeiro/ BH Shopping","1001047","KBH5301047","-19.99729, -43.96156"]
+
  
+
     ]
   }
