@@ -831,6 +831,7 @@ crossorigin="anonymous"></script>
 
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
+
   <script>
     // ===================================================================
     // VARIÁVEIS GLOBAIS
@@ -928,13 +929,17 @@ crossorigin="anonymous"></script>
     var timeoutZoomPanoramico = null;
     var ultimaVelocidadeZoom = 0;
 
-    // ✅ NOVAS VARIÁVEIS DE ESTADO PARA SUAVIZAÇÃO DA CÂMERA
+    // ✅ VARIÁVEIS DE ESTADO PARA SUAVIZAÇÃO DA CÂMERA
     var zoomAlvo = 19;
     var pitchAlvo = 55;
     var centroAlvo = { lat: null, lng: null };
     var animacaoCameraAtiva = false;
     var ultimaChamadaPan = 0;
-    var DEBOUNCE_PAN = 100; // ms mínimo entre chamadas panTo
+    var DEBOUNCE_PAN = 100;
+
+    // ✅ NOVO: Variáveis para posição alvo e animação da navegação
+    var ultimaPosicaoAlvoNavegacao = { lat: null, lng: null };
+    var animacaoNavegacaoAtiva = false;
 
     const iconMap = {
       'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
@@ -1283,15 +1288,45 @@ crossorigin="anonymous"></script>
       }
     }
 
+    // ✅ CORREÇÃO 5: SUBSTITUIR adicionarMarcadoresRota3D() — Ícone sem rotação CSS
     function adicionarMarcadoresRota3D(oL, oN, dL, dN) {
       if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
       if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
       if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
-      estaEmNavegacao = true; ultimaPosicaoMarcador = { lat: null, lng: null };
-      var si = L.divIcon({ html: '<div id="icone-navegacao-3d" class="icone-navegacao-container"><img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;transform-origin:center center;" id="img-navegacao-3d" alt="navegacao"></div>', className: 'route-start-marker-3d', iconSize: [50, 50], iconAnchor: [25, 25], popupAnchor: [0, -25] });
+      
+      estaEmNavegacao = true;
+      ultimaPosicaoMarcador = { lat: null, lng: null };
+      ultimaPosicaoAlvoNavegacao = { lat: null, lng: null };
+      animacaoNavegacaoAtiva = false;
+      
+      // ✅ Ícone SEM transform rotate — fica sempre vertical/norte
+      // O mapa gira embaixo via setBearing(), então o ícone aponta para cima fixo
+      var si = L.divIcon({
+        html: '<div id="icone-navegacao-3d" class="icone-navegacao-container">' +
+              '<img src="/imagens_app/ic_navigator_map.png" ' +
+              'onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" ' +
+              'style="width:50px;height:50px;transform:none;" ' + // ✅ SEM rotate
+              'id="img-navegacao-3d" alt="navegacao">' +
+              '</div>',
+        className: 'route-start-marker-3d',
+        iconSize: [50, 50],
+        iconAnchor: [25, 25],
+        popupAnchor: [0, -25]
+      });
+      
       startRouteMarker = L.marker([oL, oN], { icon: si, zIndexOffset: 2000 }).addTo(map);
       window.iconeNavegacao3D = document.getElementById('img-navegacao-3d');
-      var ei = L.divIcon({ html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'route-end-marker-3d', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50] });
+      
+      var ei = L.divIcon({
+        html: '<img src="/imagens_app/ic_icon_chegada.png" ' +
+              'onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" ' +
+              'style="width:50px;height:50px;">',
+        className: 'route-end-marker-3d',
+        iconSize: [50, 50],
+        iconAnchor: [25, 50],
+        popupAnchor: [0, -50]
+      });
+      
       endRouteMarker = L.marker([dL, dN], { icon: ei, zIndexOffset: 1500 }).addTo(map);
       endRouteMarker.bindPopup("<b>📍 DESTINO</b><br>Você chegou!", { closeButton: false, autoClose: true, closeOnClick: true });
     }
@@ -1331,8 +1366,7 @@ crossorigin="anonymous"></script>
       estaFazendoSnap = true;
       indicePontoMaisProximo = im;
       
-      // ✅ CORREÇÃO: Fator de suavização mais conservador (0.5 em vez de 0.7)
-      // Isso evita que o carro "pule" entre posição real e posição da rota
+      // ✅ CORREÇÃO: Fator de suavização mais conservador
       var fs = Math.min(md / 30, 0.6); // Máximo 60% de interpolação
       
       return {
@@ -1344,7 +1378,7 @@ crossorigin="anonymous"></script>
 
     function projetarPontoNaLinha(px, py, x1, y1, x2, y2) { var A = px - x1, B = py - y1, C = x2 - x1, D = y2 - y1, dot = A * C + B * D, ls = C * C + D * D, p = -1; if (ls !== 0) p = dot / ls; if (p < 0) return { lat: x1, lng: y1 }; if (p > 1) return { lat: x2, lng: y2 }; return { lat: x1 + p * C, lng: y1 + p * D }; }
 
-    // ✅ CORREÇÃO 5: SUBSTITUIR processarNovaPosicao3D() — Posição mais suave
+    // ✅ CORREÇÃO 2: SUBSTITUIR processarNovaPosicao3D() — Marcador deslizando suavemente
     function processarNovaPosicao3D(nL, nN, sK, hH) {
       velocidadeAtual = sK || 0;
       hardwareHeading = hH;
@@ -1353,8 +1387,7 @@ crossorigin="anonymous"></script>
       if (posicaoSuavizadaGPS.lat === null) {
         posicaoSuavizadaGPS = { lat: nL, lng: nN };
       } else {
-        // ✅ Fator de suavização mais forte para posição (0.25 em vez de 0.15)
-        // Isso filtra ruído do GPS sem causar lag perceptível
+        // Suavização forte para filtrar ruído do GPS
         posicaoSuavizadaGPS.lat = posicaoSuavizadaGPS.lat * 0.75 + nL * 0.25;
         posicaoSuavizadaGPS.lng = posicaoSuavizadaGPS.lng * 0.75 + nN * 0.25;
       }
@@ -1385,27 +1418,95 @@ crossorigin="anonymous"></script>
       // Suaviza heading
       headingSuavizado = suavizarHeading(headingSuavizado, hN);
       
-      // Atualiza marcador de navegação
+      // ✅ CORREÇÃO: Usa moverMarcadorSuavemente para DESLIZAR o ícone
+      // em vez de setLatLng direto que causa salto
       if (modoNavegacaoAtivo && startRouteMarker) {
-        startRouteMarker.setLatLng([lS, gS]);
-        atualizarRotacaoIconeNavegacao();
+        // Guarda a posição alvo para a animação
+        ultimaPosicaoAlvoNavegacao = { lat: lS, lng: gS };
+        
+        // Inicia animação suave se não estiver já animando
+        if (!animacaoNavegacaoAtiva) {
+          animarMarcadorNavegacaoSuave();
+        }
       }
       
       userLat = nL;
       userLng = nN;
       
-      // ✅ A câmera agora é atualizada pelo loop de animação, não aqui
-      // Isso evita chamadas concorrentes
-      
+      // Câmera atualizada pelo loop de animação
       if (destinoAtual && routingControl) atualizarRota3D();
       if (destinoAtual) verificarChegadaDestino3D();
+    }
+
+    // ✅ NOVO: Animação suave do marcador de navegação (igual ao GPS marker)
+    function animarMarcadorNavegacaoSuave() {
+      if (!modoNavegacaoAtivo || !startRouteMarker || ultimaPosicaoAlvoNavegacao.lat === null) {
+        animacaoNavegacaoAtiva = false;
+        return;
+      }
       
-      ultimaPosicaoMarcador = { lat: nL, lng: nN };
+      var targetLat = ultimaPosicaoAlvoNavegacao.lat;
+      var targetLng = ultimaPosicaoAlvoNavegacao.lng;
+      
+      // Se é a primeira vez, posiciona direto
+      if (ultimaPosicaoMarcador.lat === null) {
+        startRouteMarker.setLatLng([targetLat, targetLng]);
+        ultimaPosicaoMarcador = { lat: targetLat, lng: targetLng };
+        animacaoNavegacaoAtiva = false;
+        return;
+      }
+      
+      var distancia = calcularDistancia(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng);
+      
+      // Se mudou pouco, não anima
+      if (distancia < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) {
+        animacaoNavegacaoAtiva = false;
+        return;
+      }
+      
+      animacaoNavegacaoAtiva = true;
+      var inicioLat = ultimaPosicaoMarcador.lat;
+      var inicioLng = ultimaPosicaoMarcador.lng;
+      var duracao = 400; // um pouco mais lento que o GPS (300ms) para mais suavidade
+      var inicioTempo = performance.now();
+      
+      function animarFrame(tempoAtual) {
+        if (!modoNavegacaoAtivo) {
+          animacaoNavegacaoAtiva = false;
+          return;
+        }
+        
+        var progresso = Math.min((tempoAtual - inicioTempo) / duracao, 1);
+        // Easing suave: ease-out-cubic
+        var easing = 1 - Math.pow(1 - progresso, 3);
+        
+        var novaLat = inicioLat + (targetLat - inicioLat) * easing;
+        var novaLng = inicioLng + (targetLng - inicioLng) * easing;
+        
+        startRouteMarker.setLatLng([novaLat, novaLng]);
+        
+        // Atualiza a posição do marcador durante a animação para a câmera seguir
+        ultimaPosicaoMarcador = { lat: novaLat, lng: novaLng };
+        
+        if (progresso < 1) {
+          requestAnimationFrame(animarFrame);
+        } else {
+          ultimaPosicaoMarcador = { lat: targetLat, lng: targetLng };
+          animacaoNavegacaoAtiva = false;
+          
+          // Se chegou nova posição enquanto animava, anima de novo
+          if (ultimaPosicaoAlvoNavegacao.lat !== targetLat || ultimaPosicaoAlvoNavegacao.lng !== targetLng) {
+            animarMarcadorNavegacaoSuave();
+          }
+        }
+      }
+      
+      requestAnimationFrame(animarFrame);
     }
 
     function suavizarHeading(hA, hN) { var d = hN - hA; while (d > 180) d -= 360; while (d < -180) d += 360; var r = hA + d * FATOR_SUAVIZACAO_HEADING; while (r < 0) r += 360; while (r >= 360) r -= 360; return r; }
     
-    // ✅ CORREÇÃO 1: SUBSTITUIR atualizarRotacaoIconeNavegacao() — Ícone alinhado à rota
+    // ✅ CORREÇÃO 1: SUBSTITUIR atualizarRotacaoIconeNavegacao() — Ícone sempre vertical
     function atualizarRotacaoIconeNavegacao() {
       var img = window.iconeNavegacao3D;
       if (!img) {
@@ -1414,59 +1515,77 @@ crossorigin="anonymous"></script>
       }
       if (!img) return;
       
-      // ✅ CORREÇÃO: O ícone aponta na direção ABSOLUTA do heading (como no Waze)
-      // Não calcula diferença com o segmento — isso causava desalinhamento
-      img.style.transform = 'rotate(' + headingSuavizado + 'deg)';
+      // ✅ Ícone SEMPRE aponta para cima (norte/vertical)
+      // O próprio mapa gira via setBearing(), então o ícone não precisa rotacionar
+      img.style.transform = 'rotate(0deg)';
     }
     
     function obterHeadingProximoSegmento() { if (!pontosRota || pontosRota.length < 2) return headingSuavizado; var i = Math.min(indicePontoMaisProximo, pontosRota.length - 2); return calcularBearing(pontosRota[i].lat, pontosRota[i].lng, pontosRota[i+1].lat, pontosRota[i+1].lng); }
 
-    // ✅ CORREÇÃO 3: SUBSTITUIR atualizarCamera3D() — Câmera fluida sem tremedeira
+    // ✅ CORREÇÃO 3: SUBSTITUIR atualizarCamera3DSuave() — Câmera segue o marcador suavizado
     function atualizarCamera3DSuave() {
       if (!modoNavegacaoAtivo || !isFollowing) return;
       
-      // 1. Calcula zoom e pitch alvo baseado na velocidade
+      // 1. Calcula zoom e pitch alvo
       var zoomDesejado = calcularZoomPorVelocidade();
       var pitchDesejado = calcularPitchPorVelocidade();
       
-      // 2. Suaviza zoom (transição gradual, nunca salta)
-      zoomAlvo = zoomAlvo * 0.92 + zoomDesejado * 0.08;
-      var zoomArredondado = Math.round(zoomAlvo * 10) / 10; // 1 casa decimal para suavidade
+      // 2. Suaviza zoom (transição muito gradual)
+      zoomAlvo = zoomAlvo * 0.95 + zoomDesejado * 0.05;
+      var zoomArredondado = Math.round(zoomAlvo * 10) / 10;
       
       // 3. Suaviza pitch
-      pitchAlvo = pitchAlvo * 0.9 + pitchDesejado * 0.1;
+      pitchAlvo = pitchAlvo * 0.92 + pitchDesejado * 0.08;
       
-      // 4. Calcula centro com offset do carro
-      var c = calcularCentroMapaComOffsetSuave();
+      // 4. ✅ Usa a posição ATUAL do marcador (suavizada pela animação)
+      //    em vez da posição GPS bruta
+      var latCam = ultimaPosicaoMarcador.lat || posicaoSuavizadaGPS.lat || userLat;
+      var lngCam = ultimaPosicaoMarcador.lng || posicaoSuavizadaGPS.lng || userLng;
       
-      // 5. Aplica zoom apenas se mudou significativamente (> 0.3)
+      // 5. Calcula centro com offset baseado na posição do marcador
+      var c = calcularCentroMapaComOffsetParaCoordenadas(latCam, lngCam);
+      
+      // 6. Aplica zoom apenas se mudou significativamente
       var zoomAtual = map.getZoom();
       if (Math.abs(zoomArredondado - zoomAtual) > 0.3) {
-        map.setZoom(zoomArredondado, { animate: true, duration: 1.2 });
+        map.setZoom(zoomArredondado, { animate: true, duration: 2.0 });
       }
       
-      // 6. Aplica pitch com CSS transition suave
+      // 7. Aplica pitch com CSS transition
       aplicarPitch3DSuave(pitchAlvo);
       
-      // 7. Move o mapa com debounce — EVITA TREMEDEIRA
+      // 8. ✅ Move o mapa SEMPRE que o marcador moveu (sem debounce agressivo)
+      //    mas com duração longa para suavidade
       var agora = Date.now();
-      if (agora - ultimaChamadaPan > DEBOUNCE_PAN) {
+      if (agora - ultimaChamadaPan > 50) { // 50ms = 20fps
         ultimaChamadaPan = agora;
         map.panTo([c.lat, c.lng], { 
           animate: true, 
-          duration: 0.6, 
-          easeLinearity: 0.5,
-          noMoveStart: true // ✅ Evita eventos desnecessários que causam repuxo
+          duration: 0.8, // mais longo = mais suave
+          easeLinearity: 0.3, // curva mais suave
+          noMoveStart: true
         });
       }
       
-      // 8. Rotação do mapa (bearing) — suavizada
+      // 9. Rotação do mapa (bearing)
       if (velocidadeAtual > 3 || contadorFramesEstaveis > 30) {
         if (typeof map.setBearing === 'function') {
           map.setBearing(headingSuavizado);
         }
       }
       contadorFramesEstaveis++;
+    }
+
+    // ✅ NOVO: Calcula centro com offset para coordenadas específicas
+    function calcularCentroMapaComOffsetParaCoordenadas(lat, lng) {
+      var h = calcularAlturaTelaEmMetros(zoomAlvo);
+      var o = h * (OFFSET_CARRO_VERTICAL - 0.5);
+      var r = (headingSuavizado - 180) * Math.PI / 180;
+      
+      return {
+        lat: lat + (o * Math.cos(r)) / 111320,
+        lng: lng + (o * Math.sin(r)) / (111320 * Math.cos(lat * Math.PI / 180))
+      };
     }
 
     // Mantém função antiga como alias para compatibilidade
@@ -1478,13 +1597,13 @@ crossorigin="anonymous"></script>
     function calcularPitchPorVelocidade() { if (velocidadeAtual < 5) return PITCH_PARADO; if (velocidadeAtual < 40) return PITCH_PADRAO; if (velocidadeAtual < 80) return PITCH_MOVIMENTO; return PITCH_ALTA_VELOCIDADE; }
     function aguardarMovimentoParaZoom3D() { var m = false; var c = setInterval(function() { if (!modoNavegacaoAtivo) { clearInterval(c); return; } if (velocidadeAtual > 5 && !m) { m = true; clearInterval(c); showNotification("🚗 Partida detectada!"); iniciarZoomDinamico3D(); } }, 500); }
     
-    // ✅ CORREÇÃO 2: SUBSTITUIR iniciarZoomDinamico3D() — Loop suave com requestAnimationFrame
+    // ✅ CORREÇÃO 4: SUBSTITUIR iniciarZoomDinamico3D() — Loop mais fluido
     function iniciarZoomDinamico3D() {
       if (intervaloZoomDinamico) cancelAnimationFrame(intervaloZoomDinamico);
       
       var ultimoTempo = performance.now();
       var tempoAcumulado = 0;
-      var INTERVALO_ATUALIZACAO = 50; // 20fps é suficiente para GPS
+      var INTERVALO_ATUALIZACAO = 33; // ~30fps para máxima suavidade
       
       function loopAnimacao(tempoAtual) {
         if (!modoNavegacaoAtivo) {
@@ -1496,7 +1615,6 @@ crossorigin="anonymous"></script>
         ultimoTempo = tempoAtual;
         tempoAcumulado += delta;
         
-        // ✅ Atualiza a cada 50ms (20fps) — evita sobrecarga e tremedeira
         if (tempoAcumulado >= INTERVALO_ATUALIZACAO) {
           tempoAcumulado = 0;
           atualizarCamera3DSuave();
@@ -1511,20 +1629,23 @@ crossorigin="anonymous"></script>
     function atualizarRota3D() { if (!destinoAtual || !routingControl) return; var lo = posicaoSuavizadaGPS.lat || userLat, ln = posicaoSuavizadaGPS.lng || userLng; routingControl.setWaypoints([L.latLng(lo, ln), L.latLng(destinoAtual.lat, destinoAtual.lng)]); }
     function verificarChegadaDestino3D() { if (!destinoAtual) return; var d = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng); if (d <= 30) { showNotification("🎉 Você chegou ao destino!"); if (endRouteMarker) endRouteMarker.openPopup(); setTimeout(function() { finalizarNavegacao3D(); }, 4000); } }
 
-    // ✅ CORREÇÃO 7: SUBSTITUIR finalizarNavegacao3D() — Limpeza do loop
+    // ✅ CORREÇÃO 6: SUBSTITUIR finalizarNavegacao3D() — Limpeza completa
     function finalizarNavegacao3D() {
       modoNavegacaoAtivo = false;
       estaEmNavegacao = false;
       estaEmMovimento = false;
       velocidadeAtual = 0;
       
-      // ✅ Cancela o loop de animação em vez de clearInterval
       if (intervaloZoomDinamico) {
         cancelAnimationFrame(intervaloZoomDinamico);
         intervaloZoomDinamico = null;
       }
       
-      // Remove CSS transitions ao sair da navegação
+      // Limpa variáveis de animação
+      ultimaPosicaoAlvoNavegacao = { lat: null, lng: null };
+      animacaoNavegacaoAtiva = false;
+      
+      // Remove CSS transitions
       var mc = document.querySelector('.leaflet-map-pane');
       if (mc) mc.style.transition = '';
       var tp = document.querySelector('.leaflet-tile-pane');
@@ -1555,7 +1676,7 @@ crossorigin="anonymous"></script>
       pitchAlvo = 55;
       
       if (typeof map.setBearing === 'function') map.setBearing(0);
-      aplicarPitch3D(); // Volta ao pitch normal
+      aplicarPitch3D();
       
       var ri = document.getElementById('rotate-btn-icon');
       if (ri) ri.style.transform = 'rotate(0deg)';
@@ -1567,14 +1688,15 @@ crossorigin="anonymous"></script>
 
       map.flyTo([userLat, userLng], 17, { duration: 1 });
       
-      if (posicaoSuavizada && posicaoSuavizada.lat !== null) {
-        ultimaPosicaoMarcador.lat = posicaoSuavizada.lat;
-        ultimaPosicaoMarcador.lng = posicaoSuavizada.lng;
-      } else {
-        ultimaPosicaoMarcador = { lat: null, lng: null };
-      }
+      ultimaPosicaoMarcador = { lat: null, lng: null };
       
-      var di = L.divIcon({ html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50] });
+      var di = L.divIcon({
+        html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+        className: 'user-gps-marker',
+        iconSize: [50, 50],
+        iconAnchor: [25, 50],
+        popupAnchor: [0, -50]
+      });
       
       userMarker = L.marker([userLat, userLng], { icon: di, zIndexOffset: 1000 }).addTo(map);
       userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
@@ -1827,7 +1949,7 @@ crossorigin="anonymous"></script>
             var m = estaEmNavegacao ? startRouteMarker : userMarker;
             if (m) {
               isFollowing = true;
-              if (modoNavegacaoAtivo) { var c = calcularCentroMapaComOffsetSuave(); map.flyTo([c.lat, c.lng], zoomAtualNavegacao, { duration: 0.8 }); }
+              if (modoNavegacaoAtivo) { var c = calcularCentroMapaComOffsetParaCoordenadas(ultimaPosicaoMarcador.lat || userLat, ultimaPosicaoMarcador.lng || userLng); map.flyTo([c.lat, c.lng], zoomAtualNavegacao, { duration: 0.8 }); }
               else { map.setView(m.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 }); }
               showNotification("Voltando à sua posição");
             }
