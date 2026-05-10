@@ -34,214 +34,337 @@ crossorigin="anonymous"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
   
 <style>
-  /* ===================================================================
-     VARIÁVEIS DE TEMA
-  =================================================================== */
-  :root {
-    --bg-color: #0f1115;
-    --panel-color: #1a1d24;
-    --accent-color: #00ff88;
-    --alert-color: #ff3333;
-    --text-main: #ffffff;
-    --text-muted: #a0a0a0;
-    --sidebar-width: 68px;
-    --btn-size: 50px;
-  }
+    /* ===================================================================
+       VARIÁVEIS DE TEMA (cores globais do app)
+    =================================================================== */
+    :root {
+        --bg-color: #0f1115;
+        --panel-color: #1a1d24;
+        --accent-color: #00ff88;
+        --alert-color: #ff3333;
+        --text-main: #ffffff;
+        --text-muted: #a0a0a0;
+        --sidebar-width: 68px;
+        --btn-size: 50px;
+    }
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-  }
+    /* ===================================================================
+       RESET GLOBAL — remove paddings/margins padrão do navegador
+    =================================================================== */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+    }
 
-  body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+    /* ===================================================================
+       BODY — layout principal em coluna, tela cheia, sem scroll
+    =================================================================== */
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
 
-  /* ===================================================================
-     HEADER
-  =================================================================== */
-  header {
-    background-color: var(--panel-color);
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 2px solid var(--accent-color);
-    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
-    z-index: 1000;
-    position: relative;
-  }
+    /* ===================================================================
+       HEADER — barra superior com logo, título e botão menu
+    =================================================================== */
+    header {
+        background-color: var(--panel-color);
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 2px solid var(--accent-color);
+        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
+        z-index: 1000;
+    }
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-  .app-icon {
-    width: 50px;
-    height: 40px;
-    border-radius: 8px;
-    object-fit: contain;
-  }
+    .app-icon {
+        width: 50px;
+        height: 40px;
+        border-radius: 8px;
+        object-fit: contain;
+    }
 
-  h1 {
-    font-size: 1.2rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+    h1 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
 
-  h1 span {
-    color: var(--accent-color);
-  }
+    h1 span {
+        color: var(--accent-color);
+    }
 
-  /* ===================================================================
-     BOTÃO MENU TOGGLE
-  =================================================================== */
-  .btn-menu-toggle {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    background: none;
-    border: 1.5px solid rgba(0, 255, 136, 0.3);
-    border-radius: 10px;
-    padding: 8px 14px 6px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    user-select: none;
-    -webkit-user-select: none;
-  }
+    /* ===================================================================
+       BOTÃO MENU TOGGLE — hamburger animado com label "MENU"
+       Ao clicar, as 3 barras viram um "X" via transform
+    =================================================================== */
+    .btn-menu-toggle {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        background: none;
+        border: 1.5px solid rgba(0, 255, 136, 0.3);
+        border-radius: 10px;
+        padding: 8px 14px 6px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        user-select: none;
+        -webkit-user-select: none;
+    }
 
-  .btn-menu-toggle:hover {
-    border-color: var(--accent-color);
-    background: rgba(0, 255, 136, 0.06);
-  }
+    .btn-menu-toggle:hover {
+        border-color: var(--accent-color);
+        background: rgba(0, 255, 136, 0.06);
+    }
 
-  .btn-menu-toggle:active {
-    transform: scale(0.93);
-  }
+    .btn-menu-toggle:active {
+        transform: scale(0.93);
+    }
 
-  .menu-hamburger {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: 22px;
-  }
+    .menu-hamburger {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 22px;
+    }
 
-  .menu-hamburger span {
-    display: block;
-    height: 2.5px;
-    width: 100%;
-    background-color: var(--accent-color);
-    border-radius: 2px;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: center;
-  }
+    .menu-hamburger span {
+        display: block;
+        height: 2.5px;
+        width: 100%;
+        background-color: var(--accent-color);
+        border-radius: 2px;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-origin: center;
+    }
 
-  .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
-    transform: translateY(6.5px) rotate(45deg);
-  }
+    /* Animação do X quando o menu está ativo */
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+        transform: translateY(6.5px) rotate(45deg);
+    }
 
-  .btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
-  }
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+    }
 
-  .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
-    transform: translateY(-6.5px) rotate(-45deg);
-  }
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+        transform: translateY(-6.5px) rotate(-45deg);
+    }
 
-  .menu-label {
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--accent-color);
-    text-transform: uppercase;
-    line-height: 1;
-    margin-top: 2px;
-  }
+    .menu-label {
+        font-size: 0.55rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: var(--accent-color);
+        text-transform: uppercase;
+        line-height: 1;
+        margin-top: 2px;
+    }
 
-  /* ===================================================================
-     MAIN CONTAINER — envolve mapa + overlays absolutos
-  =================================================================== */
-  .main-container {
+    /* ===================================================================
+       SIDEBAR CONTROLS — barra vertical à direita com botões de mapa
+       Pode ser retraída via classe .retracted (translateX para fora)
+    =================================================================== */
+    .sidebar-controls {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: var(--sidebar-width);
+        z-index: 500;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 20px 0;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(0);
+    }
+
+    .sidebar-controls.retracted {
+        transform: translateX(calc(var(--sidebar-width) + 10px));
+    }
+
+    /* Botões dentro da sidebar — visibilidade controlada pela retração */
+    .sidebar-controls .map-btn {
+        width: var(--btn-size);
+        height: var(--btn-size);
+        opacity: 1;
+        transition: opacity 0.25s ease 0s, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .sidebar-controls.retracted .map-btn {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease 0s, transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    /* ===================================================================
+       BARRAS DE BUSCA — search-container para radares e rotas
+       Max-height: 0 quando fechada, 90px quando .active
+       Desliza para baixo com transição suave
+    =================================================================== */
+    .search-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(26, 29, 36, 0.98);
+        backdrop-filter: blur(8px);
+        display: flex;
+        gap: 12px;
+        z-index: 1000;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        padding: 0 15px;
+        border-bottom: 1px solid transparent;
+        transition: all 0.3s ease;
+        align-items: center;
+    }
+
+    .search-container.active {
+        max-height: 90px;
+        opacity: 1;
+        padding: 15px;
+        border-bottom: 1px solid #333;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Input de busca — cantos arredondados, fundo preto */
+    .search-container input {
+        flex: 1;
+        padding: 14px 20px;
+        border-radius: 30px;
+        border: 1px solid #444;
+        background-color: #000;
+        color: #fff;
+        font-size: 1rem;
+        outline: none;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .search-container input:focus {
+        border-color: var(--accent-color);
+    }
+
+    /* Botão circular de buscar dentro da barra */
+    .btn-search {
+        position: relative;
+        flex-shrink: 0;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        background: rgba(46, 102, 158, 0.95);
+        box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5);
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .btn-search:active {
+        transform: scale(0.9);
+    }
+
+    .btn-search img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+        display: block;
+        transform: translate(-50%, -50%);
+    }
+
+   /* ===================================================================
+   MAP-WRAPPER — container flexível que segura o mapa e overlays
+   Ocupa todo o espaço restante abaixo do header
+=================================================================== */
+.map-wrapper {
     position: relative;
     flex: 1;
     display: flex;
     overflow: hidden;
     width: 100%;
-  }
+}
 
-  /* ===================================================================
-     MAP-WRAPPER — apenas o mapa Leaflet
-  =================================================================== */
-  .map-wrapper {
-    position: relative;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  /* ===================================================================
-     MAPA LEAFLET
-  =================================================================== */
-  #map {
+/* Mapa Leaflet — preenche todo o wrapper */
+#map {
     width: 100%;
     height: 100%;
     background-color: #2a2a2a;
     z-index: 1;
-  }
+    position: relative; 
+}
 
-  /* ===================================================================
-     OVERLAYS ABSOLUTOS — FORA do fluxo do mapa, acima de tudo
-     Todos com z-index altíssimo, isolados em contexto próprio
-  =================================================================== */
-  .overlay-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 999999;
-    /* Isolamento completo do contexto de empilhamento */
-    isolation: isolate;
-  }
+/* ===================================================================
+   ISOLAR PANES DO LEAFLET — NENHUM FICA ACIMA DA BÚSSOLA
+   =================================================================== */
+.leaflet-pane,
+.leaflet-map-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-popup-pane,
+.leaflet-tooltip-pane {
+    z-index: 1 !important; 
+}
 
-  .overlay-layer > * {
-    pointer-events: auto;
-  }
+/* O painel de controles do Leaflet é o principal culpado por aparecer atrás da bússola */
+.leaflet-control-pane,
+.leaflet-top,
+.leaflet-bottom {
+    z-index: 2 !important; /* Fica acima dos tiles, mas muito abaixo da bússola */
+}
 
-  /* ===================================================================
-     BÚSSOLA — dentro de overlay-layer, garantidamente acima
-  =================================================================== */
-  .compass-widget {
+/* ===================================================================
+   BÚSSOLA — BARRERA FÍSICA INVISÍVEL PARA NADA APARECER ATRÁS
+   =================================================================== */
+.compass-widget {
     position: absolute;
     top: 20px;
     left: 5px;
     width: 65px;
     height: 65px;
-    z-index: 999999;
+    z-index: 999999 !important;
+    
     display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    /* Forçar composição em layer separado */
-    transform: translateZ(0);
-    will-change: transform;
-  }
+    
+    /* --- A SOLUÇÃO PARA O PROBLEMA DO CLICK --- */
+    /* Cria uma barreira invisível que impede renderização de itens do mapa atrás dela */
+    background: transparent; 
+    isolation: isolate; /* Cria um contexto de empilhamento intocável */
+    -webkit-backdrop-filter: blur(0px); /* Força a GPU a renderizar isso acima de tudo no Leaflet */
+    backdrop-filter: blur(0px);
+}
 
-  .compass-base {
+/* Base da bússola */
+.compass-base {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -251,618 +374,496 @@ crossorigin="anonymous"></script>
     background-repeat: no-repeat;
     background-position: center;
     opacity: 0.9;
-  }
+}
 
-  .compass-needle {
+/* Ponteiro da bússola */
+.compass-needle {
     position: absolute;
     width: 55%;
     height: 55%;
-    z-index: 2;
+    z-index: 2; 
     object-fit: contain;
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
+}
 
-  /* ===================================================================
-     TOAST — dentro de overlay-layer
-  =================================================================== */
-  .toast-notification {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    background-color: rgba(20, 20, 20, 0.95);
-    color: var(--text-main);
-    padding: 12px 25px;
-    border-radius: 50px;
-    border: 1px solid #444;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-    z-index: 999999;
-    opacity: 0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-align: center;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    white-space: nowrap;
-  }
+/* ===================================================================
+   REGRAS DE SEGURANÇA (Caso a bússola seja injetada dentro do #map via JS)
+   =================================================================== */
+#map > .compass-widget,
+#map .compass-widget {
+    position: absolute !important;
+    z-index: 999999 !important;
+    transform: none !important; /* Impede que o Leaflet quebre o z-index com transform */
+}
+    /* ===================================================================
+       MAP-BTN — estilo base para todos os botões redondos do mapa
+    =================================================================== */
+    .map-btn {
+        width: var(--btn-size);
+        height: var(--btn-size);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+        background: rgba(20, 20, 20, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
 
-  .toast-notification.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+    .map-btn:hover {
+        transform: scale(1.08);
+        border-color: var(--accent-color);
+    }
 
-  /* ===================================================================
-     SPEED WIDGET — dentro de overlay-layer
-  =================================================================== */
-  .speed-widget {
-    position: absolute;
-    bottom: -15px;
-    left: -25px;
-    width: 150px;
-    height: 150px;
-    z-index: 999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-  }
+    .map-btn:active {
+        transform: scale(0.92);
+    }
 
-  .speed-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    pointer-events: none;
-  }
+    .map-btn img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        pointer-events: none;
+    }
 
-  .speed-value {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-64%, -60%);
-    font-size: 28px;
-    font-weight: 700;
-    font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-    color: #000;
-    line-height: 1;
-    z-index: 2;
-    white-space: nowrap;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.5px;
-    min-width: 3ch;
-  }
+    /* ===================================================================
+       BOTÃO ALERTA TOGGLE — estados LIGADO/DESLIGADO
+    =================================================================== */
+    .alert-toggle-btn {
+        background: rgba(29, 28, 28, 0.9);
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
+    }
 
-  /* ===================================================================
-     ALERT CONTAINER — dentro de overlay-layer
-  =================================================================== */
-  #alert-container {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999999;
-    display: none;
-    animation: slideUp 0.3s ease-out;
-    pointer-events: none;
-  }
+    .alert-toggle-btn.alert-off {
+        background: rgba(222, 127, 127, 0.9);
+        border-color: #888;
+    }
 
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-  }
+    .alert-toggle-btn.alert-off img {
+        filter: rgba(225, 82, 82, 0.9);
+    }
 
-  @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); background: linear-gradient(90deg, #ff2200, #ee0000); }
-    100% { transform: scale(1); }
-  }
+    .alert-toggle-btn img {
+        transition: all 0.3s ease;
+    }
 
-  .alert-bar {
-    background: linear-gradient(90deg, #cc0000, #990000);
-    color: white;
-    padding: 18px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
-    border-top: 2px solid #ff5555;
-    transition: all 0.2s ease;
-  }
+    .sidebar-controls .map-btn {
+        border: 1px solid rgba(0, 255, 136, 0.35);
+    }
 
-  .alert-bar-critico {
-    animation: pulse 0.8s ease-in-out infinite;
-  }
+    #btn-route-bar {
+        width: 54px;
+        height: 54px;
+    }
 
-  .alert-bar img {
-    width: 50px;
-    height: 50px;
-    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
-  }
+    /* ===================================================================
+       CSS do botão de rotação — feedback visual + ícone girante
+    =================================================================== */
+    #btn-rotate-map {
+        transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    }
 
-  .alert-info h3 {
-    font-size: 1.2rem;
-    margin-bottom: 3px;
-    text-transform: uppercase;
-    font-weight: 800;
-  }
+    #btn-rotate-map.rotated {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
+        background-color: rgba(0, 255, 136, 0.08);
+    }
 
-  .alert-info p {
-    font-size: 0.95rem;
-    opacity: 0.95;
-  }
+    #btn-rotate-map.rotated img {
+        filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5));
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
+    }
 
-  /* ===================================================================
-     SIDEBAR CONTROLS — dentro de overlay-layer
-  =================================================================== */
-  .sidebar-controls {
-    position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: var(--sidebar-width);
-    z-index: 999999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 20px 0;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(0);
-  }
+    #btn-rotate-map:not(.rotated) img {
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
+    }
 
-  .sidebar-controls.retracted {
-    transform: translateX(calc(var(--sidebar-width) + 10px));
-  }
+    /* ===================================================================
+       MARCADORES DE USUÁRIO E NAVEGAÇÃO
+    =================================================================== */
+    .user-gps-marker,
+    .user-navigator-marker {
+        background: transparent !important;
+        border: none !important;
+    }
 
-  .sidebar-controls .map-btn {
-    width: var(--btn-size);
-    height: var(--btn-size);
-    opacity: 1;
-    transition: opacity 0.25s ease 0s, transform 0.2s ease, border-color 0.2s ease;
-  }
+    .user-gps-marker img,
+    .user-navigator-marker img {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        transition: none !important;
+        will-change: transform;
+    }
 
-  .sidebar-controls.retracted .map-btn {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.15s ease 0s, transform 0.2s ease, border-color 0.2s ease;
-  }
+    .route-start-marker {
+        background: transparent !important;
+        border: none !important;
+    }
 
-  /* ===================================================================
-     BARRAS DE BUSCA — dentro de overlay-layer
-  =================================================================== */
-  .search-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(26, 29, 36, 0.98);
-    backdrop-filter: blur(8px);
-    display: flex;
-    gap: 12px;
-    z-index: 999999;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    padding: 0 15px;
-    border-bottom: 1px solid transparent;
-    transition: all 0.3s ease;
-    align-items: center;
-  }
+    .route-start-marker img {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        animation: pulseStart 1s ease-in-out infinite;
+    }
 
-  .search-container.active {
-    max-height: 90px;
-    opacity: 1;
-    padding: 15px;
-    border-bottom: 1px solid #333;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  }
+    .route-end-marker {
+        background: transparent !important;
+        border: none !important;
+    }
 
-  .search-container input {
-    flex: 1;
-    padding: 14px 20px;
-    border-radius: 30px;
-    border: 1px solid #444;
-    background-color: #000;
-    color: #fff;
-    font-size: 1rem;
-    outline: none;
-    font-family: 'Inter', sans-serif;
-  }
+    .route-end-marker img {
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        animation: pulseEnd 1.2s ease-in-out infinite;
+    }
 
-  .search-container input:focus {
-    border-color: var(--accent-color);
-  }
+    @keyframes pulseStart {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+        100% { transform: scale(1); opacity: 1; }
+    }
 
-  .btn-search {
-    position: relative;
-    flex-shrink: 0;
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    background: rgba(46, 102, 158, 0.95);
-    box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5);
-    transition: all 0.2s ease;
-    overflow: hidden;
-  }
+    @keyframes pulseEnd {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+        100% { transform: scale(1); }
+    }
 
-  .btn-search:active {
-    transform: scale(0.9);
-  }
+    /* ===================================================================
+       MARCADORES DE RADAR
+    =================================================================== */
+    .radar-marker-icon {
+        background: transparent !important;
+        border: none !important;
+    }
 
-  .btn-search img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    display: block;
-    transform: translate(-50%, -50%);
-  }
+    .radar-marker-icon img {
+        width: 40px !important;
+        height: 40px !important;
+        object-fit: contain !important;
+        display: block !important;
+    }
 
-  /* ===================================================================
-     MAP-BTN — estilo base
-  =================================================================== */
-  .map-btn {
-    width: var(--btn-size);
-    height: var(--btn-size);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    cursor: pointer;
-    background: rgba(20, 20, 20, 0.92);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-  }
+    /* ===================================================================
+       SPEED WIDGET
+    =================================================================== */
+    .speed-widget {
+        position: absolute;
+        bottom: -15px;
+        left: -25px;
+        width: 150px;
+        height: 150px;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-  .map-btn:hover {
-    transform: scale(1.08);
-    border-color: var(--accent-color);
-  }
+    .speed-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none;
+    }
 
-  .map-btn:active {
-    transform: scale(0.92);
-  }
+    .speed-value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-64%, -60%);
+        font-size: 28px;
+        font-weight: 700;
+        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+        color: #000;
+        line-height: 1;
+        z-index: 2;
+        white-space: nowrap;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.5px;
+        min-width: 3ch;
+    }
 
-  .map-btn img {
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
-    pointer-events: none;
-  }
+    /* ===================================================================
+       ALERT CONTAINER
+    =================================================================== */
+    #alert-container {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        display: none;
+        animation: slideUp 0.3s ease-out;
+        pointer-events: none;
+    }
 
-  /* ===================================================================
-     BOTÃO ALERTA TOGGLE
-  =================================================================== */
-  .alert-toggle-btn {
-    background: rgba(29, 28, 28, 0.9);
-    border: 2px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.3s ease;
-  }
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
 
-  .alert-toggle-btn.alert-off {
-    background: rgba(222, 127, 127, 0.9);
-    border-color: #888;
-  }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); background: linear-gradient(90deg, #ff2200, #ee0000); }
+        100% { transform: scale(1); }
+    }
 
-  .alert-toggle-btn.alert-off img {
-    filter: rgba(225, 82, 82, 0.9);
-  }
+    .alert-bar {
+        background: linear-gradient(90deg, #cc0000, #990000);
+        color: white;
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
+        border-top: 2px solid #ff5555;
+        transition: all 0.2s ease;
+    }
 
-  .alert-toggle-btn img {
-    transition: all 0.3s ease;
-  }
+    .alert-bar-critico {
+        animation: pulse 0.8s ease-in-out infinite;
+    }
 
-  .sidebar-controls .map-btn {
-    border: 1px solid rgba(0, 255, 136, 0.35);
-  }
+    .alert-bar img {
+        width: 50px;
+        height: 50px;
+        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+    }
 
-  #btn-route-bar {
-    width: 54px;
-    height: 54px;
-  }
+    .alert-info h3 {
+        font-size: 1.2rem;
+        margin-bottom: 3px;
+        text-transform: uppercase;
+        font-weight: 800;
+    }
 
-  /* ===================================================================
-     BOTÃO ROTAÇÃO
-  =================================================================== */
-  #btn-rotate-map {
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-  }
+    .alert-info p {
+        font-size: 0.95rem;
+        opacity: 0.95;
+    }
 
-  #btn-rotate-map.rotated {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
-    background-color: rgba(0, 255, 136, 0.08);
-  }
+    /* ===================================================================
+       TOAST NOTIFICATION
+    =================================================================== */
+    .toast-notification {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        background-color: rgba(20, 20, 20, 0.95);
+        color: var(--text-main);
+        padding: 12px 25px;
+        border-radius: 50px;
+        border: 1px solid #444;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        opacity: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-align: center;
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        white-space: nowrap;
+    }
 
-  #btn-rotate-map.rotated img {
-    filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5));
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
-  }
+    .toast-notification.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
 
-  #btn-rotate-map:not(.rotated) img {
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
-  }
+    /* ===================================================================
+       LOADING OVERLAY
+    =================================================================== */
+    .loading-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(20, 20, 20, 0.9);
+        padding: 20px 30px;
+        border-radius: 12px;
+        border: 1px solid var(--accent-color);
+        text-align: center;
+        z-index: 1001;
+        backdrop-filter: blur(5px);
+    }
 
-  /* ===================================================================
-     MARCADORES
-  =================================================================== */
-  .user-gps-marker,
-  .user-navigator-marker {
-    background: transparent !important;
-    border: none !important;
-  }
+    .loading-spinner {
+        border: 3px solid #333;
+        border-top: 3px solid var(--accent-color);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+    }
 
-  .user-gps-marker img,
-  .user-navigator-marker img {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    transition: none !important;
-    will-change: transform;
-  }
+    @keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
 
-  .route-start-marker {
-    background: transparent !important;
-    border: none !important;
-  }
+    /* ===================================================================
+       LOADING FULLSCREEN
+    =================================================================== */
+    .loading-fullscreen {
+        position: fixed;
+        inset: 0;
+        background-color: var(--bg-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
 
-  .route-start-marker img {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    animation: pulseStart 1s ease-in-out infinite;
-  }
+    .loading-fullscreen.fade-out {
+        opacity: 0;
+        visibility: hidden;
+    }
 
-  .route-end-marker {
-    background: transparent !important;
-    border: none !important;
-  }
+    .loading-fullscreen .spinner-ring {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        position: relative;
+        margin-bottom: 24px;
+    }
 
-  .route-end-marker img {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    animation: pulseEnd 1.2s ease-in-out infinite;
-  }
+    .loading-fullscreen .spinner-ring::before,
+    .loading-fullscreen .spinner-ring::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 4px solid transparent;
+    }
 
-  @keyframes pulseStart {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
-  }
+    .loading-fullscreen .spinner-ring::before {
+        border-top-color: var(--accent-color);
+        border-right-color: var(--accent-color);
+        animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
+    }
 
-  @keyframes pulseEnd {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
-  }
+    .loading-fullscreen .spinner-ring::after {
+        inset: 10px;
+        border-bottom-color: #ff3333;
+        border-left-color: #ff3333;
+        animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse;
+    }
 
-  .radar-marker-icon {
-    background: transparent !important;
-    border: none !important;
-  }
+    @keyframes spinRing {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 
-  .radar-marker-icon img {
-    width: 40px !important;
-    height: 40px !important;
-    object-fit: contain !important;
-    display: block !important;
-  }
+    .loading-fullscreen .loading-text {
+        font-size: 1.1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-align: center;
+    }
 
-  /* ===================================================================
-     LOADING OVERLAYS
-  =================================================================== */
-  .loading-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(20, 20, 20, 0.9);
-    padding: 20px 30px;
-    border-radius: 12px;
-    border: 1px solid var(--accent-color);
-    text-align: center;
-    z-index: 9999999;
-    backdrop-filter: blur(5px);
-  }
+    .loading-fullscreen .loading-text span {
+        color: var(--accent-color);
+    }
 
-  .loading-spinner {
-    border: 3px solid #333;
-    border-top: 3px solid var(--accent-color);
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 10px;
-  }
+    .loading-fullscreen .loading-sub {
+        margin-top: 8px;
+        font-size: 0.8rem;
+        color: #777;
+        animation: pulseText 1.8s ease-in-out infinite;
+    }
 
-  @keyframes spin {
-    100% { transform: rotate(360deg); }
-  }
+    @keyframes pulseText {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+    }
 
-  .loading-fullscreen {
-    position: fixed;
-    inset: 0;
-    background-color: var(--bg-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999999;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-  }
-
-  .loading-fullscreen.fade-out {
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  .loading-fullscreen .spinner-ring {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    position: relative;
-    margin-bottom: 24px;
-  }
-
-  .loading-fullscreen .spinner-ring::before,
-  .loading-fullscreen .spinner-ring::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: 4px solid transparent;
-  }
-
-  .loading-fullscreen .spinner-ring::before {
-    border-top-color: var(--accent-color);
-    border-right-color: var(--accent-color);
-    animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
-  }
-
-  .loading-fullscreen .spinner-ring::after {
-    inset: 10px;
-    border-bottom-color: #ff3333;
-    border-left-color: #ff3333;
-    animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse;
-  }
-
-  @keyframes spinRing {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  .loading-fullscreen .loading-text {
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-align: center;
-  }
-
-  .loading-fullscreen .loading-text span {
-    color: var(--accent-color);
-  }
-
-  .loading-fullscreen .loading-sub {
-    margin-top: 8px;
-    font-size: 0.8rem;
-    color: #777;
-    animation: pulseText 1.8s ease-in-out infinite;
-  }
-
-  @keyframes pulseText {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
-  }
-
-  /* ===================================================================
-     CONTROLES LEAFLET ESCONDIDOS
-  =================================================================== */
-  .leaflet-control-zoom,
-  .leaflet-control-attribution,
-  .leaflet-routing-container {
-    display: none !important;
-  }
+    /* ===================================================================
+       CONTROLES DO LEAFLET ESCONDIDOS
+    =================================================================== */
+    .leaflet-control-zoom,
+    .leaflet-control-attribution,
+    .leaflet-routing-container {
+        display: none !important;
+    }
 </style>
 </head>
 <body>
 
-<!-- LOADING FULLSCREEN -->
-<div class="loading-fullscreen" id="loading-fullscreen">
-  <div class="spinner-ring"></div>
-  <div class="loading-text">Iniciando <span>Radar X9</span></div>
-  <div class="loading-sub">Sincronizando satélites...</div>
-</div>
-
-<!-- HEADER -->
-<header>
-  <div class="header-left">
-    <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
-    <h1>RADAR <span>X9</span> BH</h1>
+  <div class="loading-fullscreen" id="loading-fullscreen">
+    <div class="spinner-ring"></div>
+    <div class="loading-text">Iniciando <span>Radar X9</span></div>
+    <div class="loading-sub">Sincronizando satélites...</div>
   </div>
-  <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
-    <div class="menu-hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
+
+  <header>
+    <div class="header-left">
+      <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
+      <h1>RADAR <span>X9</span> BH</h1>
     </div>
-    <div class="menu-label">MENU</div>
-  </button>
-</header>
+    <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
+      <div class="menu-hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div class="menu-label">MENU</div>
+    </button>
+  </header>
 
-<!-- MAIN CONTAINER: mapa + overlays -->
-<div class="main-container">
-
-  <!-- MAPA LEAFLET (apenas o mapa, nada mais) -->
   <div class="map-wrapper">
-    <div id="map"></div>
-  </div>
 
-  <!-- OVERLAY LAYER: TUDO que deve ficar acima do mapa -->
-  <div class="overlay-layer">
-
-    <!-- Barras de busca -->
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
-      <button class="btn-search" id="btn-search-radar" title="Buscar">
-        <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca">
-      </button>
+      <button class="btn-search" id="btn-search-radar" title="Buscar"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca"></button>
     </div>
 
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
-      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;">
-        <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
-      </button>
+      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
     </div>
 
-    <!-- BÚSSOLA — garantidamente acima de todos os marcadores -->
+
+<!-- HTML: Bússola FORA do #map -->
+    <div id="app-container" style="position: relative; width: 100%; height: 100%;">
+    <div id="map"></div>
+    <div class="toast-notification" id="toast-msg"></div>
+    <!-- Bússola: irmã do #map, não filha -->
     <div class="compass-widget">
       <div class="compass-base" id="compass-base-img"></div>
-      <img src="/imagens_app/ic_compass_ponteira.png" class="compass-needle" id="compass-needle-img" alt="Ponteira">
-    </div>
-
-    <!-- Toast -->
-    <div class="toast-notification" id="toast-msg"></div>
-
-    <!-- Speed -->
+      <img src="/imagens_app/ic_compass_ponteira.png" class="compass-needle" id="compass-needle-img">
+  </div>
+  
+</div>
+     
+    
+  
+    <!-- ICONE DE VELOCIDADE  -->
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
-    <!-- Sidebar -->
+    <!-- Sidebar de controles -->
     <div class="sidebar-controls" id="sidebar-controls">
-      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa">
+      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
         <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
       </button>
-      <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta">
-        <img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
-      </button>
-      <button class="map-btn" id="btn-search-bar" title="Buscar Radares">
-        <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
-      </button>
-      <button class="map-btn" id="btn-route-bar" title="Navegar / Rota">
-        <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
-      </button>
-      <button class="map-btn" id="btn-center" title="Centralizar GPS">
-        <img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
-      </button>
-      <button class="map-btn" id="btn-refresh" title="Resetar Mapa">
-        <img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
-      </button>
-      <button class="map-btn" id="btn-zoom-in" title="Aumentar Zoom">
-        <img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
-      </button>
-      <button class="map-btn" id="btn-zoom-out" title="Diminuir Zoom">
-        <img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
-      </button>
+      <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar"><img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta"></button>
+      <button class="map-btn" id="btn-search-bar" title="Buscar Radares"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca"></button>
+      <button class="map-btn" id="btn-route-bar" title="Navegar / Rota"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
+      <button class="map-btn" id="btn-center" title="Centralizar GPS"><img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro"></button>
+      <button class="map-btn" id="btn-refresh" title="Resetar Mapa"><img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh"></button>
+      <button class="map-btn" id="btn-zoom-in" title="Aumentar Zoom"><img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In"></button>
+      <button class="map-btn" id="btn-zoom-out" title="Diminuir Zoom"><img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out"></button>
     </div>
 
-    <!-- Alerta -->
     <div id="alert-container">
       <div class="alert-bar">
         <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
@@ -873,11 +874,11 @@ crossorigin="anonymous"></script>
       </div>
     </div>
 
-    <!-- Loading -->
     <div class="loading-overlay" id="loading" style="display:none;">
       <div class="loading-spinner"></div>
       <div style="margin-top:10px; color:#fff;">Processando...</div>
     </div>
+  </div>
 
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
