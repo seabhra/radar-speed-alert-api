@@ -1452,57 +1452,81 @@ crossorigin="anonymous"></script>
 
     function suavizarHeading(hA, hN) { var d = hN - hA; while (d > 180) d -= 360; while (d < -180) d += 360; var r = hA + d * FATOR_SUAVIZACAO_HEADING; while (r < 0) r += 360; while (r >= 360) r -= 360; return r; }
 
-    function atualizarRotacaoIconeNavegacao() {
-      var img = window.iconeNavegacao3D;
-      if (!img) {
-        img = document.getElementById('img-navegacao-3d');
-        window.iconeNavegacao3D = img;
-      }
-      if (!img) return;
-      img.style.transform = 'rotate(0deg)';
-    }
+    
+// ===================================================================
+// ROTAÇÃO DO ÍCONE DE NAVEGAÇÃO SUAVE NA DIREÇÃO DA ROTA
+// ===================================================================
+
+// Se quiser suavizar a rotação do ícone também, 
+//    substitua atualizarRotacaoIconeNavegacao() por esta versão suavizada:
+
+function atualizarRotacaoIconeNavegacao() {
+  var img = window.iconeNavegacao3D;
+  if (!img) {
+    img = document.getElementById('img-navegacao-3d');
+    window.iconeNavegacao3D = img;
+  }
+  if (!img) return;
+  
+  // Suavização da rotação do ícone (independente do map.setBearing)
+  if (!window.rotacaoIconeAtual) window.rotacaoIconeAtual = 0;
+  
+  var diferenca = headingSuavizado - window.rotacaoIconeAtual;
+  while (diferenca > 180) diferenca -= 360;
+  while (diferenca < -180) diferenca += 360;
+  
+  window.rotacaoIconeAtual += diferenca * 0.15; // fator de suavização do ícone
+  while (window.rotacaoIconeAtual < 0) window.rotacaoIconeAtual += 360;
+  while (window.rotacaoIconeAtual >= 360) window.rotacaoIconeAtual -= 360;
+  
+  img.style.transform = 'rotate(' + window.rotacaoIconeAtual + 'deg)';
+}
 
     function obterHeadingProximoSegmento() { if (!pontosRota || pontosRota.length < 2) return headingSuavizado; var i = Math.min(indicePontoMaisProximo, pontosRota.length - 2); return calcularBearing(pontosRota[i].lat, pontosRota[i].lng, pontosRota[i+1].lat, pontosRota[i+1].lng); }
 
-    // ✅ Câmera suave — APENAS bearing + offset + zoom (zero pitch/transform nos panes)
-    function atualizarCamera3DSuave() {
-      if (!modoNavegacaoAtivo || !isFollowing) return;
+// SUBSTITUA a função atualizarCamera3DSuave() — adicione a chamada 
+//    de atualizarRotacaoIconeNavegacao() no loop:
 
-      var zoomDesejado = calcularZoomPorVelocidade();
+function atualizarCamera3DSuave() {
+  if (!modoNavegacaoAtivo || !isFollowing) return;
 
-      zoomAlvo = zoomAlvo * 0.97 + zoomDesejado * 0.03;
-      var zoomArredondado = Math.round(zoomAlvo * 10) / 10;
+  var zoomDesejado = calcularZoomPorVelocidade();
 
-      var latCam = ultimaPosicaoMarcador.lat || posicaoSuavizadaGPS.lat || userLat;
-      var lngCam = ultimaPosicaoMarcador.lng || posicaoSuavizadaGPS.lng || userLng;
+  zoomAlvo = zoomAlvo * 0.97 + zoomDesejado * 0.03;
+  var zoomArredondado = Math.round(zoomAlvo * 10) / 10;
 
-      var c = calcularCentroMapaComOffsetParaCoordenadas(latCam, lngCam);
+  var latCam = ultimaPosicaoMarcador.lat || posicaoSuavizadaGPS.lat || userLat;
+  var lngCam = ultimaPosicaoMarcador.lng || posicaoSuavizadaGPS.lng || userLng;
 
-      var zoomAtual = map.getZoom();
-      if (Math.abs(zoomArredondado - zoomAtual) > 0.5) {
-        map.setZoom(zoomArredondado, { animate: true, duration: 2.5 });
-      }
+  var c = calcularCentroMapaComOffsetParaCoordenadas(latCam, lngCam);
 
-      // ✅ SEM pitch — sem tocar em transform dos panes
+  var zoomAtual = map.getZoom();
+  if (Math.abs(zoomArredondado - zoomAtual) > 0.5) {
+    map.setZoom(zoomArredondado, { animate: true, duration: 2.5 });
+  }
 
-      var agora = Date.now();
-      if (agora - ultimaChamadaPan > 66) {
-        ultimaChamadaPan = agora;
-        map.panTo([c.lat, c.lng], {
-          animate: true,
-          duration: 1.2,
-          easeLinearity: 0.15,
-          noMoveStart: true
-        });
-      }
+  var agora = Date.now();
+  if (agora - ultimaChamadaPan > 66) {
+    ultimaChamadaPan = agora;
+    map.panTo([c.lat, c.lng], {
+      animate: true,
+      duration: 1.2,
+      easeLinearity: 0.15,
+      noMoveStart: true
+    });
+  }
 
-      if (velocidadeAtual > 3 || contadorFramesEstaveis > 30) {
-        if (typeof map.setBearing === 'function') {
-          map.setBearing(headingSuavizado);
-        }
-      }
-      contadorFramesEstaveis++;
+  if (velocidadeAtual > 3 || contadorFramesEstaveis > 30) {
+    if (typeof map.setBearing === 'function') {
+      map.setBearing(headingSuavizado);
     }
+  }
+  contadorFramesEstaveis++;
+
+  // ✅ CORREÇÃO: sincronizar rotação do ícone com o mapa
+  atualizarRotacaoIconeNavegacao();
+}
+
 
     function calcularCentroMapaComOffsetParaCoordenadas(lat, lng) {
       var h = calcularAlturaTelaEmMetros(zoomAlvo);
@@ -2023,6 +2047,7 @@ crossorigin="anonymous"></script>
 
     window.onload = initMap;
   </script>
+
 
 </body>
 </html>
