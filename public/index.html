@@ -531,7 +531,7 @@ crossorigin="anonymous"></script>
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-63%, -60%);
+        transform: translate(-64%, -60%);
         font-size: 28px;
         font-weight: 700;
         font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
@@ -789,10 +789,22 @@ crossorigin="anonymous"></script>
     <div id="map"></div>
     <div class="toast-notification" id="toast-msg"></div>
 
-    <div class="compass-widget">
-      <img src="/imagens_app/ic_compass.png" onerror="this.style.opacity='0.3'; this.src='https://cdn-icons-png.flaticon.com/512/2838/2838773.png'" alt="Bússola" class="compass-base">
-      <img src="/imagens_app/ic_compass_ponteira.png" onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'" alt="Ponteira" class="compass-needle" id="compass-needle-img">
+    <div class="compass-widget"> 
+      <img 
+        src="/imagens_app/ic_compass.png"
+        onerror="this.style.opacity='1'; this.src='/imagens_app/ic_compass_active.png'"
+        alt="Bússola"
+        class="compass-base"
+      >
+      <img 
+        src="/imagens_app/ic_compass_ponteira.png"
+        onerror="this.style.opacity='0.5'; this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png'"
+        alt="Ponteira"
+        class="compass-needle"
+        id="compass-needle-img"
+      >
     </div>
+    
 
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
