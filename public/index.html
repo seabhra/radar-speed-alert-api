@@ -319,17 +319,23 @@ crossorigin="anonymous"></script>
     position: relative; /* ✅ necessário para .compass-widget absolute funcionar */
 }
 
-    
-/* Garantir que a bússola fique acima de todos os layers do Leaflet */
+/* ===================================================================
+   ISOLAR PANES DO LEAFLET — NÃO DEIXAR NENHUM FICAR ACIMA DA BÚSSOLA
+   =================================================================== */
+
+/* Todos os panes do Leaflet ficam abaixo da bússola */
+.leaflet-pane,
 .leaflet-map-pane,
 .leaflet-tile-pane,
 .leaflet-overlay-pane,
 .leaflet-shadow-pane,
 .leaflet-marker-pane,
 .leaflet-popup-pane,
-.leaflet-control-pane {
-    z-index: auto; /* reseta para não competir com a bússola */
+.leaflet-control-pane,
+.leaflet-tooltip-pane {
+    z-index: 1 !important; /* forçar abaixo da bússola */
 }
+
 
   /* =================================================================== 
    BÚSSOLA WIDGET — posição fixa no canto superior esquerdo
@@ -340,26 +346,28 @@ crossorigin="anonymous"></script>
    CORREÇÃO: BÚSSOLA SEMPRE NO TOPO - NENHUM ÍCONE ATRÁS
    =================================================================== */
 
-   .compass-widget {
+   /* ✅ BÚSSOLA: isolar em contexto de empilhamento próprio, acima de TUDO */
+.compass-widget {
     position: absolute;
     top: 20px;
     left: 5px;
-
     width: 65px;
     height: 65px;
-
-    /* ✅ CORREÇÃO: z-index máximo, acima de TUDO no mapa */
-    /* Leaflet usa z-index até 1000 para marcadores, 2000 para popups */
-    z-index: 9999 !important;
-
+    
+    /* Criar novo contexto de empilhamento isolado, acima do mapa */
+    z-index: 999999 !important;
+    
+    /* Forçar composição em layer separado do GPU, acima de todos os panes */
+    transform: translateZ(0);
+    will-change: transform;
+    
     display: flex;
     align-items: center;
     justify-content: center;
-
-    pointer-events: none; /* cliques passam através para o mapa */
+    pointer-events: none;
 }
 
-/* BASE */
+/* Base da bússola */
 .compass-base {
     position: absolute;
     width: 100%;
@@ -372,7 +380,7 @@ crossorigin="anonymous"></script>
     opacity: 0.9;
 }
 
-/* PONTEIRA */
+/* Ponteira da bússola */
 .compass-needle {
     position: absolute;
     width: 55%;
@@ -380,6 +388,31 @@ crossorigin="anonymous"></script>
     z-index: 2; /* acima da base */
     object-fit: contain;
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ===================================================================
+   SE A BÚSSOLA ESTIVER DENTRO DE #map, FORÇAR SAÍDA DO FLUXO LEAFLET
+   =================================================================== */
+
+/* Mover a bússola para fora do contexto de empilhamento do Leaflet */
+#map > .compass-widget,
+#map .compass-widget {
+    /* Forçar posicionamento no topo da pilha de renderização */
+    position: absolute !important;
+    z-index: 999999 !important;
+    
+    /* Isolar em novo contexto de empilhamento */
+    isolation: isolate;
+    
+    /* Garantir que não herde transform do mapa */
+    transform: translateZ(1px) !important;
+}
+
+/* Se houver algum container pai com transform/opacity que crie contexto */
+.leaflet-container .compass-widget,
+.leaflet-map-pane ~ .compass-widget {
+    z-index: 999999 !important;
+    position: absolute !important;
 }
     /* ===================================================================
        MAP-BTN — estilo base para todos os botões redondos do mapa
@@ -804,6 +837,7 @@ crossorigin="anonymous"></script>
   </header>
 
   <div class="map-wrapper">
+
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
       <button class="btn-search" id="btn-search-radar" title="Buscar"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca"></button>
@@ -813,26 +847,20 @@ crossorigin="anonymous"></script>
       <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
       <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
     </div>
-
+<!-- HTML: Bússola FORA do #map -->
+    <div id="app-container" style="position: relative; width: 100%; height: 100%;">
     <div id="map"></div>
     <div class="toast-notification" id="toast-msg"></div>
 
 
-    <!-- ICONE DA BUSSOLA -->
-
+    <!-- Bússola: irmã do #map, não filha -->
     <div class="compass-widget">
-
-      <!-- BASE -->
       <div class="compass-base" id="compass-base-img"></div>
-  
-      <!-- PONTEIRA -->
-      <img 
-          src="/imagens_app/ic_compass_ponteira.png"
-          alt="Ponteira"
-          class="compass-needle"
-          id="compass-needle-img"
-      >  
+      <img src="/imagens_app/ic_compass_ponteira.png" class="compass-needle" id="compass-needle-img">
   </div>
+  
+</div>
+     
     
   
     <!-- ICONE DE VELOCIDADE  -->
