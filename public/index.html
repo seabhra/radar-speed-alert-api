@@ -297,30 +297,33 @@ crossorigin="anonymous"></script>
         transform: translate(-50%, -50%);
     }
 
-   /* ===================================================================
-   MAP-WRAPPER — container flexível que segura o mapa e overlays
-   Ocupa todo o espaço restante abaixo do header
-=================================================================== */
-.map-wrapper {
-    position: relative;
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-    width: 100%;
-}
+    /* ===================================================================
+       MAP-WRAPPER — container flexível que segura o mapa e overlays
+       Ocupa todo o espaço restante abaixo do header
+    =================================================================== */
+    .map-wrapper {
+        position: relative;
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+        width: 100%;
+    }
 
-/* Mapa Leaflet — preenche todo o wrapper */
+    /* Mapa Leaflet — preenche todo o wrapper */
+   /* Mapa Leaflet — preenche todo o wrapper */
 #map {
     width: 100%;
     height: 100%;
     background-color: #2a2a2a;
     z-index: 1;
-    position: relative; 
+    position: relative; /* ✅ necessário para .compass-widget absolute funcionar */
 }
 
 /* ===================================================================
-   ISOLAR PANES DO LEAFLET — NENHUM FICA ACIMA DA BÚSSOLA
+   ISOLAR PANES DO LEAFLET — NÃO DEIXAR NENHUM FICAR ACIMA DA BÚSSOLA
    =================================================================== */
+
+/* Todos os panes do Leaflet ficam abaixo da bússola */
 .leaflet-pane,
 .leaflet-map-pane,
 .leaflet-tile-pane,
@@ -328,39 +331,34 @@ crossorigin="anonymous"></script>
 .leaflet-shadow-pane,
 .leaflet-marker-pane,
 .leaflet-popup-pane,
-.leaflet-tooltip-pane {
-    z-index: 1 !important; 
-}
-
-/* O painel de controles do Leaflet é o principal culpado por aparecer atrás da bússola */
 .leaflet-control-pane,
-.leaflet-top,
-.leaflet-bottom {
-    z-index: 2 !important; /* Fica acima dos tiles, mas muito abaixo da bússola */
+.leaflet-tooltip-pane {
+    z-index: 1 !important; /* forçar abaixo da bússola */
 }
 
 /* ===================================================================
-   BÚSSOLA — BARRERA FÍSICA INVISÍVEL PARA NADA APARECER ATRÁS
+   CORREÇÃO: BÚSSOLA SEMPRE NO TOPO - NENHUM ÍCONE ATRÁS
    =================================================================== */
+
+   /* ✅ BÚSSOLA: isolar em contexto de empilhamento próprio, acima de TUDO */
 .compass-widget {
     position: absolute;
-    top: 60px;
+    top: 65px;
     left: 5px;
     width: 65px;
     height: 65px;
+    
+    /* Criar novo contexto de empilhamento isolado, acima do mapa */
     z-index: 999999 !important;
+    
+    /* Forçar composição em layer separado do GPU, acima de todos os panes */
+    transform: translateZ(0);
+    will-change: transform;
     
     display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    
-    /* --- A SOLUÇÃO PARA O PROBLEMA DO CLICK --- */
-    /* Cria uma barreira invisível que impede renderização de itens do mapa atrás dela */
-    background: transparent; 
-    isolation: isolate; /* Cria um contexto de empilhamento intocável */
-    -webkit-backdrop-filter: blur(0px); /* Força a GPU a renderizar isso acima de tudo no Leaflet */
-    backdrop-filter: blur(0px);
 }
 
 /* Base da bússola */
@@ -376,24 +374,39 @@ crossorigin="anonymous"></script>
     opacity: 0.9;
 }
 
-/* Ponteiro da bússola */
+/* Ponteira da bússola */
 .compass-needle {
     position: absolute;
     width: 55%;
     height: 55%;
-    z-index: 2; 
+    z-index: 2; /* acima da base */
     object-fit: contain;
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* ===================================================================
-   REGRAS DE SEGURANÇA (Caso a bússola seja injetada dentro do #map via JS)
+   SE A BÚSSOLA ESTIVER DENTRO DE #map, FORÇAR SAÍDA DO FLUXO LEAFLET
    =================================================================== */
+
+/* Mover a bússola para fora do contexto de empilhamento do Leaflet */
 #map > .compass-widget,
 #map .compass-widget {
+    /* Forçar posicionamento no topo da pilha de renderização */
     position: absolute !important;
     z-index: 999999 !important;
-    transform: none !important; /* Impede que o Leaflet quebre o z-index com transform */
+    
+    /* Isolar em novo contexto de empilhamento */
+    isolation: isolate;
+    
+    /* Garantir que não herde transform do mapa */
+    transform: translateZ(1px) !important;
+}
+
+/* Se houver algum container pai com transform/opacity que crie contexto */
+.leaflet-container .compass-widget,
+.leaflet-map-pane ~ .compass-widget {
+    z-index: 999999 !important;
+    position: absolute !important;
 }
     /* ===================================================================
        MAP-BTN — estilo base para todos os botões redondos do mapa
