@@ -317,7 +317,7 @@ crossorigin="anonymous"></script>
         z-index: 1;
     }
 
-    /* =================================================================== 
+  /* =================================================================== 
    BÚSSOLA WIDGET — posição fixa no canto superior esquerdo
    Apenas base + ponteira
    pointer-events: none para não interceptar toques no mapa
@@ -817,28 +817,21 @@ crossorigin="anonymous"></script>
     <div id="map"></div>
     <div class="toast-notification" id="toast-msg"></div>
 
+    /* ===================================================================
+       ICONE DA BUSSOLA 
+    =================================================================== */
+
     <div class="compass-widget"> 
 
       <img 
         src="/imagens_app/ic_compass.png"
-        onerror="
-          this.onerror=null;
-          this.removeAttribute('src');
-          this.style.background='transparent';
-          this.src='/imagens_app/ic_compass_active.png';
-        "
         alt="Bússola"
         class="compass-base"
+        id="compass-base-img"
       >
     
       <img 
         src="/imagens_app/ic_compass_ponteira.png"
-        onerror="
-          this.onerror=null;
-          this.removeAttribute('src');
-          this.style.background='transparent';
-          this.src='https://cdn-icons-png.flaticon.com/512/1140/1140644.png';
-        "
         alt="Ponteira"
         class="compass-needle"
         id="compass-needle-img"
@@ -846,7 +839,6 @@ crossorigin="anonymous"></script>
     
     </div>
     
-
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
@@ -1800,7 +1792,33 @@ function atualizarCamera3DSuave() {
       if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
       return { lat: lat, lng: lng };
     }
+// ======================================================
+// TROCA IMAGEM DA BASE SE DER ERRO
+// ======================================================
 
+const compassBase = document.getElementById('compass-base-img');
+
+if (compassBase) {
+
+    compassBase.onerror = function () {
+
+        // cria nova imagem
+        const newImg = document.createElement('img');
+
+        newImg.src = '/imagens_app/ic_compass_active.png';
+        newImg.className = 'compass-base';
+        newImg.alt = 'Bússola';
+        newImg.id = 'compass-base-img';
+
+        // substitui imagem quebrada
+        this.parentNode.replaceChild(newImg, this);
+    };
+}
+
+
+// ======================================================
+// ATUALIZA ROTAÇÃO DA PONTEIRA
+// ======================================================
     function atualizarBussola(headingDegrees) { var needle = document.getElementById('compass-needle-img'); if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)'; }
 
     function atualizarRotacaoMapa() {
