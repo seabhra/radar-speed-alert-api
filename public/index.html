@@ -310,19 +310,37 @@ crossorigin="anonymous"></script>
     }
 
     /* Mapa Leaflet — preenche todo o wrapper */
-    #map {
-        width: 100%;
-        height: 100%;
-        background-color: #2a2a2a;
-        z-index: 1;
-    }
+   /* Mapa Leaflet — preenche todo o wrapper */
+#map {
+    width: 100%;
+    height: 100%;
+    background-color: #2a2a2a;
+    z-index: 1;
+    position: relative; /* ✅ necessário para .compass-widget absolute funcionar */
+}
+
+    
+/* Garantir que a bússola fique acima de todos os layers do Leaflet */
+.leaflet-map-pane,
+.leaflet-tile-pane,
+.leaflet-overlay-pane,
+.leaflet-shadow-pane,
+.leaflet-marker-pane,
+.leaflet-popup-pane,
+.leaflet-control-pane {
+    z-index: auto; /* reseta para não competir com a bússola */
+}
 
   /* =================================================================== 
    BÚSSOLA WIDGET — posição fixa no canto superior esquerdo
    Apenas base + ponteira
    pointer-events: none para não interceptar toques no mapa
 =================================================================== */
-.compass-widget {
+/* ===================================================================
+   CORREÇÃO: BÚSSOLA SEMPRE NO TOPO - NENHUM ÍCONE ATRÁS
+   =================================================================== */
+
+   .compass-widget {
     position: absolute;
     top: 20px;
     left: 5px;
@@ -330,52 +348,39 @@ crossorigin="anonymous"></script>
     width: 65px;
     height: 65px;
 
-    z-index: 500;
+    /* ✅ CORREÇÃO: z-index máximo, acima de TUDO no mapa */
+    /* Leaflet usa z-index até 1000 para marcadores, 2000 para popups */
+    z-index: 9999 !important;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    pointer-events: none;
+    pointer-events: none; /* cliques passam através para o mapa */
 }
 
-
 /* BASE */
-
 .compass-base {
-
     position: absolute;
-
     width: 100%;
     height: 100%;
-
     z-index: 1;
-
     background-image: url('/imagens_app/ic_compass.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-
     opacity: 0.9;
 }
 
-
 /* PONTEIRA */
-
 .compass-needle {
-
     position: absolute;
-
     width: 55%;
     height: 55%;
-
-    z-index: 2;
-
+    z-index: 2; /* acima da base */
     object-fit: contain;
-
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-
     /* ===================================================================
        MAP-BTN — estilo base para todos os botões redondos do mapa
     =================================================================== */
