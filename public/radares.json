@@ -155,11 +155,11 @@
       [141, "1374", "Anel Rodoviário Celso Mello Azevedo, a 100 metros da Rua Leonídia Teixeira de Lima", "Controlador Eletrônico de Velocidade", "70", "Vitória/Rio de Janeiro", "Único", "15", "KBH0015", "-19.8565,-43.9007"],
       [142, "1375", "Anel Rodoviário Celso Mello Azevedo, a 300 metros da Rua Silveira Lobo", "Controlador Eletrônico de Velocidade", "70", "Vitória/Rio de Janeiro", "Único", "13", "KBH0013", "-19.8698,-43.9440"],
       [143, "1376", "Anel Rodoviário Celso Mello Azevedo, a 100 metros da Rua Visitação", "Controlador Eletrônico de Velocidade", "70", "Vitória/Rio de Janeiro", "Único", "11", "KBH0011", "-19.9078,-43.9920"],
-      [144, "1377", "Anel Rodoviário Celso Mello Azevedo, a 50 metros Rua Antônio Fernandes de Melo", "Controlador Eletrônico de Velocidade", "50", "Vitória/Rio de Janeiro", "Único", "9", "KBH0009", "-19.8983,-43.9813"],
+      [144, "1377", "Anel Rodoviário Celso Mello Azevedo, a 50 metros Rua Antônio Fernandes de Melo", "Controlador Eletrônico de Velocidade", "70", "Vitória/Rio de Janeiro", "Único", "9", "KBH0009", "-19.8983,-43.9813"],
       [145, "1378", "Anel Rodoviário Celso Mello Azevedo, 13075", "Controlador Eletrônico de Velocidade", "70", "Vitória/Rio de Janeiro", "Único", "7", "KBH0007", "-19.9785,-43.9846"],
       [146, "1379", "Anel Rodoviário Celso Mello Azevedo, 9889 - Pista Marginal", "Controlador Eletrônico de Velocidade", "60", "Vitória/Rio de Janeiro", "Único", "5", "KBH0005", "-19.9297,-44.0071"],
       [147, "1380", "Anel Rodoviário Celso Mello Azevedo, 7335", "Controlador Eletrônico de Velocidade", "70", "Vitória/Rio de Janeiro", "Único", "3", "KBH0003", "-19.9787,-43.9849"],
-      [148, "1381", "Anel Rodoviário Celso Mello Azevedo, a 100 metros da Rua Antônio José de Carvalho", "Controlador Eletrônico de Velocidade", "70", "Vitória/Rio de Janeiro", "Único", "1", "KBH0001", "-19.8916,-43.9755"],
+      [148, "1381","Anel Rodoviário Celso Mello Azevedo, a 100 metros da Rua Professor José Vieira de Mendonça","Controlador Eletrônico de Velocidade","50","Vitória/Rio de Janeiro","Único","1","KBH0001","-19.89219, -43.97695 "],
       [149, "1382", "Anel Rodoviário Celso Mello Azevedo, 2358", "Controlador Eletrônico de Velocidade", "70", "Rio de Janeiro/Vitória", "Único", "6", "KBH0006", "-19.9859,-43.9759"],
       [150, "1383", "Anel Rodoviário Celso Mello Azevedo, 14810", "Controlador Eletrônico de Velocidade", "70", "Rio de Janeiro/Vitória", "Único", "24", "KBH0024", "-19.9784,-43.9845"],
       [151, "1384", "Av. do Contorno, 8000", "Controlador Eletrônico de Velocidade", "60", "Savassi/Gutierrez", "Único", "6206", "KBH6206", "-19.9339,-43.9507"],
@@ -438,8 +438,8 @@
       [430, "1723","Rodovia BR-356, Próx. Anel Rodoviário ","Controlador Eletrônico de Velocidade (CEV)","80","BH Shopping/Rio de Janeiro","1001046","KBH5301046"," -19.99547, -43.96078"],
       [431, "1724","Anel Rodoviário, Próx. Rodovia BR-356","Controlador Eletrônico de Velocidade (CEV)","70","Rio de Janeiro/ BH Shopping","1001047","KBH5301047","-19.99729, -43.96156"],
       [432, "1725","Campus da UFMG, Próx Av. Perimetral Sul","Zona de Estudo Nuclear (ZEN)","30","UFMG/Centro","1001048","KBH5301048","-19.87316, -43.96663"],
-      [433, "1726","Anel Rodoviário Celso Mello Azevedo, Próx Av. Cristiano Machado","Radar de Caminhão na Faixa Esquerda (CFE)","30","Vila Suzana/Av. Antônio Carlos","1001049","KBH5301049","-19.86711, -43.93375 "]
-
+      [433, "1726","Anel Rodoviário Celso Mello Azevedo, Próx Av. Cristiano Machado","Radar de Caminhão na Faixa Esquerda (CFE)","30","Vila Suzana/Av. Antônio Carlos","1001049","KBH5301049","-19.86711, -43.93375 "],
+      [434, "1727","Av. Cristovão Colombo, Próx Rua Sergipe","Detector de Invasão de Faixa Exclusiva (DIFEX)","60","Praça da Liberdade/Savassi","1001050","KBH5301050","-19.93532, -43.93740"]
 
     ]
   }
