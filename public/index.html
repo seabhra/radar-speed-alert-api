@@ -1012,19 +1012,24 @@ crossorigin="anonymous"></script>
     let animacaoNavegacaoAtiva = false;
     
     let ultimaAtualizacaoCamera = 0;
-    let INTERVALO_CAMERA_MS = 200;
+    let INTERVALO_CAMERA_MS = 100; // Reduzido de 200 para 100ms (10fps) - mais suave
     let zoomAtualEfetivo = 19;
     let centroAtualEfetivo = { lat: null, lng: null };
     
     let bearingAlvoMapa = 0;
     let bearingAtualMapa = 0;
-    let FATOR_SUAVIZACAO_BEARING_MAPA = 0.05;
+    let FATOR_SUAVIZACAO_BEARING_MAPA = 0.12; // Aumentado de 0.05 para 0.12 - transição mais rápida mas suave
     let ultimoBearingAplicado = null;
     let bearingBloqueado = false;
     let headingIconeNavegacao = 0;
     let headingIconeSuavizado = 0;
     let FATOR_SUAVIZACAO_ICONE = 0.12;
     let ultimoHeadingRota = 0;
+    
+    // ===================================================================
+    // VARIÁVEIS GLOBAIS ADICIONAIS PARA CONTROLE SUAVE DE ROTAÇÃO
+    // ===================================================================
+    let bearingAlvoAnterior = null;
     
     const iconMap = {
       'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
@@ -1295,6 +1300,7 @@ crossorigin="anonymous"></script>
       bearingAlvoMapa = 0;
       bearingAtualMapa = 0;
       ultimoBearingAplicado = null;
+      bearingAlvoAnterior = null;
       headingIconeNavegacao = 0;
       headingIconeSuavizado = 0;
       ultimoHeadingRota = 0;
@@ -1311,11 +1317,27 @@ crossorigin="anonymous"></script>
     
       adicionarMarcadoresRota3D(userLat, userLng, destLat, destLng);
     
+      // =================================================================
+      // ESTILO DA LINHA DE ROTA: LARANJA CENTRO + ROXO BORDAS + GROSSO
+      // =================================================================
       routingControl = L.Routing.control({
         waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
         routeWhileDragging: false, addWaypoints: false, draggableWaypoints: false,
         fitSelectedRoutes: false, show: false,
-        lineOptions: { styles: [{ color: '#4FC3F7', weight: 8, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }, { color: '#B3E5FC', weight: 3, opacity: 1.0, lineCap: 'round', lineJoin: 'round' }] },
+        lineOptions: { 
+          styles: [
+            // Camada 1: Sombra externa escura (efeito de profundidade)
+            { color: '#4A148C', weight: 16, opacity: 0.4, lineCap: 'round', lineJoin: 'round' },
+            // Camada 2: Borda externa roxa escura
+            { color: '#6A1B9A', weight: 12, opacity: 0.9, lineCap: 'round', lineJoin: 'round' },
+            // Camada 3: Borda intermediária roxa
+            { color: '#8E24AA', weight: 8, opacity: 0.95, lineCap: 'round', lineJoin: 'round' },
+            // Camada 4: Centro laranja vibrante (cor principal)
+            { color: '#FF9800', weight: 5, opacity: 1.0, lineCap: 'round', lineJoin: 'round' },
+            // Camada 5: Centro brilhante laranja claro (destaque/ brilho)
+            { color: '#FFB74D', weight: 2, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }
+          ] 
+        },
         createMarker: function() { return null; }
       }).addTo(map);
     
@@ -1619,15 +1641,56 @@ crossorigin="anonymous"></script>
     function obterHeadingProximoSegmento() { if (!pontosRota || pontosRota.length < 2) return headingSuavizado; let i = Math.min(indicePontoMaisProximo, pontosRota.length - 2); return calcularBearing(pontosRota[i].lat, pontosRota[i].lng, pontosRota[i+1].lat, pontosRota[i+1].lng); }
     
     // ===================================================================
+    // ATUALIZAR BEARING DO MAPA DE FORMA ESTÁVEL — CORREÇÃO DO TREME-TREME
+    // ===================================================================
+    function atualizarBearingMapa() {
+      if (!modoNavegacaoAtivo || !map) return;
+      if (typeof map.setBearing !== 'function') return;
+    
+      // Determinar o bearing alvo baseado no estado do botão de rotação
+      if (mapaRotacionado) {
+        // Botão ativado: mapa acompanha a direção da rota (headingSuavizado)
+        bearingAlvoMapa = headingSuavizado;
+      } else {
+        // Botão desativado: norte para cima
+        bearingAlvoMapa = 0;
+      }
+    
+      // Se o bearing alvo mudou abruptamente (ex: clique no botão), resetar suavização
+      if (bearingAlvoAnterior !== null && Math.abs(bearingAlvoMapa - bearingAlvoAnterior) > 90) {
+        // Mudança grande de bearing - aplicar diretamente para evitar giro longo
+        bearingAtualMapa = bearingAlvoMapa;
+      }
+      bearingAlvoAnterior = bearingAlvoMapa;
+    
+      // Suavizar transição do bearing
+      let diff = bearingAlvoMapa - bearingAtualMapa;
+      while (diff > 180) diff -= 360;
+      while (diff < -180) diff += 360;
+    
+      bearingAtualMapa += diff * FATOR_SUAVIZACAO_BEARING_MAPA;
+      while (bearingAtualMapa < 0) bearingAtualMapa += 360;
+      while (bearingAtualMapa >= 360) bearingAtualMapa -= 360;
+    
+      // Só aplicar bearing se mudou significativamente (> 0.5 grau)
+      let diffAplicado = Math.abs(bearingAtualMapa - (ultimoBearingAplicado || 0));
+      if (diffAplicado > 180) diffAplicado = 360 - diffAplicado;
+    
+      if (diffAplicado > 0.5 || ultimoBearingAplicado === null) {
+        map.setBearing(bearingAtualMapa);
+        ultimoBearingAplicado = bearingAtualMapa;
+      }
+    }
+    
+    // ===================================================================
     // CÂMERA 3D SUAVE — CORREÇÃO DEFINITIVA DO TREME-TREME
     // ===================================================================
-    
     function atualizarCamera3DSuave() {
       if (!modoNavegacaoAtivo || !isFollowing) return;
     
       let agora = Date.now();
     
-      // Throttle: só atualiza a cada 200ms (5fps)
+      // Throttle: só atualiza a cada 100ms (10fps) - mais fluido que 200ms
       if (agora - ultimaAtualizacaoCamera < INTERVALO_CAMERA_MS) {
         return;
       }
@@ -1635,8 +1698,8 @@ crossorigin="anonymous"></script>
     
       let zoomDesejado = calcularZoomPorVelocidade();
     
-      // Suavização do zoom alvo (interpolação exponencial mais lenta)
-      zoomAlvo = zoomAlvo * 0.90 + zoomDesejado * 0.10;
+      // Suavização do zoom alvo (interpolação exponencial mais responsiva)
+      zoomAlvo = zoomAlvo * 0.85 + zoomDesejado * 0.15;
       let zoomArredondado = Math.round(zoomAlvo * 10) / 10;
     
       let latCam = ultimaPosicaoMarcador.lat || posicaoSuavizadaGPS.lat || userLat;
@@ -1651,8 +1714,8 @@ crossorigin="anonymous"></script>
         mudancaPos = calcularDistancia(c.lat, c.lng, centroAtualEfetivo.lat, centroAtualEfetivo.lng);
       }
     
-      // Só atualiza se houver mudança significativa (>3m de posição OU >0.5 de zoom)
-      if (mudancaPos < 3 && mudancaZoom < 0.5 && centroAtualEfetivo.lat !== null) {
+      // Só atualiza se houver mudança significativa (>2m de posição OU >0.3 de zoom)
+      if (mudancaPos < 2 && mudancaZoom < 0.3 && centroAtualEfetivo.lat !== null) {
         // Mesmo sem mudar posição/zoom, ainda precisa atualizar o bearing e o ícone
         atualizarBearingMapa();
         atualizarRotacaoIconeNavegacao();
@@ -1675,41 +1738,6 @@ crossorigin="anonymous"></script>
     
       // Sincronizar rotação do ícone
       atualizarRotacaoIconeNavegacao();
-    }
-    
-    // ===================================================================
-    // NOVA FUNÇÃO: ATUALIZAR BEARING DO MAPA DE FORMA ESTÁVEL
-    // ===================================================================
-    function atualizarBearingMapa() {
-      if (!modoNavegacaoAtivo || !map) return;
-      if (typeof map.setBearing !== 'function') return;
-    
-      // Determinar o bearing alvo baseado no estado do botão de rotação
-      if (mapaRotacionado) {
-        // Botão ativado: mapa acompanha a direção da rota (headingSuavizado)
-        bearingAlvoMapa = headingSuavizado;
-      } else {
-        // Botão desativado: norte para cima
-        bearingAlvoMapa = 0;
-      }
-    
-      // Suavizar transição do bearing
-      let diff = bearingAlvoMapa - bearingAtualMapa;
-      while (diff > 180) diff -= 360;
-      while (diff < -180) diff += 360;
-    
-      bearingAtualMapa += diff * FATOR_SUAVIZACAO_BEARING_MAPA;
-      while (bearingAtualMapa < 0) bearingAtualMapa += 360;
-      while (bearingAtualMapa >= 360) bearingAtualMapa -= 360;
-    
-      // Só aplicar bearing se mudou significativamente (> 1 grau)
-      let diffAplicado = Math.abs(bearingAtualMapa - (ultimoBearingAplicado || 0));
-      if (diffAplicado > 180) diffAplicado = 360 - diffAplicado;
-    
-      if (diffAplicado > 1 || ultimoBearingAplicado === null) {
-        map.setBearing(bearingAtualMapa);
-        ultimoBearingAplicado = bearingAtualMapa;
-      }
     }
     
     function calcularCentroMapaComOffsetParaCoordenadas(lat, lng) {
@@ -1759,7 +1787,9 @@ crossorigin="anonymous"></script>
     function atualizarRota3D() { if (!destinoAtual || !routingControl) return; let lo = posicaoSuavizadaGPS.lat || userLat, ln = posicaoSuavizadaGPS.lng || userLng; routingControl.setWaypoints([L.latLng(lo, ln), L.latLng(destinoAtual.lat, destinoAtual.lng)]); }
     function verificarChegadaDestino3D() { if (!destinoAtual) return; let d = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng); if (d <= 30) { showNotification("🎉 Você chegou ao destino!"); if (endRouteMarker) endRouteMarker.openPopup(); setTimeout(function() { finalizarNavegacao3D(); }, 4000); } }
     
-    // Finalizar navegação
+    // ===================================================================
+    // FINALIZAR NAVEGAÇÃO 3D — COM LIMPEZA COMPLETA
+    // ===================================================================
     function finalizarNavegacao3D() {
       modoNavegacaoAtivo = false;
       estaEmNavegacao = false;
@@ -1783,6 +1813,7 @@ crossorigin="anonymous"></script>
       bearingAlvoMapa = 0;
       bearingAtualMapa = 0;
       ultimoBearingAplicado = null;
+      bearingAlvoAnterior = null;
       headingIconeNavegacao = 0;
       headingIconeSuavizado = 0;
       ultimoHeadingRota = 0;
@@ -2020,7 +2051,7 @@ crossorigin="anonymous"></script>
       $("#speed-display").text(speedKmh);
       velocidadeAtual = speedKmh || 0;
       if (hwHeading !== null && !isNaN(hwHeading) && hwHeading >= 0) { if (!bussolaHardwareDisponivel) currentHeading = hwHeading; }
-      else if (!bussolaHardwareDisponivel && dist > 3 && prevLat !== null) { let dy = newLat - prevLat, dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180); if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) { let ch = (Math.atan2(dx, dy) * 180 / Math.PI); if (ch < 0) ch += 360; if (ch >= 360) ch -= 360; currentHeading = ch; } }
+      else if (!bussolaHardwareDisponivel && dist > 3 && prevLat !== null) { let dy = newLat - prevLat, dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180); if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) { let ch = (Math.atan2(dx, dy) * 180 / Math.PI); if (ch < 0) ch += 360; if (ch >= 360) ch = 0; currentHeading = ch; } }
       if (currentHeading !== null && currentHeading !== undefined) atualizarBussola(currentHeading);
       atualizarRotacaoMapa();
       prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
@@ -2086,13 +2117,17 @@ crossorigin="anonymous"></script>
     }
     
     // ===================================================================
-    // BOTÕES DE INTERFACE — CORREÇÃO DEFINITIVA DO BOTÃO DE ROTAÇÃO
+    // BOTÃO DE ROTAÇÃO — CORREÇÃO DEFINITIVA SEM CONFLITO
     // ===================================================================
-    
     function inicializarBotaoRotacaoMapa() {
       const rb = document.getElementById('btn-rotate-map');
       if (!rb) return;
-      if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') { rb.style.opacity = '0.3'; rb.style.pointerEvents = 'none'; return; }
+      if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') { 
+        rb.style.opacity = '0.3'; 
+        rb.style.pointerEvents = 'none'; 
+        return; 
+      }
+    
       rb.addEventListener('click', async function() {
         if (!map || typeof map.setBearing !== 'function') return;
     
@@ -2104,27 +2139,30 @@ crossorigin="anonymous"></script>
           rb.classList.add('rotated');
           showNotification('Rotação ativada');
     
-          // Se estiver em navegação, o bearing será controlado pelo loop da câmera
-          // Se NÃO estiver em navegação, rotacionar para heading atual
+          // CORREÇÃO: NUNCA chamar setBearing diretamente aqui!
+          // Deixar o loop atualizarCamera3DSuave() controlar via atualizarBearingMapa()
+          // Apenas forçar uma atualização imediata do bearing alvo
           if (!modoNavegacaoAtivo) {
+            // Fora da navegação, definir bearing alvo para heading atual
             let a = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 0;
-            map.setBearing(a);
-            let ri = document.getElementById('rotate-btn-icon');
-            if (ri) ri.style.transform = 'rotate(' + a + 'deg)';
+            bearingAlvoMapa = a;
+            bearingAtualMapa = a; // Aplicar imediatamente para evitar transição longa
+            ultimoBearingAplicado = null; // Forçar aplicação no próximo frame
           }
+    
+          let ri = document.getElementById('rotate-btn-icon');
+          if (ri) ri.style.transform = 'rotate(' + (currentHeading || 0) + 'deg)';
+    
         } else {
           // DESATIVAR rotação
           mapaRotacionado = false;
           rb.classList.remove('rotated');
           showNotification('Norte para cima');
     
-          // Resetar bearing imediatamente
-          if (typeof map.setBearing === 'function') {
-            map.setBearing(0);
-          }
+          // CORREÇÃO: NUNCA chamar setBearing(0) diretamente aqui!
+          // Deixar o loop da câmera resetar suavemente via atualizarBearingMapa()
           bearingAlvoMapa = 0;
-          bearingAtualMapa = 0;
-          ultimoBearingAplicado = null;
+          // Não resetar bearingAtualMapa imediatamente - deixar suavizar até 0
     
           let ri = document.getElementById('rotate-btn-icon');
           if (ri) ri.style.transform = 'rotate(0deg)';
@@ -2235,7 +2273,7 @@ crossorigin="anonymous"></script>
     async function carregarRadares() {
       if (!map) return;
       if (radarMarkers.length > 0) { radarMarkers.forEach(function(m) { map.removeLayer(m); }); radarMarkers = []; }
-      $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas de trânsito...</div>");
+      $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando radares...</div>");
       try {
         let response = await fetch('radares.json?v=' + Date.now());
         if (!response.ok) throw new Error("HTTP " + response.status);
@@ -2286,7 +2324,7 @@ crossorigin="anonymous"></script>
         contador++;
       }
       $("#loading").hide();
-      if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' alertas)');
+      if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
       else showNotification("Nenhum radar encontrado.");
     }
     
