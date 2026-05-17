@@ -1974,60 +1974,63 @@ crossorigin="anonymous"></script>
     // EXTRAIR COORDENADAS — VERSÃO MELHORADA COM DETECÇÃO DE FORMATO
     // ===================================================================
     function extrairCoordenadas(record, index) {
-      if (!record || record.length < 10) {
+    if (!record || record.length < 9) {
         console.warn('Radar #' + (index !== undefined ? index : '?') + ': record muito curto (' + (record ? record.length : 0) + ' campos)');
         return null;
-      }
-
-      let s = String(record[9]).trim();
-      console.log('Radar #' + (index !== undefined ? index : '?') + ': coordenada bruta = "' + s + '"');
-
-      // NOVA LÓGICA: Detectar formato e converter corretamente
-      let lat, lng;
-
-      // Tentar formato com ponto decimal padrão: "-19.919055,-43.938641"
-      if (s.includes('.')) {
+    }
+    
+    // Detectar índice da geometria baseado no tamanho do record
+    // 10 campos = índice 9 (padrão correto: tem SENTIDO_FISCALIZADO)
+    // 9 campos  = índice 8 (faltando SENTIDO_FISCALIZADO)
+    let geomIndex = (record.length >= 10) ? 9 : 8;
+    let s = String(record[geomIndex]).trim();
+    console.log('Radar #' + (index !== undefined ? index : '?') + ': coordenada bruta = "' + s + '"');
+    
+    // NOVA LÓGICA: Detectar formato e converter corretamente
+    let lat, lng;
+    
+    // Tentar formato com ponto decimal padrão: "-19.919055,-43.938641"
+    if (s.includes('.')) {
         let parts = s.split(',').map(function(p) { return p.trim(); });
         if (parts.length === 2) {
-          lat = parseFloat(parts[0]);
-          lng = parseFloat(parts[1]);
+            lat = parseFloat(parts[0]);
+            lng = parseFloat(parts[1]);
         }
-      }
-      // Formato brasileiro com vírgula decimal: "-19,919055;-43,938641" (ponto-e-vírgula como separador)
-      else if (s.includes(';')) {
+    }
+    // Formato brasileiro com vírgula decimal: "-19,919055;-43,938641" (ponto-e-vírgula como separador)
+    else if (s.includes(';')) {
         let parts = s.split(';').map(function(p) { return p.trim().replace(',', '.'); });
         if (parts.length === 2) {
-          lat = parseFloat(parts[0]);
-          lng = parseFloat(parts[1]);
+            lat = parseFloat(parts[0]);
+            lng = parseFloat(parts[1]);
         }
-      }
-      // Formato brasileiro com vírgula decimal E vírgula como separador (problemático)
-      // "-19,919055,-43,938641" → precisa de lógica mais inteligente
-      else if ((s.match(/,/g) || []).length >= 3) {
+    }
+    // Formato brasileiro com vírgula decimal E vírgula como separador (problemático)
+    // "-19,919055,-43,938641" → precisa de lógica mais inteligente
+    else if ((s.match(/,/g) || []).length >= 3) {
         // Assumir que a coordenada está no formato lat,decimal_lng,decimal
-        // Estratégia: encontrar o separador entre os dois números (vírgula entre número completo e sinal negativo)
         let match = s.match(/(-?\d+,\d+),(-?\d+,\d+)/);
         if (match) {
-          lat = parseFloat(match[1].replace(',', '.'));
-          lng = parseFloat(match[2].replace(',', '.'));
+            lat = parseFloat(match[1].replace(',', '.'));
+            lng = parseFloat(match[2].replace(',', '.'));
         }
-      }
-      // Último recurso: tentar split simples
-      else {
+    }
+    // Último recurso: tentar split simples
+    else {
         let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); });
         if (parts.length === 2) {
-          lat = parseFloat(parts[0]);
-          lng = parseFloat(parts[1]);
+            lat = parseFloat(parts[0]);
+            lng = parseFloat(parts[1]);
         }
-      }
-
-      if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    }
+    
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
         console.warn('Radar #' + (index !== undefined ? index : '?') + ': coordenadas inválidas (lat=' + lat + ', lng=' + lng + ')');
         return null;
-      }
-
-      return { lat: lat, lng: lng };
     }
+    
+    return { lat: lat, lng: lng };
+}
     
     // ======================================================
     // TROCA IMAGEM DA BASE SE DER ERRO
