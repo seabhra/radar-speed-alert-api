@@ -1,0 +1,420 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --scroll-color: #3B8BD4;
+    --scroll-light: #E6F1FB;
+    --scroll-mid: #85B7EB;
+    --loop-color: #534AB7;
+    --loop-light: #EEEDFE;
+    --loop-mid: #AFA9EC;
+    --vs-color: #888780;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { background: transparent; font-family: 'DM Mono', monospace; }
+
+  .wrapper {
+    padding: 28px 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .header-line {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: 4px;
+  }
+
+  .col-label {
+    flex: 1;
+    text-align: center;
+  }
+
+  .vs-label {
+    width: 64px;
+    text-align: center;
+  }
+
+  .arena {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    border: 1px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+  }
+
+  .col {
+    flex: 1;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: background 0.3s;
+    cursor: default;
+  }
+
+  .col-scroll {
+    background: var(--scroll-light);
+    border-right: 1px solid var(--color-border-tertiary);
+  }
+
+  .col-scroll:hover { background: #D2E6F6; }
+
+  @media (prefers-color-scheme: dark) {
+    .col-scroll { background: #0C447C22; }
+    .col-scroll:hover { background: #0C447C40; }
+    .col-loop { background: #26215C22; }
+    .col-loop:hover { background: #26215C40; }
+  }
+
+  .col-loop {
+    background: var(--loop-light);
+  }
+  .col-loop:hover { background: #DDDCFA; }
+
+  .vs-divider {
+    width: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--color-background-secondary);
+    border-left: 1px solid var(--color-border-tertiary);
+    border-right: 1px solid var(--color-border-tertiary);
+  }
+
+  .vs-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text-tertiary);
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    letter-spacing: 0.05em;
+  }
+
+  .col-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .col-scroll .col-title { color: #185FA5; }
+  .col-loop .col-title { color: #3C3489; }
+
+  @media (prefers-color-scheme: dark) {
+    .col-scroll .col-title { color: #85B7EB; }
+    .col-loop .col-title { color: #AFA9EC; }
+  }
+
+  .dimension-row {
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid transparent;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .dimension-row:hover {
+    transform: translateX(2px);
+    border-color: var(--color-border-secondary);
+  }
+
+  .col-scroll .dimension-row:hover { transform: translateX(2px); }
+  .col-loop .dimension-row:hover { transform: translateX(-2px); }
+
+  .dim-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 6px 10px 3px;
+    color: var(--color-text-tertiary);
+  }
+
+  .dim-value {
+    font-size: 12px;
+    line-height: 1.4;
+    padding: 0 10px 8px;
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  .col-scroll .dimension-row { background: #FFFFFF55; }
+  .col-loop .dimension-row { background: #FFFFFF55; }
+
+  @media (prefers-color-scheme: dark) {
+    .col-scroll .dimension-row { background: #FFFFFF08; }
+    .col-loop .dimension-row { background: #FFFFFF08; }
+  }
+
+  .col-scroll .dimension-row.active {
+    background: #FFFFFF;
+    border-color: var(--scroll-mid);
+  }
+  .col-loop .dimension-row.active {
+    background: #FFFFFF;
+    border-color: var(--loop-mid);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .col-scroll .dimension-row.active { background: #185FA520; border-color: #378ADD; }
+    .col-loop .dimension-row.active { background: #3C348920; border-color: #7F77DD; }
+  }
+
+  .detail-panel {
+    border-radius: var(--border-radius-md);
+    padding: 16px 20px;
+    border: 1px solid var(--color-border-tertiary);
+    min-height: 80px;
+    background: var(--color-background-primary);
+    transition: opacity 0.3s;
+  }
+
+  .detail-panel .d-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .detail-panel .d-content {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--color-text-secondary);
+  }
+
+  .detail-panel .d-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .detail-scroll .d-title { color: #185FA5; }
+  .detail-loop .d-title { color: #3C3489; }
+
+  @media (prefers-color-scheme: dark) {
+    .detail-scroll .d-title { color: #85B7EB; }
+    .detail-loop .d-title { color: #AFA9EC; }
+  }
+
+  .tese-box {
+    border-left: 3px solid var(--color-border-secondary);
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+  }
+
+  .hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    text-align: center;
+  }
+</style>
+
+<div class="wrapper">
+
+  <div class="tese-box">
+    "O Scroll Infinito é a ilusão do loop. O que não se esgota é o estímulo, não o sentido. O Loop Infinito do Newsgamenismo é outra coisa: o que não se esgota é o sistema do acontecimento."
+  </div>
+
+  <p class="hint">↓ selecione uma dimensão para expandir</p>
+
+  <div>
+    <div class="header-line">
+      <div class="col-label">Scroll Infinito</div>
+      <div class="vs-label"></div>
+      <div class="col-label">Loop Infinito</div>
+    </div>
+
+    <div class="arena">
+      <div class="col col-scroll" id="col-left">
+        <div class="col-title">Webjornalismo<br>& Plataformas</div>
+        <div class="dimension-row" data-dim="movimento" data-side="scroll" onclick="select(this, 'scroll', 'movimento')">
+          <div class="dim-label">Movimento</div>
+          <div class="dim-value">Horizontal — desliza sobre superfícies</div>
+        </div>
+        <div class="dimension-row" data-dim="relacao" data-side="scroll" onclick="select(this, 'scroll', 'relacao')">
+          <div class="dim-label">Relação c/ o acontecimento</div>
+          <div class="dim-value">Tangencia</div>
+        </div>
+        <div class="dimension-row" data-dim="sujeito" data-side="scroll" onclick="select(this, 'scroll', 'sujeito')">
+          <div class="dim-label">Sujeito</div>
+          <div class="dim-value">Consumidor de fluxo</div>
+        </div>
+        <div class="dimension-row" data-dim="tempo" data-side="scroll" onclick="select(this, 'scroll', 'tempo')">
+          <div class="dim-label">Temporalidade</div>
+          <div class="dim-value">Presente contínuo sem memória</div>
+        </div>
+        <div class="dimension-row" data-dim="semfim" data-side="scroll" onclick="select(this, 'scroll', 'semfim')">
+          <div class="dim-label">O que não tem fim</div>
+          <div class="dim-value">A fila de estímulos</div>
+        </div>
+      </div>
+
+      <div class="vs-divider">
+        <span class="vs-text">vs</span>
+      </div>
+
+      <div class="col col-loop" id="col-right">
+        <div class="col-title">Newsgamenismo<br>& NewsGames</div>
+        <div class="dimension-row" data-dim="movimento" data-side="loop" onclick="select(this, 'loop', 'movimento')">
+          <div class="dim-label">Movimento</div>
+          <div class="dim-value">Vertical — mergulha em profundidade</div>
+        </div>
+        <div class="dimension-row" data-dim="relacao" data-side="loop" onclick="select(this, 'loop', 'relacao')">
+          <div class="dim-label">Relação c/ o acontecimento</div>
+          <div class="dim-value">Habita</div>
+        </div>
+        <div class="dimension-row" data-dim="sujeito" data-side="loop" onclick="select(this, 'loop', 'sujeito')">
+          <div class="dim-label">Sujeito</div>
+          <div class="dim-value">Jogador de sistema</div>
+        </div>
+        <div class="dimension-row" data-dim="tempo" data-side="loop" onclick="select(this, 'loop', 'tempo')">
+          <div class="dim-label">Temporalidade</div>
+          <div class="dim-value">Duração com consequência</div>
+        </div>
+        <div class="dimension-row" data-dim="semfim" data-side="loop" onclick="select(this, 'loop', 'semfim')">
+          <div class="dim-label">O que não tem fim</div>
+          <div class="dim-value">O sistema do acontecimento</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-panel" id="detail-box">
+    <div class="d-label">Clique em qualquer dimensão para explorar</div>
+    <div class="d-content" id="detail-content" style="color: var(--color-text-tertiary); font-style: italic;">Selecione uma linha acima para ver a distinção conceitual expandida.</div>
+  </div>
+
+</div>
+
+<script>
+const details = {
+  movimento: {
+    scroll: {
+      title: "Scroll: movimento horizontal",
+      text: "Deslizar é um gesto de superfície. O usuário passa pelo acontecimento sem entrar nele. A interface foi projetada para que nenhum ponto de fricção interrompa o fluxo — porque fricção é onde o sentido começa. O scroll perfeito é aquele que nunca para."
+    },
+    loop: {
+      title: "Loop: movimento vertical",
+      text: "Mergulhar é um gesto de profundidade. O jogador entra no sistema do acontecimento, age dentro dele, sofre consequências, recomeça. Cada recomeço revela uma camada que a passagem anterior não alcançou. O sem-fim não é ausência de fundo — é a profundidade que não se deixa esgotar."
+    }
+  },
+  relacao: {
+    scroll: {
+      title: "Scroll: tangencia o acontecimento",
+      text: "O feed toca o fato sem habitá-lo. A notícia passa pela tela como objeto — um frame entre outros frames. A superfície se renova; o acontecimento permanece intocado. O leitor sabe que algo aconteceu. Raramente sabe como."
+    },
+    loop: {
+      title: "Loop: habita o acontecimento",
+      text: "O newsGame não representa o sistema — simula-o. Habitar é diferente de ler sobre. Em September 12th, o jogador não lê sobre o ciclo vicioso do terrorismo: ele o produz com seus próprios cliques. O acontecimento deixa de ser objeto e se torna ambiente."
+    }
+  },
+  sujeito: {
+    scroll: {
+      title: "Scroll: consumidor de fluxo",
+      text: "O consumidor de fluxo é definido pelo que passa diante dele — não pelo que faz. Sua agência é mínima: rolar, pausar, curtir, compartilhar. A decisão mais importante que ele toma é quando parar de rolar. E o design de toda plataforma de scroll infinito foi construído para que essa decisão nunca seja tomada."
+    },
+    loop: {
+      title: "Loop: jogador de sistema",
+      text: "O jogador de sistema não consome o acontecimento — experimenta suas regras. Ele age, e o sistema responde. Age de novo, e o sistema responde diferente. O conhecimento que emerge não é o de quem leu sobre o problema: é o de quem viveu dentro das suas impossibilidades estruturais."
+    }
+  },
+  tempo: {
+    scroll: {
+      title: "Scroll: presente contínuo sem memória",
+      text: "O feed é amnésico por design. O que está no topo agora substituiu o que estava há cinco minutos. O passado não acumula — ele desaparece abaixo da dobra. A temporalidade do scroll é a do eterno agora: urgente, efêmero, sem consequência."
+    },
+    loop: {
+      title: "Loop: duração com consequência",
+      text: "No newsGame, o tempo tem peso. A decisão tomada no turno anterior afeta o estado atual. O jogador carrega a memória das suas escolhas — e aprende precisamente porque não pode desfazê-las. É uma temporalidade de causa e efeito, não de estímulo e substituição."
+    }
+  },
+  semfim: {
+    scroll: {
+      title: "Scroll: a fila de estímulos não termina",
+      text: "O TikTok também é infinito. O Twitter também nunca termina. O que o scroll infinito garante é que haverá sempre mais conteúdo — não necessariamente mais sentido. A inesgotabilidade é do estoque de estímulos, não da compreensão do mundo."
+    },
+    loop: {
+      title: "Loop: o sistema do acontecimento não se resolve",
+      text: "O que não termina no newsGame não é o conteúdo — é a complexidade do sistema que ele simula. Spent termina quando o dinheiro acaba. Mas a pobreza estrutural que causou o esgotamento permanece intacta fora da tela. O loop infinito aponta para além de si mesmo: para o mundo que ele tornou navegável."
+    }
+  }
+};
+
+let activeScroll = null;
+let activeLoop = null;
+
+function select(el, side, dim) {
+  const allRows = document.querySelectorAll('.dimension-row');
+  const scrollRows = document.querySelectorAll('.col-scroll .dimension-row');
+  const loopRows = document.querySelectorAll('.col-loop .dimension-row');
+
+  if (side === 'scroll') {
+    scrollRows.forEach(r => r.classList.remove('active'));
+    el.classList.add('active');
+    activeScroll = dim;
+  } else {
+    loopRows.forEach(r => r.classList.remove('active'));
+    el.classList.add('active');
+    activeLoop = dim;
+  }
+
+  const currentDim = dim;
+  const scrollData = details[currentDim].scroll;
+  const loopData = details[currentDim].loop;
+
+  loopRows.forEach(r => {
+    if (r.dataset.dim === currentDim) r.classList.add('active');
+    else r.classList.remove('active');
+  });
+  scrollRows.forEach(r => {
+    if (r.dataset.dim === currentDim) r.classList.add('active');
+    else r.classList.remove('active');
+  });
+
+  const box = document.getElementById('detail-box');
+  box.style.opacity = 0;
+  setTimeout(() => {
+    document.getElementById('detail-content').innerHTML = `
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;" class="detail-scroll">
+          <div class="d-title">${scrollData.title}</div>
+          <div class="d-content">${scrollData.text}</div>
+        </div>
+        <div style="width:1px;background:var(--color-border-tertiary);flex-shrink:0;"></div>
+        <div style="flex:1;min-width:200px;" class="detail-loop">
+          <div class="d-title">${loopData.title}</div>
+          <div class="d-content">${loopData.text}</div>
+        </div>
+      </div>`;
+    box.style.opacity = 1;
+    box.style.transition = 'opacity 0.25s';
+  }, 150);
+}
+</script>
