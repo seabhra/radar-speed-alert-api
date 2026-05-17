@@ -1971,7 +1971,7 @@ crossorigin="anonymous"></script>
     function resetarMapa() { resetarTotalMapa(); carregarRadares(); }
     
     function extrairCoordenadas(record) {
-      if (!record || record.length < 10) return null;
+      if (!record || record.length < 8) return null;
       let s = String(record[9]).trim().replace(/\s*,\s*/g, ',').trim();
       if (!s.includes('.') && s.includes(',')) { let p = s.indexOf(','); if (p !== -1) s = s.substring(0, p) + '.' + s.substring(p + 1); }
       let parts = s.split(','); if (parts.length !== 2) return null;
