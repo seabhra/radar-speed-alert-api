@@ -1,917 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-  <!-- Cache Control -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
-
-  <title>Radar X9 BH - Alerta Inteligente (OSM + IA)</title>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-
-  <!-- JS: SEM integrity — mesma razão -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
-crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
-crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"
-crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"
-crossorigin="anonymous"></script>
-
-<!-- CSS: SEM integrity — Tracking Prevention é só aviso, não bloqueia -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
-      crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
-      crossorigin="anonymous" />
-
-<!-- Favicon inline (elimina 404) -->
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📡</text></svg>">
-  
-<style>
-    /* ===================================================================
-       VARIÁVEIS DE TEMA (cores globais do app)
-    =================================================================== */
-    :root {
-        --bg-color: #0f1115;
-        --panel-color: #1a1d24;
-        --accent-color: #00ff88;
-        --alert-color: #ff3333;
-        --text-main: #ffffff;
-        --text-muted: #a0a0a0;
-        --sidebar-width: 68px;
-        --btn-size: 50px;
-    }
-
-    /* ===================================================================
-       RESET GLOBAL — remove paddings/margins padrão do navegador
-    =================================================================== */
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    /* ===================================================================
-       BODY — layout principal em coluna, tela cheia, sem scroll
-    =================================================================== */
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    /* ===================================================================
-       HEADER — barra superior com logo, título e botão menu
-    =================================================================== */
-    header {
-        background-color: var(--panel-color);
-        padding: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 2px solid var(--accent-color);
-        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
-        z-index: 1000;
-    }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .app-icon {
-        width: 50px;
-        height: 40px;
-        border-radius: 8px;
-        object-fit: contain;
-    }
-
-    h1 {
-        font-size: 1.2rem;
-        font-weight: 800;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    h1 span {
-        color: var(--accent-color);
-    }
-
-    /* ===================================================================
-       BOTÃO MENU TOGGLE — hamburger animado com label "MENU"
-       Ao clicar, as 3 barras viram um "X" via transform
-    =================================================================== */
-    .btn-menu-toggle {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 2px;
-        background: none;
-        border: 1.5px solid rgba(0, 255, 136, 0.3);
-        border-radius: 10px;
-        padding: 8px 14px 6px;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        user-select: none;
-        -webkit-user-select: none;
-    }
-
-    .btn-menu-toggle:hover {
-        border-color: var(--accent-color);
-        background: rgba(0, 255, 136, 0.06);
-    }
-
-    .btn-menu-toggle:active {
-        transform: scale(0.93);
-    }
-
-    .menu-hamburger {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        width: 22px;
-    }
-
-    .menu-hamburger span {
-        display: block;
-        height: 2.5px;
-        width: 100%;
-        background-color: var(--accent-color);
-        border-radius: 2px;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        transform-origin: center;
-    }
-
-    /* Animação do X quando o menu está ativo */
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
-        transform: translateY(6.5px) rotate(45deg);
-    }
-
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
-        opacity: 0;
-        transform: scaleX(0);
-    }
-
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
-        transform: translateY(-6.5px) rotate(-45deg);
-    }
-
-    .menu-label {
-        font-size: 0.55rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        color: var(--accent-color);
-        text-transform: uppercase;
-        line-height: 1;
-        margin-top: 2px;
-    }
-
-    /* ===================================================================
-       SIDEBAR CONTROLS — barra vertical à direita com botões de mapa
-       Pode ser retraída via classe .retracted (translateX para fora)
-    =================================================================== */
-    .sidebar-controls {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: var(--sidebar-width);
-        z-index: 500;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 20px 0;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateX(0);
-    }
-
-    .sidebar-controls.retracted {
-        transform: translateX(calc(var(--sidebar-width) + 10px));
-    }
-
-    /* Botões dentro da sidebar — visibilidade controlada pela retração */
-    .sidebar-controls .map-btn {
-        width: var(--btn-size);
-        height: var(--btn-size);
-        opacity: 1;
-        transition: opacity 0.25s ease 0s, transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .sidebar-controls.retracted .map-btn {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.15s ease 0s, transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    /* ===================================================================
-       BARRAS DE BUSCA — search-container para radares e rotas
-       Max-height: 0 quando fechada, 90px quando .active
-       Desliza para baixo com transição suave
-    =================================================================== */
-    .search-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: rgba(26, 29, 36, 0.98);
-        backdrop-filter: blur(8px);
-        display: flex;
-        gap: 12px;
-        z-index: 1000;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        padding: 0 15px;
-        border-bottom: 1px solid transparent;
-        transition: all 0.3s ease;
-        align-items: center;
-    }
-
-    .search-container.active {
-        max-height: 90px;
-        opacity: 1;
-        padding: 15px;
-        border-bottom: 1px solid #333;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Input de busca — cantos arredondados, fundo preto */
-    .search-container input {
-        flex: 1;
-        padding: 14px 20px;
-        border-radius: 30px;
-        border: 1px solid #444;
-        background-color: #000;
-        color: #fff;
-        font-size: 1rem;
-        outline: none;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .search-container input:focus {
-        border-color: var(--accent-color);
-    }
-
-    /* Botão circular de buscar dentro da barra */
-    .btn-search {
-        position: relative;
-        flex-shrink: 0;
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        background: rgba(46, 102, 158, 0.95);
-        box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5);
-        transition: all 0.2s ease;
-        overflow: hidden;
-    }
-
-    .btn-search:active {
-        transform: scale(0.9);
-    }
-
-    .btn-search img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-        display: block;
-        transform: translate(-50%, -50%);
-    }
-
-    /* ===================================================================
-       MAP-WRAPPER — container flexível que segura o mapa e overlays
-       Ocupa todo o espaço restante abaixo do header
-    =================================================================== */
-    .map-wrapper {
-        position: relative;
-        flex: 1;
-        display: flex;
-        overflow: hidden;
-        width: 100%;
-    }
-
-    /* Mapa Leaflet — preenche todo o wrapper */
-   /* Mapa Leaflet — preenche todo o wrapper */
-#map {
-    width: 100%;
-    height: 100%;
-    background-color: #2a2a2a;
-    z-index: 1;
-    position: relative; /* ✅ necessário para .compass-widget absolute funcionar */
-}
-
-/* ===================================================================
-   ISOLAR PANES DO LEAFLET — NÃO DEIXAR NENHUM FICAR ACIMA DA BÚSSOLA
-   =================================================================== */
-/* Esconde o ícone de rotação padrão do leaflet-rotate */
-.leaflet-control-rotate,
-.leaflet-rotate-control,
-.leaflet-control-rotate-icon,
-.leaflet-rotate-control-icon,
-.leaflet-control-rotate-toggle,
-.leaflet-rotate-toggle,
-.leaflet-control-rotate a,
-.leaflet-rotate-control a {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
-/* Todos os panes do Leaflet ficam abaixo da bússola */
-.leaflet-pane,
-.leaflet-map-pane,
-.leaflet-tile-pane,
-.leaflet-overlay-pane,
-.leaflet-shadow-pane,
-.leaflet-marker-pane,
-.leaflet-popup-pane,
-.leaflet-control-pane,
-.leaflet-tooltip-pane {
-    z-index: 1 !important; /* forçar abaixo da bússola */
-}
-
-/* ===================================================================
-   CORREÇÃO: BÚSSOLA SEMPRE NO TOPO - NENHUM ÍCONE ATRÁS
-   =================================================================== */
-
-   /* ✅ BÚSSOLA: isolar em contexto de empilhamento próprio, acima de TUDO */
-.compass-widget {
-    position: absolute;
-    top: 65px;
-    left: 5px;
-    width: 65px;
-    height: 65px;
-    
-    /* Criar novo contexto de empilhamento isolado, acima do mapa */
-    z-index: 999999 !important;
-    
-    /* Forçar composição em layer separado do GPU, acima de todos os panes */
-    transform: translateZ(0);
-    will-change: transform;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-}
-
-/* Base da bússola */
-.compass-base {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    background-image: url('/imagens_app/ic_compass.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.9;
-}
-
-/* Ponteira da bússola */
-.compass-needle {
-    position: absolute;
-    width: 55%;
-    height: 55%;
-    z-index: 2; /* acima da base */
-    object-fit: contain;
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* ===================================================================
-   SE A BÚSSOLA ESTIVER DENTRO DE #map, FORÇAR SAÍDA DO FLUXO LEAFLET
-   =================================================================== */
-
-/* Mover a bússola para fora do contexto de empilhamento do Leaflet */
-#map > .compass-widget,
-#map .compass-widget {
-    /* Forçar posicionamento no topo da pilha de renderização */
-    position: absolute !important;
-    z-index: 999999 !important;
-    
-    /* Isolar em novo contexto de empilhamento */
-    isolation: isolate;
-    
-    /* Garantir que não herde transform do mapa */
-    transform: translateZ(1px) !important;
-}
-
-/* Se houver algum container pai com transform/opacity que crie contexto */
-.leaflet-container .compass-widget,
-.leaflet-map-pane ~ .compass-widget {
-    z-index: 999999 !important;
-    position: absolute !important;
-}
-    /* ===================================================================
-       MAP-BTN — estilo base para todos os botões redondos do mapa
-    =================================================================== */
-    .map-btn {
-        width: var(--btn-size);
-        height: var(--btn-size);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        cursor: pointer;
-        background: rgba(20, 20, 20, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-    }
-
-    .map-btn:hover {
-        transform: scale(1.08);
-        border-color: var(--accent-color);
-    }
-
-    .map-btn:active {
-        transform: scale(0.92);
-    }
-
-    .map-btn img {
-        width: 30px;
-        height: 30px;
-        object-fit: contain;
-        pointer-events: none;
-    }
-
-    /* ===================================================================
-       BOTÃO ALERTA TOGGLE — estados LIGADO/DESLIGADO
-    =================================================================== */
-    .alert-toggle-btn {
-        background: rgba(29, 28, 28, 0.9);
-        border: 2px solid rgba(255, 255, 255, 0.08);
-        transition: all 0.3s ease;
-    }
-
-    .alert-toggle-btn.alert-off {
-        background: rgba(222, 127, 127, 0.9);
-        border-color: #888;
-    }
-
-    .alert-toggle-btn.alert-off img {
-        filter: rgba(225, 82, 82, 0.9);
-    }
-
-    .alert-toggle-btn img {
-        transition: all 0.3s ease;
-    }
-
-    .sidebar-controls .map-btn {
-        border: 1px solid rgba(0, 255, 136, 0.35);
-    }
-
-    #btn-route-bar {
-        width: 54px;
-        height: 54px;
-    }
-
-    /* ===================================================================
-       CSS do botão de rotação — feedback visual + ícone girante
-    =================================================================== */
-    #btn-rotate-map {
-        transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    }
-
-    #btn-rotate-map.rotated {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
-        background-color: rgba(0, 255, 136, 0.08);
-    }
-
-    #btn-rotate-map.rotated img {
-        filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5));
-        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
-    }
-
-    #btn-rotate-map:not(.rotated) img {
-        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
-    }
-
-    /* ===================================================================
-       MARCADORES DE USUÁRIO E NAVEGAÇÃO
-    =================================================================== */
-    .user-gps-marker,
-    .user-navigator-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .user-gps-marker img,
-    .user-navigator-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        transition: none !important;
-        will-change: transform;
-    }
-
-    .route-start-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .route-start-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        animation: pulseStart 1s ease-in-out infinite;
-    }
-
-    .route-end-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .route-end-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        animation: pulseEnd 1.2s ease-in-out infinite;
-    }
-
-    @keyframes pulseStart {
-        0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-        100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes pulseEnd {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-    }
-
-    /* ===================================================================
-       MARCADORES DE RADAR
-    =================================================================== */
-    .radar-marker-icon {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .radar-marker-icon img {
-        width: 40px !important;
-        height: 40px !important;
-        object-fit: contain !important;
-        display: block !important;
-    }
-
-    /* ===================================================================
-       SPEED WIDGET
-    =================================================================== */
-    .speed-widget {
-        position: absolute;
-        bottom: -15px;
-        left: -25px;
-        width: 150px;
-        height: 150px;
-        z-index: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .speed-bg {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        pointer-events: none;
-    }
-
-    .speed-value {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-64%, -60%);
-        font-size: 28px;
-        font-weight: 700;
-        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-        color: #000;
-        line-height: 1;
-        z-index: 2;
-        white-space: nowrap;
-        text-align: center;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: -0.5px;
-        min-width: 3ch;
-    }
-
-    /* ===================================================================
-       ALERT CONTAINER
-    =================================================================== */
-    #alert-container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-        display: none;
-        animation: slideUp 0.3s ease-out;
-        pointer-events: none;
-    }
-
-    @keyframes slideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); background: linear-gradient(90deg, #ff2200, #ee0000); }
-        100% { transform: scale(1); }
-    }
-
-    .alert-bar {
-        background: linear-gradient(90deg, #cc0000, #990000);
-        color: white;
-        padding: 18px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
-        border-top: 2px solid #ff5555;
-        transition: all 0.2s ease;
-    }
-
-    .alert-bar-critico {
-        animation: pulse 0.8s ease-in-out infinite;
-    }
-
-    .alert-bar img {
-        width: 50px;
-        height: 50px;
-        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
-    }
-
-    .alert-info h3 {
-        font-size: 1.2rem;
-        margin-bottom: 3px;
-        text-transform: uppercase;
-        font-weight: 800;
-    }
-
-    .alert-info p {
-        font-size: 0.95rem;
-        opacity: 0.95;
-    }
-
-    /* ===================================================================
-       TOAST NOTIFICATION
-    =================================================================== */
-    .toast-notification {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-20px);
-        background-color: rgba(20, 20, 20, 0.95);
-        color: var(--text-main);
-        padding: 12px 25px;
-        border-radius: 50px;
-        border: 1px solid #444;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-        z-index: 2000;
-        opacity: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-align: center;
-        pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        white-space: nowrap;
-    }
-
-    .toast-notification.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-
-    /* ===================================================================
-       LOADING OVERLAY
-    =================================================================== */
-    .loading-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(20, 20, 20, 0.9);
-        padding: 20px 30px;
-        border-radius: 12px;
-        border: 1px solid var(--accent-color);
-        text-align: center;
-        z-index: 1001;
-        backdrop-filter: blur(5px);
-    }
-
-    .loading-spinner {
-        border: 3px solid #333;
-        border-top: 3px solid var(--accent-color);
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 10px;
-    }
-
-    @keyframes spin {
-        100% { transform: rotate(360deg); }
-    }
-
-    /* ===================================================================
-       LOADING FULLSCREEN
-    =================================================================== */
-    .loading-fullscreen {
-        position: fixed;
-        inset: 0;
-        background-color: var(--bg-color);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-
-    .loading-fullscreen.fade-out {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .loading-fullscreen .spinner-ring {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        position: relative;
-        margin-bottom: 24px;
-    }
-
-    .loading-fullscreen .spinner-ring::before,
-    .loading-fullscreen .spinner-ring::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        border: 4px solid transparent;
-    }
-
-    .loading-fullscreen .spinner-ring::before {
-        border-top-color: var(--accent-color);
-        border-right-color: var(--accent-color);
-        animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
-    }
-
-    .loading-fullscreen .spinner-ring::after {
-        inset: 10px;
-        border-bottom-color: #ff3333;
-        border-left-color: #ff3333;
-        animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse;
-    }
-
-    @keyframes spinRing {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .loading-fullscreen .loading-text {
-        font-size: 1.1rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        text-align: center;
-    }
-
-    .loading-fullscreen .loading-text span {
-        color: var(--accent-color);
-    }
-
-    .loading-fullscreen .loading-sub {
-        margin-top: 8px;
-        font-size: 0.8rem;
-        color: #777;
-        animation: pulseText 1.8s ease-in-out infinite;
-    }
-
-    @keyframes pulseText {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 1; }
-    }
-
-    /* ===================================================================
-       CONTROLES DO LEAFLET ESCONDIDOS
-    =================================================================== */
-    .leaflet-control-zoom,
-    .leaflet-control-attribution,
-    .leaflet-routing-container {
-        display: none !important;
-    }
-</style>
-</head>
-<body>
-
-  <div class="loading-fullscreen" id="loading-fullscreen">
-    <div class="spinner-ring"></div>
-    <div class="loading-text">Iniciando <span>Radar X9</span></div>
-    <div class="loading-sub">Sincronizando satélites...</div>
-  </div>
-
-  <header>
-    <div class="header-left">
-      <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
-      <h1>RADAR <span>X9</span> BH</h1>
-    </div>
-    <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
-      <div class="menu-hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <div class="menu-label">MENU</div>
-    </button>
-  </header>
-
-  <div class="map-wrapper">
-
-    <div class="search-container" id="search-bar-radares">
-      <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
-      <button class="btn-search" id="btn-search-radar" title="Buscar"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca"></button>
-    </div>
-
-    <div class="search-container" id="search-bar-rota">
-      <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
-      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
-    </div>
-
-
-<!-- HTML: Bússola FORA do #map -->
-    <div id="app-container" style="position: relative; width: 100%; height: 100%;">
-    <div id="map"></div>
-    <div class="toast-notification" id="toast-msg"></div>
-    <!-- Bússola: irmã do #map, não filha -->
-    <div class="compass-widget">
-      <div class="compass-base" id="compass-base-img"></div>
-      <img src="/imagens_app/ic_compass_ponteira.png" class="compass-needle" id="compass-needle-img">
-  </div>
-  
-</div>
-     
-    
-  
-    <!-- ICONE DE VELOCIDADE  -->
-    <div class="speed-widget">
-      <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
-      <div class="speed-value" id="speed-display">0</div>
-    </div>
-
-    <!-- Sidebar de controles -->
-    <div class="sidebar-controls" id="sidebar-controls">
-      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
-        <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
-      </button>
-      <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar"><img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta"></button>
-      <button class="map-btn" id="btn-search-bar" title="Buscar Radares"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca"></button>
-      <button class="map-btn" id="btn-route-bar" title="Navegar / Rota"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
-      <button class="map-btn" id="btn-center" title="Centralizar GPS"><img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro"></button>
-      <button class="map-btn" id="btn-refresh" title="Resetar Mapa"><img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh"></button>
-      <button class="map-btn" id="btn-zoom-in" title="Aumentar Zoom"><img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In"></button>
-      <button class="map-btn" id="btn-zoom-out" title="Diminuir Zoom"><img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out"></button>
-    </div>
-
-    <div id="alert-container">
-      <div class="alert-bar">
-        <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
-        <div class="alert-info">
-          <h3 id="alert-title">ATENÇÃO!</h3>
-          <p id="alert-text">Radar Próximo</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="loading-overlay" id="loading" style="display:none;">
-      <div class="loading-spinner"></div>
-      <div style="margin-top:10px; color:#fff;">Processando...</div>
-    </div>
-  </div>
-
-  <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
-
-  <script>
+<script>
     // ===================================================================
     // VARIÁVEIS GLOBAIS
     // ===================================================================
@@ -1012,13 +99,13 @@ crossorigin="anonymous"></script>
     let animacaoNavegacaoAtiva = false;
     
     let ultimaAtualizacaoCamera = 0;
-    let INTERVALO_CAMERA_MS = 100; // Reduzido de 200 para 100ms (10fps) - mais suave
+    let INTERVALO_CAMERA_MS = 100;
     let zoomAtualEfetivo = 19;
     let centroAtualEfetivo = { lat: null, lng: null };
     
     let bearingAlvoMapa = 0;
     let bearingAtualMapa = 0;
-    let FATOR_SUAVIZACAO_BEARING_MAPA = 0.12; // Aumentado de 0.05 para 0.12 - transição mais rápida mas suave
+    let FATOR_SUAVIZACAO_BEARING_MAPA = 0.12;
     let ultimoBearingAplicado = null;
     let bearingBloqueado = false;
     let headingIconeNavegacao = 0;
@@ -1970,13 +1057,62 @@ crossorigin="anonymous"></script>
     
     function resetarMapa() { resetarTotalMapa(); carregarRadares(); }
     
-    function extrairCoordenadas(record) {
-      if (!record || record.length < 8) return null;
-      let s = String(record[9]).trim().replace(/\s*,\s*/g, ',').trim();
-      if (!s.includes('.') && s.includes(',')) { let p = s.indexOf(','); if (p !== -1) s = s.substring(0, p) + '.' + s.substring(p + 1); }
-      let parts = s.split(','); if (parts.length !== 2) return null;
-      let lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
-      if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    // ===================================================================
+    // EXTRAIR COORDENADAS — VERSÃO MELHORADA COM DETECÇÃO DE FORMATO
+    // ===================================================================
+    function extrairCoordenadas(record, index) {
+      if (!record || record.length < 10) {
+        console.warn('Radar #' + (index !== undefined ? index : '?') + ': record muito curto (' + (record ? record.length : 0) + ' campos)');
+        return null;
+      }
+
+      let s = String(record[9]).trim();
+      console.log('Radar #' + (index !== undefined ? index : '?') + ': coordenada bruta = "' + s + '"');
+
+      // NOVA LÓGICA: Detectar formato e converter corretamente
+      let lat, lng;
+
+      // Tentar formato com ponto decimal padrão: "-19.919055,-43.938641"
+      if (s.includes('.')) {
+        let parts = s.split(',').map(function(p) { return p.trim(); });
+        if (parts.length === 2) {
+          lat = parseFloat(parts[0]);
+          lng = parseFloat(parts[1]);
+        }
+      }
+      // Formato brasileiro com vírgula decimal: "-19,919055;-43,938641" (ponto-e-vírgula como separador)
+      else if (s.includes(';')) {
+        let parts = s.split(';').map(function(p) { return p.trim().replace(',', '.'); });
+        if (parts.length === 2) {
+          lat = parseFloat(parts[0]);
+          lng = parseFloat(parts[1]);
+        }
+      }
+      // Formato brasileiro com vírgula decimal E vírgula como separador (problemático)
+      // "-19,919055,-43,938641" → precisa de lógica mais inteligente
+      else if ((s.match(/,/g) || []).length >= 3) {
+        // Assumir que a coordenada está no formato lat,decimal_lng,decimal
+        // Estratégia: encontrar o separador entre os dois números (vírgula entre número completo e sinal negativo)
+        let match = s.match(/(-?\d+,\d+),(-?\d+,\d+)/);
+        if (match) {
+          lat = parseFloat(match[1].replace(',', '.'));
+          lng = parseFloat(match[2].replace(',', '.'));
+        }
+      }
+      // Último recurso: tentar split simples
+      else {
+        let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); });
+        if (parts.length === 2) {
+          lat = parseFloat(parts[0]);
+          lng = parseFloat(parts[1]);
+        }
+      }
+
+      if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        console.warn('Radar #' + (index !== undefined ? index : '?') + ': coordenadas inválidas (lat=' + lat + ', lng=' + lng + ')');
+        return null;
+      }
+
       return { lat: lat, lng: lng };
     }
     
@@ -2284,21 +1420,30 @@ crossorigin="anonymous"></script>
       } catch (e) { console.warn("[Radar X9] Falha:", e.message); $("#loading").hide(); showNotification("Erro ao carregar radares: " + e.message); }
     }
     
+    // ===================================================================
+    // RENDERIZAR RADARES NO MAPA — VERSÃO MELHORADA COM LOGS
+    // ===================================================================
     function renderizarRadaresNoMapa(records, origem) {
       if (!map) return;
       let contador = 0;
+      let falhasCoords = 0;
+      let falhasValidacao = 0;
+
       for (let i = 0; i < records.length; i++) {
         let record = records[i];
         let endereco = record[2] || "Endereço não informado";
         let tipo = (record[3] || "Não Identificado").trim();
         let velocidade = record[4] || "0";
-        let coordsFinais = extrairCoordenadas(record);
-        if (!coordsFinais) continue;
+        let coordsFinais = extrairCoordenadas(record, i);
+        if (!coordsFinais) {
+          falhasCoords++;
+          continue;
+        }
         let iconeUrl = getIconUrl(tipo, velocidade);
         let fallbackUrl = '/imagens_app/ic_radar_cev_v2.png';
         let iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
         let radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
-    
+
         setTimeout(function() { 
           let el = radarMarker.getElement(); 
           if (el) {
@@ -2306,23 +1451,24 @@ crossorigin="anonymous"></script>
             if (imgEl) imgEl.setAttribute('data-fallback', fallbackUrl); 
           }
         }, 100);
-    
+
         let tipoExibicao = ajusteNomes[tipo] || tipo;
         let isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
         let tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
         radarMarker.bindPopup(
-  '<div style="color:#222;font-family:Inter;text-align:center;min-width:200px;">' +
-  tituloPopup +
-  '<br><hr style="border:0;border-top:1px solid #ddd;margin:5px 0;">' +
-  endereco +
-  '<br><div style="color:#d00;font-weight:bold;margin-top:5px;">Máx: ' +
-  velocidade +
-  ' km/h</div></div>'
-);
+          '<div style="color:#222;font-family:Inter;text-align:center;min-width:200px;">' +
+          tituloPopup +
+          '<br><hr style="border:0;border-top:1px solid #ddd;margin:5px 0;">' +
+          endereco +
+          '<br><div style="color:#d00;font-weight:bold;margin-top:5px;">Máx: ' +
+          velocidade +
+          ' km/h</div></div>'
+        );
         radarMarker.radarData = { id: i, latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco: endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA };
         radarMarkers.push(radarMarker);
         contador++;
       }
+      console.log('Total: ' + records.length + ', Sucesso: ' + contador + ', Falhas: ' + falhasCoords);
       $("#loading").hide();
       if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
       else showNotification("Nenhum radar encontrado.");
@@ -2352,8 +1498,4 @@ crossorigin="anonymous"></script>
     }, { once: true });
     
     window.onload = initMap;
-      </script>
-
-
-</body>
-</html>
+</script>
