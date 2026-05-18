@@ -1028,6 +1028,14 @@ crossorigin="anonymous"></script>
     let FATOR_SUAVIZACAO_BEARING_MAPA = 0.12;
     let ultimoBearingAplicado = null;
     let bearingBloqueado = false;
+
+    // ===================================================================
+    // DETECÇÃO DE SUPORTE A ROTAÇÃO DO MAPA
+    // ===================================================================
+    // O Leaflet nativo NÃO suporta rotação. É necessário o plugin leaflet-rotate.
+    // CDN: https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js
+    // GitHub: https://github.com/Raruto/leaflet-rotate
+    let mapRotationSuportada = false;  // true se setBearing está disponível
     let headingIconeNavegacao = 0;
     let headingIconeSuavizado = 0;
     let FATOR_SUAVIZACAO_ICONE = 0.12;
@@ -1866,7 +1874,7 @@ crossorigin="anonymous"></script>
       headingSuavizado = 0;
       zoomAlvo = 19;
     
-      if (typeof map.setBearing === 'function') map.setBearing(0);
+      if (mapRotationSuportada && map.setBearing) map.setBearing(0);
     
       let ri = document.getElementById('rotate-btn-icon');
       if (ri) ri.style.transform = 'rotate(0deg)';
@@ -1951,7 +1959,7 @@ crossorigin="anonymous"></script>
       if (modoNavegacaoAtivo) finalizarNavegacao3D();
       fecharTodasBarras();
       mapaRotacionado = false;
-      if (typeof map.setBearing === 'function') map.setBearing(0);
+      if (mapRotationSuportada && map.setBearing) map.setBearing(0);
       let ri = document.getElementById('rotate-btn-icon'); if (ri) ri.style.transform = 'rotate(0deg)';
       let rb = document.getElementById('btn-rotate-map'); if (rb) rb.classList.remove('rotated');
       posicaoSuavizada = { lat: null, lng: null }; posicaoSuavizadaGPS = { lat: null, lng: null };
@@ -2061,20 +2069,17 @@ crossorigin="anonymous"></script>
     function atualizarBussola(headingDegrees) { let needle = document.getElementById('compass-needle-img'); if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)'; }
     
     // ===================================================================
-    // ATUALIZAR ROTAÇÃO DO MAPA (bússola) — FORA DA NAVEGAÇÃO
+    // ATUALIZAR ROTAÇÃO DA BÚSSOLA (fora da navegação)
     // ===================================================================
     function atualizarRotacaoMapa() {
       if (!mapaRotacionado || !map) return;
-
-      // Durante navegação: NÃO fazer nada aqui — câmera controla tudo
+      // Durante navegação: NÃO fazer nada — câmera controla tudo
       if (modoNavegacaoAtivo) return;
-
-      // Fora da navegação: atualizar ícone da bússola periodicamente
-      let agora = Date.now();
-      if (agora - ultimaAtualizacaoRotacao < 200) return;
+      // Fora da navegação: atualizar ícone da bússola
+      let agora = Date.now(); 
+      if (agora - ultimaAtualizacaoRotacao < 200) return; 
       ultimaAtualizacaoRotacao = agora;
-
-      let ri = document.getElementById('rotate-btn-icon');
+      let ri = document.getElementById('rotate-btn-icon'); 
       if (ri) ri.style.transform = 'rotate(' + currentHeading + 'deg)';
     }
     
@@ -2251,7 +2256,21 @@ crossorigin="anonymous"></script>
     // ===================================================================
     function initMap() {
       if (typeof L === 'undefined') { hideFullscreenLoading(); showNotification("Erro de conexão."); return; }
+
+      // Criar mapa COM opção rotate (necessária para o plugin leaflet-rotate)
       map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
+
+      // DETECTAR se o plugin leaflet-rotate está carregado
+      // O plugin adiciona o método setBearing ao prototype do mapa
+      if (typeof map.setBearing === 'function') {
+        mapRotationSuportada = true;
+        console.log('[Radar X9] ✅ Plugin leaflet-rotate detectado. Rotação ativada.');
+      } else {
+        mapRotationSuportada = false;
+        console.warn('[Radar X9] ⚠️ Plugin leaflet-rotate NÃO detectado. Rotação do mapa desabilitada.');
+        console.warn('[Radar X9] Adicione ao HTML: <script src="https://unpkg.com/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"><\/script>');
+      }
+
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
       inicializarBussolaHardware();
