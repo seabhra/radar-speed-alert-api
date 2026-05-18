@@ -1518,13 +1518,13 @@ crossorigin="anonymous"></script>
     
       headingSuavizado = suavizarHeading(headingSuavizado, hN);
     
-      // Atualizar heading do ícone de navegação - SEMPRE aponta para a rota quando em snap
-      if (modoNavegacaoAtivo && headingDoSegmento !== null) {
-        headingIconeNavegacao = headingDoSegmento;
-        ultimoHeadingRota = headingDoSegmento;
+      // Atualizar heading do ícone de navegação
+      if (modoNavegacaoAtivo && estaFazendoSnap && ultimoHeadingRota !== null) {
+        // Quando em snap, ícone aponta para o segmento da rota
+        headingIconeNavegacao = ultimoHeadingRota;
       } else if (modoNavegacaoAtivo) {
-        // Fora do snap, usar último heading conhecido da rota ou heading suavizado
-        headingIconeNavegacao = ultimoHeadingRota || headingSuavizado;
+        // Fora do snap, usar heading suavizado
+        headingIconeNavegacao = headingSuavizado;
       }
     
       if (modoNavegacaoAtivo && startRouteMarker) {
