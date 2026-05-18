@@ -1007,12 +1007,6 @@
     let FATOR_SUAVIZACAO_BEARING_MAPA = 0.12;
     let ultimoBearingAplicado = null;
     let bearingBloqueado = false;
-
-    // ===================================================================
-    // REFERÊNCIAS DOM PARA ROTAÇÃO CSS
-    // ===================================================================
-    let mapTilePane = null;      // .leaflet-tile-pane (camada de tiles)
-    let mapOverlayPane = null;   // .leaflet-overlay-pane (marcadores, rotas)
     let headingIconeNavegacao = 0;
     let headingIconeSuavizado = 0;
     let FATOR_SUAVIZACAO_ICONE = 0.12;
@@ -1851,9 +1845,7 @@
       headingSuavizado = 0;
       zoomAlvo = 19;
     
-      // Limpar rotação
-      if (typeof map.setBearing === 'function') { try { map.setBearing(0); } catch(e) {} }
-      rotacionarMapaCSS(0);
+      if (typeof map.setBearing === 'function') map.setBearing(0);
     
       let ri = document.getElementById('rotate-btn-icon');
       if (ri) ri.style.transform = 'rotate(0deg)';
@@ -1938,9 +1930,7 @@
       if (modoNavegacaoAtivo) finalizarNavegacao3D();
       fecharTodasBarras();
       mapaRotacionado = false;
-      // Limpar rotação
-      if (typeof map.setBearing === 'function') { try { map.setBearing(0); } catch(e) {} }
-      rotacionarMapaCSS(0);
+      if (typeof map.setBearing === 'function') map.setBearing(0);
       let ri = document.getElementById('rotate-btn-icon'); if (ri) ri.style.transform = 'rotate(0deg)';
       let rb = document.getElementById('btn-rotate-map'); if (rb) rb.classList.remove('rotated');
       posicaoSuavizada = { lat: null, lng: null }; posicaoSuavizadaGPS = { lat: null, lng: null };
@@ -2050,15 +2040,21 @@
     function atualizarBussola(headingDegrees) { let needle = document.getElementById('compass-needle-img'); if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)'; }
     
     // ===================================================================
-    // CORREÇÃO: ROTAÇÃO DO MAPA — AGORA ESTÁVEL E CONTROLADA
+    // ATUALIZAR ROTAÇÃO DO MAPA (bússola) — FORA DA NAVEGAÇÃO
     // ===================================================================
     function atualizarRotacaoMapa() {
       if (!mapaRotacionado || !map) return;
-      // Durante navegação, a rotação do mapa é controlada por atualizarBearingMapa()
-      // NÃO chamar setBearing aqui para evitar conflito com a câmera 3D
-      let agora = Date.now(); if (agora - ultimaAtualizacaoRotacao < 200) return; ultimaAtualizacaoRotacao = agora;
-      // Apenas atualizar o ícone da bússola, não o mapa
-      let ri = document.getElementById('rotate-btn-icon'); if (ri) ri.style.transform = 'rotate(' + currentHeading + 'deg)';
+
+      // Durante navegação: NÃO fazer nada aqui — câmera controla tudo
+      if (modoNavegacaoAtivo) return;
+
+      // Fora da navegação: atualizar ícone da bússola periodicamente
+      let agora = Date.now();
+      if (agora - ultimaAtualizacaoRotacao < 200) return;
+      ultimaAtualizacaoRotacao = agora;
+
+      let ri = document.getElementById('rotate-btn-icon');
+      if (ri) ri.style.transform = 'rotate(' + currentHeading + 'deg)';
     }
     
     function inicializarBussolaHardware() {
@@ -2234,16 +2230,7 @@
     // ===================================================================
     function initMap() {
       if (typeof L === 'undefined') { hideFullscreenLoading(); showNotification("Erro de conexão."); return; }
-
-      // Criar mapa
       map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
-
-      // Guardar referências aos panes para rotação CSS
-      setTimeout(function() {
-        mapTilePane = document.querySelector('.leaflet-tile-pane');
-        mapOverlayPane = document.querySelector('.leaflet-overlay-pane');
-      }, 100);
-
       aplicarTemaMapa();
       setInterval(aplicarTemaMapa, 300000);
       inicializarBussolaHardware();
@@ -2420,7 +2407,6 @@
     
     window.onload = initMap;
 </script>
-
 
 </body>
 </html>
