@@ -2054,15 +2054,21 @@ crossorigin="anonymous"></script>
     function atualizarBussola(headingDegrees) { let needle = document.getElementById('compass-needle-img'); if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)'; }
     
     // ===================================================================
-    // CORREÇÃO: ROTAÇÃO DO MAPA — AGORA ESTÁVEL E CONTROLADA
+    // ATUALIZAR ROTAÇÃO DO MAPA (bússola) — FORA DA NAVEGAÇÃO
     // ===================================================================
     function atualizarRotacaoMapa() {
       if (!mapaRotacionado || !map) return;
-      // Durante navegação, a rotação do mapa é controlada por atualizarBearingMapa()
-      // NÃO chamar setBearing aqui para evitar conflito com a câmera 3D
-      let agora = Date.now(); if (agora - ultimaAtualizacaoRotacao < 200) return; ultimaAtualizacaoRotacao = agora;
-      // Apenas atualizar o ícone da bússola, não o mapa
-      let ri = document.getElementById('rotate-btn-icon'); if (ri) ri.style.transform = 'rotate(' + currentHeading + 'deg)';
+
+      // Durante navegação: NÃO fazer nada aqui — câmera controla tudo
+      if (modoNavegacaoAtivo) return;
+
+      // Fora da navegação: atualizar ícone da bússola periodicamente
+      let agora = Date.now();
+      if (agora - ultimaAtualizacaoRotacao < 200) return;
+      ultimaAtualizacaoRotacao = agora;
+
+      let ri = document.getElementById('rotate-btn-icon');
+      if (ri) ri.style.transform = 'rotate(' + currentHeading + 'deg)';
     }
     
     function inicializarBussolaHardware() {
