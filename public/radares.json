@@ -443,13 +443,30 @@
       [426, "1719","Av. Juscelino Kubitschek - Via Expressa, 4369","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001042","KBH5301042"," -19.924004, -43.982507"],
       [427, "1720"," Av. Juscelino Kubitschek - Via Expressa, 1990","Controlador Eletrônico de Velocidade (CEV)","60","Contagem/BH","1001043","KBH5301043","-19.922776, -43.974044"],
       [428, "1721","Av. Antônio Carlos,  Esq. Av. Mal. Experidião Rosa","Detector de Uso de Celular (DUC)","60"," UFMG/Centro","1001044"," KBH5301044"," -19.87137, -43.95507"],
-      [429, "1722"," Av. Antônio Carlos, Esq. Av. Maj. Delfino de Paula","Detector de Uso de Celular (DUC)","60","UFMG/Centro","1001045"," KBH5301044","-19.87491, -43.95370"],
+      [429, "1722"," Av. Antônio Carlos, Esq. Av. Maj. Delfino de Paula","Detector de Uso de Celular (DUC)","60","UFMG/Centro","1001045"," KBH5301045","-19.87491, -43.95370"],
       [430, "1723","Rodovia BR-356, Próx. Anel Rodoviário ","Controlador Eletrônico de Velocidade (CEV)","80","BH Shopping/Rio de Janeiro","1001046","KBH5301046"," -19.99547, -43.96078"],
       [431, "1724","Anel Rodoviário, Próx. Rodovia BR-356","Controlador Eletrônico de Velocidade (CEV)","70","Rio de Janeiro/ BH Shopping","1001047","KBH5301047","-19.99729, -43.96156"],
       [432, "1725","Campus da UFMG, Próx Av. Perimetral Sul","Zona de Estudo Nuclear (ZEN)","30","UFMG/Centro","1001048","KBH5301048","-19.87316, -43.96663"],
       [433, "1726","Anel Rodoviário Celso Mello Azevedo, Próx Av. Cristiano Machado","Radar de Caminhão na Faixa Esquerda (CFE)","30","Vila Suzana/Av. Antônio Carlos","1001049","KBH5301049","-19.86711, -43.93375"],
       [434, "1727","Av. Cristovão Colombo, Próx Rua Sergipe","Detector de Invasão de Faixa Exclusiva (DIFEX)","60","Praça da Liberdade/Savassi","1001050","KBH5301050","-19.93532, -43.93740"],
-      [435, "1728"," Av. Tereza Cristina, Próximo à Rua Bastilha: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Barreiro/Centro","1001050","KBH5301050", "-19.95372, -44.01372 "]
-   
+      [435, "1728"," Av. Tereza Cristina, Próximo à Rua Bastilha: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)","60","Barreiro/Centro","1001051","KBH5301051", "-19.95372, -44.01372"],
+      [436, "1729"," Av. Amazonas, Próximo à Rua Sararé", "Detector de Uso de Celular (DUC)","60","Centro/Contagem","1001052","KBH5301052", "-19.94051, -44.00210"],
+      [437, "1730"," Av. Amazonas, Próximo à Rua Sararé", "Detector de Uso de Celular (DUC)","60","Contagem/Centro","1001053","KBH5301053", "-19.94070, -44.00204"],
+      [438, "1731","Rua Sararé, Próximo à Av. Amazonas", "Detector de Uso de Celular (DUC)","60","Cabana/Centro","1001054","KBH5301054", "-19.94066, -44.00191"],
+      [439, "1732","Av. Amazonas, Próximo ao Anel Rodoviário","Detector de Uso de Celular (DUC)","60","Contagem/Centro","1001055","KBH5301055", "-19.94663, -44.00634"],
+      [440, "1733","Av. Amazonas, Próximo ao Anel Rodoviário","Câmera Olho Vivo (COV)","60","Contagem/Centro","1001056","KBH5301056", "-19.94767, -44.00800"],
+      [441, "1734","Av. Amazonas, Próximo à Rua Sararé","Câmera Olho Vivo (COV)","60","Contagem/Centro","1001057","KBH5301057", "-19.94049, -44.00189"],
+      [442, "1735","Av. Amazonas, Próximo à Rua Visconde de Cairú","Câmera Olho Vivo (COV)","60","Contagem/Centro","1001058","KBH5301058", "-19.94572, -44.00545"],
+      [443, "1736","Av. Amazonas, Próximo à Rua Visconde de Cairú","Leitor Inteligente de Placas (OCR-P)","60","Contagem/Centro","1001059","KBH5301059","-19.94594, -44.00565"],
+      [444, "1737","Av. Amazonas, Próximo à Rua Visconde de Cairú","Leitor de Reconhecimento Facial (OCR-F)","60","Centro/Contagem","1001060","KBH5301060","-19.94607, -44.00591"],
+      [445, "1738","Av. Amazonas, Próximo à Rua Sararé","Leitor de Reconhecimento Facial (OCR-F)","60","Contagem/Centro","1001061","KBH5301061","-19.94079, -44.00212"],
+      [446, "1739","Av. Amazonas, Próximo à Sararé","Leitor Inteligente de Placas (OCR-P)","60","Centro/Contagem","1001062","KBH5301062","-19.94075, -44.00223"],
+      [447, "1739","Av. Amazonas, Próximo à Sararé","Zona de Perigo e Violência (ZPV)","60","Centro/Contagem","1001063","KBH5301063","-19.94120, -44.00254"],
+      [448, "1740","Av. Amazonas, Próximo Rua Visconde de Cairú","Zona de Perigo e Violência (ZPV)","60","Centro/Contagem","1001064","KBH5301064","-19.94524, -44.00525"],
+      [449, "1741","Rua Independência, Próximo Rua Frei Gáspar","Zona de Perigo e Violência (ZPV)","60","Cabana/Centro","1001065","KBH5301065","-19.94736, -44.00137"],
+      [450, "1742","Rua Independência, Próximo Rua Sararé","Zona de Perigo e Violência (ZPV)","60","Cabana/Centro","1001066","KBH5301066","-19.94111, -44.00124"]
+      
+    
+
     ]
   }
