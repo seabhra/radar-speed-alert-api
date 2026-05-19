@@ -103,4 +103,19 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-
+// ===================================================================
+// AÇÃO AO CLICAR NA NOTIFICAÇÃO
+// ===================================================================
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({type: 'window'}).then(function(clientList) {
+      if (clientList.length > 0) {
+        // Se o app já estiver aberto em alguma aba, traz para frente
+        return clientList[0].focus();
+      }
+      // Se não estiver aberto, abre uma nova janela com o app
+      return clients.openWindow('/');
+    })
+  );
+});
