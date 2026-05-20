@@ -897,7 +897,7 @@
 
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
-
+<script>
   // ===================================================================
   // VARIÁVEIS GLOBAIS
   // ===================================================================
@@ -1411,12 +1411,12 @@
     ultimaPosicaoMarcador = { lat: null, lng: null };
   
     var startIcon = L.divIcon({
-      html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" style="width:50px;height:50px;">',
-      className: 'route-start-marker user-navigator-marker',
-      iconSize: [50, 50],
-      iconAnchor: [25, 50],
-      popupAnchor: [0, -50]
-    });
+  html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
+  className: 'route-start-marker user-navigator-marker',
+  iconSize: [50, 50],
+  iconAnchor: [25, 50],
+  popupAnchor: [0, -50]
+});
   
     startRouteMarker = L.marker([originLat, originLng], {
       icon: startIcon,
@@ -1430,13 +1430,12 @@
     });
   
     var endIcon = L.divIcon({
-      html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" style="width:50px;height:50px;">',
-      className: 'route-end-marker',
-      iconSize: [50, 50],
-      iconAnchor: [25, 50],
-      popupAnchor: [0, -50]
-    });
-  
+  html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+  className: 'route-end-marker',
+  iconSize: [50, 50],
+  iconAnchor: [25, 50],
+  popupAnchor: [0, -50]
+});
     endRouteMarker = L.marker([destLat, destLng], {
       icon: endIcon,
       zIndexOffset: 900
@@ -1519,12 +1518,12 @@
     if (rb) rb.classList.remove('rotated');
   
     var defaultIcon = L.divIcon({
-      html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" style="width:50px;height:50px;">',
-      className: 'user-gps-marker',
-      iconSize: [50, 50],
-      iconAnchor: [25, 50],
-      popupAnchor: [0, -50]
-    });
+  html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+  className: 'user-gps-marker',
+  iconSize: [50, 50],
+  iconAnchor: [25, 50],
+  popupAnchor: [0, -50]
+});
   
     userMarker = L.marker([userLat, userLng], {
       icon: defaultIcon,
@@ -1886,13 +1885,15 @@
     userLng = newLng;
   
     if (!userMarker && !estaEmNavegacao) {
-      var defaultIcon = L.divIcon({
-        html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" style="width:50px;height:50px;">',
-        className: 'user-gps-marker',
-        iconSize: [50, 50],
-        iconAnchor: [25, 50],
-        popupAnchor: [0, -50]
-      });
+  var defaultIcon = L.divIcon({
+    html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+    className: 'user-gps-marker',
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
+    popupAnchor: [0, -50]
+  });
+}
+
       userMarker = L.marker([smoothLat, smoothLng], {
         icon: defaultIcon,
         zIndexOffset: 1000
@@ -1903,11 +1904,14 @@
         offset: [0, -25]
       });
       ultimaPosicaoMarcador.lat = smoothLat;
-      ultimaPosicaoMarcador.lng = smoothLng;
-      if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
-    } else {
-      moverMarcadorSuavemente(smoothLat, smoothLng);
-    }
+ultimaPosicaoMarcador.lng = smoothLng;
+
+if (!gpsInitialized) {
+  gpsInitialized = true;
+  hideFullscreenLoading();
+} else {
+  moverMarcadorSuavemente(smoothLat, smoothLng);
+}
   
     // ✅ Atualiza rota com throttle de 5 segundos
     if (destinoAtual && routingControl && estaEmNavegacao) {
@@ -2263,7 +2267,7 @@
       var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
   
       radarMarker.bindPopup(
-        '<div style="color:#222; font-family:'Inter'; text-align:center; min-width:200px;">' +
+        '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">'+
         tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
         endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div></div>'
       );
@@ -2362,6 +2366,7 @@
   }, { once: true });
   
   window.onload = initMap;
+</script>
 
 </body>
 </html>
