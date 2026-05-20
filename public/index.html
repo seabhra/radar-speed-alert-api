@@ -1525,42 +1525,55 @@
       adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
 
       // 🛣️ CRIA A LINHA DE ROTA (Leaflet Routing Machine)
-      routingControl = L.Routing.control({
-        waypoints: [
-          L.latLng(userLat, userLng),
-          L.latLng(destLat, destLng)
-        ],
-        routeWhileDragging: false,
-        addWaypoints: false,
-        draggableWaypoints: false,
-        fitSelectedRoutes: false,
-        show: false,
-        lineOptions: {
-          styles: [
-            { color: '#ff5500', opacity: 0.95, weight: 7 },
-            { color: '#ffd1b3', opacity: 1.0, weight: 3 }
-          ]
-        },
-        createMarker: function() { return null; },
-        router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' })
-      }).addTo(map);
-
-      routingControl.on('routesfound', function(e) {
-        var summary = e.routes[0].summary;
-        var distanciaKm = (summary.totalDistance / 1000).toFixed(1);
-        var tempoMin = Math.round(summary.totalTime / 60);
-        map.fitBounds(L.latLngBounds([userLat, userLng], [destLat, destLng]), { padding: [50, 50] });
-        $("#loading").hide();
-        showNotification("Rota: " + distanciaKm + " km - " + tempoMin + " min");
-      });
-
-      routingControl.on('routingerror', function() {
-        $("#loading").hide();
-        showNotification("Erro ao traçar rota.");
-      });
-
-      showNotification("Navegação iniciada!");
+     // =================================================================
+  // ESTILO DA LINHA DE ROTA: LARANJA CENTRO + ROXO BORDAS + GROSSO
+  // =================================================================
+  // Múltiplas camadas de linha (da base para o topo):
+  // 1. Sombra externa escura roxa (weight: 16)
+  // 2. Borda externa roxa (weight: 12)
+  // 3. Borda intermediária roxa clara (weight: 8)
+  // 4. Centro laranja vibrante (weight: 5)
+  // 5. Centro brilhante laranja claro (weight: 2)
+  // =================================================================
+  routingControl = L.Routing.control({
+    waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
+    routeWhileDragging: false, addWaypoints: false, draggableWaypoints: false,
+    fitSelectedRoutes: false, show: false,
+    lineOptions: { 
+      styles: [
+        // Camada 1: Sombra externa escura (efeito de profundidade)
+        { color: '#4A148C', weight: 16, opacity: 0.4, lineCap: 'round', lineJoin: 'round' },
+        // Camada 2: Borda externa roxa escura
+        { color: '#6A1B9A', weight: 12, opacity: 0.9, lineCap: 'round', lineJoin: 'round' },
+        // Camada 3: Borda intermediária roxa
+        { color: '#8E24AA', weight: 8, opacity: 0.95, lineCap: 'round', lineJoin: 'round' },
+        // Camada 4: Centro laranja vibrante (cor principal)
+        { color: '#FF9800', weight: 5, opacity: 1.0, lineCap: 'round', lineJoin: 'round' },
+        // Camada 5: Centro brilhante laranja claro (destaque/ brilho)
+        { color: '#FFB74D', weight: 2, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }
+      ] 
+    },
+    createMarker: function() { return null; }
+  }).addTo(map);
+  routingControl.on('routesfound', function(e) {
+    let route = e.routes[0];
+    pontosRota = route.coordinates.map(function(c) { return { lat: c.lat, lng: c.lng }; });
+    if (pontosRota.length >= 2) { 
+      headingRota = calcularBearing(pontosRota[0].lat, pontosRota[0].lng, pontosRota[1].lat, pontosRota[1].lng); 
+      headingSuavizado = headingRota; 
+      rotacaoAtual = headingRota; 
+      headingIconeNavegacao = headingRota;
+      headingIconeSuavizado = headingRota;
+      ultimoHeadingRota = headingRota;
     }
+    configurarVistaInicialNavegacao();
+    let dk = (route.summary.totalDistance / 1000).toFixed(1); let tm = Math.round(route.summary.totalTime / 60);
+    $("#loading").hide(); showNotification("🚗 " + dk + " km • " + tm + " min");
+  });
+  routingControl.on('routingerror', function() { $("#loading").hide(); showNotification("Erro ao traçar rota."); });
+  showNotification("🚀 Navegação iniciada");
+}
+
 
     // ===================================================================
     // ROTAS E ENDEREÇOS
@@ -2206,6 +2219,8 @@ function extrairCoordenadas(record, index) {
     }, { once: true });
     window.onload = initMap;
   </script>
+
+
 
 </body>
 </html>
