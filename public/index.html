@@ -897,6 +897,8 @@
 
   <audio id="alert-soud" src="audio_app/alerta.mp3" preload="auto"></audio>
 
+
+
   <script>
     // ===================================================================
     // VARIÁVEIS GLOBAIS
@@ -928,7 +930,10 @@
     var routingControl = null;
     var destinoAtual = null;
     var userMarker = null;
-
+    let INTERVALO_CAMERA_MS = 70; // Reduzido de 100 para 70ms (10fps) - mais suave
+    let FATOR_SUAVIZACAO_BEARING_MAPA = 0.20; // Aumentado de 0.12 para 0.20 - transição mais rápida mas suave
+    
+    let bearingAlvoAnterior = null;
     let alertaHabilitado = true;
     let ultimoRadarAlertado = null;
     let returnToGpsTimer = null;
@@ -1528,13 +1533,7 @@
      // =================================================================
   // ESTILO DA LINHA DE ROTA: LARANJA CENTRO + ROXO BORDAS + GROSSO
   // =================================================================
-  // Múltiplas camadas de linha (da base para o topo):
-  // 1. Sombra externa escura roxa (weight: 16)
-  // 2. Borda externa roxa (weight: 12)
-  // 3. Borda intermediária roxa clara (weight: 8)
-  // 4. Centro laranja vibrante (weight: 5)
-  // 5. Centro brilhante laranja claro (weight: 2)
-  // =================================================================
+ 
   routingControl = L.Routing.control({
     waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
     routeWhileDragging: false, addWaypoints: false, draggableWaypoints: false,
@@ -1574,7 +1573,201 @@
   showNotification("🚀 Navegação iniciada");
 }
 
+// ===================================================================
+// INICIAR NAVEGAÇÃO 3D — COM ESTILO DE LINHA LARANJA/ROXA GROSSA
+// ===================================================================
+function iniciarNavegacao3D(destLat, destLng) {
+  if (!userLat || !userLng) { showNotification("⏳ Aguardando sinal GPS..."); return; }
+  if (routingControl) { removerRota3D(); }
+  posicaoSuavizadaGPS = { lat: userLat, lng: userLng }; headingSuavizado = hardwareHeading || 0;
+  headingAnterior = null; contadorFramesEstaveis = 0; pontosRota = []; indicePontoMaisProximo = 0;
+  destinoAtual = { lat: destLat, lng: destLng }; modoNavegacaoAtivo = true; estaEmNavegacao = true; isFollowing = true;
 
+  // Resetar variáveis de rotação para estado limpo
+  bearingAlvoMapa = 0;
+  bearingAtualMapa = 0;
+  ultimoBearingAplicado = null;
+  bearingAlvoAnterior = null;
+  headingIconeNavegacao = 0;
+  headingIconeSuavizado = 0;
+  ultimoHeadingRota = 0;
+
+  fecharTodasBarras();
+
+  let sidebar = document.getElementById('sidebar-controls');
+  let btnMenu = document.getElementById('btn-menu-toggle');
+  if (sidebar && !sidebar.classList.contains('retracted')) {
+    sidebarAberta = false;
+    sidebar.classList.add('retracted');
+    if (btnMenu) btnMenu.classList.add('active');
+  }
+
+  adicionarMarcadoresRota3D(userLat, userLng, destLat, destLng);
+}
+// ===================================================================
+// CÂMERA 3D SUAVE — CORREÇÃO DEFINITIVA DO TREME-TREME
+// ===================================================================
+function atualizarCamera3DSuave() {
+  if (!modoNavegacaoAtivo || !isFollowing) return;
+
+  let agora = Date.now();
+
+  // Throttle: só atualiza a cada 100ms (10fps) - mais fluido que 200ms
+  if (agora - ultimaAtualizacaoCamera < INTERVALO_CAMERA_MS) {
+    return;
+  }
+  ultimaAtualizacaoCamera = agora;
+
+  let zoomDesejado = calcularZoomPorVelocidade();
+
+  // Suavização do zoom alvo (interpolação exponencial mais responsiva)
+  zoomAlvo = zoomAlvo * 0.85 + zoomDesejado * 0.15;
+  let zoomArredondado = Math.round(zoomAlvo * 10) / 10;
+
+  let latCam = ultimaPosicaoMarcador.lat || posicaoSuavizadaGPS.lat || userLat;
+  let lngCam = ultimaPosicaoMarcador.lng || posicaoSuavizadaGPS.lng || userLng;
+
+  let c = calcularCentroMapaComOffsetParaCoordenadas(latCam, lngCam);
+
+  // Verificar se a mudança é significativa o suficiente
+  let mudancaZoom = Math.abs(zoomArredondado - zoomAtualEfetivo);
+  let mudancaPos = 0;
+  if (centroAtualEfetivo.lat !== null) {
+    mudancaPos = calcularDistancia(c.lat, c.lng, centroAtualEfetivo.lat, centroAtualEfetivo.lng);
+  }
+
+  // Só atualiza se houver mudança significativa (>2m de posição OU >0.3 de zoom)
+  if (mudancaPos < 2 && mudancaZoom < 0.3 && centroAtualEfetivo.lat !== null) {
+    // Mesmo sem mudar posição/zoom, ainda precisa atualizar o bearing e o ícone
+    atualizarBearingMapa();
+    atualizarRotacaoIconeNavegacao();
+    return;
+  }
+
+  // Atualizar centro e zoom efetivos
+  centroAtualEfetivo = { lat: c.lat, lng: c.lng };
+  zoomAtualEfetivo = zoomArredondado;
+
+  // CORREÇÃO CRÍTICA: Durante navegação, usar setView com animate:false
+  // flyTo e panTo causam tremedeira quando combinados com setBearing
+  map.setView([c.lat, c.lng], zoomArredondado, {
+    animate: false,
+    duration: 0
+  });
+
+  // Atualizar bearing do mapa (rotação) - de forma controlada
+  atualizarBearingMapa();
+
+  // Sincronizar rotação do ícone
+  atualizarRotacaoIconeNavegacao();
+}
+
+// ===================================================================
+// FINALIZAR NAVEGAÇÃO 3D — COM LIMPEZA COMPLETA
+// ===================================================================
+function finalizarNavegacao3D() {
+  modoNavegacaoAtivo = false;
+  estaEmNavegacao = false;
+  estaEmMovimento = false;
+  velocidadeAtual = 0;
+
+  if (intervaloZoomDinamico) {
+    cancelAnimationFrame(intervaloZoomDinamico);
+    intervaloZoomDinamico = null;
+  }
+
+  ultimaPosicaoAlvoNavegacao = { lat: null, lng: null };
+  animacaoNavegacaoAtiva = false;
+
+  // Resetar variáveis de suavização da câmera
+  ultimaAtualizacaoCamera = 0;
+  zoomAtualEfetivo = 19;
+  centroAtualEfetivo = { lat: null, lng: null };
+
+  // Resetar variáveis de rotação
+  bearingAlvoMapa = 0;
+  bearingAtualMapa = 0;
+  ultimoBearingAplicado = null;
+  bearingAlvoAnterior = null;
+  headingIconeNavegacao = 0;
+  headingIconeSuavizado = 0;
+  ultimoHeadingRota = 0;
+
+  // LIMPAR qualquer resíduo de perspective/rotateX nos panes
+  let mc = document.querySelector('.leaflet-map-pane');
+  if (mc) {
+    mc.style.transition = '';
+    mc.style.transform = '';
+    mc.style.transformOrigin = '';
+    mc.style.transformStyle = '';
+  }
+  let tp = document.querySelector('.leaflet-tile-pane');
+  if (tp) {
+    tp.style.transition = '';
+    tp.style.transform = '';
+    tp.style.transformOrigin = '';
+  }
+  let md = document.getElementById('map');
+  if (md) {
+    md.style.perspective = '';
+  }
+
+  if (routingControl) {
+    map.removeControl(routingControl);
+    routingControl = null;
+  }
+
+  destinoAtual = null;
+  pontosRota = [];
+
+  if (startRouteMarker) {
+    map.removeLayer(startRouteMarker);
+    startRouteMarker = null;
+  }
+  if (endRouteMarker) {
+    map.removeLayer(endRouteMarker);
+    endRouteMarker = null;
+  }
+
+  window.iconeNavegacao3D = null;
+  rotacaoAtual = 0;
+  headingSuavizado = 0;
+  zoomAlvo = 19;
+
+  if (typeof map.setBearing === 'function') map.setBearing(0);
+
+  let ri = document.getElementById('rotate-btn-icon');
+  if (ri) ri.style.transform = 'rotate(0deg)';
+  let rb = document.getElementById('btn-rotate-map');
+  if (rb) rb.classList.remove('rotated');
+  mapaRotacionado = false;
+
+  // Restaurar sidebar
+  let sidebar = document.getElementById('sidebar-controls');
+  let btnMenu = document.getElementById('btn-menu-toggle');
+  if (sidebar && sidebar.classList.contains('retracted')) {
+    sidebarAberta = true;
+    sidebar.classList.remove('retracted');
+    if (btnMenu) btnMenu.classList.remove('active');
+  }
+
+  map.flyTo([userLat, userLng], 17, { duration: 1 });
+
+  ultimaPosicaoMarcador = { lat: null, lng: null };
+
+  let di = L.divIcon({
+    html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+    className: 'user-gps-marker',
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
+    popupAnchor: [0, -50]
+  });
+
+  userMarker = L.marker([userLat, userLng], { icon: di, zIndexOffset: 1000 }).addTo(map);
+  userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+
+  showNotification("🗺️ Navegação encerrada");
+}
     // ===================================================================
     // ROTAS E ENDEREÇOS
     // ===================================================================
@@ -2219,8 +2412,6 @@ function extrairCoordenadas(record, index) {
     }, { once: true });
     window.onload = initMap;
   </script>
-
-
 
 </body>
 </html>
