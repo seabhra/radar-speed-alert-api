@@ -2380,8 +2380,70 @@
       }
       return false;
     }
+    
+// ===================================================================
+// INTEGRAÇÃO APP INVENTOR & PWA - NOTIFICAÇÃO NATIVA
+// ===================================================================
+
+function enviarNotificacaoNativa(titulo, mensagem) {
+  // 1. Tenta enviar via Interface do App Inventor (Se estiver rodando dentro do APK)
+  if (typeof AppInventor !== 'undefined') {
+    // Envia a string no formato exato que configuramos nos blocos: "NOTIFICACAO|Titulo|Mensagem"
+    AppInventor.setWebViewString("NOTIFICACAO|" + titulo + "|" + mensagem);
+    return; // Sai da função, pois o APK vai cuidar do resto
+  } 
   
-    // Desbloqueio de áudio para dispositivos móveis
+  // 2. Fallback: Se não for App Inventor, tenta enviar via Service Worker (PWA no Chrome)
+  else if ('Notification' in window && Notification.permission === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification(titulo, {
+        body: mensagem,
+        icon: '/imagens_app/ic_radar_cev_v2.png',
+        vibrate: [200, 100, 200],
+        tag: 'alerta-radar',
+        renotify: true,
+        requireInteraction: true // Mantém a notificação na tela até o usuário interagir
+      });
+    }).catch(function(err) {
+      console.error('Erro ao enviar notificação SW:', err);
+    });
+  }
+  
+  // 3. Se não tem permissão ainda (PWA), solicita
+  else if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(function(permission) {
+      if (permission === 'granted') {
+        enviarNotificacaoNativa(titulo, mensagem); // Tenta novamente após aprovar
+      }
+    });
+  }
+}
+
+// ===================================================================
+// SOLICITAR PERMISSÕES E WAKELOCK AO INICIAR
+// ===================================================================
+function solicitarPermissaoNotificacao() {
+  // Isso só funciona para PWA. No App Inventor, a permissão é pedida pelo próprio APK.
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+async function solicitarWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      const wakeLock = await navigator.wakeLock.request('screen');
+      console.log('WakeLock ativado: Tela manter-se-á acessa.');
+      wakeLock.addEventListener('release', () => {
+        console.log('WakeLock liberado.');
+      });
+    }
+  } catch (err) {
+    console.error('Erro ao solicitar WakeLock:', err);
+  }
+}
+
+// Desbloqueio de áudio para dispositivos móveis
     document.addEventListener('click', function desbloquearAudio() {
       var sound = document.getElementById("alert-soud");
       if (sound) { sound.play().then(function() { sound.pause(); sound.currentTime = 0; }).catch(function() {}); }
