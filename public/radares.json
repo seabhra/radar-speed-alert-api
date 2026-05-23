@@ -472,10 +472,37 @@
       [455, "1747","Av. Afonso Pena, Próximo à Rua Ramalhete","Leitor Inteligente de Placas (OCR-P)", "60","Centro/Praça do Papa","1001071","KBH5301071","-19.94684, -43.92144"],
       [456, "1748","Av. Afonso Pena, Próximo à Rua Ramalhete","Leitor de Reconhecimento Facial (OCR-F)", "60","Centro/Praça do Papa","1001072","KBH5301072","-19.94700, -43.92134"],
       [457, "1749","Anel Rodoviário, Próximo à Rua Moisés Kalil","Área de Escape Caminhões (ARE)", "70","Rio de Janeiro/Vitória","1001073","KBH5301073","-19.98837, -43.97216"],
-      [458, "1750","Av. Nossa Senhora do Carmos, Próximo à Rua Uruguai","Câmera Olho Vivo (COV)", "60","Belvedere/Savassi","1001074","KBH5301074","-19.94754, -43.93503"],
-      [459, "1751","Av. Nossa Senhora do Carmos, Próximo à Rua Uruguai","Leitor Inteligente de Placas (OCR-P)", "60","Belvedere/Savassi","1001075","KBH5301075","-19.94783, -43.93515"],
-      [460, "1752","Av. Nossa Senhora do Carmos, Próximo à Rua Uruguai","Leitor de Reconhecimento Facial (OCR-F)", "60","Belvedere/Savassi","1001076","KBH5301076","-19.94732, -43.93509"]
-      
+      [458, "1750","Av. Nossa Senhora do Carmo, Próximo à Rua Uruguai","Câmera Olho Vivo (COV)", "60","Belvedere/Savassi","1001074","KBH5301074","-19.94754, -43.93503"],
+      [459, "1751","Av. Nossa Senhora do Carmo, Próximo à Rua Uruguai","Leitor Inteligente de Placas (OCR-P)", "60","Belvedere/Savassi","1001075","KBH5301075","-19.94783,-43.93515"],
+      [460, "1752","Av. Nossa Senhora do Carmo, Próximo à Rua Uruguai","Leitor de Reconhecimento Facial (OCR-F)", "60","Belvedere/Savassi","1001076","KBH5301076","-19.94732,-43.93509"],
+      [461, "1753","Rua Patagônia, Próximo à Rua Groelândia","Controlador Eletrônico de Velocidade (CEV)", "40","AnchietaBelvedere","1001077","KBH5301077","-19.95941,-43.93528"],
+      [462, "1754","Av. Cristóvão Colombo, Próximo à Av. Do Contorno","Câmera Olho Vivo (COV)", "60","Savassi/Belvedere","1001077","KBH5301077","-19.93993, -43.93446"],
+      [463, "1755","Av. Cristóvão Colombo, Próximo à Av. Do Contorno","Leitor Inteligente de Placas (OCR-P)", "60","Savassi/Belvedere","1001078","KBH5301078","-19.94003,-43.93422"],
+      [464, "1756","Av. Cristóvão Colombo, Próximo à Av. Do Contorno","Leitor de Reconhecimento Facial (OCR-F)", "60","Savassi/Belvedere","1001079","KBH5301079","-19.93979, -43.93459"],
+      [465, "1757","Av. Olegário Maciel, Próximo à Rua Rodrigues Caldas","Câmera Olho Vivo (COV)", "60","Cidade Jardim/Centro","1001080","KBH5301080","-19.93256, -43.94776"],
+      [466, "1758","Av. Olegário Maciel, Próximo à Rua Rodrigues Caldas","Leitor Inteligente de Placas (OCR-P)", "60","Cidade Jardim/Centro","1001081","KBH5301081","-19.93269, -43.94778"],
+      [467, "1759","Av. Olegário Maciel, Próximo à Rua Rodrigues Caldas","Leitor de Reconhecimento Facial (OCR-F)", "60","Cidade Jardim/Centro","1001082","KBH5301082","-19.93244, -43.94773"],
+      [468, "1760","Rua Tupinambás, Próximo à Rua Curitiba","Câmera Olho Vivo (COV)", "60","Rua Paraná/Rua Curitiba","1001083","KBH5301083","-19.91722, -43.94090"],
+      [469, "1761","Rua Tupinambás, Próximo à Rua Curitiba","Leitor Inteligente de Placas (OCR-P)", "60","Rua Paraná/Rua Curitiba","1001084","KBH5301084","-19.91721, -43.94098"],
+      [470, "1762","Rua Tupinambás, Próximo à Rua Curitiba","Leitor de Reconhecimento Facial (OCR-F)", "60","Rua Paraná/Rua Curitiba","1001085","KBH5301085","-19.91730, -43.94092"],
+      [471, "1763","Av. Olegário Maciel, Próximo à Rua Tupinambás","Câmera Olho Vivo (COV)", "60","Rua Rio Grande do Sul/Rua Curitiba","1001086","KBH5301086","-19.91662, -43.94350"],
+      [472, "1764","Av. Olegário Maciel, Próximo à Rua Tupinambás","Leitor Inteligente de Placas (OCR-P)", "60","Rua Rio Grande do Sul/Rua Curitiba","1001087","KBH5301087","-19.91664, -43.94339"],
+      [473, "1765","Av. Olegário Maciel, Próximo à Rua Tupinambás","Leitor de Reconhecimento Facial (OCR-F)", "60","Rua Rio Grande do Sul/Rua Curitiba","1001087","KBH5301087","-19.91671, -43.94344"],
+      [474, "1766","Rua Tupinambás, Próximo à Rua Rio Grande do Sul","Câmera Olho Vivo (COV)", "60","Rua Rio Grande do Sul/Rua Curitiba","1001088","KBH5301088","-19.91628, -43.94471"],
+      [475, "1767","Rua Tupinambás, Próximo à Rua Rio Grande do Sul","Leitor Inteligente de Placas (OCR-P)", "60","Rua Rio Grande do Sul/Rua Curitiba","1001089","KBH5301089","-19.91626, -43.94483"],
+      [476, "1768","Rua Tupinambás, Próximo à Rua Rio Grande do Sul","Leitor de Reconhecimento Facial (OCR-F)", "60","Rua Rio Grande do Sul/Rua Curitiba","1001090","KBH5301090","-19.91630, -43.94463"],
+      [477, "1769","Rua Araguari, Próximo à Av. Augusto de Lima","Câmera Olho Vivo (COV)", "60","Lourdes/Centro","1001091","KBH5301091","-19.92180, -43.94903"],
+      [478, "1770","Rua Araguari, Próximo à Av. Augusto de Lima","Leitor Inteligente de Placas (OCR-P)", "60","Lourdes/Centro","1001092","KBH5301092","-19.92190, -43.94906"],
+      [479, "1771","Rua Araguari, Próximo à Av. Augusto de Lima","Leitor de Reconhecimento Facial (OCR-F)", "60","Lourdes/Centro","1001093","KBH5301093","-19.92171, -43.94899"],
+      [480, "1772","Av. Amazonas, Próximo à Rua Curitiba","Câmera Olho Vivo (COV)", "60","Praça da Estação/Praça Raul Soares","1001094","KBH5301094","-19.92097, -43.94188"],
+      [481, "1773","Av. Amazonas, Próximo à Rua Curitiba","Leitor Inteligente de Placas (OCR-P)", "60","Praça da Estação/Praça Raul Soares","1001095","KBH5301095","-19.92090, -43.94170"],
+      [482, "1774","Av. Amazonas, Próximo à Rua Curitiba","Leitor de Reconhecimento Facial (OCR-F)", "60","Praça da Estação/Praça Raul Soares","1001096","KBH5301096","-19.92105, -43.94196"],
+      [483, "1775","Rua dos Carijós, Próximo à Rua Curitiba","Apenas Trânsito Local (ATL)", "70","Praça Sete/Paraná","1001097","KBH5301097"," -19.91844, -43.94124"],
+      [484, "1772","Av. Nossa Senhora do Carmo, Próximo à Rua Medusa","Câmera Olho Vivo (COV)", "60","Savassi/Santa Lúcia","1001094","KBH5301094","-19.96121, -43.94492"],
+      [485, "1773","Av. Nossa Senhora do Carmo, Próximo à Rua Medusa","Leitor Inteligente de Placas (OCR-P)", "60","Savassi/Santa Lúcia","1001095","KBH5301095","-19.96138, -43.94509"],
+      [486, "1774","Av. Nossa Senhora do Carmo, Próximo à Rua Medusa","Leitor de Reconhecimento Facial (OCR-F)", "60","Savassi/Santa Lúcia","1001096","KBH5301096","-19.96144, -43.94487"]
+     
 
+    
     ]
   }
