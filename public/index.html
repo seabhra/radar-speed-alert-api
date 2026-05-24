@@ -1064,7 +1064,11 @@
       'Apenas Trânsito Local (ATL)',
       'Zona de Estudo Nuclear (ZEN)'
     ];
-  
+
+    function getIconUrl(tipoOriginal) {
+  const tipoAjustado = ajusteNomes[tipoOriginal] || tipoOriginal;
+  return iconMap[tipoOriginal] || iconMap[tipoAjustado] || iconMap['default'];
+}
     const ajusteNomes = {
       'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
       'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
