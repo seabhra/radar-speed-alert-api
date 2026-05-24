@@ -533,12 +533,12 @@
       [516, "1804","Av. Afonso Pena, Próximo à Rua Alagoas","Câmera Olho Vivo (COV)", "60","Rodoviária/Mangabeiras","10010120","KBH53010120","-19.92687, -43.93385"],
       [517, "1805","Av. Afonso Pena, Próximo à Rua Alagoas","Leitor Inteligente de Placas (OCR-P)", "60","Rodoviária/Mangabeiras","10010121","KBH53010121","-19.92676, -43.93401"],
       [518, "1806","Av. Afonso Pena, Próximo à Rua Alagoas","Leitor de Reconhecimento Facial (OCR-F)", "60","Rodoviária/Mangabeiras","10010122","KBH53010122","-19.92719, -43.93371"],
-      [519, "1807","Av. Afonso Pena, Próximo à Rua ","Controle Inteligente de Velocidade (CIV)", "100","Belo Horizonte","10010123","KBH53010123","-20.05821, -43.97576"],
-      [521, "1808","Av. Afonso Pena, Próximo à Rua ","Controle Inteligente de Velocidade (CIV)", "100","Rio de Janeiro/Belo Horizonte","10010124","KBH53010124","-20.05238, -43.96864"],
+      [519, "1807","Av. Afonso Pena, Próximo à Rua ","Radar Inteligente de Velocidade Média (RIV)", "100","Belo Horizonte","10010123","KBH53010123","-20.05821, -43.97576"],
+      [521, "1808","Av. Afonso Pena, Próximo à Rua ","Radar Inteligente de Velocidade Média (RIV)", "100","Rio de Janeiro/Belo Horizonte","10010124","KBH53010124","-20.05238, -43.96864"],
       [522, "1809","Av. Afonso Pena, Próximo à Rua ","Controlador Eletrônico de Velocidade (CEV)", "100","Rio de Janeiro/Belo Horizonte","10010125","KBH530101257","-20.06427, -43.97931"],
       [523, "1810","Rodovia BR-040, Próximo ao Viaduto do Mutuca","Controlador Eletrônico de Velocidade (CEV)", "100","Belo Horizonte/Rio de Janeiro","10010126","KBH53010126","-20.01598, -43.97023"],
-      [524, "1811","Rodovia BR-040, Próximo ao Viaduto do Mutuca","Controle Inteligente de Velocidade (CIV)", "100","Belo Horizonte/Rio de Janeiro","10010127","KBH53010127","-20.01608, -43.97029"],
-      [525, "1812","Rodovia BR-040, Próximo à rua Montreal","Controle Inteligente de Velocidade (CIV)", "100","Rio de Janeiro/Belo Horizonte","1001028","KBH53010128","-20.06326, -43.97867"]
+      [524, "1811","Rodovia BR-040, Próximo ao Viaduto do Mutuca","Radar Inteligente de Velocidade Média (RIV)", "100","Belo Horizonte/Rio de Janeiro","10010127","KBH53010127","-20.01608, -43.97029"],
+      [525, "1812","Rodovia BR-040, Próximo à rua Montreal","Radar Inteligente de Velocidade Média (RIV)", "100","Rio de Janeiro/Belo Horizonte","1001028","KBH53010128","-20.06326, -43.97867"]
     
     ]
   }
