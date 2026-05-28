@@ -1124,9 +1124,68 @@ const TIPOS_ALERTA_RISCO = [
   'Zona de Estudo Nuclear (ZEN)'
 ];
 
+
+// ===================================================================
+// ALERTA DE PROMOÇÃO
+// ===================================================================
+
 const TIPOS_ALERTA_PROMOCAO = [
-  'Com IA do Vercel'
+ 
 ];
+
+
+// ===================================================================
+// INTEGRAÇÃO IA VERCEL - ALERTA DE PROMOÇÃO
+// ===================================================================
+async function consultarIAVercel(pergunta) {
+  try {
+    // URL da sua API no Vercel (ajuste se necessário em produção)
+    const url = '/api/chat'; 
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pergunta: pergunta })
+    });
+    
+    if (!response.ok) return;
+    
+    const data = await response.json();
+    
+    // Se a IA detectar que é uma promoção, dispara o alerta verde
+    if (data.tipoAlerta === 'promocao') {
+      dispararAlertaPromocaoIA(data.resposta || "Promoção detectada pela IA!");
+    }
+  } catch (error) {
+    console.warn("IA Vercel indisponível ou erro de rede:", error);
+  }
+}
+
+function dispararAlertaPromocaoIA(mensagem) {
+  // Limpa estados anteriores do alerta
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
+  $(".alert-bar").css("background", "");
+
+  // Configura visual do Alerta de Promoção (Verde)
+  $("#alert-title").text("🎉 ALERTA DE PROMOÇÃO!");
+  $("#alert-text").text(mensagem);
+  $(".alert-bar").addClass("alert-bar-promocao");
+  
+  // Ícone de promoção (usando o da zona verde ou o que preferir)
+  $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
+
+  // Exibe o alerta
+  if (!$("#alert-container").is(":visible")) { 
+    $("#alert-container").fadeIn(200); 
+  }
+  
+  // Esconde o alerta após o tempo padrão
+  clearTimeout(alertTimeout);
+  alertTimeout = setTimeout(function() { 
+    if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
+  }, ALERT_CONFIG.TEMPO_ALERTA);
+}
+
+
 
 // Função auxiliar para classificar o tipo do alerta
 function classificarAlerta(tipoOriginal) {
