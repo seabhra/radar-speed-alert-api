@@ -1,5 +1,5 @@
-
-// api/chat.js versão 1 Radar X9 - Belo Horizonte
+// api/chat.js versão 2 Radar X9 - Belo Horizonte
+// Foco exclusivo: Detecção de Alertas de Promoção via IA
 
 export default function handler(req, res) {
     // Configura os cabeçalhos CORS
@@ -22,22 +22,24 @@ export default function handler(req, res) {
           return res.status(400).json({ error: "O campo 'pergunta' é obrigatório." });
         }
   
-        // Lógica simples para identificar promoções e riscos baseada em palavras-chave
-        let tipoAlerta = 'radar'; // padrão
+        // Lógica EXCLUSIVA para identificar PROMOÇÕES via IA
+        let tipoAlerta = 'nenhum'; // Padrão: não é alerta de promoção
         const perguntaLower = pergunta.toLowerCase();
         
-        const palavrasRisco = ['perigo', 'violência', 'acidente', 'inundação', 'escape', 'nuclear'];
-        const palavrasPromocao = ['promoção', 'promo', 'desconto', 'oferta', 'vercel'];
+        // Palavras que acionam o alerta verde de promoção
+        const palavrasPromocao = ['promoção', 'promo', 'desconto', 'oferta', 'vercel', 'grátis', 'cupom'];
         
-        if (palavrasRisco.some(palavra => perguntaLower.includes(palavra))) {
-            tipoAlerta = 'risco';
-        } else if (palavrasPromocao.some(palavra => perguntaLower.includes(palavra))) {
+        if (palavrasPromocao.some(palavra => perguntaLower.includes(palavra))) {
             tipoAlerta = 'promocao';
         }
   
-        // Simulação de resposta da IA com classificação do alerta
-        const resposta = `Resposta da IA para: ${pergunta} | Tipo de Alerta Detectado: ${tipoAlerta}`;
+        // Se for promoção, retorna uma mensagem amigável para o alerta verde
+        // Se não for, retorna uma mensagem neutra (o frontend vai ignorar)
+        const resposta = tipoAlerta === 'promocao' 
+            ? `🎉 Promoção detectada! Aproveite: ${pergunta}` 
+            : `Nenhuma promoção encontrada para: ${pergunta}`;
         
+        // Retorna para o frontend
         res.status(200).json({ resposta, tipoAlerta });
         
       } catch (error) {
@@ -49,5 +51,3 @@ export default function handler(req, res) {
       res.status(405).json({ error: `Método ${req.method} não permitido` });
     }
   }
-
-
