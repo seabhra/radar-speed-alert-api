@@ -936,9 +936,9 @@
     </div>
   </div>
 
-  <audio id="alert-soud-radar" src="audio_app/alerta_sound-radar.mp3" preload="auto"></audio>
-  <audio id="alert-soud-promo" src="audio_app/alerta_sound-promo.mp3" preload="auto"></audio>
-  <audio id="alert-soud-risco" src="audio_app/alerta_sound-risco.mp3" preload="auto"></audio>
+  <audio id="alert-sound-radar" src="audio_app/alerta_sound-radar.mp3" preload="auto"></audio>
+  <audio id="alert-sound-promo" src="audio_app/alerta_sound-promo.mp3" preload="auto"></audio>
+  <audio id="alert-sound-risco" src="audio_app/alerta_sound-risco.mp3" preload="auto"></audio>
 
  
   <script>
@@ -1528,7 +1528,7 @@ function aplicarTemaMapa() {
 
 function fecharAlertaImediatamente() {
   // Pausa todos os MP3s
-  ['alert-soud-radar', 'alert-soud-risco', 'alert-soud-promo'].forEach(function(id) {
+  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-promo'].forEach(function(id) {
     var sound = document.getElementById(id);
     if (sound) { sound.pause(); sound.currentTime = 0; }
   });
