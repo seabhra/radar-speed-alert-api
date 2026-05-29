@@ -604,7 +604,7 @@
     }
 
     /* ===================================================================
-       ALERT CONTAINER
+       ALERT CONTAINER - RADAR (COR VERMELHO)
     =================================================================== */
     #alert-container {
         position: absolute;
@@ -936,9 +936,9 @@
     </div>
   </div>
 
-  <audio id="alert-soud" src="audio_app/alerta_sound-radar.mp3" preload="auto"></audio>
-  <audio id="alert-soud" src="audio_app/alerta_sound-promo.mp3" preload="auto"></audio>
-  <audio id="alert-soud" src="audio_app/alerta_sound-risco.mp3" preload="auto"></audio>
+  <audio id="alert-soud-radar" src="audio_app/alerta_sound-radar.mp3" preload="auto"></audio>
+  <audio id="alert-soud-promo" src="audio_app/alerta_sound-promo.mp3" preload="auto"></audio>
+  <audio id="alert-soud-risco" src="audio_app/alerta_sound-risco.mp3" preload="auto"></audio>
 
  
   <script>
@@ -1527,8 +1527,11 @@ function aplicarTemaMapa() {
 }
 
 function fecharAlertaImediatamente() {
-  var sound = document.getElementById("alert-soud");
-  if (sound) { sound.pause(); sound.currentTime = 0; }
+  // Pausa todos os MP3s
+  ['alert-soud-radar', 'alert-soud-risco', 'alert-soud-promo'].forEach(function(id) {
+    var sound = document.getElementById(id);
+    if (sound) { sound.pause(); sound.currentTime = 0; }
+  });
   clearTimeout(alertTimeout);
 }
 
@@ -2042,15 +2045,14 @@ function dispararAlerta(radar, distancia) {
   if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
   
   const tipoAlerta = classificarAlerta(radar.tipoOriginal);
-  const som = document.getElementById("alert-soud");
   const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
   const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
   
-  // Limpa classes anteriores
+  // Limpa classes visuais anteriores
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
-  $(".alert-bar").css("background", ""); // Remove css inline para usar classes
+  $(".alert-bar").css("background", ""); 
 
-  // Aplica configurações baseadas no tipo de alerta
+  // Aplica o visual do alerta
   if (tipoAlerta === 'risco') {
     $("#alert-title").text("⚠️ ALERTA DE RISCO!");
     $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
@@ -2067,16 +2069,30 @@ function dispararAlerta(radar, distancia) {
 
   $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
   
-  if (!$("#alert-container").is(":visible")) { 
+  const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
+  if (isNewAlert) { 
     $("#alert-container").fadeIn(200); 
     contagemTocarSom = 0; 
   }
   
-  // Alertas de risco e promoção não disparam som irritante de radar
-  if (alertaHabilitado && tipoAlerta === 'radar' && som && contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) {
-    som.pause(); som.currentTime = 0; som.play().catch(function(e) {}); contagemTocarSom++;
+  // ✅ REGRA DE TOQUE DO MP3: 
+  // Radar toca no máximo 2 vezes | Risco e Promoção tocam sempre que for um alerta novo
+  if (alertaHabilitado) {
+    var deveTocar = false;
+    
+    if (tipoAlerta === 'radar') {
+      if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true;
+    } else {
+      if (isNewAlert) deveTocar = true;
+    }
+    
+    if (deveTocar) {
+      tocarSomAlerta(tipoAlerta); // Dispara o MP3 específico
+      contagemTocarSom++;
+    }
   }
   
+  // Zona crítica (Visual pulsante)
   if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
     if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
     else if (tipoAlerta === 'promocao') $(".alert-bar").addClass("alert-bar-promocao-critico");
@@ -2085,7 +2101,9 @@ function dispararAlerta(radar, distancia) {
   
   ultimoRadarAlertado = radar.id;
   clearTimeout(alertTimeout);
-  alertTimeout = setTimeout(function() { if ($("#alert-container").is(":visible")) esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
+  alertTimeout = setTimeout(function() { 
+    if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
+  }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
 function inicializarBotaoRotacaoMapa() {
@@ -2497,11 +2515,29 @@ async function solicitarWakeLock() {
   }
 }
 
-document.addEventListener('click', function desbloquearAudio() {
-  var sound = document.getElementById("alert-soud");
-  if (sound) { sound.play().then(function() { sound.pause(); sound.currentTime = 0; }).catch(function() {}); }
-  document.removeEventListener('click', desbloquearAudio);
-}, { once: true });
+// ===================================================================
+// DESBLOQUEIO DE ÁUDIO MOBILE (Obrigatório para MP3 funcionar)
+// ===================================================================
+function desbloquearAudioMobile() {
+  ['alert-soud-radar', 'alert-soud-risco', 'alert-soud-promo'].forEach(function(id) {
+    var som = document.getElementById(id);
+    if (som) {
+      // Tenta tocar e pausar imediatamente para "destravar" o autoplay do navegador
+      som.play().then(function() {
+        som.pause();
+        som.currentTime = 0;
+        console.log('[Radar X9] ✅ Áudio desbloqueado: ' + id);
+      }).catch(function() {
+        // Ainda bloqueado, vai tentar de novo no próximo clique
+      });
+    }
+  });
+}
+
+// Escuta cliques e toques na tela para destravar o áudio na primeira interação
+['click', 'touchstart', 'touchend'].forEach(function(eventType) {
+  document.addEventListener(eventType, desbloquearAudioMobile, { once: true, passive: true });
+});
 
 window.onload = initMap;
 
