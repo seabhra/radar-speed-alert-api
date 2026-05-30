@@ -540,7 +540,11 @@
       [523, "1811","Rodovia BR-040, Próximo ao Viaduto do Mutuca","Radar Inteligente de Velocidade Média (RIV)", "100","Belo Horizonte/Rio de Janeiro","10010127","KBH53010127","-20.01608, -43.97029"],
       [524, "1812","Rodovia BR-040, Próximo à rua Montreal","Radar Inteligente de Velocidade Média (RIV)", "100","Rio de Janeiro/Belo Horizonte","1001028","KBH53010128","-20.06326, -43.97867"],
       [525, "1813","Rodovia BR-040, Próximo ao Viaduto do Mutuca","Radar Inteligente de Velocidade Média (RIV)", "100","Belo Horizonte/Rio de Janeiro","1001029","KBH53010129","-20.05164, -43.96791"],
-      [526, "1814","Rodovia BR-040, Próximo ao Viaduto do Mutuca","Controlador Eletrônico de Velocidade (CEV)", "100","Belo Horizonte/Rio de Janeiro","1001030","KBH53010130","-20.05190, -43.96820"]
-    
+      [526, "1814","Rodovia BR-040, Próximo ao Viaduto do Mutuca","Controlador Eletrônico de Velocidade (CEV)", "100","Belo Horizonte/Rio de Janeiro","1001030","KBH53010130","-20.05190, -43.96820"],
+      [527, "1815","Rua Alabandina, Esq. Rua Renato Nascimento","Alerta de Alto Índice de Acidente (AIA)","60","Centro/Caiçara","1001031","KBH53010131","-19.89578, -43.96909"],
+      [528, "1816","Av. Jequitinhonha, Esq. Rua Leopoldo Gomes","Alerta de Alto Índice de Acidente (AIA)","60","Centro/Alto Vera Cruz","1001032","KBH53010132","-19.91022, -43.89414"],
+      [529, "1816","Av. Jequitinhonha, Esq. Rua Leopoldo Gomes","Câmera Olho Vivo (COV)","60","Centro/Alto Vera Cruz","1001033","KBH53010133","-19.91026, -43.89427"]
+         
+
     ]
   }
