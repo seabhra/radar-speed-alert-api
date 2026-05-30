@@ -267,7 +267,7 @@
       [253, "1528", "Av. Cristiano Machado, 2150 - Pista MOVE", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Centro/Bairro", "Único", "1", "1", "-19.88870,-43.92926"],
       [254, "1529", "Av. Cristiano Machado, a 200 metros da Rua Joana Darc - Pista MOVE", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Bairro/Centro", "Único", "1", "1", "-19.854033,-43.935025"],
       [255, "1530", "Av. Cristiano Machado, 2273 - Pista MOVE", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Bairro/Centro", "Único", "1", "1", "-19.88855,-43.92939"],
-      [256, "1531", "Av. Cristiano Machado, Esq. Rua Dom Leme - Pista MOVE", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Bairro/Centro", "Único", "1", "1", "-19.886206,-43.929235"],
+      [256, "1531", "Av. Cristiano Machado, Esq. Rua Dom Leme - Pista MOVE", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Bairro/Centro", "Único", "1", "1", "-19.88621, -43.92930"],
       [257, "1532", "Av. Cristiano Machado, Esq. Rua Dom Leme - Pista MOVE", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Bairro/Centro", "Único", "1", "1", "-19.88607,-43.92930"],
       [258, "1533","Rua Dom Leme, Esq. Av. Cristiano Machado","Detector de Avanço de Semáforo (DAS)","60","Silveira/Cidade Nova","Único","1","1","- -19.88604, -43.92956 "],
       [259,"1534","Rua Dom Leme, Esq. Av. Cristiano Machado"," Detector de Conversão em Local Proibido  (DCP)","60","Silveira/Cidade Nova","Único","1","1","-19.88604, -43.92947 "],
