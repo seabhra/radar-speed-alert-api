@@ -2495,6 +2495,141 @@ function enviarNotificacaoNativa(titulo, mensagem) {
   }
 }
 
+// ===================================================================
+// ✅ CORREÇÃO: Integração App Inventor — Protocolo robusto
+// ===================================================================
+function enviarParaAppInventor(acao, dados) {
+  if (typeof AppInventor !== 'undefined') {
+    try {
+      // Formato: AÇÃO|dado1|dado2|...
+      var mensagem = acao + '|' + dados.join('|');
+      AppInventor.setWebViewString(mensagem);
+      console.log('[Radar X9] → AppInventor:', mensagem);
+      return true;
+    } catch (e) {
+      console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
+      return false;
+    }
+  }
+  return false;
+}
+// ===================================================================
+// ✅ RECEBER DADOS DO APP INVENTOR via WebViewStringChanged
+// ===================================================================
+
+// O App Inventor envia: "GPS|lat|lng|speed|heading"
+// Configure no App Inventor: quando LocationSensor.LocationChanged,
+// set WebViewer1.WebViewString = "GPS|" + latitude + "|" + longitude + "|" + speed + "|" + heading
+
+// Função chamada pelo App Inventor via RunJavaScript ou via poll
+
+function receberDadosAppInventor(dadosStr) {
+  if (!dadosStr || typeof dadosStr !== 'string') return;
+  
+  var partes = dadosStr.split('|');
+  var acao = partes[0];
+
+  if (acao === 'GPS' && partes.length >= 3) {
+    var lat = parseFloat(partes[1]);
+    var lng = parseFloat(partes[2]);
+    var speed = partes[3] ? parseFloat(partes[3]) : 0;
+    var heading = partes[4] ? parseFloat(partes[4]) : null;
+
+    // ✅ CORREÇÃO PARA OPÇÃO 1 (Azimuth):
+    // O Azimuth retorna -1 quando o celular está deitado (plano) ou indisponível.
+    // Se for -1, tratamos como nulo para o JS calcular pelo movimento do carro.
+    // Valores de 0 a 360 são VÁLIDOS (0 = Norte).
+    if (heading === -1 || isNaN(heading)) {
+      heading = null;
+    }
+
+    // ✅ Proteção contra coordenadas 0,0 (Oceano Atlântico)
+    // Se o GPS falhar, o App Inventor pode enviar 0.0. Ignoramos isso.
+    if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
+      gpsSource = 'appinventor';
+      processarNovaPosicao(lat, lng, speed, heading);
+    }
+  }
+  
+  if (acao === 'PERMISSAO' && partes.length >= 2) {
+    console.log('[Radar X9] Permissão ' + partes[1] + ': ' + (partes[2] || 'unknown'));
+  }
+}
+
+
+
+function receberDadosAppInventor(dadosStr) {
+  if (!dadosStr || typeof dadosStr !== 'string') return;
+  
+  var partes = dadosStr.split('|');
+  var acao = partes[0];
+
+  if (acao === 'GPS' && partes.length >= 3) {
+    var lat = parseFloat(partes[1]);
+    var lng = parseFloat(partes[2]);
+    var speed = partes[3] ? parseFloat(partes[3]) : 0;
+    var heading = partes[4] ? parseFloat(partes[4]) : null;
+
+    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+      gpsSource = 'appinventor';
+      processarNovaPosicao(lat, lng, speed, heading);
+    }
+  }
+  
+  if (acao === 'PERMISSAO' && partes.length >= 2) {
+    var perm = partes[1];
+    var status = partes[2] || 'unknown';
+    console.log('[Radar X9] Permissão ' + perm + ': ' + status);
+  }
+}
+
+// Poll para verificar se o AppInventor enviou dados
+// (Alternativa ao WebViewStringChanged se não puder usar RunJavaScript)
+var ultimoWebViewString = '';
+function pollAppInventor() {
+  if (typeof AppInventor !== 'undefined') {
+    try {
+      var current = AppInventor.getWebViewString();
+      if (current && current !== ultimoWebViewString) {
+        ultimoWebViewString = current;
+        receberDadosAppInventor(current);
+        // Limpa para não processar novamente
+        AppInventor.setWebViewString('');
+      }
+    } catch(e) {}
+  }
+}
+setInterval(pollAppInventor, 500);
+
+// ===================================================================
+// ✅ ENVIAR NOTIFICAÇÃO NATIVA
+// ===================================================================
+function enviarNotificacaoNativa(titulo, mensagem) {
+  // Tenta App Inventor primeiro
+  if (enviarParaAppInventor('NOTIFICACAO', [titulo, mensagem])) {
+    return;
+  }
+  // Fallback para PWA / navegador
+  if ('Notification' in window) {
+    if (Notification.permission === 'granted') {
+      navigator.serviceWorker.ready.then(function(registration) {
+        registration.showNotification(titulo, {
+          body: mensagem,
+          icon: '/imagens_app/ic_radar_cev_v2.png',
+          vibrate: [200, 100, 200],
+          tag: 'alerta-radar',
+          renotify: true,
+          requireInteraction: true
+        });
+      }).catch(function() {});
+    } else if (Notification.permission === 'default') {
+      Notification.requestPermission().then(function(perm) {
+        if (perm === 'granted') enviarNotificacaoNativa(titulo, mensagem);
+      });
+    }
+  }
+}
+
 function solicitarPermissaoNotificacao() {
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
@@ -2516,10 +2651,37 @@ async function solicitarWakeLock() {
 }
 
 // ===================================================================
+// ✅ NOVA FUNÇÃO: tocarSomAlerta (estava AUSENTE)
+// ===================================================================
+function tocarSomAlerta(tipoAlerta) {
+  var soundId = 'alert-sound-radar'; // padrão
+
+  if (tipoAlerta === 'risco') {
+    soundId = 'alert-sound-risco';
+  } else if (tipoAlerta === 'promocao') {
+    soundId = 'alert-sound-promo';
+  }
+
+  var sound = document.getElementById(soundId);
+  if (!sound) {
+    // Fallback: tenta qualquer som disponível
+    sound = document.getElementById('alert-sound-radar');
+  }
+  if (!sound) return;
+
+  sound.currentTime = 0;
+  sound.play().catch(function(err) {
+    console.warn('[Radar X9] Áudio bloqueado pelo navegador:', err);
+    // Tenta desbloquear e tocar novamente
+    desbloquearAudioMobile();
+  });
+}
+
+// ===================================================================
 // DESBLOQUEIO DE ÁUDIO MOBILE (Obrigatório para MP3 funcionar)
 // ===================================================================
 function desbloquearAudioMobile() {
-  ['alert-soud-radar', 'alert-soud-risco', 'alert-soud-promo'].forEach(function(id) {
+  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-promo'].forEach(function(id) {
     var som = document.getElementById(id);
     if (som) {
       // Tenta tocar e pausar imediatamente para "destravar" o autoplay do navegador
