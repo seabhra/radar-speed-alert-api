@@ -1100,6 +1100,9 @@ const iconMap = {
   // ✅ CORREÇÃO: RIV agora mapeia para ic_cam_video_v2.png
   'Radar Inteligente de Velocidade Média (RIV)':'/imagens_app/ic_cam_video_v2.png',
   'Radar Inteligente de Velocidade Média':'/imagens_app/ic_cam_video_v2.png',
+  // ✅ NOVO: Ícone de Túnel Viário
+  'Passagem Sob Túnel Viário (TUV)':'/imagens_app/ic_tunel_v2.png',
+  'Passagem Sob Túnel Viário':'/imagens_app/ic_tunel_v2.png',
   'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
@@ -1116,7 +1119,6 @@ const TIPOS_SEM_ALERTA = [
   'Câmera Olho Vivo',
   'Reconhecimento Facial (OCR-F)',
   'Leitor de Placas (OCR-P)',
- 
   'Apenas Trânsito Local (ATL)',
   'Zona de Estudo Nuclear (ZEN)',
   'Passagem Sob Túnel Viário (TUV)'
@@ -1331,6 +1333,11 @@ function getIconUrl(tipo, velocidade) {
     return iconMap['Radar Inteligente de Velocidade Média (RIV)'];
   }
 
+  // ✅ NOVO: Verifica Túnel Viário ANTES de outras regras genéricas
+  if (tipoLimpo.includes('Túnel') || tipoLimpo.includes('TUV')) {
+    return iconMap['Passagem Sob Túnel Viário (TUV)'];
+  }
+
   if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC'))
     return iconMap['Zona Verde de Trânsito (ZVT)'];
   if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP'))
@@ -1374,6 +1381,8 @@ function getIconUrl(tipo, velocidade) {
     { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
     { keys: ['Tráfego Proibido', 'DTLP'],       icon: iconMap['Detector de Tráfego em Local Proibido'] },
     { keys: ['BUS', 'Faixa Preferencial'],       icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
+    // ✅ NOVO: Fallback para Túnel Viário no array de substrings
+    { keys: ['Túnel', 'TUV'],                    icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
   ];
   for (var s = 0; s < substrings.length; s++) {
     var entry = substrings[s];
