@@ -1097,7 +1097,7 @@ const iconMap = {
   'Zona de Estudo Nuclear (ZEN)':'/imagens_app/ic_radar_nuclear_v2.png',
   'Área de Escape Caminhões (ARE)':'/imagens_app/ic_area_escape.png',
   'Passagem Sob Túnel Viário (TUV)':'/imagens_app/ic_tunel_v2.png',
-  'Passagem Sob Túnel Viário':'/imagens_app/ic_tunel_v2.png',
+
 
   // ✅ CORREÇÃO: RIV agora mapeia para ic_cam_video_v2.png
   'Radar Inteligente de Velocidade Média (RIV)':'/imagens_app/ic_cam_video_v2.png',
@@ -1114,13 +1114,14 @@ const TIPOS_SEM_ALERTA = [
   'Zona Verde de Trânsito (ZVC)',
   'Zona Verde de Trânsito',
   'BUS',
+   'Passagem Sob Túnel Viário (TUV)',
   'Câmera Olho Vivo (COV)',
   'Câmera Olho Vivo',
   'Reconhecimento Facial (OCR-F)',
   'Leitor de Placas (OCR-P)',
   'Apenas Trânsito Local (ATL)',
-  'Zona de Estudo Nuclear (ZEN)',
-  'Passagem Sob Túnel Viário (TUV)'
+  'Zona de Estudo Nuclear (ZEN)'
+ 
 
 ];
 
@@ -1242,6 +1243,7 @@ const ajusteNomes = {
   'Controle de Redução de Velocidade': 'Painel de Redução de Velocidade (PRV)',
   'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
   'Detector de Parada sobre Faixa de Pedestres': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
+  'Passagem Sob Túnel Viário (TUV)':'Passagem Sob Túnel Viário (TUV)',
   'Detector de Avanço de Semáforo (DAS)': 'Radar de Avanço de Semáforo (DAS)',
   'Detector de Avanço de Semáforo': 'Radar de Avanço de Semáforo (DAS)',
   'Detector de Conversão em Local Proibido': 'Detector de Conversão em Local Proibido (DCP)',
@@ -1265,7 +1267,7 @@ const ajusteNomes = {
   'Leitor Inteligente de Placas (OCR-P)': 'Leitor de Placas (OCR-P)',
   'Leitor de Reconhecimento Facial': 'Reconhecimento Facial (OCR-F)',
   'Apenas Trânsito Local (ATL)': 'Apenas Trânsito Local (ATL)',
-  'Passagem Sob Túnel Viário (TUV)':'Passagem Sob Túnel Viário (TUV)',
+ 
   'Radar Inteligente de Velocidade Média (RIV)': 'Radar Inteligente de Velocidade Média (RIV)',
   'Radar Inteligente de Velocidade Média': 'Radar Inteligente de Velocidade Média (RIV)',
   'Leitor de Reconhecimento Facial (OCR-F)': 'Reconhecimento Facial (OCR-F)'
@@ -1358,26 +1360,32 @@ function getIconUrl(tipo, velocidade) {
 
   if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
 
-  var substrings = [
-    { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
-    { keys: ['Túnel Viário', 'TUV'],               icon: iconMap['Passagem Sob Túnel Viário (TUV))'] },
-    { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
-    { keys: ['OCR-P', 'Placas'],                 icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
-    { keys: ['Celular', 'DUC'],                  icon: iconMap['Detector de Uso de Celular'] },
-    { keys: ['Cinto', 'VCS'],                    icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
-    { keys: ['Acidente', 'AIA'],                 icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
-    // ✅ RIV já tratado no early return acima, mas mantido aqui como fallback
-    { keys: ['Média', 'RIV'],                    icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
-    { keys: ['Apenas', 'ATL'],                    icon: iconMap['Apenas Trânsito Local (ATL)'] },
-    { keys: ['Perigo', 'ZPV'],                   icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
-    { keys: ['Inundaç', 'ZIR'],                  icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
-    { keys: ['Redução', 'Redutor', 'DRV', 'CRV'],icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
-    { keys: ['Conversão'],                       icon: iconMap['Detector de Conversão em Local Proibido'] },
-    { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
-    { keys: ['Tráfego Proibido', 'DTLP'],       icon: iconMap['Detector de Tráfego em Local Proibido'] },
-    { keys: ['BUS', 'Faixa Preferencial'],       icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
+  
 
+  var substrings = [
+    // ✅ TÚNEL ISOLADO NO TOPO: Evita que o "ário" de "Viário" dispare o "Semáforo"
+    { keys: ['Túnel Viário', 'TUV'],               icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
+    
+    { keys: ['Olho Vivo', 'COV'],                  icon: iconMap['Câmera Olho Vivo (COV)'] },
+    { keys: ['Facial'],                             icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
+    { keys: ['OCR-P', 'Placas'],                    icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
+    { keys: ['Celular', 'DUC'],                     icon: iconMap['Detector de Uso de Celular'] },
+    { keys: ['Cinto', 'VCS'],                       icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
+    { keys: ['Acidente', 'AIA'],                    icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
+    // ✅ RIV já tratado no early return acima, mas mantido aqui como fallback
+    { keys: ['Média', 'RIV'],                       icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
+    { keys: ['Apenas', 'ATL'],                      icon: iconMap['Apenas Trânsito Local (ATL)'] },
+    { keys: ['Perigo', 'ZPV'],                      icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
+    { keys: ['Inundaç', 'ZIR'],                     icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
+    { keys: ['Redução', 'Redutor', 'DRV', 'CRV'],   icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
+    { keys: ['Conversão'],                          icon: iconMap['Detector de Conversão em Local Proibido'] },
+    { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
+    { keys: ['Tráfego Proibido', 'DTLP'],           icon: iconMap['Detector de Tráfego em Local Proibido'] },
+    { keys: ['BUS', 'Faixa Preferencial'],           icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
   ];
+
+
+  
   for (var s = 0; s < substrings.length; s++) {
     var entry = substrings[s];
     for (var k = 0; k < entry.keys.length; k++) {
