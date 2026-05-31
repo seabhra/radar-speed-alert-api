@@ -1096,9 +1096,7 @@ const iconMap = {
   'Radar de Caminhão na Faixa Esquerda (CFE)':'/imagens_app/ic_radar_truck_v2.png',
   'Zona de Estudo Nuclear (ZEN)':'/imagens_app/ic_radar_nuclear_v2.png',
   'Área de Escape Caminhões (ARE)':'/imagens_app/ic_area_escape.png',
-  'Passagem Sob Túnel Viário (TUV)':'/imagens_app/ic_tunel_v2.png',
-
-
+  'Apenas Trânsito Local (ATL)':'/imagens_app/ic_local_traffic_v2.png',
   // ✅ CORREÇÃO: RIV agora mapeia para ic_cam_video_v2.png
   'Radar Inteligente de Velocidade Média (RIV)':'/imagens_app/ic_cam_video_v2.png',
   'Radar Inteligente de Velocidade Média':'/imagens_app/ic_cam_video_v2.png',
@@ -1114,14 +1112,14 @@ const TIPOS_SEM_ALERTA = [
   'Zona Verde de Trânsito (ZVC)',
   'Zona Verde de Trânsito',
   'BUS',
-   'Passagem Sob Túnel Viário (TUV)',
   'Câmera Olho Vivo (COV)',
   'Câmera Olho Vivo',
   'Reconhecimento Facial (OCR-F)',
   'Leitor de Placas (OCR-P)',
-  'Apenas Trânsito Local (ATL)',
-  'Zona de Estudo Nuclear (ZEN)'
  
+  'Apenas Trânsito Local (ATL)',
+  'Zona de Estudo Nuclear (ZEN)',
+  'Passagem Sob Túnel Viário (TUV)'
 
 ];
 
@@ -1132,7 +1130,7 @@ const TIPOS_ALERTA_RISCO = [
   'Zona de Perigo e Violência (ZPV)',
   'Zona de Perigo e Violência',
   'Alto Índice  de Acidente (AIA)',
-  'Alto Índice de Acidente (AIA)',
+  'Alerta de Alto Índice de Acidente (AIA)',
   'Alerta de Alto Índice de Acidente',
   'Zona de Risco de Inundações Recorrentes (ZIR)',
   'Área de Escape Caminhões (ARE)',
@@ -1243,7 +1241,6 @@ const ajusteNomes = {
   'Controle de Redução de Velocidade': 'Painel de Redução de Velocidade (PRV)',
   'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
   'Detector de Parada sobre Faixa de Pedestres': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
-  'Passagem Sob Túnel Viário (TUV)':'Passagem Sob Túnel Viário (TUV)',
   'Detector de Avanço de Semáforo (DAS)': 'Radar de Avanço de Semáforo (DAS)',
   'Detector de Avanço de Semáforo': 'Radar de Avanço de Semáforo (DAS)',
   'Detector de Conversão em Local Proibido': 'Detector de Conversão em Local Proibido (DCP)',
@@ -1267,7 +1264,7 @@ const ajusteNomes = {
   'Leitor Inteligente de Placas (OCR-P)': 'Leitor de Placas (OCR-P)',
   'Leitor de Reconhecimento Facial': 'Reconhecimento Facial (OCR-F)',
   'Apenas Trânsito Local (ATL)': 'Apenas Trânsito Local (ATL)',
- 
+  'Passagem Sob Túnel Viário (TUV)':'Passagem Sob Túnel Viário (TUV)',
   'Radar Inteligente de Velocidade Média (RIV)': 'Radar Inteligente de Velocidade Média (RIV)',
   'Radar Inteligente de Velocidade Média': 'Radar Inteligente de Velocidade Média (RIV)',
   'Leitor de Reconhecimento Facial (OCR-F)': 'Reconhecimento Facial (OCR-F)'
@@ -1323,22 +1320,15 @@ function deveAlertaRadar(tipoOriginal) {
 // ✅ CORREÇÃO PRINCIPAL: getIconUrl ÚNICO com early return para RIV
 // A primeira definição (que usava ajusteNomes) foi REMOVIDA pois era
 // sobrescrita por esta. Agora esta é a única versão.
-
-
 function getIconUrl(tipo, velocidade) {
   const tipoLimpo = tipo ? tipo.trim() : "";
   if (!tipoLimpo) return iconMap['default'];
 
-  // ✅ PRIORIDADE MÁXIMA 1: Túnel Viário (TUV)
-  // Se a string tiver "Túnel" ou "TUV", vai o ícone de túnel. Fim.
-  if (tipoLimpo.includes('Túnel') || tipoLimpo.includes('TUV') || tipoLimpo.includes('túnel')) {
-    return '/imagens_app/ic_tunel_v2.png';
-  }
-
-  // ✅ PRIORIDADE MÁXIMA 2: Radar Inteligente de Velocidade Média (RIV)
-  // Se a string tiver "Média" ou "RIV", vai o ícone de câmera. Fim.
-  if (tipoLimpo.includes('Média') || tipoLimpo.includes('(RIV)') || tipoLimpo.includes('RIV') || tipoLimpo.includes('média')) {
-    return '/imagens_app/ic_cam_video_v2.png';
+  // ✅ CORREÇÃO CRÍTICA: Verifica RIV ANTES de "Velocidade"
+  // Sem isso, "Radar Inteligente de Velocidade Média" caia no bloco
+  // isRadarVelocidade e recebia ic_radar_cev_v2.png em vez de ic_cam_video_v2.png
+  if (tipoLimpo.includes('Média') || tipoLimpo.includes('(RIV)') || tipoLimpo.includes('RIV')) {
+    return iconMap['Radar Inteligente de Velocidade Média (RIV)'];
   }
 
   if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC'))
@@ -1365,10 +1355,8 @@ function getIconUrl(tipo, velocidade) {
     return '/imagens_app/ic_radar_cev_v2.png';
   }
 
-  // Verificação exata no iconMap
   if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
 
-  // Verificação por substring (Fallback)
   var substrings = [
     { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
     { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
@@ -1376,6 +1364,8 @@ function getIconUrl(tipo, velocidade) {
     { keys: ['Celular', 'DUC'],                  icon: iconMap['Detector de Uso de Celular'] },
     { keys: ['Cinto', 'VCS'],                    icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
     { keys: ['Acidente', 'AIA'],                 icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
+    // ✅ RIV já tratado no early return acima, mas mantido aqui como fallback
+    { keys: ['Média', 'RIV'],                    icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
     { keys: ['Apenas', 'ATL'],                    icon: iconMap['Apenas Trânsito Local (ATL)'] },
     { keys: ['Perigo', 'ZPV'],                   icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
     { keys: ['Inundaç', 'ZIR'],                  icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
@@ -1391,12 +1381,8 @@ function getIconUrl(tipo, velocidade) {
       if (tipoLimpo.includes(entry.keys[k])) return entry.icon;
     }
   }
-  
   return iconMap['default'];
 }
-
-
-
 
 // Patch global para ícones de radar com fallback
 document.addEventListener('error', function(e) {
