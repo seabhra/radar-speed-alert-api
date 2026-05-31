@@ -543,8 +543,13 @@
       [526, "1814","Rodovia BR-040, Próximo ao Viaduto do Mutuca","Controlador Eletrônico de Velocidade (CEV)", "100","Belo Horizonte/Rio de Janeiro","1001030","KBH53010130","-20.05190, -43.96820"],
       [527, "1815","Rua Alabandina, Esq. Rua Renato Nascimento","Alerta de Alto Índice de Acidente (AIA)","60","Centro/Caiçara","1001031","KBH53010131","-19.89578, -43.96909"],
       [528, "1816","Av. Jequitinhonha, Esq. Rua Leopoldo Gomes","Alerta de Alto Índice de Acidente (AIA)","60","Centro/Alto Vera Cruz","1001032","KBH53010132","-19.91022, -43.89414"],
-      [529, "1816","Av. Jequitinhonha, Esq. Rua Leopoldo Gomes","Câmera Olho Vivo (COV)","60","Centro/Alto Vera Cruz","1001033","KBH53010133","-19.91026, -43.89427"]
+      [529, "1817","Av. Jequitinhonha, Esq. Rua Leopoldo Gomes","Câmera Olho Vivo (COV)","60","Centro/Alto Vera Cruz","1001033","KBH53010133","-19.91026, -43.89427"],
+      [530, "1818","Av. Cristiano Machado, Túnel da Lagoinha","Passagem Sob Túnel Viário (TUV)","60","Centro/Bairro","1001034","KBH53010134","-19.91143, -43.93909"],
+      [531, "1819","Av. Cristiano Machado, Túnel da Lagoinha","Passagem Sob Túnel Viário (TUV)","60","Bairro/Centro","1001035","KBH53010135","-19.90647, -43.93777"],
+      [532, "1820","Av. Padre Argemiro Moreira, Próx. Rua José de Alencar","Passagem Sob Túnel Viário (TUV)","60","Sabará/Capitão Eduardo","1001036","KBH53010136","-19.83604, -43.86893"],
+      [533, "1821","Av. Padre Argemiro Moreira, Próx. Rua José de Alencar","Passagem Sob Túnel Viário (TUV)","60","Capitão Eduardo/Sabará","1001037","KBH53010137","-19.83483, -43.86828"]
+      
          
-
+      
     ]
   }
