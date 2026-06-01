@@ -1211,18 +1211,7 @@ function classificarAlerta(tipoOriginal) {
   return 'radar';
 }
 
-// ===================================================================
-// ESPALHA COORDENADAS DE RADARES NO MESMO PONTO
-// ===================================================================
-function getOffsetCoords(lat, lng, index, total) {
-  if (total <= 1 || index === 0) return [lat, lng];
-  const angle = (index / total) * 2 * Math.PI;
-  const radius = 0.00015; // ~15 metros de distância
-  return [
-    lat + Math.cos(angle) * radius,
-    lng + Math.sin(angle) * radius
-  ];
-}
+
 
 // ===================================================================
 // AJUSTE DE NOMES
@@ -2370,31 +2359,67 @@ async function carregarRadares() {
 }
 
 // ===================================================================
-// ✅ CORREÇÃO: renderizarRadaresNoMapa COM ESPALHAMENTO DE COORDENADAS
+// FUNÇÃO: renderizarRadaresNoMapa (Sem espalhamento de coordenadas)
 // ===================================================================
 function renderizarRadaresNoMapa(records, origem) {
   if (!map) return;
   var radaresExternos = records || [];
   var contador = 0;
 
-  // ✅ NOVO: Agrupa radares por coordenada para espalhamento
-  var coordMap = {};
-
   for (var i = 0; i < radaresExternos.length; i++) {
     var record = radaresExternos[i];
     var coords = extrairCoordenadas(record, i);
     if (!coords) continue;
 
-    // Arredonda para agrupar radares no mesmo ponto
-    var coordKey = coords.lat.toFixed(5) + ',' + coords.lng.toFixed(5);
+    var finalLat = coords.lat;
+    var finalLng = coords.lng;
 
-    if (!coordMap[coordKey]) coordMap[coordKey] = [];
-    coordMap[coordKey].push({
-      index: i,
-      record: record,
-      coords: coords
-    });
+    var endereco = record[2] || "Endereço não informado";
+    var tipo = (record[3] || "Não Identificado").trim();
+    var velocidade = record[4] || "0";
+
+    var iconeUrl = getIconUrl(tipo, velocidade);
+    // ✅ Correção Vercel: removido a barra "/" inicial do caminho do fallback
+    var fallbackUrl = 'imagens_app/ic_radar_cev_v2.png'; 
+    var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
+
+    var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
+
+    setTimeout(function(mk, fb) {
+      return function() {
+        var el = mk.getElement();
+        if (el) {
+          var imgEl = el.querySelector('img');
+          if (imgEl) { imgEl.setAttribute('data-fallback', fb); }
+        }
+      };
+    }(radarMarker, fallbackUrl), 100);
+
+    var tipoExibicao = ajusteNomes[tipo] || tipo;
+    var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
+    var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
+
+    radarMarker.bindPopup(
+      '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' +
+      tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
+      endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div></div>'
+    );
+
+    radarMarker.radarData = {
+      id: i, latitude: finalLat, longitude: finalLng,
+      endereco: endereco, velocidade_maxima: velocidade,
+      tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA
+    };
+    radarMarkers.push(radarMarker);
+    contador++;
   }
+
+  $("#loading").hide();
+  if (contador > 0) { showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)'); }
+  else { showNotification("Nenhum radar encontrado.");
+    
+   }
+
 
   // ✅ NOVO: Criar markers com offset quando há sobreposição
   var chaves = Object.keys(coordMap);
