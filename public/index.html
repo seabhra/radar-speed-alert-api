@@ -936,29 +936,25 @@
     </div>
   </div>
 
-  <!-- =================================================================== -->
+<!-- =================================================================== -->
 <!-- ÁUDIOS DE ALERTA (com fallback inteligente) -->
 <!-- =================================================================== -->
 
-
   
 <audio id="alert-sound-radar" preload="auto">
-  <source src="/sons/alerta_radar.mp3" type="audio/mpeg">
-  <source src="/alerta_sound-radar.mp3" type="audio/mpeg">
+  <source src="audio_app/alerta_radar.mp3" type="audio/mpeg">
+  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="alert-sound-risco" preload="auto">
-  <source src="/sons/alerta_risco.mp3" type="audio/mpeg">
-  <!-- Fallback: usa o som do radar comum se o de risco não existir -->
-  <source src="/alerta_sound-radar.mp3" type="audio/mpeg">
+  <source src="audio_app/alerta_risco.mp3" type="audio/mpeg">
+  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="alert-sound-promo" preload="auto">
-  <source src="/sons/alerta_promo.mp3" type="audio/mpeg">
-  <!-- Fallback: usa o som do radar comum se o de promoção não existir -->
-  <source src="/alerta_sound-radar.mp3" type="audio/mpeg">
+  <source src="audio_app/alerta_promo.mp3" type="audio/mpeg">
+  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
 </audio>
-
  
   <script>
 // ===================================================================
@@ -2719,26 +2715,30 @@ async function solicitarWakeLock() {
 // FUNÇÃO: tocarSomAlerta (com fallback duplo)
 // ===================================================================
 function tocarSomAlerta(tipoAlerta) {
-  var soundId = 'alert-sound-radar';
-
-  if (tipoAlerta === 'risco') {
-    soundId = 'alert-sound-risco';
-  } else if (tipoAlerta === 'promocao') {
-    soundId = 'alert-sound-promo';
+  // 1. Tenta mandar o App Inventor tocar o som nativo (MUITO MAIS CONFIÁVEL)
+  if (typeof AppInventor !== 'undefined') {
+    enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
+    return; // Para por aqui, o App Inventor cuida do resto
   }
+
+  // 2. Fallback para PWA/Navegador (Se não estiver no App Inventor)
+  var soundId = 'alert-sound-radar';
+  if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
+  else if (tipoAlerta === 'promocao') soundId = 'alert-sound-promo';
 
   var sound = document.getElementById(soundId);
+  if (!sound) sound = document.getElementById('alert-sound-radar');
 
-  // Se o áudio específico não existe, volta pro padrão
-  if (!sound) {
-    sound = document.getElementById('alert-sound-radar');
-  }
-
-  // Se nenhum áudio existe, cria um beep com Web Audio API
-  if (!sound) {
+  if (sound) {
+    sound.currentTime = 0;
+    sound.play().catch(function(err) {
+      console.warn('[Radar X9] Áudio bloqueado pelo navegador:', err);
+      tocarBeepEmergencia(tipoAlerta); // Fallback final
+    });
+  } else {
     tocarBeepEmergencia(tipoAlerta);
-    return;
   }
+
 
   sound.currentTime = 0;
   sound.play().catch(function(err) {
@@ -2752,6 +2752,44 @@ function tocarSomAlerta(tipoAlerta) {
       });
     }, 300);
   });
+}
+
+// ===================================================================
+// BEEP DE EMERGÊNCIA (Web Audio API - Funciona mesmo com autoplay bloqueado)
+// ===================================================================
+function tocarBeepEmergencia(tipoAlerta) {
+  try {
+    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Tenta desbloquear o contexto de áudio
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    var oscillator = audioCtx.createOscillator();
+    var gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    // Configurações do som (Agudo = Radar, Grave = Risco)
+    if (tipoAlerta === 'risco') {
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.setValueAtTime(300, audioCtx.currentTime); // 300Hz (Grave)
+    } else {
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // 800Hz (Agudo)
+    }
+
+    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); // Volume pela metade
+    
+    // Duração do beep: 0.2 segundos
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.2);
+    
+  } catch (e) {
+    console.error('[Radar X9] Falha total ao tocar beep:', e);
+  }
 }
 
 // ===================================================================
