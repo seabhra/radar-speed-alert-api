@@ -1,6 +1,7 @@
 {
   "framework": null,
   "buildCommand": "npm run build",
+  "outputDirectory": "public",
   "rewrites": [
     {
       "source": "/api/:path*",
@@ -8,5 +9,4 @@
     }
   ]
 }
-
 
