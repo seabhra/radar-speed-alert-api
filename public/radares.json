@@ -552,7 +552,7 @@
       [535, "1823","Av. Padre Argemiro Moreira, Próx. Rodovia BR-381","Passagem Sob Túnel Viário (TUV)","60","Distrito Industrial Betim/BR-381","1001039","KBH53010139","-19.95620, -44.12727"],
       [536, "1824","Rua dos Emboabas, Sob Rodovia BR-040","Passagem Sob Túnel Viário (TUV)","60","Água Branca/Jardim Laguna","1001040","KBH53010140","-19.92134, -44.03653"],
       [537, "1825","Rua Vinte e Oito, Próx. Rodovia BR-040","Passagem Sob Túnel Viário (TUV)","60","Jardim Laguna/BR-040","1001041","KBH53010141","-19.92092, -44.03665"],
-      [538, "1826","Rua Vinte e Oito, Próx. Rodovia BR-040","Controlador Eletrônico de Velocidade (CEV)","30","Jardim Laguna/BR-040","1001042","KBH53010142","-19.92001, -44.03689"]
+      [538, "1826","Rua Vinte e Oito, Próx. Rodovia BR-040","Controlador Eletrônico de Velocidade (CEV)", "30","Jardim Laguna/BR-040","1001042","KBH53010142","-19.92001, -44.03689"]
 
       
     ]
