@@ -547,9 +547,13 @@
       [530, "1818","Av. Cristiano Machado, Túnel da Lagoinha","Passagem Sob Túnel Viário (TUV)","60","Centro/Bairro","1001034","KBH53010134","-19.91143, -43.93909"],
       [531, "1819","Av. Cristiano Machado, Túnel da Lagoinha","Passagem Sob Túnel Viário (TUV)","60","Bairro/Centro","1001035","KBH53010135","-19.90647, -43.93777"],
       [532, "1820","Av. Padre Argemiro Moreira, Próx. Rua José de Alencar","Passagem Sob Túnel Viário (TUV)","60","Sabará/Capitão Eduardo","1001036","KBH53010136","-19.83604, -43.86893"],
-      [533, "1821","Av. Padre Argemiro Moreira, Próx. Rua José de Alencar","Passagem Sob Túnel Viário (TUV)","60","Capitão Eduardo/Sabará","1001037","KBH53010137","-19.83483, -43.86828"]
-      
-         
+      [533, "1821","Av. Padre Argemiro Moreira, Próx. Rua José de Alencar","Passagem Sob Túnel Viário (TUV)","60","Capitão Eduardo/Sabará","1001037","KBH53010137","-19.83483, -43.86828"],
+      [534, "1822","Rua Barra Longá, Próx. Rodovia BR-381","Passagem Sob Túnel Viário (TUV)","60","BR-381/Distrito Industrial Betim","1001038","KBH53010138","-19.95656, -44.12735"],
+      [535, "1823","Av. Padre Argemiro Moreira, Próx. Rodovia BR-381","Passagem Sob Túnel Viário (TUV)","60","Distrito Industrial Betim/BR-381","1001039","KBH53010139","-19.95620, -44.12727"],
+      [536, "1824","Rua dos Emboabas, Sob Rodovia BR-040","Passagem Sob Túnel Viário (TUV)","60","Água Branca/Jardim Laguna","1001040","KBH53010140","-19.92134, -44.03653"],
+      [537, "1825","Rua Vinte e Oito, Próx. Rodovia BR-040","Passagem Sob Túnel Viário (TUV)","60","Jardim Laguna/BR-040","1001041","KBH53010141","-19.92092, -44.03665"],
+      [538, "1826","Rua Vinte e Oito, Próx. Rodovia BR-040","Controlador Eletrônico de Velocidade (CEV)","30","Jardim Laguna/BR-040","1001042","KBH53010142","-19.92001, -44.03689"]
+
       
     ]
   }
