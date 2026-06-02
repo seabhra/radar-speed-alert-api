@@ -956,7 +956,7 @@
   <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
 </audio>
  
-  <script>
+<script>
 // ===================================================================
 // VARIÁVEIS GLOBAIS
 // ===================================================================
@@ -1072,10 +1072,8 @@ const iconMap = {
   'Zona de Risco de Inundações Recorrentes':'/imagens_app/ic_zona_inunda.png',
   'Detector de Uso de Celular': '/imagens_app/ic_radar_duc_v2.png',
   'Detector de Uso de Celular (DUC)': '/imagens_app/ic_radar_duc_v2.png',
-
   'Controle de Redução de Velocidade (CRV)':'/imagens_app/ic_radar_rev_v2.png',
   'Controle de Redução de Velocidade':'/imagens_app/ic_radar_rev_v2.png',
-
   'Verificador de Cinto de Segurança (VCS)':'/imagens_app/ic_radar_cinto_v2.png',
   'Verificador de Cinto de Segurança':'/imagens_app/ic_radar_cinto_v2.png',
   'Leitor Inteligente de Placas (OCR-P)':'/imagens_app/ic_radar_ocr_v2.png',
@@ -1093,10 +1091,8 @@ const iconMap = {
   'Zona de Estudo Nuclear (ZEN)':'/imagens_app/ic_radar_nuclear_v2.png',
   'Área de Escape Caminhões (ARE)':'/imagens_app/ic_area_escape.png',
   'Apenas Trânsito Local (ATL)':'/imagens_app/ic_local_traffic_v2.png',
-  // ✅ CORREÇÃO: RIV agora mapeia para ic_cam_video_v2.png
   'Radar Inteligente de Velocidade Média (RIV)':'/imagens_app/ic_cam_video_v2.png',
   'Radar Inteligente de Velocidade Média':'/imagens_app/ic_cam_video_v2.png',
-  // ✅ NOVO: Ícone de Túnel Viário
   'Passagem Sob Túnel Viário (TUV)':'/imagens_app/ic_tunel_v2.png',
   'Passagem Sob Túnel Viário':'/imagens_app/ic_tunel_v2.png',
   'default': '/imagens_app/ic_radar_cev_v2.png'
@@ -1118,7 +1114,6 @@ const TIPOS_SEM_ALERTA = [
   'Apenas Trânsito Local (ATL)',
   'Zona de Estudo Nuclear (ZEN)',
   'Passagem Sob Túnel Viário (TUV)'
-
 ];
 
 // ===================================================================
@@ -1135,34 +1130,21 @@ const TIPOS_ALERTA_RISCO = [
   'Zona de Estudo Nuclear (ZEN)'
 ];
 
-
-// ===================================================================
-// ALERTA DE PROMOÇÃO
-// ===================================================================
-
-const TIPOS_ALERTA_PROMOCAO = [
- 
-];
-
+const TIPOS_ALERTA_PROMOCAO = [];
 
 // ===================================================================
 // INTEGRAÇÃO IA VERCEL - ALERTA DE PROMOÇÃO
 // ===================================================================
 async function consultarIAVercel(pergunta) {
   try {
-    // URL da sua API no Vercel (ajuste se necessário em produção)
     const url = '/api/chat'; 
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pergunta: pergunta })
     });
-    
     if (!response.ok) return;
-    
     const data = await response.json();
-    
-    // Se a IA detectar que é uma promoção, dispara o alerta verde
     if (data.tipoAlerta === 'promocao') {
       dispararAlertaPromocaoIA(data.resposta || "Promoção detectada pela IA!");
     }
@@ -1172,33 +1154,21 @@ async function consultarIAVercel(pergunta) {
 }
 
 function dispararAlertaPromocaoIA(mensagem) {
-  // Limpa estados anteriores do alerta
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
   $(".alert-bar").css("background", "");
-
-  // Configura visual do Alerta de Promoção (Verde)
   $("#alert-title").text("🎉 ALERTA DE PROMOÇÃO!");
   $("#alert-text").text(mensagem);
   $(".alert-bar").addClass("alert-bar-promocao");
-  
-  // Ícone de promoção (usando o da zona verde ou o que preferir)
   $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
-
-  // Exibe o alerta
   if (!$("#alert-container").is(":visible")) { 
     $("#alert-container").fadeIn(200); 
   }
-  
-  // Esconde o alerta após o tempo padrão
   clearTimeout(alertTimeout);
   alertTimeout = setTimeout(function() { 
     if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
   }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
-
-
-// Função auxiliar para classificar o tipo do alerta
 function classificarAlerta(tipoOriginal) {
   if (!tipoOriginal) return 'radar';
   var tipoLimpo = tipoOriginal.trim();
@@ -1210,8 +1180,6 @@ function classificarAlerta(tipoOriginal) {
   }
   return 'radar';
 }
-
-
 
 // ===================================================================
 // AJUSTE DE NOMES
@@ -1304,25 +1272,16 @@ function deveAlertaRadar(tipoOriginal) {
   return true;
 }
 
-// ✅ CORREÇÃO PRINCIPAL: getIconUrl ÚNICO com early return para RIV
-// A primeira definição (que usava ajusteNomes) foi REMOVIDA pois era
-// sobrescrita por esta. Agora esta é a única versão.
 function getIconUrl(tipo, velocidade) {
   const tipoLimpo = tipo ? tipo.trim() : "";
   if (!tipoLimpo) return iconMap['default'];
 
-  // ✅ CORREÇÃO CRÍTICA: Verifica RIV ANTES de "Velocidade"
-  // Sem isso, "Radar Inteligente de Velocidade Média" caia no bloco
-  // isRadarVelocidade e recebia ic_radar_cev_v2.png em vez de ic_cam_video_v2.png
   if (tipoLimpo.includes('Média') || tipoLimpo.includes('(RIV)') || tipoLimpo.includes('RIV')) {
     return iconMap['Radar Inteligente de Velocidade Média (RIV)'];
   }
-
-  // ✅ NOVO: Verifica Túnel Viário ANTES de outras regras genéricas
   if (tipoLimpo.includes('Túnel') || tipoLimpo.includes('TUV')) {
     return iconMap['Passagem Sob Túnel Viário (TUV)'];
   }
-
   if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC'))
     return iconMap['Zona Verde de Trânsito (ZVT)'];
   if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP'))
@@ -1356,7 +1315,6 @@ function getIconUrl(tipo, velocidade) {
     { keys: ['Celular', 'DUC'],                  icon: iconMap['Detector de Uso de Celular'] },
     { keys: ['Cinto', 'VCS'],                    icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
     { keys: ['Acidente', 'AIA'],                 icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
-    // ✅ RIV já tratado no early return acima, mas mantido aqui como fallback
     { keys: ['Média', 'RIV'],                    icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
     { keys: ['Apenas', 'ATL'],                    icon: iconMap['Apenas Trânsito Local (ATL)'] },
     { keys: ['Perigo', 'ZPV'],                   icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
@@ -1366,7 +1324,6 @@ function getIconUrl(tipo, velocidade) {
     { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
     { keys: ['Tráfego Proibido', 'DTLP'],       icon: iconMap['Detector de Tráfego em Local Proibido'] },
     { keys: ['BUS', 'Faixa Preferencial'],       icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
-    // ✅ NOVO: Fallback para Túnel Viário no array de substrings
     { keys: ['Túnel', 'TUV'],                    icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
   ];
   for (var s = 0; s < substrings.length; s++) {
@@ -1378,7 +1335,6 @@ function getIconUrl(tipo, velocidade) {
   return iconMap['default'];
 }
 
-// Patch global para ícones de radar com fallback
 document.addEventListener('error', function(e) {
   var target = e.target;
   if (target && target.tagName === 'IMG') {
@@ -1474,9 +1430,7 @@ function moverMarcadorSuavemente(targetLat, targetLng) {
     marcadorParaMover.setLatLng([targetLat, targetLng]);
     return;
   }
-  var distancia = calcularDistancia(
-    ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng
-  );
+  var distancia = calcularDistancia(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng);
   if (distancia < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) return;
   var inicioLat = ultimaPosicaoMarcador.lat;
   var inicioLng = ultimaPosicaoMarcador.lng;
@@ -1535,7 +1489,6 @@ function aplicarTemaMapa() {
 }
 
 function fecharAlertaImediatamente() {
-  // Pausa todos os MP3s
   ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-promo'].forEach(function(id) {
     var sound = document.getElementById(id);
     if (sound) { sound.pause(); sound.currentTime = 0; }
@@ -1545,9 +1498,7 @@ function fecharAlertaImediatamente() {
 
 function esconderAlertaVisual() {
   $("#alert-container").fadeOut(150);
-  // Reseta todas as classes de cor e animação
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
-  // Volta ao padrão vermelho (caso seja um radar comum na próxima vez)
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   contagemTocarSom = 0;
   fecharAlertaImediatamente();
@@ -1566,16 +1517,9 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     iconAnchor: [25, 25],
     popupAnchor: [0, -25]
   });
-  startRouteMarker = L.marker([originLat, originLng], {
-    icon: startIcon,
-    zIndexOffset: 2000,
-    pane: 'markerPane'
-  }).addTo(map);
-  startRouteMarker.bindTooltip("Navegando para destino", {
-    permanent: false,
-    direction: "top",
-    offset: [0, -30]
-  });
+  startRouteMarker = L.marker([originLat, originLng], { icon: startIcon, zIndexOffset: 2000, pane: 'markerPane' }).addTo(map);
+  startRouteMarker.bindTooltip("Navegando para destino", { permanent: false, direction: "top", offset: [0, -30] });
+  
   var endIcon = L.divIcon({
     html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
     className: 'route-end-marker',
@@ -1583,24 +1527,13 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     iconAnchor: [25, 50],
     popupAnchor: [0, -50]
   });
-  endRouteMarker = L.marker([destLat, destLng], {
-    icon: endIcon,
-    zIndexOffset: 900
-  }).addTo(map);
-  endRouteMarker.bindPopup("<b>DESTINO</b><br>Você chegou ao seu destino!", {
-    closeButton: false,
-    autoClose: true,
-    closeOnClick: true
-  });
+  endRouteMarker = L.marker([destLat, destLng], { icon: endIcon, zIndexOffset: 900 }).addTo(map);
+  endRouteMarker.bindPopup("<b>DESTINO</b><br>Você chegou ao seu destino!", { closeButton: false, autoClose: true, closeOnClick: true });
 }
 
 function atualizarRota() {
   if (!destinoAtual || !userLat || !userLng || !routingControl) return;
-  var waypoints = [
-    L.latLng(userLat, userLng),
-    L.latLng(destinoAtual.lat, destinoAtual.lng)
-  ];
-  routingControl.setWaypoints(waypoints);
+  routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
   routingControl.route();
 }
 
@@ -1616,10 +1549,7 @@ function verificarChegadaDestino() {
 
 function finalizarNavegacao() {
   if (!map) return;
-  if (routingControl) {
-    map.removeControl(routingControl);
-    routingControl = null;
-  }
+  if (routingControl) { map.removeControl(routingControl); routingControl = null; }
   destinoAtual = null;
   estaEmNavegacao = false;
   estaEmMovimento = false;
@@ -1647,6 +1577,7 @@ function finalizarNavegacao() {
   }
   var rb = document.getElementById('btn-rotate-map');
   if (rb) rb.classList.remove('rotated');
+  
   var defaultIcon = L.divIcon({
     html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
     className: 'user-gps-marker',
@@ -1654,15 +1585,9 @@ function finalizarNavegacao() {
     iconAnchor: [25, 50],
     popupAnchor: [0, -50]
   });
-  userMarker = L.marker([userLat, userLng], {
-    icon: defaultIcon,
-    zIndexOffset: 1000
-  }).addTo(map);
-  userMarker.bindTooltip("Você está aqui", {
-    permanent: false,
-    direction: "top",
-    offset: [0, -25]
-  });
+  userMarker = L.marker([userLat, userLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
+  userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+  
   var sidebar = document.getElementById('sidebar-controls');
   var btnMenu = document.getElementById('btn-menu-toggle');
   if (sidebar && sidebar.classList.contains('retracted')) {
@@ -1677,27 +1602,14 @@ function finalizarNavegacao() {
 function removerRota() { finalizarNavegacao(); }
 
 function criarRota(destLat, destLng) {
-  if (!userLat || !userLng) {
-    showNotification("Aguardando posição GPS...");
-    return;
-  }
-  if (routingControl) {
-    map.removeControl(routingControl);
-    routingControl = null;
-  }
+  if (!userLat || !userLng) { showNotification("Aguardando posição GPS..."); return; }
+  if (routingControl) { map.removeControl(routingControl); routingControl = null; }
   destinoAtual = { lat: destLat, lng: destLng };
   adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
   routingControl = L.Routing.control({
-    waypoints: [
-      L.latLng(userLat, userLng),
-      L.latLng(destLat, destLng)
-    ],
-    routeWhileDragging: false,
-    addWaypoints: false,
-    draggableWaypoints: false,
-    fitSelectedRoutes: false,
-    show: false,
-    autoRoute: true,
+    waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
+    routeWhileDragging: false, addWaypoints: false, draggableWaypoints: false,
+    fitSelectedRoutes: false, show: false, autoRoute: true,
     lineOptions: {
       styles: [
         { color: '#4A148C', weight: 16, opacity: 0.4, lineCap: 'round', lineJoin: 'round' },
@@ -1711,6 +1623,7 @@ function criarRota(destLat, destLng) {
     createMarker: function() { return null; },
     showAlternatives: false
   }).addTo(map);
+  
   routingControl.on('routesfound', function(e) {
     let route = e.routes[0];
     if (route.coordinates && route.coordinates.length >= 2) {
@@ -1728,10 +1641,7 @@ function criarRota(destLat, destLng) {
     showNotification("🚗 " + dk + " km • " + tm + " min");
     iniciarModoNavegacaoSuave();
   });
-  routingControl.on('routingerror', function() {
-    $("#loading").hide();
-    showNotification("Erro ao traçar rota.");
-  });
+  routingControl.on('routingerror', function() { $("#loading").hide(); showNotification("Erro ao traçar rota."); });
   showNotification("🚀 Navegação iniciada");
 }
 
@@ -1785,9 +1695,7 @@ function atualizarCameraNavegacaoSuave() {
     bearingAtual = suavizarBearing(bearingAlvo, bearingAtual, FATOR_SUAVIZACAO_BEARING);
     map.setBearing(bearingAtual);
     var rotateBtnIcon = document.getElementById('rotate-btn-icon');
-    if (rotateBtnIcon) {
-      rotateBtnIcon.style.transform = 'rotate(' + bearingAtual + 'deg)';
-    }
+    if (rotateBtnIcon) rotateBtnIcon.style.transform = 'rotate(' + bearingAtual + 'deg)';
   }
   if (mudancaPos < 2 && mudancaZoom < 0.3 && centroAtualEfetivo.lat !== null) return;
   centroAtualEfetivo = { lat: c.lat, lng: c.lng };
@@ -1810,7 +1718,7 @@ function resetarMapa() {
   mapaRotacionado = false;
   bearingAlvo = 0;
   bearingAtual = 0;
-  if (typeof map.setBearing === 'function') { map.setBearing(0); }
+  if (typeof map.setBearing === 'function') map.setBearing(0);
   var rotateBtnIcon = document.getElementById('rotate-btn-icon');
   if (rotateBtnIcon) {
     rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
@@ -1836,89 +1744,48 @@ function resetarMapa() {
   showNotification("Mapa resetado");
 }
 
-
-  function extrairCoordenadas(record, index) {
-    if (!record || record.length < 9) {
-        return null;
-    }
-    
-    let geomIndex = (record.length >= 10) ? 9 : 8;
-    let s = String(record[geomIndex]).trim();
-    
-    // Se o campo está vazio, tenta o campo anterior
-    if (!s || s === '' || s === 'null' || s === 'undefined') {
-        geomIndex = (geomIndex === 9) ? 8 : 7;
-        s = String(record[geomIndex]).trim();
-    }
-    
-    if (!s || s === '') return null;
-    
-    let lat = null, lng = null;
-    
-    // ✅ TENTATIVA 1: Padrão decimal com ponto (ex: "-19.9190, -43.9386")
-    if (lat === null && s.includes('.')) {
-        let parts = s.split(',').map(function(p) { return p.trim(); });
-        if (parts.length >= 2) {
-            lat = parseFloat(parts[0]);
-            lng = parseFloat(parts[parts.length - 1]);
-        }
-    }
-    
-    // ✅ TENTATIVA 2: Ponto e vírgula (ex: "-19.9190; -43.9386")
-    if ((lat === null || isNaN(lat)) && s.includes(';')) {
-        let parts = s.split(';').map(function(p) { return p.trim().replace(',', '.'); });
-        if (parts.length >= 2) {
-            lat = parseFloat(parts[0]);
-            lng = parseFloat(parts[1]);
-        }
-    }
-    
-    // ✅ TENTATIVA 3: Vírgula decimal brasileira (ex: "-19,9190, -43,9386")
-    if ((lat === null || isNaN(lat)) && (s.match(/,/g) || []).length >= 3) {
-        let match = s.match(/(-?\d+,\d+),\s*(-?\d+,\d+)/);
-        if (match) {
-            lat = parseFloat(match[1].replace(',', '.'));
-            lng = parseFloat(match[2].replace(',', '.'));
-        }
-    }
-    
-    // ✅ TENTATIVA 4: Apenas duas partes com vírgula separadora
-    if ((lat === null || isNaN(lat))) {
-        let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); });
+function extrairCoordenadas(record, index) {
+  if (!record || record.length < 9) return null;
+  let geomIndex = (record.length >= 10) ? 9 : 8;
+  let s = String(record[geomIndex]).trim();
+  if (!s || s === '' || s === 'null' || s === 'undefined') {
+    geomIndex = (geomIndex === 9) ? 8 : 7;
+    s = String(record[geomIndex]).trim();
+  }
+  if (!s || s === '') return null;
+  let lat = null, lng = null;
+  
+  if (lat === null && s.includes('.')) {
+    let parts = s.split(',').map(function(p) { return p.trim(); });
+    if (parts.length >= 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[parts.length - 1]); }
+  }
+  if ((lat === null || isNaN(lat)) && s.includes(';')) {
+    let parts = s.split(';').map(function(p) { return p.trim().replace(',', '.'); });
+    if (parts.length >= 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
+  }
+  if ((lat === null || isNaN(lat)) && (s.match(/,/g) || []).length >= 3) {
+    let match = s.match(/(-?\d+,\d+),\s*(-?\d+,\d+)/);
+    if (match) { lat = parseFloat(match[1].replace(',', '.')); lng = parseFloat(match[2].replace(',', '.')); }
+  }
+  if ((lat === null || isNaN(lat))) {
+    let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); });
+    if (parts.length === 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
+  }
+  if (lat === null || isNaN(lat) || lng === null || isNaN(lng)) {
+    for (var f = Math.max(0, geomIndex - 2); f < Math.min(record.length, geomIndex + 3); f++) {
+      if (f === geomIndex) continue;
+      var campo = String(record[f]).trim();
+      if (campo.includes('.') && campo.includes(',')) {
+        let parts = campo.split(',').map(function(p) { return p.trim(); });
         if (parts.length === 2) {
-            // Tenta interpretar como decimal
-            lat = parseFloat(parts[0]);
-            lng = parseFloat(parts[1]);
+          var tLat = parseFloat(parts[0]); var tLng = parseFloat(parts[1]);
+          if (!isNaN(tLat) && !isNaN(tLng) && tLat >= -90 && tLat <= 90) { lat = tLat; lng = tLng; break; }
         }
+      }
     }
-    
-    // ✅ TENTATIVA 5: Verifica campos vizinhos do record
-    if (lat === null || isNaN(lat) || lng === null || isNaN(lng)) {
-        for (var f = Math.max(0, geomIndex - 2); f < Math.min(record.length, geomIndex + 3); f++) {
-            if (f === geomIndex) continue;
-            var campo = String(record[f]).trim();
-            if (campo.includes('.') && campo.includes(',')) {
-                let parts = campo.split(',').map(function(p) { return p.trim(); });
-                if (parts.length === 2) {
-                    var tLat = parseFloat(parts[0]);
-                    var tLng = parseFloat(parts[1]);
-                    if (!isNaN(tLat) && !isNaN(tLng) && tLat >= -90 && tLat <= 90) {
-                        lat = tLat;
-                        lng = tLng;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    
-    // Validação final
-    if (isNaN(lat) || isNaN(lng) || lat === null || lng === null || 
-        lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-        return null;
-    }
-    
-    return { lat: lat, lng: lng };
+  }
+  if (isNaN(lat) || isNaN(lng) || lat === null || lng === null || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+  return { lat: lat, lng: lng };
 }
 
 function atualizarBussola(headingDegrees) {
@@ -1935,6 +1802,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   var smoothLat = posSuave.lat;
   var smoothLng = posSuave.lng;
   posicaoSuavizadaGPS = { lat: smoothLat, lng: smoothLng };
+  
   if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
     dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
     var time = (currentTime - prevTime) / 1000;
@@ -1942,16 +1810,15 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   } else if (prevLat !== null) {
     dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
   }
+  
   if (speedKmh > 250) speedKmh = 0;
   velocidadeAtual = speedKmh;
   $("#speed-display").text(speedKmh);
   estaEmMovimento = speedKmh > 3 || dist > 2;
+  
   var novoHeading = null;
   if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
-    if (!bussolaHardwareDisponivel) {
-      currentHeading = hardwareHeading;
-      bussolaHardwareDisponivel = true;
-    }
+    if (!bussolaHardwareDisponivel) { currentHeading = hardwareHeading; bussolaHardwareDisponivel = true; }
     novoHeading = hardwareHeading;
   } else if (!bussolaHardwareDisponivel && dist > 3 && prevLat !== null) {
     var dy = newLat - prevLat;
@@ -1968,14 +1835,10 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
     bearingAlvo = novoHeading;
     headingIconeNavegacao = novoHeading;
   }
-  if (currentHeading !== null && currentHeading !== undefined) {
-    atualizarBussola(currentHeading);
-  }
-  prevLat = newLat;
-  prevLng = newLng;
-  prevTime = currentTime;
-  userLat = newLat;
-  userLng = newLng;
+  if (currentHeading !== null && currentHeading !== undefined) atualizarBussola(currentHeading);
+  
+  prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
+  
   if (estaEmNavegacao && startRouteMarker) {
     startRouteMarker.setLatLng([smoothLat, smoothLng]);
     var imgNav = document.getElementById('nav-icon-img');
@@ -1985,57 +1848,32 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
     }
     ultimaPosicaoMarcador.lat = smoothLat;
     ultimaPosicaoMarcador.lng = smoothLng;
-    if (!gpsInitialized) {
-      gpsInitialized = true;
-      hideFullscreenLoading();
-    }
+    if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
   } else if (!estaEmNavegacao) {
     if (!userMarker) {
       var defaultIcon = L.divIcon({
         html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-        className: 'user-gps-marker',
-        iconSize: [50, 50],
-        iconAnchor: [25, 50],
-        popupAnchor: [0, -50]
+        className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50]
       });
-      userMarker = L.marker([smoothLat, smoothLng], {
-        icon: defaultIcon,
-        zIndexOffset: 1000
-      }).addTo(map);
-      userMarker.bindTooltip("Você está aqui", {
-        permanent: false,
-        direction: "top",
-        offset: [0, -25]
-      });
-      ultimaPosicaoMarcador.lat = smoothLat;
-      ultimaPosicaoMarcador.lng = smoothLng;
-      if (!gpsInitialized) {
-        gpsInitialized = true;
-        hideFullscreenLoading();
-      }
+      userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
+      userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+      ultimaPosicaoMarcador.lat = smoothLat; ultimaPosicaoMarcador.lng = smoothLng;
+      if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
     } else {
       moverMarcadorSuavemente(smoothLat, smoothLng);
     }
   }
+  
   if (destinoAtual && routingControl && estaEmNavegacao) {
     if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
-      atualizarRota();
-      window.ultimaAtualizacaoRota = currentTime;
+      atualizarRota(); window.ultimaAtualizacaoRota = currentTime;
     }
   }
-  if (estaEmNavegacao && isFollowing) {
-    atualizarCameraNavegacaoSuave();
-  } else if (isFollowing && !estaEmNavegacao) {
-    map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.5 });
-  }
-  if (alertaHabilitado) {
-    verificarProximidadeRadares();
-  } else {
-    fecharAlertaImediatamente();
-  }
-  if (destinoAtual) {
-    verificarChegadaDestino();
-  }
+  if (estaEmNavegacao && isFollowing) { atualizarCameraNavegacaoSuave(); }
+  else if (isFollowing && !estaEmNavegacao) { map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.5 }); }
+  
+  if (alertaHabilitado) verificarProximidadeRadares(); else fecharAlertaImediatamente();
+  if (destinoAtual) verificarChegadaDestino();
 }
 
 function startGPSTracking() {
@@ -2044,18 +1882,13 @@ function startGPSTracking() {
   watchId = navigator.geolocation.watchPosition(
     function(position) {
       if (gpsSource !== 'appinventor') gpsSource = 'browser';
-      var newLat = position.coords.latitude;
-      var newLng = position.coords.longitude;
       var speedKmh = 0;
       if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
-      processarNovaPosicao(newLat, newLng, speedKmh, position.coords.heading);
+      processarNovaPosicao(position.coords.latitude, position.coords.longitude, speedKmh, position.coords.heading);
     }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
   );
   browserGpsTimeout = setTimeout(function() {
-    if (!gpsInitialized && gpsSource === 'none') {
-      showNotification("Aguardando GPS do app...");
-      hideFullscreenLoading();
-    }
+    if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); }
   }, 8000);
 }
 
@@ -2093,56 +1926,36 @@ function atualizarDistanciaAlerta(distancia) {
 function dispararAlerta(radar, distancia) {
   const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
   if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
-  
   const tipoAlerta = classificarAlerta(radar.tipoOriginal);
   const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
   const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
   
-  // Limpa classes visuais anteriores
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
   $(".alert-bar").css("background", ""); 
 
-  // Aplica o visual do alerta
   if (tipoAlerta === 'risco') {
     $("#alert-title").text("⚠️ ALERTA DE RISCO!");
-    $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
     $(".alert-bar").addClass("alert-bar-risco");
   } else if (tipoAlerta === 'promocao') {
     $("#alert-title").text("🎉 ALERTA DE PROMOÇÃO!");
-    $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
     $(".alert-bar").addClass("alert-bar-promocao");
   } else {
     $("#alert-title").text("ALERTA DE RADAR!");
-    $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
     $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   }
-
+  $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
   $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
   
   const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
-  if (isNewAlert) { 
-    $("#alert-container").fadeIn(200); 
-    contagemTocarSom = 0; 
-  }
+  if (isNewAlert) { $("#alert-container").fadeIn(200); contagemTocarSom = 0; }
   
-  // ✅ REGRA DE TOQUE DO MP3: 
-  // Radar toca no máximo 2 vezes | Risco e Promoção tocam sempre que for um alerta novo
   if (alertaHabilitado) {
     var deveTocar = false;
-    
-    if (tipoAlerta === 'radar') {
-      if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true;
-    } else {
-      if (isNewAlert) deveTocar = true;
-    }
-    
-    if (deveTocar) {
-      tocarSomAlerta(tipoAlerta); // Dispara o MP3 específico
-      contagemTocarSom++;
-    }
+    if (tipoAlerta === 'radar') { if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; }
+    else { if (isNewAlert) deveTocar = true; }
+    if (deveTocar) { tocarSomAlerta(tipoAlerta); contagemTocarSom++; }
   }
   
-  // Zona crítica (Visual pulsante)
   if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
     if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
     else if (tipoAlerta === 'promocao') $(".alert-bar").addClass("alert-bar-promocao-critico");
@@ -2151,9 +1964,7 @@ function dispararAlerta(radar, distancia) {
   
   ultimoRadarAlertado = radar.id;
   clearTimeout(alertTimeout);
-  alertTimeout = setTimeout(function() { 
-    if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
-  }, ALERT_CONFIG.TEMPO_ALERTA);
+  alertTimeout = setTimeout(function() { if ($("#alert-container").is(":visible")) esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
 function inicializarBotaoRotacaoMapa() {
@@ -2162,51 +1973,35 @@ function inicializarBotaoRotacaoMapa() {
   if (!rotateBtn) return;
   if (rotateBtnIcon) {
     rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
-    rotateBtnIcon.onerror = function() { 
-      this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; 
-    };
+    rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
   }
   if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') {
     console.error('[Radar X9] ERRO: leaflet-rotate NÃO carregou!');
-    rotateBtn.style.opacity = '0.3';
-    rotateBtn.style.pointerEvents = 'none';
-    rotateBtn.title = 'Rotação indisponível';
-    showNotification('Plugin de rotação não carregou.');
-    return;
+    rotateBtn.style.opacity = '0.3'; rotateBtn.style.pointerEvents = 'none';
+    rotateBtn.title = 'Rotação indisponível'; showNotification('Plugin de rotação não carregou.'); return;
   }
   rotateBtn.addEventListener('click', async function () {
     if (!map || typeof map.setBearing !== 'function') return;
-    if (!bussolaHardwareDisponivel) {
-      await solicitarPermissaoBussolaIOS();
-    }
+    if (!bussolaHardwareDisponivel) { await solicitarPermissaoBussolaIOS(); }
     if (!mapaRotacionado) {
       mapaRotacionado = true;
       var anguloRotacao = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 0;
-      bearingAlvo = anguloRotacao;
-      bearingAtual = anguloRotacao;
-      map.setBearing(anguloRotacao);
-      rotateBtn.classList.add('rotated');
+      bearingAlvo = anguloRotacao; bearingAtual = anguloRotacao;
+      map.setBearing(anguloRotacao); rotateBtn.classList.add('rotated');
       if (rotateBtnIcon) {
         rotateBtnIcon.src = "/imagens_app/ic_girar_map.png";
-        rotateBtnIcon.onerror = function() { 
-          this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; 
-        };
+        rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
         rotateBtnIcon.style.transform = 'rotate(' + anguloRotacao + 'deg)';
       }
-      if (bussolaHardwareDisponivel) { showNotification('Mapa rotacionado — bússola ativa'); }
-      else if (currentHeading > 0) { showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)'); }
-      else { showNotification('Mapa rotacionado — aguardando direção...'); }
+      if (bussolaHardwareDisponivel) showNotification('Mapa rotacionado — bússola ativa');
+      else if (currentHeading > 0) showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)');
+      else showNotification('Mapa rotacionado — aguardando direção...');
     } else {
-      mapaRotacionado = false;
-      bearingAlvo = 0;
-      bearingAtual = 0;
-      map.setBearing(0);
-      rotateBtn.classList.remove('rotated');
+      mapaRotacionado = false; bearingAlvo = 0; bearingAtual = 0;
+      map.setBearing(0); rotateBtn.classList.remove('rotated');
       if (rotateBtnIcon) {
         rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
-        rotateBtnIcon.onerror = function() { 
-          this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; 
-        };
+        rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
         rotateBtnIcon.style.transform = 'rotate(0deg)';
       }
       showNotification('Mapa resetado (Norte para cima)');
@@ -2222,17 +2017,11 @@ function inicializarBotaoAlertaToggle() {
     alertaHabilitado = !alertaHabilitado;
     if (alertaHabilitado) {
       alertBtn.classList.remove('alert-off');
-      if (alertIcon) {
-        alertIcon.src = "/imagens_app/ic_sound_on.png";
-        alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
-      }
+      if (alertIcon) { alertIcon.src = "/imagens_app/ic_sound_on.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; }; }
       showNotification("Alerta LIGADO");
     } else {
       alertBtn.classList.add('alert-off');
-      if (alertIcon) {
-        alertIcon.src = "/imagens_app/ic_sound_off.png";
-        alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
-      }
+      if (alertIcon) { alertIcon.src = "/imagens_app/ic_sound_off.png"; alertIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; }; }
       showNotification("Alerta DESLIGADO");
     }
     esconderAlertaVisual();
@@ -2240,40 +2029,22 @@ function inicializarBotaoAlertaToggle() {
 }
 
 function initMap() {
-  if (typeof L === 'undefined') {
-    hideFullscreenLoading();
-    showNotification("Erro de conexão. Os mapas não puderam carregar.");
-    return;
-  }
-  map = L.map('map', {
-    center: [userLat, userLng],
-    zoom: 17,
-    zoomControl: false,
-    rotate: true,
-    bearing: 0
-  });
-  if (typeof map.setBearing !== 'function') {
-    console.warn('[Radar X9] AVISO: leaflet-rotate pode não ter carregado.');
-  }
+  if (typeof L === 'undefined') { hideFullscreenLoading(); showNotification("Erro de conexão. Os mapas não puderam carregar."); return; }
+  map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
+  if (typeof map.setBearing !== 'function') console.warn('[Radar X9] AVISO: leaflet-rotate pode não ter carregado.');
   aplicarTemaMapa();
   setInterval(aplicarTemaMapa, 300000);
   inicializarBussolaHardware();
-  map.on('dragstart', function() {
-    isFollowing = false;
-    if (returnToGpsTimer) clearTimeout(returnToGpsTimer);
-  });
+  map.on('dragstart', function() { isFollowing = false; if (returnToGpsTimer) clearTimeout(returnToGpsTimer); });
   map.on('dragend', function() {
     returnToGpsTimer = setTimeout(function() {
       if (!isFollowing) {
         var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
-        if (marcadorAtivo) {
-          isFollowing = true;
-          map.setView(marcadorAtivo.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 });
-          showNotification("Voltando à sua posição atual");
-        }
+        if (marcadorAtivo) { isFollowing = true; map.setView(marcadorAtivo.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 }); showNotification("Voltando à sua posição atual"); }
       }
     }, TEMPO_RETORNO_GPS);
   });
+  
   $("#btn-calc-route").click(async function() {
     var endereco = $("#route-query").val().trim();
     if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
@@ -2283,54 +2054,34 @@ function initMap() {
     else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
   });
   $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
-  function fecharTodasBarras() {
-    searchActive = false;
-    routeActive = false;
-    document.getElementById('search-bar-radares').classList.remove('active');
-    document.getElementById('search-bar-rota').classList.remove('active');
-  }
+  
+  function fecharTodasBarras() { searchActive = false; routeActive = false; document.getElementById('search-bar-radares').classList.remove('active'); document.getElementById('search-bar-rota').classList.remove('active'); }
   $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
   $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
   $("#btn-search-bar").click(function() {
     if (searchActive) { fecharTodasBarras(); return; }
-    if (routeActive) routeActive = false;
-    searchActive = true;
-    $("#search-bar-rota").removeClass('active');
-    $("#search-bar-radares").addClass('active');
-    if (!sidebarAberta) {
-      sidebarAberta = true;
-      document.getElementById('sidebar-controls').classList.remove('retracted');
-      document.getElementById('btn-menu-toggle').classList.remove('active');
-    }
+    if (routeActive) routeActive = false; searchActive = true;
+    $("#search-bar-rota").removeClass('active'); $("#search-bar-radares").addClass('active');
+    if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
     setTimeout(function() { $("#query").focus(); }, 300);
   });
   $("#btn-route-bar").click(function() {
     if (routeActive) { fecharTodasBarras(); return; }
-    if (searchActive) searchActive = false;
-    routeActive = true;
-    $("#search-bar-radares").removeClass('active');
-    $("#search-bar-rota").addClass('active');
-    if (!sidebarAberta) {
-      sidebarAberta = true;
-      document.getElementById('sidebar-controls').classList.remove('retracted');
-      document.getElementById('btn-menu-toggle').classList.remove('active');
-    }
+    if (searchActive) searchActive = false; routeActive = true;
+    $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").addClass('active');
+    if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
     setTimeout(function() { $("#route-query").focus(); }, 300);
   });
   $("#btn-center").click(function() {
-    fecharTodasBarras();
-    isFollowing = true;
+    fecharTodasBarras(); isFollowing = true;
     var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
-    if (marcadorAtivo) {
-      map.flyTo(marcadorAtivo.getLatLng(), 17, { duration: 0.5 });
-      showNotification("Centralizando na sua posição");
-    } else {
-      showNotification("Aguardando sinal GPS...");
-    }
+    if (marcadorAtivo) { map.flyTo(marcadorAtivo.getLatLng(), 17, { duration: 0.5 }); showNotification("Centralizando na sua posição"); }
+    else showNotification("Aguardando sinal GPS...");
   });
   $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
   $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
   $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
+  
   inicializarBotaoRotacaoMapa();
   inicializarBotaoAlertaToggle();
   startGPSTracking();
@@ -2339,28 +2090,21 @@ function initMap() {
 
 async function carregarRadares() {
   if (!map) return;
-  if (radarMarkers.length > 0) {
-    radarMarkers.forEach(function(marker) { map.removeLayer(marker); });
-    radarMarkers = [];
-  }
+  if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
   $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando radares...</div>");
   try {
     var response = await fetch('radares.json?v=' + Date.now());
     if (!response.ok) throw new Error("Arquivo não encontrado (HTTP " + response.status + ")");
     var data = await response.json();
     var records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-    if (records.length > 0) { renderizarRadaresNoMapa(records, "radares.json"); }
-    else { throw new Error("Nenhum radar encontrado no JSON"); }
+    if (records.length > 0) renderizarRadaresNoMapa(records, "radares.json");
+    else throw new Error("Nenhum radar encontrado no JSON");
   } catch (e) {
     console.warn("[Radar X9] Falha ao carregar radares.json:", e.message);
-    $("#loading").hide();
-    showNotification("Erro ao carregar radares: " + e.message);
+    $("#loading").hide(); showNotification("Erro ao carregar radares: " + e.message);
   }
 }
 
-// ===================================================================
-// FUNÇÃO: renderizarRadaresNoMapa (Sem espalhamento de coordenadas)
-// ===================================================================
 function renderizarRadaresNoMapa(records, origem) {
   if (!map) return;
   var radaresExternos = records || [];
@@ -2373,25 +2117,19 @@ function renderizarRadaresNoMapa(records, origem) {
 
     var finalLat = coords.lat;
     var finalLng = coords.lng;
-
     var endereco = record[2] || "Endereço não informado";
     var tipo = (record[3] || "Não Identificado").trim();
     var velocidade = record[4] || "0";
 
     var iconeUrl = getIconUrl(tipo, velocidade);
-    // ✅ Correção Vercel: removido a barra "/" inicial do caminho do fallback
     var fallbackUrl = 'imagens_app/ic_radar_cev_v2.png'; 
     var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
 
     var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
-
     setTimeout(function(mk, fb) {
       return function() {
         var el = mk.getElement();
-        if (el) {
-          var imgEl = el.querySelector('img');
-          if (imgEl) { imgEl.setAttribute('data-fallback', fb); }
-        }
+        if (el) { var imgEl = el.querySelector('img'); if (imgEl) imgEl.setAttribute('data-fallback', fb); }
       };
     }(radarMarker, fallbackUrl), 100);
 
@@ -2415,71 +2153,8 @@ function renderizarRadaresNoMapa(records, origem) {
   }
 
   $("#loading").hide();
-  if (contador > 0) { showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)'); }
-  else { showNotification("Nenhum radar encontrado.");
-    
-   }
-
-
-  // ✅ NOVO: Criar markers com offset quando há sobreposição
-  var chaves = Object.keys(coordMap);
-  for (var c = 0; c < chaves.length; c++) {
-    var grupo = coordMap[chaves[c]];
-
-    for (var g = 0; g < grupo.length; g++) {
-      var item = grupo[g];
-      var i = item.index;
-      var record = item.record;
-      var coords = item.coords;
-
-      // ✅ Aplica offset para radares na mesma coordenada
-      var offsetCoords = getOffsetCoords(coords.lat, coords.lng, g, grupo.length);
-      var finalLat = offsetCoords[0];
-      var finalLng = offsetCoords[1];
-
-      var endereco = record[2] || "Endereço não informado";
-      var tipo = (record[3] || "Não Identificado").trim();
-      var velocidade = record[4] || "0";
-
-      var iconeUrl = getIconUrl(tipo, velocidade);
-      var fallbackUrl = '/imagens_app/ic_radar_cev_v2.png';
-      var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
-
-      var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
-
-      setTimeout(function(mk, fb) {
-        return function() {
-          var el = mk.getElement();
-          if (el) {
-            var imgEl = el.querySelector('img');
-            if (imgEl) { imgEl.setAttribute('data-fallback', fb); }
-          }
-        };
-      }(radarMarker, fallbackUrl), 100);
-
-      var tipoExibicao = ajusteNomes[tipo] || tipo;
-      var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
-      var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
-
-      radarMarker.bindPopup(
-        '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' +
-        tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
-        endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div></div>'
-      );
-
-      radarMarker.radarData = {
-        id: i, latitude: finalLat, longitude: finalLng,
-        endereco: endereco, velocidade_maxima: velocidade,
-        tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA
-      };
-      radarMarkers.push(radarMarker);
-      contador++;
-    }
-  }
-
-  $("#loading").hide();
-  if (contador > 0) { showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)'); }
-  else { showNotification("Nenhum radar encontrado."); }
+  if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
+  else showNotification("Nenhum radar encontrado.");
 }
 
 function buscarRadares(query) {
@@ -2490,13 +2165,11 @@ function buscarRadares(query) {
   radarMarkers.forEach(function(marker) {
     var d = marker.radarData;
     if ((d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase().includes(q)) {
-      encontrou = true;
-      boundsGroup.addLayer(marker);
-      marker.openPopup();
+      encontrou = true; boundsGroup.addLayer(marker); marker.openPopup();
     }
   });
   if (encontrou) { if (map) map.fitBounds(boundsGroup.getBounds().pad(0.2)); isFollowing = false; }
-  else { showNotification("Nenhum radar encontrado para: " + query); }
+  else showNotification("Nenhum radar encontrado para: " + query);
 }
 
 function showError(error) {
@@ -2505,44 +2178,30 @@ function showError(error) {
   if (error.code === 1) msg = "Permissão de GPS negada.";
   if (error.code === 2) msg = "Sinal GPS indisponível.";
   if (error.code === 3) msg = "Tempo esgotado. Tentando novamente...";
-  showNotification(msg);
-  hideFullscreenLoading();
-  if (error.code === 3) { setTimeout(startGPSTracking, 5000); }
+  showNotification(msg); hideFullscreenLoading();
+  if (error.code === 3) setTimeout(startGPSTracking, 5000);
 }
 
 function inicializarBussolaHardware() {
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission === 'function') {
-    console.log('[Radar X9] Bússola iOS detectada');
-    return;
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    console.log('[Radar X9] Bússola iOS detectada'); return;
   }
   if (typeof DeviceOrientationEvent !== 'undefined') {
     window.addEventListener('deviceorientation', function(event) {
-      if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
-        currentHeading = event.webkitCompassHeading;
-        bussolaHardwareDisponivel = true;
-      } else if (event.alpha !== null && event.absolute === true) {
-        currentHeading = event.alpha;
-        bussolaHardwareDisponivel = true;
-      }
+      if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) { currentHeading = event.webkitCompassHeading; bussolaHardwareDisponivel = true; }
+      else if (event.alpha !== null && event.absolute === true) { currentHeading = event.alpha; bussolaHardwareDisponivel = true; }
     }, true);
     console.log('[Radar X9] deviceorientation listener registrado');
-  } else {
-    console.warn('[Radar X9] deviceorientation API não disponível');
-  }
+  } else console.warn('[Radar X9] deviceorientation API não disponível');
 }
 
 async function solicitarPermissaoBussolaIOS() {
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission === 'function') {
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
     try {
       var resposta = await DeviceOrientationEvent.requestPermission();
       if (resposta === 'granted') {
         window.addEventListener('deviceorientation', function(event) {
-          if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) {
-            currentHeading = event.webkitCompassHeading;
-            bussolaHardwareDisponivel = true;
-          }
+          if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) { currentHeading = event.webkitCompassHeading; bussolaHardwareDisponivel = true; }
         }, true);
         return true;
       }
@@ -2555,122 +2214,36 @@ async function solicitarPermissaoBussolaIOS() {
 // ===================================================================
 // INTEGRAÇÃO APP INVENTOR & PWA - NOTIFICAÇÃO NATIVA
 // ===================================================================
-function enviarNotificacaoNativa(titulo, mensagem) {
-  if (typeof AppInventor !== 'undefined') {
-    AppInventor.setWebViewString("NOTIFICACAO|" + titulo + "|" + mensagem);
-    return;
-  } else if ('Notification' in window && Notification.permission === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification(titulo, {
-        body: mensagem,
-        icon: '/imagens_app/ic_radar_cev_v2.png',
-        vibrate: [200, 100, 200],
-        tag: 'alerta-radar',
-        renotify: true,
-        requireInteraction: true
-      });
-    }).catch(function(err) {
-      console.error('Erro ao enviar notificação SW:', err);
-    });
-  } else if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().then(function(permission) {
-      if (permission === 'granted') {
-        enviarNotificacaoNativa(titulo, mensagem);
-      }
-    });
-  }
-}
-
-// ===================================================================
-// ✅ CORREÇÃO: Integração App Inventor — Protocolo robusto
-// ===================================================================
 function enviarParaAppInventor(acao, dados) {
   if (typeof AppInventor !== 'undefined') {
     try {
-      // Formato: AÇÃO|dado1|dado2|...
       var mensagem = acao + '|' + dados.join('|');
       AppInventor.setWebViewString(mensagem);
       console.log('[Radar X9] → AppInventor:', mensagem);
       return true;
-    } catch (e) {
-      console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
-      return false;
-    }
+    } catch (e) { console.error('[Radar X9] Erro ao enviar para AppInventor:', e); return false; }
   }
   return false;
 }
-// ===================================================================
-// ✅ RECEBER DADOS DO APP INVENTOR via WebViewStringChanged
-// ===================================================================
-
-// O App Inventor envia: "GPS|lat|lng|speed|heading"
-// Configure no App Inventor: quando LocationSensor.LocationChanged,
-// set WebViewer1.WebViewString = "GPS|" + latitude + "|" + longitude + "|" + speed + "|" + heading
-
-// Função chamada pelo App Inventor via RunJavaScript ou via poll
 
 function receberDadosAppInventor(dadosStr) {
   if (!dadosStr || typeof dadosStr !== 'string') return;
-  
   var partes = dadosStr.split('|');
   var acao = partes[0];
-
   if (acao === 'GPS' && partes.length >= 3) {
     var lat = parseFloat(partes[1]);
     var lng = parseFloat(partes[2]);
     var speed = partes[3] ? parseFloat(partes[3]) : 0;
     var heading = partes[4] ? parseFloat(partes[4]) : null;
-
-    // ✅ CORREÇÃO PARA OPÇÃO 1 (Azimuth):
-    // O Azimuth retorna -1 quando o celular está deitado (plano) ou indisponível.
-    // Se for -1, tratamos como nulo para o JS calcular pelo movimento do carro.
-    // Valores de 0 a 360 são VÁLIDOS (0 = Norte).
-    if (heading === -1 || isNaN(heading)) {
-      heading = null;
-    }
-
-    // ✅ Proteção contra coordenadas 0,0 (Oceano Atlântico)
-    // Se o GPS falhar, o App Inventor pode enviar 0.0. Ignoramos isso.
+    if (heading === -1 || isNaN(heading)) heading = null; // Tratamento Azimuth
     if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
       gpsSource = 'appinventor';
       processarNovaPosicao(lat, lng, speed, heading);
     }
   }
-  
-  if (acao === 'PERMISSAO' && partes.length >= 2) {
-    console.log('[Radar X9] Permissão ' + partes[1] + ': ' + (partes[2] || 'unknown'));
-  }
+  if (acao === 'PERMISSAO' && partes.length >= 2) console.log('[Radar X9] Permissão ' + partes[1] + ': ' + (partes[2] || 'unknown'));
 }
 
-
-
-function receberDadosAppInventor(dadosStr) {
-  if (!dadosStr || typeof dadosStr !== 'string') return;
-  
-  var partes = dadosStr.split('|');
-  var acao = partes[0];
-
-  if (acao === 'GPS' && partes.length >= 3) {
-    var lat = parseFloat(partes[1]);
-    var lng = parseFloat(partes[2]);
-    var speed = partes[3] ? parseFloat(partes[3]) : 0;
-    var heading = partes[4] ? parseFloat(partes[4]) : null;
-
-    if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-      gpsSource = 'appinventor';
-      processarNovaPosicao(lat, lng, speed, heading);
-    }
-  }
-  
-  if (acao === 'PERMISSAO' && partes.length >= 2) {
-    var perm = partes[1];
-    var status = partes[2] || 'unknown';
-    console.log('[Radar X9] Permissão ' + perm + ': ' + status);
-  }
-}
-
-// Poll para verificar se o AppInventor enviou dados
-// (Alternativa ao WebViewStringChanged se não puder usar RunJavaScript)
 var ultimoWebViewString = '';
 function pollAppInventor() {
   if (typeof AppInventor !== 'undefined') {
@@ -2679,7 +2252,6 @@ function pollAppInventor() {
       if (current && current !== ultimoWebViewString) {
         ultimoWebViewString = current;
         receberDadosAppInventor(current);
-        // Limpa para não processar novamente
         AppInventor.setWebViewString('');
       }
     } catch(e) {}
@@ -2687,39 +2259,21 @@ function pollAppInventor() {
 }
 setInterval(pollAppInventor, 500);
 
-// ===================================================================
-// ✅ ENVIAR NOTIFICAÇÃO NATIVA
-// ===================================================================
 function enviarNotificacaoNativa(titulo, mensagem) {
-  // Tenta App Inventor primeiro
-  if (enviarParaAppInventor('NOTIFICACAO', [titulo, mensagem])) {
-    return;
-  }
-  // Fallback para PWA / navegador
+  if (enviarParaAppInventor('NOTIFICACAO', [titulo, mensagem])) return;
   if ('Notification' in window) {
     if (Notification.permission === 'granted') {
       navigator.serviceWorker.ready.then(function(registration) {
-        registration.showNotification(titulo, {
-          body: mensagem,
-          icon: '/imagens_app/ic_radar_cev_v2.png',
-          vibrate: [200, 100, 200],
-          tag: 'alerta-radar',
-          renotify: true,
-          requireInteraction: true
-        });
+        registration.showNotification(titulo, { body: mensagem, icon: '/imagens_app/ic_radar_cev_v2.png', vibrate: [200, 100, 200], tag: 'alerta-radar', renotify: true, requireInteraction: true });
       }).catch(function() {});
     } else if (Notification.permission === 'default') {
-      Notification.requestPermission().then(function(perm) {
-        if (perm === 'granted') enviarNotificacaoNativa(titulo, mensagem);
-      });
+      Notification.requestPermission().then(function(perm) { if (perm === 'granted') enviarNotificacaoNativa(titulo, mensagem); });
     }
   }
 }
 
 function solicitarPermissaoNotificacao() {
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission();
-  }
+  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
 }
 
 async function solicitarWakeLock() {
@@ -2727,26 +2281,22 @@ async function solicitarWakeLock() {
     if ('wakeLock' in navigator) {
       const wakeLock = await navigator.wakeLock.request('screen');
       console.log('WakeLock ativado: Tela manter-se-á acessa.');
-      wakeLock.addEventListener('release', () => {
-        console.log('WakeLock liberado.');
-      });
+      wakeLock.addEventListener('release', () => { console.log('WakeLock liberado.'); });
     }
-  } catch (err) {
-    console.error('Erro ao solicitar WakeLock:', err);
-  }
+  } catch (err) { console.error('Erro ao solicitar WakeLock:', err); }
 }
 
 // ===================================================================
-// FUNÇÃO: tocarSomAlerta (com fallback duplo)
+// FUNÇÃO: tocarSomAlerta (CORRIGIDA E UNIFICADA)
 // ===================================================================
 function tocarSomAlerta(tipoAlerta) {
-  // 1. Tenta mandar o App Inventor tocar o som nativo (MUITO MAIS CONFIÁVEL)
+  // 1. Tenta mandar o App Inventor tocar o som nativo
   if (typeof AppInventor !== 'undefined') {
     enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
-    return; // Para por aqui, o App Inventor cuida do resto
+    return; 
   }
 
-  // 2. Fallback para PWA/Navegador (Se não estiver no App Inventor)
+  // 2. Fallback para PWA/Navegador
   var soundId = 'alert-sound-radar';
   if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
   else if (tipoAlerta === 'promocao') soundId = 'alert-sound-promo';
@@ -2757,93 +2307,71 @@ function tocarSomAlerta(tipoAlerta) {
   if (sound) {
     sound.currentTime = 0;
     sound.play().catch(function(err) {
-      console.warn('[Radar X9] Áudio bloqueado pelo navegador:', err);
-      tocarBeepEmergencia(tipoAlerta); // Fallback final
+      console.warn('[Radar X9] Áudio bloqueado, tentando desbloquear:', err);
+      desbloquearAudioMobile();
+      // Segunda tentativa após delay
+      setTimeout(function() {
+        sound.currentTime = 0;
+        sound.play().catch(function() {
+          tocarBeepEmergencia(tipoAlerta);
+        });
+      }, 300);
     });
   } else {
     tocarBeepEmergencia(tipoAlerta);
   }
-
-
-  sound.currentTime = 0;
-  sound.play().catch(function(err) {
-    console.warn('[Radar X9] Áudio bloqueado, tentando desbloquear:', err);
-    desbloquearAudioMobile();
-    // Segunda tentativa após pequeno delay
-    setTimeout(function() {
-      sound.currentTime = 0;
-      sound.play().catch(function() {
-        tocarBeepEmergencia(tipoAlerta);
-      });
-    }, 300);
-  });
 }
 
 // ===================================================================
-// BEEP DE EMERGÊNCIA (Web Audio API - Funciona mesmo com autoplay bloqueado)
+// BEEP DE EMERGÊNCIA (Web Audio API)
 // ===================================================================
 function tocarBeepEmergencia(tipoAlerta) {
   try {
     var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Tenta desbloquear o contexto de áudio
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-
+    if (audioCtx.state === 'suspended') audioCtx.resume();
     var oscillator = audioCtx.createOscillator();
     var gainNode = audioCtx.createGain();
-
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
 
-    // Configurações do som (Agudo = Radar, Grave = Risco)
     if (tipoAlerta === 'risco') {
       oscillator.type = 'sawtooth';
-      oscillator.frequency.setValueAtTime(300, audioCtx.currentTime); // 300Hz (Grave)
+      oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
     } else {
       oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // 800Hz (Agudo)
+      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
     }
 
-    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); // Volume pela metade
-    
-    // Duração do beep: 0.2 segundos
+    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
     oscillator.start(audioCtx.currentTime);
     oscillator.stop(audioCtx.currentTime + 0.2);
-    
   } catch (e) {
     console.error('[Radar X9] Falha total ao tocar beep:', e);
   }
 }
 
 // ===================================================================
-// DESBLOQUEIO DE ÁUDIO MOBILE (Obrigatório para MP3 funcionar)
+// DESBLOQUEIO DE ÁUDIO MOBILE
 // ===================================================================
 function desbloquearAudioMobile() {
   ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-promo'].forEach(function(id) {
     var som = document.getElementById(id);
     if (som) {
-      // Tenta tocar e pausar imediatamente para "destravar" o autoplay do navegador
       som.play().then(function() {
         som.pause();
         som.currentTime = 0;
         console.log('[Radar X9] ✅ Áudio desbloqueado: ' + id);
-      }).catch(function() {
-        // Ainda bloqueado, vai tentar de novo no próximo clique
-      });
+      }).catch(function() {});
     }
   });
 }
 
-// Escuta cliques e toques na tela para destravar o áudio na primeira interação
 ['click', 'touchstart', 'touchend'].forEach(function(eventType) {
   document.addEventListener(eventType, desbloquearAudioMobile, { once: true, passive: true });
 });
 
 window.onload = initMap;
-
-  </script>
+</script>
 
   
 </body>
