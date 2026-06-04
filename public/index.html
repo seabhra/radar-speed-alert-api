@@ -1296,6 +1296,7 @@ function getIconUrl(tipo, velocidade) {
   if (isRadarVelocidade) {
     var velStr = String(velocidade || '').trim();
     var velNum = parseInt(velStr.replace(/[^0-9]/g, ''), 10);
+    if (velNum === 40) return '/imagens_app/ic_radar_cev_30_v2.png';
     if (velNum === 40) return '/imagens_app/ic_radar_cev_40_v2.png';
     if (velNum === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
     if (velNum === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
