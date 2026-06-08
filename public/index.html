@@ -3,12 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-  <!-- Cache Control -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-
   <title>Radar X9 BH - Alerta Inteligente (OSM + IA)</title>
   
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous" />
@@ -19,11 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js" crossorigin="anonymous"></script>
 
-
   <style>
-    /* ===================================================================
-       VARIÁVEIS DE TEMA (cores globais do app)
-    =================================================================== */
     :root {
         --bg-color: #0f1115;
         --panel-color: #1a1d24;
@@ -34,821 +27,110 @@
         --sidebar-width: 68px;
         --btn-size: 50px;
     }
-
-    /* ===================================================================
-       RESET GLOBAL — remove paddings/margins padrão do navegador
-    =================================================================== */
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    /* ===================================================================
-       BODY — layout principal em coluna, tela cheia, sem scroll
-    =================================================================== */
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    /* ===================================================================
-       HEADER — barra superior com logo, título e botão menu
-    =================================================================== */
-    header {
-        background-color: var(--panel-color);
-        padding: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 2px solid var(--accent-color);
-        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
-        z-index: 1000;
-    }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .app-icon {
-        width: 50px;
-        height: 40px;
-        border-radius: 8px;
-        object-fit: contain;
-    }
-
-    h1 {
-        font-size: 1.2rem;
-        font-weight: 800;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    h1 span {
-        color: var(--accent-color);
-    }
-
-    /* ===================================================================
-       BOTÃO MENU TOGGLE — hamburger animado com label "MENU"
-       Ao clicar, as 3 barras viram um "X" via transform
-    =================================================================== */
-    .btn-menu-toggle {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 2px;
-        background: none;
-        border: 1.5px solid rgba(0, 255, 136, 0.3);
-        border-radius: 10px;
-        padding: 8px 14px 6px;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        user-select: none;
-        -webkit-user-select: none;
-    }
-
-    .btn-menu-toggle:hover {
-        border-color: var(--accent-color);
-        background: rgba(0, 255, 136, 0.06);
-    }
-
-    .btn-menu-toggle:active {
-        transform: scale(0.93);
-    }
-
-    .menu-hamburger {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        width: 22px;
-    }
-
-    .menu-hamburger span {
-        display: block;
-        height: 2.5px;
-        width: 100%;
-        background-color: var(--accent-color);
-        border-radius: 2px;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        transform-origin: center;
-    }
-
-    /* Animação do X quando o menu está ativo */
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
-        transform: translateY(6.5px) rotate(45deg);
-    }
-
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
-        opacity: 0;
-        transform: scaleX(0);
-    }
-
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
-        transform: translateY(-6.5px) rotate(-45deg);
-    }
-
-    .menu-label {
-        font-size: 0.55rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        color: var(--accent-color);
-        text-transform: uppercase;
-        line-height: 1;
-        margin-top: 2px;
-    }
-
-    /* ===================================================================
-       SIDEBAR CONTROLS — barra vertical à direita com botões de mapa
-       Pode ser retraída via classe .retracted (translateX para fora)
-    =================================================================== */
-    .sidebar-controls {
-        position: absolute;
-        top: 0;
-        right: 0;
-        height: 100%;
-        width: var(--sidebar-width);
-        z-index: 500;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 20px 0;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateX(0);
-    }
-
-    .sidebar-controls.retracted {
-        transform: translateX(calc(var(--sidebar-width) + 10px));
-    }
-
-    /* Botões dentro da sidebar — visibilidade controlada pela retração */
-    .sidebar-controls .map-btn {
-        width: var(--btn-size);
-        height: var(--btn-size);
-        opacity: 1;
-        transition: opacity 0.25s ease 0s, transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .sidebar-controls.retracted .map-btn {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.15s ease 0s, transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    /* ===================================================================
-       BARRAS DE BUSCA — search-container para radares e rotas
-       Max-height: 0 quando fechada, 90px quando .active
-       Desliza para baixo com transição suave
-    =================================================================== */
-    .search-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: rgba(26, 29, 36, 0.98);
-        backdrop-filter: blur(8px);
-        display: flex;
-        gap: 12px;
-        z-index: 1000;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        padding: 0 15px;
-        border-bottom: 1px solid transparent;
-        transition: all 0.3s ease;
-        align-items: center;
-    }
-
-    .search-container.active {
-        max-height: 90px;
-        opacity: 1;
-        padding: 15px;
-        border-bottom: 1px solid #333;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    /* Input de busca — cantos arredondados, fundo preto */
-    .search-container input {
-        flex: 1;
-        padding: 14px 20px;
-        border-radius: 30px;
-        border: 1px solid #444;
-        background-color: #000;
-        color: #fff;
-        font-size: 1rem;
-        outline: none;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .search-container input:focus {
-        border-color: var(--accent-color);
-    }
-
-    /* Botão circular de buscar dentro da barra */
-    .btn-search {
-        position: relative;
-        flex-shrink: 0;
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        background: rgba(46, 102, 158, 0.95);
-        box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5);
-        transition: all 0.2s ease;
-        overflow: hidden;
-    }
-
-    .btn-search:active {
-        transform: scale(0.9);
-    }
-
-    .btn-search img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-        display: block;
-        transform: translate(-50%, -50%);
-    }
-
-    /* ===================================================================
-       MAP-WRAPPER — container flexível que segura o mapa e overlays
-       Ocupa todo o espaço restante abaixo do header
-    =================================================================== */
-    .map-wrapper {
-        position: relative;
-        flex: 1;
-        display: flex;
-        overflow: hidden;
-        width: 100%;
-    }
-
-    /* Mapa Leaflet — preenche todo o wrapper */
-   /* Mapa Leaflet — preenche todo o wrapper */
-#map {
-    width: 100%;
-    height: 100%;
-    background-color: #2a2a2a;
-    z-index: 1;
-    position: relative; /* ✅ necessário para .compass-widget absolute funcionar */
-}
-
-/* ===================================================================
-   ISOLAR PANES DO LEAFLET — NÃO DEIXAR NENHUM FICAR ACIMA DA BÚSSOLA
-   =================================================================== */
-/* Esconde o ícone de rotação padrão do leaflet-rotate */
-.leaflet-control-rotate,
-.leaflet-rotate-control,
-.leaflet-control-rotate-icon,
-.leaflet-rotate-control-icon,
-.leaflet-control-rotate-toggle,
-.leaflet-rotate-toggle,
-.leaflet-control-rotate a,
-.leaflet-rotate-control a {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
-/* Todos os panes do Leaflet ficam abaixo da bússola */
-.leaflet-pane,
-.leaflet-map-pane,
-.leaflet-tile-pane,
-.leaflet-overlay-pane,
-.leaflet-shadow-pane,
-.leaflet-marker-pane,
-.leaflet-popup-pane,
-.leaflet-control-pane,
-.leaflet-tooltip-pane {
-    z-index: 1 !important; /* forçar abaixo da bússola */
-}
-
-/* ===================================================================
-   CORREÇÃO: BÚSSOLA SEMPRE NO TOPO - NENHUM ÍCONE ATRÁS
-   =================================================================== */
-
-   /* ✅ BÚSSOLA: isolar em contexto de empilhamento próprio, acima de TUDO */
-.compass-widget {
-    position: absolute;
-    top: 65px;
-    left: 5px;
-    width: 65px;
-    height: 65px;
-    
-    /* Criar novo contexto de empilhamento isolado, acima do mapa */
-    z-index: 999999 !important;
-    
-    /* Forçar composição em layer separado do GPU, acima de todos os panes */
-    transform: translateZ(0);
-    will-change: transform;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-}
-
-/* Base da bússola */
-.compass-base {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    background-image: url('/imagens_app/ic_compass.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.9;
-}
-
-/* Ponteira da bússola */
-.compass-needle {
-    position: absolute;
-    width: 55%;
-    height: 55%;
-    z-index: 2; /* acima da base */
-    object-fit: contain;
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* ===================================================================
-   SE A BÚSSOLA ESTIVER DENTRO DE #map, FORÇAR SAÍDA DO FLUXO LEAFLET
-   =================================================================== */
-
-/* Mover a bússola para fora do contexto de empilhamento do Leaflet */
-#map > .compass-widget,
-#map .compass-widget {
-    /* Forçar posicionamento no topo da pilha de renderização */
-    position: absolute !important;
-    z-index: 999999 !important;
-    
-    /* Isolar em novo contexto de empilhamento */
-    isolation: isolate;
-    
-    /* Garantir que não herda transform do mapa */
-    transform: translateZ(1px) !important;
-}
-
-/* Se houver algum container pai com transform/opacity que crie contexto */
-.leaflet-container .compass-widget,
-.leaflet-map-pane ~ .compass-widget {
-    z-index: 999999 !important;
-    position: absolute !important;
-}
-    /* ===================================================================
-       MAP-BTN — estilo base para todos os botões redondos do mapa
-    =================================================================== */
-    .map-btn {
-        width: var(--btn-size);
-        height: var(--btn-size);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        cursor: pointer;
-        background: rgba(20, 20, 20, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-        transition: all 0.2s ease;
-        flex-shrink: 0;
-    }
-
-    .map-btn:hover {
-        transform: scale(1.08);
-        border-color: var(--accent-color);
-    }
-
-    .map-btn:active {
-        transform: scale(0.92);
-    }
-
-    .map-btn img {
-        width: 30px;
-        height: 30px;
-        object-fit: contain;
-        pointer-events: none;
-    }
-
-    /* ===================================================================
-       BOTÃO ALERTA TOGGLE — estados LIGADO/DESLIGADO
-    =================================================================== */
-    .alert-toggle-btn {
-        background: rgba(29, 28, 28, 0.9);
-        border: 2px solid rgba(255, 255, 255, 0.08);
-        transition: all 0.3s ease;
-    }
-
-    .alert-toggle-btn.alert-off {
-        background: rgba(222, 127, 127, 0.9);
-        border-color: #888;
-    }
-
-    .alert-toggle-btn.alert-off img {
-        filter: rgba(225, 82, 82, 0.9);
-    }
-
-    .alert-toggle-btn img {
-        transition: all 0.3s ease;
-    }
-
-    .sidebar-controls .map-btn {
-        border: 1px solid rgba(0, 255, 136, 0.35);
-    }
-
-    #btn-route-bar {
-        width: 54px;
-        height: 54px;
-    }
-
-    /* ===================================================================
-       CSS do botão de rotação — feedback visual + ícone girante
-    =================================================================== */
-    #btn-rotate-map {
-        transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    }
-
-    #btn-rotate-map.rotated {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
-        background-color: rgba(0, 255, 136, 0.08);
-    }
-
-    #btn-rotate-map.rotated img {
-        filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5));
-        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
-    }
-
-    #btn-rotate-map:not(.rotated) img {
-        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
-    }
-
-    /* ===================================================================
-       MARCADORES DE USUÁRIO E NAVEGAÇÃO
-    =================================================================== */
-    .user-gps-marker,
-    .user-navigator-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .user-gps-marker img,
-    .user-navigator-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        transition: none !important;
-        will-change: transform;
-    }
-
-    .route-start-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .route-start-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        animation: pulseStart 1s ease-in-out infinite;
-    }
-
-    .route-end-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .route-end-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        animation: pulseEnd 1.2s ease-in-out infinite;
-    }
-
-    @keyframes pulseStart {
-        0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-        100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes pulseEnd {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-    }
-
-    /* ===================================================================
-       MARCADORES DE RADAR
-    =================================================================== */
-    .radar-marker-icon {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .radar-marker-icon img {
-        width: 40px !important;
-        height: 40px !important;
-        object-fit: contain !important;
-        display: block !important;
-    }
-
-    /* ===================================================================
-       SPEED WIDGET
-    =================================================================== */
-    .speed-widget {
-        position: absolute;
-        bottom: -15px;
-        left: -25px;
-        width: 150px;
-        height: 150px;
-        z-index: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .speed-bg {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        pointer-events: none;
-    }
-
-    .speed-value {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-64%, -60%);
-        font-size: 28px;
-        font-weight: 700;
-        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-        color: #000;
-        line-height: 1;
-        z-index: 2;
-        white-space: nowrap;
-        text-align: center;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: -0.5px;
-        min-width: 3ch;
-    }
-
-    /* ===================================================================
-       ALERT CONTAINER - RADAR (COR VERMELHO)
-    =================================================================== */
-    #alert-container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-        display: none;
-        animation: slideUp 0.3s ease-out;
-        pointer-events: none;
-    }
-
-    @keyframes slideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-    }
-
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); background: linear-gradient(90deg, #ff2200, #ee0000); }
-        100% { transform: scale(1); }
-    }
-
-    .alert-bar {
-        background: linear-gradient(90deg, #cc0000, #990000);
-        color: white;
-        padding: 18px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
-        border-top: 2px solid #ff5555;
-        transition: all 0.2s ease;
-    }
-
-    .alert-bar-critico {
-        animation: pulse 0.8s ease-in-out infinite;
-    }
-
-    /* ===================================================================
-       ALERTA DE RISCO (AMARELO)
-    =================================================================== */
-    .alert-bar-risco {
-        background: linear-gradient(90deg, #e6a800, #b38600);
-        border-top: 2px solid #ffcc00;
-        box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4);
-    }
-
-    .alert-bar-risco-critico {
-        animation: pulseRisco 0.8s ease-in-out infinite;
-    }
-
-    @keyframes pulseRisco {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); background: linear-gradient(90deg, #ffcc00, #e6a800); }
-        100% { transform: scale(1); }
-    }
-
-    /* ===================================================================
-       ALERTA DE PROMOÇÃO (VERDE)
-    =================================================================== */
-    .alert-bar-promocao {
-        background: linear-gradient(90deg, #00b359, #008040);
-        border-top: 2px solid #00e066;
-        box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4);
-    }
-
-    .alert-bar-promocao-critico {
-        animation: pulsePromocao 0.8s ease-in-out infinite;
-    }
-
-    @keyframes pulsePromocao {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); background: linear-gradient(90deg, #00e066, #00b359); }
-        100% { transform: scale(1); }
-    }
-
-    .alert-bar img {
-        width: 50px;
-        height: 50px;
-        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
-    }
-
-    .alert-info h3 {
-        font-size: 1.2rem;
-        margin-bottom: 3px;
-        text-transform: uppercase;
-        font-weight: 800;
-    }
-
-    .alert-info p {
-        font-size: 0.95rem;
-        opacity: 0.95;
-    }
-
-    /* ===================================================================
-       TOAST NOTIFICATION
-    =================================================================== */
-    .toast-notification {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-20px);
-        background-color: rgba(20, 20, 20, 0.95);
-        color: var(--text-main);
-        padding: 12px 25px;
-        border-radius: 50px;
-        border: 1px solid #444;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-        z-index: 2000;
-        opacity: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-align: center;
-        pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        white-space: nowrap;
-    }
-
-    .toast-notification.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-
-    /* ===================================================================
-       LOADING OVERLAY
-    =================================================================== */
-    .loading-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(20, 20, 20, 0.9);
-        padding: 20px 30px;
-        border-radius: 12px;
-        border: 1px solid var(--accent-color);
-        text-align: center;
-        z-index: 1001;
-        backdrop-filter: blur(5px);
-    }
-
-    .loading-spinner {
-        border: 3px solid #333;
-        border-top: 3px solid var(--accent-color);
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 10px;
-    }
-
-    @keyframes spin {
-        100% { transform: rotate(360deg); }
-    }
-
-    /* ===================================================================
-       LOADING FULLSCREEN
-    =================================================================== */
-    .loading-fullscreen {
-        position: fixed;
-        inset: 0;
-        background-color: var(--bg-color);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-
-    .loading-fullscreen.fade-out {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    .loading-fullscreen .spinner-ring {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        position: relative;
-        margin-bottom: 24px;
-    }
-
-    .loading-fullscreen .spinner-ring::before,
-    .loading-fullscreen .spinner-ring::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        border: 4px solid transparent;
-    }
-
-    .loading-fullscreen .spinner-ring::before {
-        border-top-color: var(--accent-color);
-        border-right-color: var(--accent-color);
-        animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
-    }
-
-    .loading-fullscreen .spinner-ring::after {
-        inset: 10px;
-        border-bottom-color: #ff3333;
-        border-left-color: #ff3333;
-        animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse;
-    }
-
-    @keyframes spinRing {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .loading-fullscreen .loading-text {
-        font-size: 1.1rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        text-align: center;
-    }
-
-    .loading-fullscreen .loading-text span {
-        color: var(--accent-color);
-    }
-
-    .loading-fullscreen .loading-sub {
-        margin-top: 8px;
-        font-size: 0.8rem;
-        color: #777;
-        animation: pulseText 1.8s ease-in-out infinite;
-    }
-
-    @keyframes pulseText {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 1; }
-    }
-
-    /* ===================================================================
-       CONTROLES DO LEAFLET ESCONDIDOS
-    =================================================================== */
-    .leaflet-control-zoom,
-    .leaflet-control-attribution,
-    .leaflet-routing-container {
-        display: none !important;
-    }
-</style>
-
-
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    header { background-color: var(--panel-color); padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--accent-color); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1); z-index: 1000; }
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .app-icon { width: 50px; height: 40px; border-radius: 8px; object-fit: contain; }
+    h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    h1 span { color: var(--accent-color); }
+    .btn-menu-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: 1.5px solid rgba(0, 255, 136, 0.3); border-radius: 10px; padding: 8px 14px 6px; cursor: pointer; transition: all 0.25s ease; user-select: none; -webkit-user-select: none; }
+    .btn-menu-toggle:hover { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.06); }
+    .btn-menu-toggle:active { transform: scale(0.93); }
+    .menu-hamburger { display: flex; flex-direction: column; gap: 4px; width: 22px; }
+    .menu-hamburger span { display: block; height: 2.5px; width: 100%; background-color: var(--accent-color); border-radius: 2px; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+    .menu-label { font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px; color: var(--accent-color); text-transform: uppercase; line-height: 1; margin-top: 2px; }
+    .sidebar-controls { position: absolute; top: 0; right: 0; height: 100%; width: var(--sidebar-width); z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px 0; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); }
+    .sidebar-controls.retracted { transform: translateX(calc(var(--sidebar-width) + 10px)); }
+    .sidebar-controls .map-btn { width: var(--btn-size); height: var(--btn-size); opacity: 1; transition: opacity 0.25s ease 0s, transform 0.2s ease, border-color 0.2s ease; }
+    .sidebar-controls.retracted .map-btn { opacity: 0; pointer-events: none; transition: opacity 0.15s ease 0s, transform 0.2s ease, border-color 0.2s ease; }
+    .search-container { position: absolute; top: 0; left: 0; width: 100%; background-color: rgba(26, 29, 36, 0.98); backdrop-filter: blur(8px); display: flex; gap: 12px; z-index: 1000; max-height: 0; overflow: hidden; opacity: 0; padding: 0 15px; border-bottom: 1px solid transparent; transition: all 0.3s ease; align-items: center; }
+    .search-container.active { max-height: 90px; opacity: 1; padding: 15px; border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
+    .search-container input { flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444; background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif; }
+    .search-container input:focus { border-color: var(--accent-color); }
+    .btn-search { position: relative; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer; background: rgba(46, 102, 158, 0.95); box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); transition: all 0.2s ease; overflow: hidden; }
+    .btn-search:active { transform: scale(0.9); }
+    .btn-search img { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; object-fit: contain; display: block; transform: translate(-50%, -50%); }
+    .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
+    #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; position: relative; }
+    .leaflet-control-rotate, .leaflet-rotate-control, .leaflet-control-rotate-icon, .leaflet-rotate-control-icon, .leaflet-control-rotate-toggle, .leaflet-rotate-toggle, .leaflet-control-rotate a, .leaflet-rotate-control a { display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; width: 0 !important; height: 0 !important; }
+    .leaflet-pane, .leaflet-map-pane, .leaflet-tile-pane, .leaflet-overlay-pane, .leaflet-shadow-pane, .leaflet-marker-pane, .leaflet-popup-pane, .leaflet-control-pane, .leaflet-tooltip-pane { z-index: 1 !important; }
+    .compass-widget { position: absolute; top: 65px; left: 5px; width: 65px; height: 65px; z-index: 999999 !important; transform: translateZ(0); will-change: transform; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+    .compass-base { position: absolute; width: 100%; height: 100%; z-index: 1; background-image: url('/imagens_app/ic_compass.png'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.9; }
+    .compass-needle { position: absolute; width: 55%; height: 55%; z-index: 2; object-fit: contain; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    #map > .compass-widget, #map .compass-widget { position: absolute !important; z-index: 999999 !important; isolation: isolate; transform: translateZ(1px) !important; }
+    .leaflet-container .compass-widget, .leaflet-map-pane ~ .compass-widget { z-index: 999999 !important; position: absolute !important; }
+    .map-btn { width: var(--btn-size); height: var(--btn-size); display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; background: rgba(20, 20, 20, 0.92); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6); transition: all 0.2s ease; flex-shrink: 0; }
+    .map-btn:hover { transform: scale(1.08); border-color: var(--accent-color); }
+    .map-btn:active { transform: scale(0.92); }
+    .map-btn img { width: 30px; height: 30px; object-fit: contain; pointer-events: none; }
+    .alert-toggle-btn { background: rgba(29, 28, 28, 0.9); border: 2px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease; }
+    .alert-toggle-btn.alert-off { background: rgba(222, 127, 127, 0.9); border-color: #888; }
+    .alert-toggle-btn img { transition: all 0.3s ease; }
+    .sidebar-controls .map-btn { border: 1px solid rgba(0, 255, 136, 0.35); }
+    #btn-route-bar { width: 54px; height: 54px; }
+    #btn-rotate-map { transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; }
+    #btn-rotate-map.rotated { border-color: var(--accent-color); box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1); background-color: rgba(0, 255, 136, 0.08); }
+    #btn-rotate-map.rotated img { filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5)); transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease; }
+    #btn-rotate-map:not(.rotated) img { transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease; }
+    .user-gps-marker, .user-navigator-marker { background: transparent !important; border: none !important; }
+    .user-gps-marker img, .user-navigator-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); transition: none !important; will-change: transform; }
+    .route-start-marker { background: transparent !important; border: none !important; }
+    .route-start-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); animation: pulseStart 1s ease-in-out infinite; }
+    .route-end-marker { background: transparent !important; border: none !important; }
+    .route-end-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); animation: pulseEnd 1.2s ease-in-out infinite; }
+    @keyframes pulseStart { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes pulseEnd { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    .radar-marker-icon { background: transparent !important; border: none !important; }
+    .radar-marker-icon img { width: 40px !important; height: 40px !important; object-fit: contain !important; display: block !important; }
+    .speed-widget { position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500; display: flex; align-items: center; justify-content: center; }
+    .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    .speed-value { position: absolute; top: 50%; left: 50%; transform: translate(-64%, -60%); font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif; color: #000; line-height: 1; z-index: 2; white-space: nowrap; text-align: center; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch; }
+    #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); background: linear-gradient(90deg, #ff2200, #ee0000); } 100% { transform: scale(1); } }
+    .alert-bar { background: linear-gradient(90deg, #cc0000, #990000); color: white; padding: 18px; display: flex; align-items: center; gap: 15px; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); border-top: 2px solid #ff5555; transition: all 0.2s ease; }
+    .alert-bar-critico { animation: pulse 0.8s ease-in-out infinite; }
+
+    /* ALERTA RISCO (amarelo) */
+    .alert-bar-risco { background: linear-gradient(90deg, #e6a800, #b38600) !important; border-top: 2px solid #ffcc00; box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); }
+    .alert-bar-risco-critico { animation: pulseRisco 0.8s ease-in-out infinite; }
+    @keyframes pulseRisco { 0% { transform: scale(1); } 50% { transform: scale(1.02); background: linear-gradient(90deg, #ffcc00, #e6a800); } 100% { transform: scale(1); } }
+
+    /* ALERTA MOBILIDADE (verde) — substitui promoção */
+    .alert-bar-mobilidade { background: linear-gradient(90deg, #007a3d, #005a2d) !important; border-top: 2px solid #00cc66; box-shadow: 0 -5px 20px rgba(0, 170, 85, 0.4); }
+    .alert-bar-mobilidade-critico { animation: pulseMobilidade 0.8s ease-in-out infinite; }
+    @keyframes pulseMobilidade { 0% { transform: scale(1); } 50% { transform: scale(1.02); background: linear-gradient(90deg, #00cc66, #009944); } 100% { transform: scale(1); } }
+
+    /* ALERTA PROMOÇÃO (mantido para compatibilidade) */
+    .alert-bar-promocao { background: linear-gradient(90deg, #00b359, #008040) !important; border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
+    .alert-bar-promocao-critico { animation: pulsePromocao 0.8s ease-in-out infinite; }
+    @keyframes pulsePromocao { 0% { transform: scale(1); } 50% { transform: scale(1.02); background: linear-gradient(90deg, #00e066, #00b359); } 100% { transform: scale(1); } }
+
+    .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
+    .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
+    .alert-info p { font-size: 0.95rem; opacity: 0.95; }
+    .toast-notification { position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px; border-radius: 50px; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8); z-index: 2000; opacity: 0; font-size: 0.95rem; font-weight: 600; text-align: center; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; white-space: nowrap; }
+    .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .loading-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.9); padding: 20px 30px; border-radius: 12px; border: 1px solid var(--accent-color); text-align: center; z-index: 1001; backdrop-filter: blur(5px); }
+    .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .loading-fullscreen { position: fixed; inset: 0; background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
+    .loading-fullscreen.fade-out { opacity: 0; visibility: hidden; }
+    .loading-fullscreen .spinner-ring { width: 60px; height: 60px; border-radius: 50%; position: relative; margin-bottom: 24px; }
+    .loading-fullscreen .spinner-ring::before, .loading-fullscreen .spinner-ring::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent; }
+    .loading-fullscreen .spinner-ring::before { border-top-color: var(--accent-color); border-right-color: var(--accent-color); animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite; }
+    .loading-fullscreen .spinner-ring::after { inset: 10px; border-bottom-color: #ff3333; border-left-color: #ff3333; animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse; }
+    @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-fullscreen .loading-text { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; text-align: center; }
+    .loading-fullscreen .loading-text span { color: var(--accent-color); }
+    .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.8rem; color: #777; animation: pulseText 1.8s ease-in-out infinite; }
+    @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .leaflet-control-zoom, .leaflet-control-attribution, .leaflet-routing-container { display: none !important; }
+  </style>
 </head>
 <body>
 
@@ -864,49 +146,35 @@
       <h1>RADAR <span>X9</span> BH</h1>
     </div>
     <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
-      <div class="menu-hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
+      <div class="menu-hamburger"><span></span><span></span><span></span></div>
       <div class="menu-label">MENU</div>
     </button>
   </header>
 
   <div class="map-wrapper">
-
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
       <button class="btn-search" id="btn-search-radar" title="Buscar"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca"></button>
     </div>
-
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
       <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
     </div>
 
-
-<!-- HTML: Bússola FORA do #map -->
     <div id="app-container" style="position: relative; width: 100%; height: 100%;">
-    <div id="map"></div>
-    <div class="toast-notification" id="toast-msg"></div>
-    <!-- Bússola: irmã do #map, não filha -->
-    <div class="compass-widget">
-      <div class="compass-base" id="compass-base-img"></div>
-      <img src="/imagens_app/ic_compass_ponteira.png" class="compass-needle" id="compass-needle-img">
-  </div>
-  
-</div>
-     
-    
-  
-    <!-- ICONE DE VELOCIDADE  -->
+      <div id="map"></div>
+      <div class="toast-notification" id="toast-msg"></div>
+      <div class="compass-widget">
+        <div class="compass-base" id="compass-base-img"></div>
+        <img src="/imagens_app/ic_compass_ponteira.png" class="compass-needle" id="compass-needle-img">
+      </div>
+    </div>
+
     <div class="speed-widget">
       <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
-    <!-- Sidebar de controles -->
     <div class="sidebar-controls" id="sidebar-controls">
       <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
         <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
@@ -936,26 +204,21 @@
     </div>
   </div>
 
-<!-- =================================================================== -->
-<!-- ÁUDIOS DE ALERTA (com fallback inteligente) -->
-<!-- =================================================================== -->
+  <!-- ÁUDIOS DE ALERTA -->
+  <audio id="alert-sound-radar" preload="auto">
+    <source src="audio_app/alerta_radar.mp3" type="audio/mpeg">
+    <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="alert-sound-risco" preload="auto">
+    <source src="audio_app/alerta_risco.mp3" type="audio/mpeg">
+    <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
+  </audio>
+  <!-- Som de mobilidade: usa alerta_promo.mp3 ou fallback para radar -->
+  <audio id="alert-sound-mobilidade" preload="auto">
+    <source src="audio_app/alerta_promo.mp3" type="audio/mpeg">
+    <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
+  </audio>
 
-  
-<audio id="alert-sound-radar" preload="auto">
-  <source src="audio_app/alerta_radar.mp3" type="audio/mpeg">
-  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
-</audio>
-
-<audio id="alert-sound-risco" preload="auto">
-  <source src="audio_app/alerta_risco.mp3" type="audio/mpeg">
-  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
-</audio>
-
-<audio id="alert-sound-promo" preload="auto">
-  <source src="audio_app/alerta_promo.mp3" type="audio/mpeg">
-  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
-</audio>
- 
 <script>
 // ===================================================================
 // VARIÁVEIS GLOBAIS
@@ -978,9 +241,6 @@ let gpsInitialized = false;
 let browserGpsTimeout = null;
 let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
 
-// ===================================================================
-// VARIÁVEIS GLOBAIS DE CONTROLE DE NAVEGAÇÃO
-// ===================================================================
 var estaEmNavegacao = false;
 var startRouteMarker = null;
 var endRouteMarker = null;
@@ -993,32 +253,27 @@ const INTERVALO_CAMERA_MS = 100;
 let zoomAlvo = 17;
 let zoomAtualEfetivo = 17;
 let centroAtualEfetivo = { lat: null, lng: null };
-
 let bearingAlvo = 0;
 let bearingAtual = 0;
 const FATOR_SUAVIZACAO_BEARING = 0.15;
 let bearingAlvoAnterior = null;
-
 let headingIconeNavegacao = 0;
 let headingIconeSuavizado = 0;
-
 let velocidadeAtual = 0;
 let estaEmMovimento = false;
 let posicaoSuavizadaGPS = { lat: null, lng: null };
-
 let alertaHabilitado = true;
 let ultimoRadarAlertado = null;
 let returnToGpsTimer = null;
 const TEMPO_RETORNO_GPS = 8000;
-
 let refreshDelayTimer = null;
 const TEMPO_REFRESH_DELAY = 5000;
-
 let sidebarAberta = true;
 
-// ===================================================================
-// CONFIGURAÇÃO DE ALERTAS
-// ===================================================================
+// Contexto de áudio para desbloqueio
+let audioContextGlobal = null;
+let audioDesbloqueado = false;
+
 const ALERT_CONFIG = {
   DISTANCIA_MAXIMA: 180,
   DISTANCIA_CRITICA: 100,
@@ -1098,26 +353,19 @@ const iconMap = {
   'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
+// ===================================================================
+// TIPOS SEM ALERTA — apenas os que realmente não devem alertar
+// (BUS, OCR-F, OCR-P, ZVT, COV, TUV foram REMOVIDOS daqui
+//  pois agora são "Avisos de Mobilidade" com alerta verde)
+// ===================================================================
 const TIPOS_SEM_ALERTA = [
-  'Detector de Faixa Preferencial de Ônibus (BUS)',
-  'Detector de Faixa Preferencial de Ônibus',
-  'Faixa Preferencial de Ônibus (BUS)',
-  'Faixa Preferencial de Ônibus',
-  'Zona Verde de Trânsito (ZVT)',
-  'Zona Verde de Trânsito (ZVC)',
-  'Zona Verde de Trânsito',
-  'BUS',
-  'Câmera Olho Vivo (COV)',
-  'Câmera Olho Vivo',
-  'Reconhecimento Facial (OCR-F)',
-  'Leitor de Placas (OCR-P)',
   'Apenas Trânsito Local (ATL)',
   'Zona de Estudo Nuclear (ZEN)',
-  'Passagem Sob Túnel Viário (TUV)'
+  'BUS'
 ];
 
 // ===================================================================
-// CONFIGURAÇÃO DOS NOVOS ALERTAS (RISCO)
+// TIPOS DE ALERTA: RISCO (amarelo)
 // ===================================================================
 const TIPOS_ALERTA_RISCO = [
   'Zona de Perigo e Violência (ZPV)',
@@ -1130,53 +378,53 @@ const TIPOS_ALERTA_RISCO = [
   'Zona de Estudo Nuclear (ZEN)'
 ];
 
+// ===================================================================
+// TIPOS DE AVISO DE MOBILIDADE (verde)
+// ===================================================================
+const TIPOS_ALERTA_MOBILIDADE = [
+  'Detector de Faixa Preferencial de Ônibus (BUS)',
+  'Detector de Faixa Preferencial de Ônibus',
+  'Faixa Preferencial de Ônibus (BUS)',
+  'Faixa Preferencial de Ônibus',
+  'Leitor de Reconhecimento Facial (OCR-F)',
+  'Leitor de Reconhecimento Facial',
+  'Reconhecimento Facial (OCR-F)',
+  'Leitor Inteligente de Placas (OCR-P)',
+  'Leitor Inteligente de Placas',
+  'Leitor de Placas (OCR-P)',
+  'Zona Verde de Trânsito (ZVT)',
+  'Zona Verde de Trânsito (ZVC)',
+  'Zona Verde de Trânsito',
+  'Câmera Olho Vivo (COV)',
+  'Câmera Olho Vivo',
+  'Passagem Sob Túnel Viário (TUV)',
+  'Passagem Sob Túnel Viário'
+];
+
 const TIPOS_ALERTA_PROMOCAO = [];
 
 // ===================================================================
-// INTEGRAÇÃO IA VERCEL - ALERTA DE PROMOÇÃO
+// CLASSIFICAR ALERTA
 // ===================================================================
-async function consultarIAVercel(pergunta) {
-  try {
-    const url = '/api/chat'; 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pergunta: pergunta })
-    });
-    if (!response.ok) return;
-    const data = await response.json();
-    if (data.tipoAlerta === 'promocao') {
-      dispararAlertaPromocaoIA(data.resposta || "Promoção detectada pela IA!");
-    }
-  } catch (error) {
-    console.warn("IA Vercel indisponível ou erro de rede:", error);
-  }
-}
-
-function dispararAlertaPromocaoIA(mensagem) {
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
-  $(".alert-bar").css("background", "");
-  $("#alert-title").text("🎉 ALERTA DE PROMOÇÃO!");
-  $("#alert-text").text(mensagem);
-  $(".alert-bar").addClass("alert-bar-promocao");
-  $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
-  if (!$("#alert-container").is(":visible")) { 
-    $("#alert-container").fadeIn(200); 
-  }
-  clearTimeout(alertTimeout);
-  alertTimeout = setTimeout(function() { 
-    if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
-  }, ALERT_CONFIG.TEMPO_ALERTA);
-}
-
 function classificarAlerta(tipoOriginal) {
   if (!tipoOriginal) return 'radar';
   var tipoLimpo = tipoOriginal.trim();
+  // Risco primeiro
   for (var i = 0; i < TIPOS_ALERTA_RISCO.length; i++) {
     if (tipoLimpo === TIPOS_ALERTA_RISCO[i] || tipoLimpo.includes(TIPOS_ALERTA_RISCO[i])) return 'risco';
   }
-  for (var j = 0; j < TIPOS_ALERTA_PROMOCAO.length; j++) {
-    if (tipoLimpo === TIPOS_ALERTA_PROMOCAO[j] || tipoLimpo.includes(TIPOS_ALERTA_PROMOCAO[j])) return 'promocao';
+  // Mobilidade
+  for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
+    if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobilidade';
+  }
+  // Por substring para mobilidade
+  if (tipoLimpo.includes('BUS') || tipoLimpo.includes('Preferencial') ||
+      tipoLimpo.includes('OCR-F') || tipoLimpo.includes('Facial') ||
+      tipoLimpo.includes('OCR-P') || tipoLimpo.includes('Placas') ||
+      tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC') ||
+      tipoLimpo.includes('Olho Vivo') || tipoLimpo.includes('COV') ||
+      tipoLimpo.includes('Túnel') || tipoLimpo.includes('TUV')) {
+    return 'mobilidade';
   }
   return 'radar';
 }
@@ -1226,6 +474,30 @@ const ajusteNomes = {
 };
 
 // ===================================================================
+// INTEGRAÇÃO IA VERCEL
+// ===================================================================
+async function consultarIAVercel(pergunta) {
+  try {
+    var response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pergunta: pergunta }) });
+    if (!response.ok) return;
+    var data = await response.json();
+    if (data.tipoAlerta === 'mobilidade') dispararAlertaMobilidadeIA(data.resposta || "Aviso de mobilidade detectado pela IA!");
+  } catch (error) { console.warn("IA Vercel indisponível:", error); }
+}
+
+function dispararAlertaMobilidadeIA(mensagem) {
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-promocao alert-bar-promocao-critico");
+  $(".alert-bar").css("background", "");
+  $("#alert-title").text("🟢 AVISO DE MOBILIDADE");
+  $("#alert-text").text(mensagem);
+  $(".alert-bar").addClass("alert-bar-mobilidade");
+  $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
+  if (!$("#alert-container").is(":visible")) $("#alert-container").fadeIn(200);
+  clearTimeout(alertTimeout);
+  alertTimeout = setTimeout(function() { if ($("#alert-container").is(":visible")) esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
+}
+
+// ===================================================================
 // BOTÃO MENU
 // ===================================================================
 (function() {
@@ -1233,15 +505,11 @@ const ajusteNomes = {
   var sidebar = document.getElementById('sidebar-controls');
   btnMenu.addEventListener('click', function() {
     sidebarAberta = !sidebarAberta;
-    if (sidebarAberta) {
-      sidebar.classList.remove('retracted');
-      btnMenu.classList.remove('active');
-    } else {
-      sidebar.classList.add('retracted');
-      btnMenu.classList.add('active');
+    if (sidebarAberta) { sidebar.classList.remove('retracted'); btnMenu.classList.remove('active'); }
+    else {
+      sidebar.classList.add('retracted'); btnMenu.classList.add('active');
       if (searchActive || routeActive) {
-        searchActive = false;
-        routeActive = false;
+        searchActive = false; routeActive = false;
         document.getElementById('search-bar-radares').classList.remove('active');
         document.getElementById('search-bar-rota').classList.remove('active');
       }
@@ -1253,14 +521,7 @@ const ajusteNomes = {
 // FUNÇÕES AUXILIARES
 // ===================================================================
 function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
-  return L.icon({
-    iconUrl: iconUrl,
-    iconSize: [tamanho, tamanho],
-    iconAnchor: [tamanho / 2, tamanho / 2],
-    popupAnchor: [0, -tamanho / 2],
-    className: 'radar-marker-icon',
-    iconUrlFallback: fallbackUrl || '/imagens_app/ic_radar_cev_v2.png'
-  });
+  return L.icon({ iconUrl: iconUrl, iconSize: [tamanho, tamanho], iconAnchor: [tamanho/2, tamanho/2], popupAnchor: [0, -tamanho/2], className: 'radar-marker-icon', iconUrlFallback: fallbackUrl || '/imagens_app/ic_radar_cev_v2.png' });
 }
 
 function deveAlertaRadar(tipoOriginal) {
@@ -1275,62 +536,47 @@ function deveAlertaRadar(tipoOriginal) {
 function getIconUrl(tipo, velocidade) {
   const tipoLimpo = tipo ? tipo.trim() : "";
   if (!tipoLimpo) return iconMap['default'];
-
-  if (tipoLimpo.includes('Média') || tipoLimpo.includes('(RIV)') || tipoLimpo.includes('RIV')) {
-    return iconMap['Radar Inteligente de Velocidade Média (RIV)'];
-  }
-  if (tipoLimpo.includes('Túnel') || tipoLimpo.includes('TUV')) {
-    return iconMap['Passagem Sob Túnel Viário (TUV)'];
-  }
-  if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC'))
-    return iconMap['Zona Verde de Trânsito (ZVT)'];
-  if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP'))
-    return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
-  if (tipoLimpo.includes('Semáforo') || tipoLimpo.includes('(DAS)'))
-    return iconMap['Detector de Avanço de Semáforo (DAS)'];
-  if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)' ||
-      tipoLimpo === 'Controle de Redução de Velocidade')
-    return iconMap['Controle de Redução de Velocidade (CRV)'];
-
+  if (tipoLimpo.includes('Média') || tipoLimpo.includes('(RIV)') || tipoLimpo.includes('RIV')) return iconMap['Radar Inteligente de Velocidade Média (RIV)'];
+  if (tipoLimpo.includes('Túnel') || tipoLimpo.includes('TUV')) return iconMap['Passagem Sob Túnel Viário (TUV)'];
+  if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC')) return iconMap['Zona Verde de Trânsito (ZVT)'];
+  if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP')) return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
+  if (tipoLimpo.includes('Semáforo') || tipoLimpo.includes('(DAS)')) return iconMap['Detector de Avanço de Semáforo (DAS)'];
+  if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)' || tipoLimpo === 'Controle de Redução de Velocidade') return iconMap['Controle de Redução de Velocidade (CRV)'];
   var isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('CEM') || tipoLimpo.includes('Controlador Eletrônico');
   if (isRadarVelocidade) {
-    var velStr = String(velocidade || '').trim();
-    var velNum = parseInt(velStr.replace(/[^0-9]/g, ''), 10);
+    var velNum = parseInt(String(velocidade || '').replace(/[^0-9]/g, ''), 10);
     if (velNum === 30) return '/imagens_app/ic_radar_cev_30_v2.png';
     if (velNum === 40) return '/imagens_app/ic_radar_cev_40_v2.png';
     if (velNum === 50) return '/imagens_app/ic_radar_cev_50_v2.png';
     if (velNum === 60) return '/imagens_app/ic_radar_cev_60_v2.png';
     if (velNum === 70) return '/imagens_app/ic_radar_cev_70_v2.png';
     if (velNum === 80) return '/imagens_app/ic_radar_cev_80_v2.png';
-    if (velNum === 100) return '/imagens_app/ic_radar_cev_100_v2.png'; 
+    if (velNum === 100) return '/imagens_app/ic_radar_cev_100_v2.png';
     if (velNum === 110) return '/imagens_app/ic_radar_cev_110_v2.png';
     return '/imagens_app/ic_radar_cev_v2.png';
   }
-
   if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
-
   var substrings = [
-    { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
-    { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
-    { keys: ['OCR-P', 'Placas'],                 icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
-    { keys: ['Celular', 'DUC'],                  icon: iconMap['Detector de Uso de Celular'] },
-    { keys: ['Cinto', 'VCS'],                    icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
-    { keys: ['Acidente', 'AIA'],                 icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
-    { keys: ['Média', 'RIV'],                    icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
-    { keys: ['Apenas', 'ATL'],                    icon: iconMap['Apenas Trânsito Local (ATL)'] },
-    { keys: ['Perigo', 'ZPV'],                   icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
-    { keys: ['Inundaç', 'ZIR'],                  icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
-    { keys: ['Redução', 'Redutor', 'DRV', 'CRV'],icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
-    { keys: ['Conversão'],                       icon: iconMap['Detector de Conversão em Local Proibido'] },
+    { keys: ['Olho Vivo', 'COV'], icon: iconMap['Câmera Olho Vivo (COV)'] },
+    { keys: ['Facial'], icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
+    { keys: ['OCR-P', 'Placas'], icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
+    { keys: ['Celular', 'DUC'], icon: iconMap['Detector de Uso de Celular'] },
+    { keys: ['Cinto', 'VCS'], icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
+    { keys: ['Acidente', 'AIA'], icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
+    { keys: ['Média', 'RIV'], icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
+    { keys: ['Apenas', 'ATL'], icon: iconMap['Apenas Trânsito Local (ATL)'] },
+    { keys: ['Perigo', 'ZPV'], icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
+    { keys: ['Inundaç', 'ZIR'], icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
+    { keys: ['Redução', 'Redutor', 'DRV', 'CRV'], icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
+    { keys: ['Conversão'], icon: iconMap['Detector de Conversão em Local Proibido'] },
     { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
-    { keys: ['Tráfego Proibido', 'DTLP'],       icon: iconMap['Detector de Tráfego em Local Proibido'] },
-    { keys: ['BUS', 'Faixa Preferencial'],       icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
-    { keys: ['Túnel', 'TUV'],                    icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
+    { keys: ['Tráfego Proibido', 'DTLP'], icon: iconMap['Detector de Tráfego em Local Proibido'] },
+    { keys: ['BUS', 'Faixa Preferencial'], icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
+    { keys: ['Túnel', 'TUV'], icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
   ];
   for (var s = 0; s < substrings.length; s++) {
-    var entry = substrings[s];
-    for (var k = 0; k < entry.keys.length; k++) {
-      if (tipoLimpo.includes(entry.keys[k])) return entry.icon;
+    for (var k = 0; k < substrings[s].keys.length; k++) {
+      if (tipoLimpo.includes(substrings[s].keys[k])) return substrings[s].icon;
     }
   }
   return iconMap['default'];
@@ -1340,10 +586,7 @@ document.addEventListener('error', function(e) {
   var target = e.target;
   if (target && target.tagName === 'IMG') {
     var parent = target.closest('.radar-marker-icon');
-    if (parent) {
-      var fallback = target.getAttribute('data-fallback');
-      if (fallback) { target.src = fallback; e.preventDefault(); e.stopPropagation(); }
-    }
+    if (parent) { var fb = target.getAttribute('data-fallback'); if (fb) { target.src = fb; e.preventDefault(); e.stopPropagation(); } }
   }
 }, true);
 
@@ -1359,11 +602,7 @@ function hideFullscreenLoading() {
 }
 
 function calcularDistancia(lat1, lon1, lat2, lon2) {
-  var R = 6371e3;
-  var p1 = lat1 * Math.PI / 180;
-  var p2 = lat2 * Math.PI / 180;
-  var dp = (lat2 - lat1) * Math.PI / 180;
-  var dl = (lon2 - lon1) * Math.PI / 180;
+  var R = 6371e3, p1 = lat1*Math.PI/180, p2 = lat2*Math.PI/180, dp = (lat2-lat1)*Math.PI/180, dl = (lon2-lon1)*Math.PI/180;
   var a = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
@@ -1386,20 +625,12 @@ function calcularZoomPorVelocidade() {
 
 function calcularCentroMapaComOffset(lat, lng, bearing) {
   if (!estaEmNavegacao || !mapaRotacionado) return { lat: lat, lng: lng };
-  var offsetDist = 0.0003;
-  var rad = (bearing - 90) * Math.PI / 180;
-  return {
-    lat: lat - Math.cos(rad) * offsetDist,
-    lng: lng - Math.sin(rad) * offsetDist
-  };
+  var offsetDist = 0.0003, rad = (bearing - 90) * Math.PI / 180;
+  return { lat: lat - Math.cos(rad)*offsetDist, lng: lng - Math.sin(rad)*offsetDist };
 }
 
 function suavizarPosicao(novaLat, novaLng) {
-  if (posicaoSuavizada.lat === null) {
-    posicaoSuavizada.lat = novaLat;
-    posicaoSuavizada.lng = novaLng;
-    return { lat: novaLat, lng: novaLng };
-  }
+  if (posicaoSuavizada.lat === null) { posicaoSuavizada.lat = novaLat; posicaoSuavizada.lng = novaLng; return { lat: novaLat, lng: novaLng }; }
   var fator = ALERT_CONFIG.SUAVIZACAO_FATOR;
   posicaoSuavizada.lat += (novaLat - posicaoSuavizada.lat) * fator;
   posicaoSuavizada.lng += (novaLng - posicaoSuavizada.lng) * fator;
@@ -1417,7 +648,7 @@ function calcularTendenciaDistancia(radarId, distanciaAtual) {
   if (historicoDistanciasRadar[radarId].length > 5) historicoDistanciasRadar[radarId].shift();
   var historico = historicoDistanciasRadar[radarId];
   if (historico.length < 2) return { estaAproximando: true, estaAfastando: false };
-  var diferenca = historico[0].distancia - historico[historico.length - 1].distancia;
+  var diferenca = historico[0].distancia - historico[historico.length-1].distancia;
   if (diferenca > 5) return { estaAproximando: true, estaAfastando: false, diferenca: diferenca };
   if (diferenca < -5) return { estaAproximando: false, estaAfastando: true, diferenca: diferenca };
   return { estaAproximando: true, estaAfastando: false, diferenca: 0 };
@@ -1426,71 +657,43 @@ function calcularTendenciaDistancia(radarId, distanciaAtual) {
 function moverMarcadorSuavemente(targetLat, targetLng) {
   var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
   if (!marcadorParaMover) return;
-  if (ultimaPosicaoMarcador.lat === null) {
-    ultimaPosicaoMarcador = { lat: targetLat, lng: targetLng };
-    marcadorParaMover.setLatLng([targetLat, targetLng]);
-    return;
-  }
+  if (ultimaPosicaoMarcador.lat === null) { ultimaPosicaoMarcador = { lat: targetLat, lng: targetLng }; marcadorParaMover.setLatLng([targetLat, targetLng]); return; }
   var distancia = calcularDistancia(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng);
   if (distancia < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) return;
-  var inicioLat = ultimaPosicaoMarcador.lat;
-  var inicioLng = ultimaPosicaoMarcador.lng;
-  var duracao = 300;
-  var inicioTempo = performance.now();
+  var inicioLat = ultimaPosicaoMarcador.lat, inicioLng = ultimaPosicaoMarcador.lng, duracao = 300, inicioTempo = performance.now();
   if (animacaoMarcadorAtiva) return;
   animacaoMarcadorAtiva = true;
   function animarFrame(tempoAtual) {
     var progresso = Math.min((tempoAtual - inicioTempo) / duracao, 1);
     var easing = 1 - Math.pow(1 - progresso, 3);
-    var latAtual = inicioLat + (targetLat - inicioLat) * easing;
-    var lngAtual = inicioLng + (targetLng - inicioLng) * easing;
-    marcadorParaMover.setLatLng([latAtual, lngAtual]);
-    if (progresso < 1) {
-      requestAnimationFrame(animarFrame);
-    } else {
-      ultimaPosicaoMarcador = { lat: targetLat, lng: targetLng };
-      animacaoMarcadorAtiva = false;
-    }
+    marcadorParaMover.setLatLng([inicioLat + (targetLat - inicioLat)*easing, inicioLng + (targetLng - inicioLng)*easing]);
+    if (progresso < 1) requestAnimationFrame(animarFrame);
+    else { ultimaPosicaoMarcador = { lat: targetLat, lng: targetLng }; animacaoMarcadorAtiva = false; }
   }
   requestAnimationFrame(animarFrame);
 }
 
-function limparHistoricoDistancia(radarId) {
-  if (historicoDistanciasRadar[radarId]) delete historicoDistanciasRadar[radarId];
-}
+function limparHistoricoDistancia(radarId) { if (historicoDistanciasRadar[radarId]) delete historicoDistanciasRadar[radarId]; }
 
 function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, radarId, distanciaAtual) {
-  if (!uHeading || uHeading === -1 || isNaN(uHeading)) {
-    var t = calcularTendenciaDistancia(radarId, distanciaAtual);
-    return { estaAproximando: t.estaAproximando, estaAfastando: t.estaAfastando };
-  }
-  var deltaX = radarLng - uLng;
-  var deltaY = radarLat - uLat;
+  if (!uHeading || uHeading === -1 || isNaN(uHeading)) { var t = calcularTendenciaDistancia(radarId, distanciaAtual); return { estaAproximando: t.estaAproximando, estaAfastando: t.estaAfastando }; }
+  var deltaX = radarLng - uLng, deltaY = radarLat - uLat;
   var anguloRadar = (Math.atan2(deltaY, deltaX) * 180 / Math.PI + 360) % 360;
-  var diff = Math.abs(uHeading - anguloRadar);
-  diff = Math.min(diff, 360 - diff);
+  var diff = Math.min(Math.abs(uHeading - anguloRadar), 360 - Math.abs(uHeading - anguloRadar));
   var tendencia = calcularTendenciaDistancia(radarId, distanciaAtual);
-  return {
-    estaAproximando: (diff < ALERT_CONFIG.ANGULO_APROXIMACAO) || tendencia.estaAproximando,
-    estaAfastando: (diff > ALERT_CONFIG.ANGULO_AFASTANDO) && tendencia.estaAfastando
-  };
+  return { estaAproximando: (diff < ALERT_CONFIG.ANGULO_APROXIMACAO) || tendencia.estaAproximando, estaAfastando: (diff > ALERT_CONFIG.ANGULO_AFASTANDO) && tendencia.estaAfastando };
 }
 
 function aplicarTemaMapa() {
   if (!map) return;
   var hora = new Date().getHours();
-  var urlAtual = (hora >= 19 || hora < 6)
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-  if (tileLayer) {
-    tileLayer.setUrl(urlAtual);
-  } else {
-    tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
-  }
+  var urlAtual = (hora >= 19 || hora < 6) ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+  if (tileLayer) tileLayer.setUrl(urlAtual);
+  else tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
 }
 
 function fecharAlertaImediatamente() {
-  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-promo'].forEach(function(id) {
+  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-mobilidade'].forEach(function(id) {
     var sound = document.getElementById(id);
     if (sound) { sound.pause(); sound.currentTime = 0; }
   });
@@ -1499,7 +702,7 @@ function fecharAlertaImediatamente() {
 
 function esconderAlertaVisual() {
   $("#alert-container").fadeOut(150);
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-promocao alert-bar-promocao-critico");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   contagemTocarSom = 0;
   fecharAlertaImediatamente();
@@ -1509,25 +712,11 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
   if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
   if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
-  estaEmNavegacao = true;
-  ultimaPosicaoMarcador = { lat: null, lng: null };
-  var startIcon = L.divIcon({
-    html: '<img id="nav-icon-img" src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;transform-origin:center center;transition:transform 0.3s ease-out;">',
-    className: 'route-start-marker user-navigator-marker',
-    iconSize: [50, 50],
-    iconAnchor: [25, 25],
-    popupAnchor: [0, -25]
-  });
+  estaEmNavegacao = true; ultimaPosicaoMarcador = { lat: null, lng: null };
+  var startIcon = L.divIcon({ html: '<img id="nav-icon-img" src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;transform-origin:center center;transition:transform 0.3s ease-out;">', className: 'route-start-marker user-navigator-marker', iconSize: [50,50], iconAnchor: [25,25], popupAnchor: [0,-25] });
   startRouteMarker = L.marker([originLat, originLng], { icon: startIcon, zIndexOffset: 2000, pane: 'markerPane' }).addTo(map);
-  startRouteMarker.bindTooltip("Navegando para destino", { permanent: false, direction: "top", offset: [0, -30] });
-  
-  var endIcon = L.divIcon({
-    html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-    className: 'route-end-marker',
-    iconSize: [50, 50],
-    iconAnchor: [25, 50],
-    popupAnchor: [0, -50]
-  });
+  startRouteMarker.bindTooltip("Navegando para destino", { permanent: false, direction: "top", offset: [0,-30] });
+  var endIcon = L.divIcon({ html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'route-end-marker', iconSize: [50,50], iconAnchor: [25,50], popupAnchor: [0,-50] });
   endRouteMarker = L.marker([destLat, destLng], { icon: endIcon, zIndexOffset: 900 }).addTo(map);
   endRouteMarker.bindPopup("<b>DESTINO</b><br>Você chegou ao seu destino!", { closeButton: false, autoClose: true, closeOnClick: true });
 }
@@ -1540,8 +729,7 @@ function atualizarRota() {
 
 function verificarChegadaDestino() {
   if (!destinoAtual || !userLat || !userLng) return;
-  var distanciaDestino = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
-  if (distanciaDestino <= 30) {
+  if (calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng) <= 30) {
     showNotification("Você chegou ao seu destino!");
     if (endRouteMarker) endRouteMarker.openPopup();
     setTimeout(function() { finalizarNavegacao(); }, 4000);
@@ -1551,51 +739,25 @@ function verificarChegadaDestino() {
 function finalizarNavegacao() {
   if (!map) return;
   if (routingControl) { map.removeControl(routingControl); routingControl = null; }
-  destinoAtual = null;
-  estaEmNavegacao = false;
-  estaEmMovimento = false;
-  velocidadeAtual = 0;
+  destinoAtual = null; estaEmNavegacao = false; estaEmMovimento = false; velocidadeAtual = 0;
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
   if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
-  ultimaPosicaoMarcador = { lat: null, lng: null };
-  posicaoSuavizadaGPS = { lat: null, lng: null };
-  ultimaAtualizacaoCamera = 0;
-  zoomAtualEfetivo = 17;
-  centroAtualEfetivo = { lat: null, lng: null };
-  zoomAlvo = 17;
-  bearingAlvo = 0;
-  bearingAtual = 0;
-  bearingAlvoAnterior = null;
-  headingIconeNavegacao = 0;
-  headingIconeSuavizado = 0;
+  ultimaPosicaoMarcador = { lat: null, lng: null }; posicaoSuavizadaGPS = { lat: null, lng: null };
+  ultimaAtualizacaoCamera = 0; zoomAtualEfetivo = 17; centroAtualEfetivo = { lat: null, lng: null };
+  zoomAlvo = 17; bearingAlvo = 0; bearingAtual = 0; bearingAlvoAnterior = null;
+  headingIconeNavegacao = 0; headingIconeSuavizado = 0;
   if (typeof map.setBearing === 'function') map.setBearing(0);
   mapaRotacionado = false;
   var ri = document.getElementById('rotate-btn-icon');
-  if (ri) {
-    ri.src = "/imagens_app/ic_girado_map.png";
-    ri.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
-    ri.style.transform = 'rotate(0deg)';
-  }
+  if (ri) { ri.src = "/imagens_app/ic_girado_map.png"; ri.style.transform = 'rotate(0deg)'; }
   var rb = document.getElementById('btn-rotate-map');
   if (rb) rb.classList.remove('rotated');
-  
-  var defaultIcon = L.divIcon({
-    html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-    className: 'user-gps-marker',
-    iconSize: [50, 50],
-    iconAnchor: [25, 50],
-    popupAnchor: [0, -50]
-  });
+  var defaultIcon = L.divIcon({ html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'user-gps-marker', iconSize: [50,50], iconAnchor: [25,50], popupAnchor: [0,-50] });
   userMarker = L.marker([userLat, userLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-  userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
-  
+  userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0,-25] });
   var sidebar = document.getElementById('sidebar-controls');
   var btnMenu = document.getElementById('btn-menu-toggle');
-  if (sidebar && sidebar.classList.contains('retracted')) {
-    sidebarAberta = true;
-    sidebar.classList.remove('retracted');
-    if (btnMenu) btnMenu.classList.remove('active');
-  }
+  if (sidebar && sidebar.classList.contains('retracted')) { sidebarAberta = true; sidebar.classList.remove('retracted'); if (btnMenu) btnMenu.classList.remove('active'); }
   map.flyTo([userLat, userLng], 17, { duration: 1 });
   showNotification("Navegação encerrada");
 }
@@ -1609,37 +771,19 @@ function criarRota(destLat, destLng) {
   adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
   routingControl = L.Routing.control({
     waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
-    routeWhileDragging: false, addWaypoints: false, draggableWaypoints: false,
-    fitSelectedRoutes: false, show: false, autoRoute: true,
-    lineOptions: {
-      styles: [
-        { color: '#4A148C', weight: 16, opacity: 0.4, lineCap: 'round', lineJoin: 'round' },
-        { color: '#6A1B9A', weight: 12, opacity: 0.9, lineCap: 'round', lineJoin: 'round' },
-        { color: '#8E24AA', weight: 8, opacity: 0.95, lineCap: 'round', lineJoin: 'round' },
-        { color: '#FF9800', weight: 5, opacity: 1.0, lineCap: 'round', lineJoin: 'round' },
-        { color: '#FFB74D', weight: 2, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }
-      ],
-      addWaypoints: false
-    },
-    createMarker: function() { return null; },
-    showAlternatives: false
+    routeWhileDragging: false, addWaypoints: false, draggableWaypoints: false, fitSelectedRoutes: false, show: false, autoRoute: true,
+    lineOptions: { styles: [{ color: '#4A148C', weight: 16, opacity: 0.4, lineCap: 'round', lineJoin: 'round' }, { color: '#6A1B9A', weight: 12, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }, { color: '#8E24AA', weight: 8, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }, { color: '#FF9800', weight: 5, opacity: 1.0, lineCap: 'round', lineJoin: 'round' }, { color: '#FFB74D', weight: 2, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }], addWaypoints: false },
+    createMarker: function() { return null; }, showAlternatives: false
   }).addTo(map);
-  
   routingControl.on('routesfound', function(e) {
     let route = e.routes[0];
     if (route.coordinates && route.coordinates.length >= 2) {
-      var p1 = route.coordinates[0];
-      var p2 = route.coordinates[1];
+      var p1 = route.coordinates[0], p2 = route.coordinates[1];
       var heading = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
-      headingIconeNavegacao = heading;
-      headingIconeSuavizado = heading;
-      bearingAlvo = heading;
-      bearingAtual = heading;
+      headingIconeNavegacao = heading; headingIconeSuavizado = heading; bearingAlvo = heading; bearingAtual = heading;
     }
-    let dk = (route.summary.totalDistance / 1000).toFixed(1);
-    let tm = Math.round(route.summary.totalTime / 60);
-    $("#loading").hide();
-    showNotification("🚗 " + dk + " km • " + tm + " min");
+    let dk = (route.summary.totalDistance/1000).toFixed(1), tm = Math.round(route.summary.totalTime/60);
+    $("#loading").hide(); showNotification("🚗 " + dk + " km • " + tm + " min");
     iniciarModoNavegacaoSuave();
   });
   routingControl.on('routingerror', function() { $("#loading").hide(); showNotification("Erro ao traçar rota."); });
@@ -1647,32 +791,18 @@ function criarRota(destLat, destLng) {
 }
 
 function calcularBearing(lat1, lng1, lat2, lng2) {
-  var dLon = (lng2 - lng1) * Math.PI / 180;
-  var lat1Rad = lat1 * Math.PI / 180;
-  var lat2Rad = lat2 * Math.PI / 180;
-  var y = Math.sin(dLon) * Math.cos(lat2Rad);
-  var x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLon);
-  var brng = Math.atan2(y, x) * 180 / Math.PI;
-  return (brng + 360) % 360;
+  var dLon = (lng2-lng1)*Math.PI/180, lat1Rad = lat1*Math.PI/180, lat2Rad = lat2*Math.PI/180;
+  var y = Math.sin(dLon)*Math.cos(lat2Rad), x = Math.cos(lat1Rad)*Math.sin(lat2Rad) - Math.sin(lat1Rad)*Math.cos(lat2Rad)*Math.cos(dLon);
+  return (Math.atan2(y, x)*180/Math.PI + 360) % 360;
 }
 
 function iniciarModoNavegacaoSuave() {
-  estaEmNavegacao = true;
-  isFollowing = true;
-  var sidebar = document.getElementById('sidebar-controls');
-  var btnMenu = document.getElementById('btn-menu-toggle');
-  if (sidebar && !sidebar.classList.contains('retracted')) {
-    sidebarAberta = false;
-    sidebar.classList.add('retracted');
-    if (btnMenu) btnMenu.classList.add('active');
-  }
+  estaEmNavegacao = true; isFollowing = true;
+  var sidebar = document.getElementById('sidebar-controls'), btnMenu = document.getElementById('btn-menu-toggle');
+  if (sidebar && !sidebar.classList.contains('retracted')) { sidebarAberta = false; sidebar.classList.add('retracted'); if (btnMenu) btnMenu.classList.add('active'); }
   if (currentHeading > 0 && typeof map.setBearing === 'function') {
-    mapaRotacionado = true;
-    bearingAlvo = currentHeading;
-    bearingAtual = currentHeading;
-    map.setBearing(currentHeading);
-    var rb = document.getElementById('btn-rotate-map');
-    if (rb) rb.classList.add('rotated');
+    mapaRotacionado = true; bearingAlvo = currentHeading; bearingAtual = currentHeading; map.setBearing(currentHeading);
+    var rb = document.getElementById('btn-rotate-map'); if (rb) rb.classList.add('rotated');
   }
 }
 
@@ -1688,100 +818,62 @@ function atualizarCameraNavegacaoSuave() {
   let lngCam = ultimaPosicaoMarcador.lng || posicaoSuavizada.lng || userLng;
   let c = calcularCentroMapaComOffset(latCam, lngCam, bearingAtual);
   let mudancaZoom = Math.abs(zoomArredondado - zoomAtualEfetivo);
-  let mudancaPos = 0;
-  if (centroAtualEfetivo.lat !== null) {
-    mudancaPos = calcularDistancia(c.lat, c.lng, centroAtualEfetivo.lat, centroAtualEfetivo.lng);
-  }
+  let mudancaPos = centroAtualEfetivo.lat !== null ? calcularDistancia(c.lat, c.lng, centroAtualEfetivo.lat, centroAtualEfetivo.lng) : 999;
   if (mapaRotacionado && typeof map.setBearing === 'function') {
     bearingAtual = suavizarBearing(bearingAlvo, bearingAtual, FATOR_SUAVIZACAO_BEARING);
     map.setBearing(bearingAtual);
-    var rotateBtnIcon = document.getElementById('rotate-btn-icon');
-    if (rotateBtnIcon) rotateBtnIcon.style.transform = 'rotate(' + bearingAtual + 'deg)';
+    var rbi = document.getElementById('rotate-btn-icon'); if (rbi) rbi.style.transform = 'rotate(' + bearingAtual + 'deg)';
   }
   if (mudancaPos < 2 && mudancaZoom < 0.3 && centroAtualEfetivo.lat !== null) return;
-  centroAtualEfetivo = { lat: c.lat, lng: c.lng };
-  zoomAtualEfetivo = zoomArredondado;
+  centroAtualEfetivo = { lat: c.lat, lng: c.lng }; zoomAtualEfetivo = zoomArredondado;
   map.setView([c.lat, c.lng], zoomArredondado, { animate: false, duration: 0 });
 }
 
 async function buscarCoordenadas(endereco) {
   try {
-    var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil');
-    var response = await fetch(url);
+    var response = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil'));
     var data = await response.json();
     if (data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
     return null;
-  } catch (e) { console.error("Erro ao buscar coordenadas:", e); return null; }
+  } catch (e) { return null; }
 }
 
 function resetarMapa() {
   if (!map) return;
-  mapaRotacionado = false;
-  bearingAlvo = 0;
-  bearingAtual = 0;
+  mapaRotacionado = false; bearingAlvo = 0; bearingAtual = 0;
   if (typeof map.setBearing === 'function') map.setBearing(0);
-  var rotateBtnIcon = document.getElementById('rotate-btn-icon');
-  if (rotateBtnIcon) {
-    rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
-    rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
-    rotateBtnIcon.style.transform = 'rotate(0deg)';
-  }
-  var rotateBtn = document.getElementById('btn-rotate-map');
-  if (rotateBtn) rotateBtn.classList.remove('rotated');
+  var rbi = document.getElementById('rotate-btn-icon');
+  if (rbi) { rbi.src = "/imagens_app/ic_girado_map.png"; rbi.style.transform = 'rotate(0deg)'; }
+  var rb = document.getElementById('btn-rotate-map'); if (rb) rb.classList.remove('rotated');
   map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
   isFollowing = false;
   if (refreshDelayTimer) clearTimeout(refreshDelayTimer);
   refreshDelayTimer = setTimeout(function() {
     var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
-    if (marcadorAtivo && !isFollowing) {
-      isFollowing = true;
-      map.flyTo(marcadorAtivo.getLatLng(), 20, { duration: 0.8 });
-      showNotification("Retornando à sua posição atual");
-    }
+    if (marcadorAtivo && !isFollowing) { isFollowing = true; map.flyTo(marcadorAtivo.getLatLng(), 20, { duration: 0.8 }); showNotification("Retornando à sua posição atual"); }
     refreshDelayTimer = null;
   }, TEMPO_REFRESH_DELAY);
-  removerRota();
-  esconderAlertaVisual();
-  showNotification("Mapa resetado");
+  removerRota(); esconderAlertaVisual(); showNotification("Mapa resetado");
 }
 
 function extrairCoordenadas(record, index) {
   if (!record || record.length < 9) return null;
   let geomIndex = (record.length >= 10) ? 9 : 8;
   let s = String(record[geomIndex]).trim();
-  if (!s || s === '' || s === 'null' || s === 'undefined') {
-    geomIndex = (geomIndex === 9) ? 8 : 7;
-    s = String(record[geomIndex]).trim();
-  }
+  if (!s || s === '' || s === 'null' || s === 'undefined') { geomIndex = (geomIndex === 9) ? 8 : 7; s = String(record[geomIndex]).trim(); }
   if (!s || s === '') return null;
   let lat = null, lng = null;
-  
-  if (lat === null && s.includes('.')) {
-    let parts = s.split(',').map(function(p) { return p.trim(); });
-    if (parts.length >= 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[parts.length - 1]); }
-  }
-  if ((lat === null || isNaN(lat)) && s.includes(';')) {
-    let parts = s.split(';').map(function(p) { return p.trim().replace(',', '.'); });
-    if (parts.length >= 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
-  }
-  if ((lat === null || isNaN(lat)) && (s.match(/,/g) || []).length >= 3) {
-    let match = s.match(/(-?\d+,\d+),\s*(-?\d+,\d+)/);
-    if (match) { lat = parseFloat(match[1].replace(',', '.')); lng = parseFloat(match[2].replace(',', '.')); }
-  }
-  if ((lat === null || isNaN(lat))) {
-    let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); });
-    if (parts.length === 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
-  }
+  if (lat === null && s.includes('.')) { let parts = s.split(',').map(function(p) { return p.trim(); }); if (parts.length >= 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[parts.length-1]); } }
+  if ((lat === null || isNaN(lat)) && s.includes(';')) { let parts = s.split(';').map(function(p) { return p.trim().replace(',', '.'); }); if (parts.length >= 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); } }
+  if ((lat === null || isNaN(lat)) && (s.match(/,/g) || []).length >= 3) { let match = s.match(/(-?\d+,\d+),\s*(-?\d+,\d+)/); if (match) { lat = parseFloat(match[1].replace(',','.')); lng = parseFloat(match[2].replace(',','.')); } }
+  if (lat === null || isNaN(lat)) { let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); }); if (parts.length === 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); } }
   if (lat === null || isNaN(lat) || lng === null || isNaN(lng)) {
-    for (var f = Math.max(0, geomIndex - 2); f < Math.min(record.length, geomIndex + 3); f++) {
+    for (var f = Math.max(0, geomIndex-2); f < Math.min(record.length, geomIndex+3); f++) {
       if (f === geomIndex) continue;
       var campo = String(record[f]).trim();
       if (campo.includes('.') && campo.includes(',')) {
         let parts = campo.split(',').map(function(p) { return p.trim(); });
-        if (parts.length === 2) {
-          var tLat = parseFloat(parts[0]); var tLng = parseFloat(parts[1]);
-          if (!isNaN(tLat) && !isNaN(tLng) && tLat >= -90 && tLat <= 90) { lat = tLat; lng = tLng; break; }
-        }
+        if (parts.length === 2) { var tLat = parseFloat(parts[0]), tLng = parseFloat(parts[1]); if (!isNaN(tLat) && !isNaN(tLng) && tLat >= -90 && tLat <= 90) { lat = tLat; lng = tLng; break; } }
       }
     }
   }
@@ -1796,50 +888,34 @@ function atualizarBussola(headingDegrees) {
 
 function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   if (!map) return;
-  var currentTime = Date.now();
-  var dist = 0;
+  var currentTime = Date.now(), dist = 0;
   adicionarAoHistorico(newLat, newLng, currentTime);
   var posSuave = suavizarPosicao(newLat, newLng);
-  var smoothLat = posSuave.lat;
-  var smoothLng = posSuave.lng;
+  var smoothLat = posSuave.lat, smoothLng = posSuave.lng;
   posicaoSuavizadaGPS = { lat: smoothLat, lng: smoothLng };
-  
   if (speedKmh === 0 && prevLat !== null && prevTime !== null) {
     dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
     var time = (currentTime - prevTime) / 1000;
-    if (time > 0) speedKmh = Math.round((dist / time) * 3.6);
-  } else if (prevLat !== null) {
-    dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
-  }
-  
+    if (time > 0) speedKmh = Math.round((dist/time)*3.6);
+  } else if (prevLat !== null) { dist = calcularDistancia(prevLat, prevLng, newLat, newLng); }
   if (speedKmh > 250) speedKmh = 0;
   velocidadeAtual = speedKmh;
   $("#speed-display").text(speedKmh);
   estaEmMovimento = speedKmh > 3 || dist > 2;
-  
   var novoHeading = null;
   if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
     if (!bussolaHardwareDisponivel) { currentHeading = hardwareHeading; bussolaHardwareDisponivel = true; }
     novoHeading = hardwareHeading;
   } else if (!bussolaHardwareDisponivel && dist > 3 && prevLat !== null) {
-    var dy = newLat - prevLat;
-    var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
+    var dy = newLat - prevLat, dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
     if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) {
-      var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI);
-      if (calcHeading < 0) calcHeading += 360;
-      if (calcHeading >= 360) calcHeading -= 360;
-      currentHeading = calcHeading;
-      novoHeading = calcHeading;
+      var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI + 360) % 360;
+      currentHeading = calcHeading; novoHeading = calcHeading;
     }
   }
-  if (novoHeading !== null && estaEmMovimento) {
-    bearingAlvo = novoHeading;
-    headingIconeNavegacao = novoHeading;
-  }
+  if (novoHeading !== null && estaEmMovimento) { bearingAlvo = novoHeading; headingIconeNavegacao = novoHeading; }
   if (currentHeading !== null && currentHeading !== undefined) atualizarBussola(currentHeading);
-  
   prevLat = newLat; prevLng = newLng; prevTime = currentTime; userLat = newLat; userLng = newLng;
-  
   if (estaEmNavegacao && startRouteMarker) {
     startRouteMarker.setLatLng([smoothLat, smoothLng]);
     var imgNav = document.getElementById('nav-icon-img');
@@ -1847,33 +923,24 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
       headingIconeSuavizado = suavizarBearing(headingIconeNavegacao, headingIconeSuavizado || headingIconeNavegacao, 0.2);
       imgNav.style.transform = 'rotate(' + headingIconeSuavizado + 'deg)';
     }
-    ultimaPosicaoMarcador.lat = smoothLat;
-    ultimaPosicaoMarcador.lng = smoothLng;
+    ultimaPosicaoMarcador.lat = smoothLat; ultimaPosicaoMarcador.lng = smoothLng;
     if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
   } else if (!estaEmNavegacao) {
     if (!userMarker) {
-      var defaultIcon = L.divIcon({
-        html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-        className: 'user-gps-marker', iconSize: [50, 50], iconAnchor: [25, 50], popupAnchor: [0, -50]
-      });
+      var defaultIcon = L.divIcon({ html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">', className: 'user-gps-marker', iconSize: [50,50], iconAnchor: [25,50], popupAnchor: [0,-50] });
       userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-      userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+      userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0,-25] });
       ultimaPosicaoMarcador.lat = smoothLat; ultimaPosicaoMarcador.lng = smoothLng;
       if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
-    } else {
-      moverMarcadorSuavemente(smoothLat, smoothLng);
-    }
+    } else { moverMarcadorSuavemente(smoothLat, smoothLng); }
   }
-  
   if (destinoAtual && routingControl && estaEmNavegacao) {
-    if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
-      atualizarRota(); window.ultimaAtualizacaoRota = currentTime;
-    }
+    if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) { atualizarRota(); window.ultimaAtualizacaoRota = currentTime; }
   }
-  if (estaEmNavegacao && isFollowing) { atualizarCameraNavegacaoSuave(); }
-  else if (isFollowing && !estaEmNavegacao) { map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.5 }); }
-  
-  if (alertaHabilitado) verificarProximidadeRadares(); else fecharAlertaImediatamente();
+  if (estaEmNavegacao && isFollowing) atualizarCameraNavegacaoSuave();
+  else if (isFollowing && !estaEmNavegacao) map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.5 });
+  if (alertaHabilitado) verificarProximidadeRadares();
+  else fecharAlertaImediatamente();
   if (destinoAtual) verificarChegadaDestino();
 }
 
@@ -1895,8 +962,7 @@ function startGPSTracking() {
 
 function verificarProximidadeRadares() {
   if (!alertaHabilitado || radarMarkers.length === 0) return;
-  let radarMaisProximo = null;
-  let menorDistancia = Infinity;
+  let radarMaisProximo = null, menorDistancia = Infinity;
   radarMarkers.forEach(function(marker) {
     const rData = marker.radarData;
     if (!deveAlertaRadar(rData.tipoOriginal)) return;
@@ -1908,7 +974,7 @@ function verificarProximidadeRadares() {
     if (menorDistancia <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) { esconderAlertaVisual(); ultimoRadarAlertado = radarMaisProximo.id; limparHistoricoDistancia(radarMaisProximo.id); return; }
     if (direcao.estaAfastando) { fecharAlertaImediatamente(); limparHistoricoDistancia(radarMaisProximo.id); if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA - 30) ultimoRadarAlertado = null; return; }
     if (direcao.estaAproximando) {
-      if (ultimoRadarAlertado !== radarMaisProximo.id) { dispararAlerta(radarMaisProximo, menorDistancia); }
+      if (ultimoRadarAlertado !== radarMaisProximo.id) dispararAlerta(radarMaisProximo, menorDistancia);
       else { atualizarDistanciaAlerta(menorDistancia); if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) $(".alert-bar").addClass("alert-bar-critico"); }
     }
   } else {
@@ -1919,8 +985,7 @@ function verificarProximidadeRadares() {
 
 function atualizarDistanciaAlerta(distancia) {
   if (!$("#alert-container").is(":visible")) return;
-  var textoAtual = $("#alert-text").text();
-  var partes = textoAtual.split(" - a ");
+  var partes = $("#alert-text").text().split(" - a ");
   if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
 }
 
@@ -1930,13 +995,16 @@ function dispararAlerta(radar, distancia) {
   const tipoAlerta = classificarAlerta(radar.tipoOriginal);
   const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
   const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
-  
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
-  $(".alert-bar").css("background", ""); 
+
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-promocao alert-bar-promocao-critico");
+  $(".alert-bar").css("background", "");
 
   if (tipoAlerta === 'risco') {
     $("#alert-title").text("⚠️ ALERTA DE RISCO!");
     $(".alert-bar").addClass("alert-bar-risco");
+  } else if (tipoAlerta === 'mobilidade') {
+    $("#alert-title").text("🟢 AVISO DE MOBILIDADE");
+    $(".alert-bar").addClass("alert-bar-mobilidade");
   } else if (tipoAlerta === 'promocao') {
     $("#alert-title").text("🎉 ALERTA DE PROMOÇÃO!");
     $(".alert-bar").addClass("alert-bar-promocao");
@@ -1944,25 +1012,27 @@ function dispararAlerta(radar, distancia) {
     $("#alert-title").text("ALERTA DE RADAR!");
     $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   }
+
   $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
   $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
-  
+
   const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
   if (isNewAlert) { $("#alert-container").fadeIn(200); contagemTocarSom = 0; }
-  
+
   if (alertaHabilitado) {
     var deveTocar = false;
     if (tipoAlerta === 'radar') { if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; }
     else { if (isNewAlert) deveTocar = true; }
     if (deveTocar) { tocarSomAlerta(tipoAlerta); contagemTocarSom++; }
   }
-  
+
   if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
     if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
+    else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
     else if (tipoAlerta === 'promocao') $(".alert-bar").addClass("alert-bar-promocao-critico");
     else $(".alert-bar").addClass("alert-bar-critico");
   }
-  
+
   ultimoRadarAlertado = radar.id;
   clearTimeout(alertTimeout);
   alertTimeout = setTimeout(function() { if ($("#alert-container").is(":visible")) esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
@@ -1972,39 +1042,20 @@ function inicializarBotaoRotacaoMapa() {
   const rotateBtn = document.getElementById('btn-rotate-map');
   const rotateBtnIcon = document.getElementById('rotate-btn-icon');
   if (!rotateBtn) return;
-  if (rotateBtnIcon) {
-    rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
-    rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
-  }
-  if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') {
-    console.error('[Radar X9] ERRO: leaflet-rotate NÃO carregou!');
-    rotateBtn.style.opacity = '0.3'; rotateBtn.style.pointerEvents = 'none';
-    rotateBtn.title = 'Rotação indisponível'; showNotification('Plugin de rotação não carregou.'); return;
-  }
-  rotateBtn.addEventListener('click', async function () {
+  if (rotateBtnIcon) { rotateBtnIcon.src = "/imagens_app/ic_girado_map.png"; rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; }; }
+  if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') { rotateBtn.style.opacity = '0.3'; rotateBtn.style.pointerEvents = 'none'; rotateBtn.title = 'Rotação indisponível'; showNotification('Plugin de rotação não carregou.'); return; }
+  rotateBtn.addEventListener('click', async function() {
     if (!map || typeof map.setBearing !== 'function') return;
-    if (!bussolaHardwareDisponivel) { await solicitarPermissaoBussolaIOS(); }
+    if (!bussolaHardwareDisponivel) await solicitarPermissaoBussolaIOS();
     if (!mapaRotacionado) {
       mapaRotacionado = true;
-      var anguloRotacao = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 0;
-      bearingAlvo = anguloRotacao; bearingAtual = anguloRotacao;
-      map.setBearing(anguloRotacao); rotateBtn.classList.add('rotated');
-      if (rotateBtnIcon) {
-        rotateBtnIcon.src = "/imagens_app/ic_girar_map.png";
-        rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
-        rotateBtnIcon.style.transform = 'rotate(' + anguloRotacao + 'deg)';
-      }
-      if (bussolaHardwareDisponivel) showNotification('Mapa rotacionado — bússola ativa');
-      else if (currentHeading > 0) showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)');
-      else showNotification('Mapa rotacionado — aguardando direção...');
+      var ang = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 0;
+      bearingAlvo = ang; bearingAtual = ang; map.setBearing(ang); rotateBtn.classList.add('rotated');
+      if (rotateBtnIcon) { rotateBtnIcon.src = "/imagens_app/ic_girar_map.png"; rotateBtnIcon.style.transform = 'rotate(' + ang + 'deg)'; }
+      showNotification(bussolaHardwareDisponivel ? 'Mapa rotacionado — bússola ativa' : (currentHeading > 0 ? 'Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)' : 'Mapa rotacionado — aguardando direção...'));
     } else {
-      mapaRotacionado = false; bearingAlvo = 0; bearingAtual = 0;
-      map.setBearing(0); rotateBtn.classList.remove('rotated');
-      if (rotateBtnIcon) {
-        rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
-        rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
-        rotateBtnIcon.style.transform = 'rotate(0deg)';
-      }
+      mapaRotacionado = false; bearingAlvo = 0; bearingAtual = 0; map.setBearing(0); rotateBtn.classList.remove('rotated');
+      if (rotateBtnIcon) { rotateBtnIcon.src = "/imagens_app/ic_girado_map.png"; rotateBtnIcon.style.transform = 'rotate(0deg)'; }
       showNotification('Mapa resetado (Norte para cima)');
     }
   });
@@ -2045,7 +1096,7 @@ function initMap() {
       }
     }, TEMPO_RETORNO_GPS);
   });
-  
+
   $("#btn-calc-route").click(async function() {
     var endereco = $("#route-query").val().trim();
     if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
@@ -2055,7 +1106,7 @@ function initMap() {
     else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
   });
   $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
-  
+
   function fecharTodasBarras() { searchActive = false; routeActive = false; document.getElementById('search-bar-radares').classList.remove('active'); document.getElementById('search-bar-rota').classList.remove('active'); }
   $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
   $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
@@ -2082,7 +1133,7 @@ function initMap() {
   $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
   $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
   $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
-  
+
   inicializarBotaoRotacaoMapa();
   inicializarBotaoAlertaToggle();
   startGPSTracking();
@@ -2097,62 +1148,36 @@ async function carregarRadares() {
     var response = await fetch('radares.json?v=' + Date.now());
     if (!response.ok) throw new Error("Arquivo não encontrado (HTTP " + response.status + ")");
     var data = await response.json();
-    var records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+    var records = Array.isArray(data) ? data : (data.result?.records || data.records || []);
     if (records.length > 0) renderizarRadaresNoMapa(records, "radares.json");
     else throw new Error("Nenhum radar encontrado no JSON");
-  } catch (e) {
-    console.warn("[Radar X9] Falha ao carregar radares.json:", e.message);
-    $("#loading").hide(); showNotification("Erro ao carregar radares: " + e.message);
-  }
+  } catch (e) { $("#loading").hide(); showNotification("Erro ao carregar radares: " + e.message); }
 }
 
 function renderizarRadaresNoMapa(records, origem) {
   if (!map) return;
-  var radaresExternos = records || [];
   var contador = 0;
-
-  for (var i = 0; i < radaresExternos.length; i++) {
-    var record = radaresExternos[i];
+  for (var i = 0; i < records.length; i++) {
+    var record = records[i];
     var coords = extrairCoordenadas(record, i);
     if (!coords) continue;
-
-    var finalLat = coords.lat;
-    var finalLng = coords.lng;
+    var finalLat = coords.lat, finalLng = coords.lng;
     var endereco = record[2] || "Endereço não informado";
     var tipo = (record[3] || "Não Identificado").trim();
     var velocidade = record[4] || "0";
-
     var iconeUrl = getIconUrl(tipo, velocidade);
-    var fallbackUrl = 'imagens_app/ic_radar_cev_v2.png'; 
+    var fallbackUrl = 'imagens_app/ic_radar_cev_v2.png';
     var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
-
     var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
-    setTimeout(function(mk, fb) {
-      return function() {
-        var el = mk.getElement();
-        if (el) { var imgEl = el.querySelector('img'); if (imgEl) imgEl.setAttribute('data-fallback', fb); }
-      };
-    }(radarMarker, fallbackUrl), 100);
-
+    setTimeout(function(mk, fb) { return function() { var el = mk.getElement(); if (el) { var imgEl = el.querySelector('img'); if (imgEl) imgEl.setAttribute('data-fallback', fb); } }; }(radarMarker, fallbackUrl), 100);
     var tipoExibicao = ajusteNomes[tipo] || tipo;
     var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
     var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
-
-    radarMarker.bindPopup(
-      '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' +
-      tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
-      endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div></div>'
-    );
-
-    radarMarker.radarData = {
-      id: i, latitude: finalLat, longitude: finalLng,
-      endereco: endereco, velocidade_maxima: velocidade,
-      tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA
-    };
+    radarMarker.bindPopup('<div style="color:#222;font-family:\'Inter\';text-align:center;min-width:200px;">' + tituloPopup + '<br><hr style="border:0;border-top:1px solid #ddd;margin:5px 0;">' + endereco + '<br><div style="color:#d00;font-weight:bold;margin-top:5px;">Máx: ' + velocidade + ' km/h</div></div>');
+    radarMarker.radarData = { id: i, latitude: finalLat, longitude: finalLng, endereco: endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA };
     radarMarkers.push(radarMarker);
     contador++;
   }
-
   $("#loading").hide();
   if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
   else showNotification("Nenhum radar encontrado.");
@@ -2160,14 +1185,10 @@ function renderizarRadaresNoMapa(records, origem) {
 
 function buscarRadares(query) {
   if (!query || query.length < 2) return;
-  var encontrou = false;
-  var boundsGroup = L.featureGroup();
-  var q = query.toLowerCase();
+  var encontrou = false, boundsGroup = L.featureGroup(), q = query.toLowerCase();
   radarMarkers.forEach(function(marker) {
     var d = marker.radarData;
-    if ((d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase().includes(q)) {
-      encontrou = true; boundsGroup.addLayer(marker); marker.openPopup();
-    }
+    if ((d.endereco + ' ' + d.tipoOriginal + ' ' + d.tipoExibicao).toLowerCase().includes(q)) { encontrou = true; boundsGroup.addLayer(marker); marker.openPopup(); }
   });
   if (encontrou) { if (map) map.fitBounds(boundsGroup.getBounds().pad(0.2)); isFollowing = false; }
   else showNotification("Nenhum radar encontrado para: " + query);
@@ -2184,16 +1205,13 @@ function showError(error) {
 }
 
 function inicializarBussolaHardware() {
-  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    console.log('[Radar X9] Bússola iOS detectada'); return;
-  }
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') { console.log('[Radar X9] Bússola iOS detectada'); return; }
   if (typeof DeviceOrientationEvent !== 'undefined') {
     window.addEventListener('deviceorientation', function(event) {
       if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) { currentHeading = event.webkitCompassHeading; bussolaHardwareDisponivel = true; }
       else if (event.alpha !== null && event.absolute === true) { currentHeading = event.alpha; bussolaHardwareDisponivel = true; }
     }, true);
-    console.log('[Radar X9] deviceorientation listener registrado');
-  } else console.warn('[Radar X9] deviceorientation API não disponível');
+  }
 }
 
 async function solicitarPermissaoBussolaIOS() {
@@ -2213,49 +1231,33 @@ async function solicitarPermissaoBussolaIOS() {
 }
 
 // ===================================================================
-// INTEGRAÇÃO APP INVENTOR & PWA - NOTIFICAÇÃO NATIVA
+// INTEGRAÇÃO APP INVENTOR
 // ===================================================================
 function enviarParaAppInventor(acao, dados) {
   if (typeof AppInventor !== 'undefined') {
-    try {
-      var mensagem = acao + '|' + dados.join('|');
-      AppInventor.setWebViewString(mensagem);
-      console.log('[Radar X9] → AppInventor:', mensagem);
-      return true;
-    } catch (e) { console.error('[Radar X9] Erro ao enviar para AppInventor:', e); return false; }
+    try { var mensagem = acao + '|' + dados.join('|'); AppInventor.setWebViewString(mensagem); return true; }
+    catch (e) { return false; }
   }
   return false;
 }
 
 function receberDadosAppInventor(dadosStr) {
   if (!dadosStr || typeof dadosStr !== 'string') return;
-  var partes = dadosStr.split('|');
-  var acao = partes[0];
+  var partes = dadosStr.split('|'), acao = partes[0];
   if (acao === 'GPS' && partes.length >= 3) {
-    var lat = parseFloat(partes[1]);
-    var lng = parseFloat(partes[2]);
+    var lat = parseFloat(partes[1]), lng = parseFloat(partes[2]);
     var speed = partes[3] ? parseFloat(partes[3]) : 0;
     var heading = partes[4] ? parseFloat(partes[4]) : null;
-    if (heading === -1 || isNaN(heading)) heading = null; // Tratamento Azimuth
-    if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
-      gpsSource = 'appinventor';
-      processarNovaPosicao(lat, lng, speed, heading);
-    }
+    if (heading === -1 || isNaN(heading)) heading = null;
+    if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) { gpsSource = 'appinventor'; processarNovaPosicao(lat, lng, speed, heading); }
   }
-  if (acao === 'PERMISSAO' && partes.length >= 2) console.log('[Radar X9] Permissão ' + partes[1] + ': ' + (partes[2] || 'unknown'));
 }
 
 var ultimoWebViewString = '';
 function pollAppInventor() {
   if (typeof AppInventor !== 'undefined') {
-    try {
-      var current = AppInventor.getWebViewString();
-      if (current && current !== ultimoWebViewString) {
-        ultimoWebViewString = current;
-        receberDadosAppInventor(current);
-        AppInventor.setWebViewString('');
-      }
-    } catch(e) {}
+    try { var current = AppInventor.getWebViewString(); if (current && current !== ultimoWebViewString) { ultimoWebViewString = current; receberDadosAppInventor(current); AppInventor.setWebViewString(''); } }
+    catch(e) {}
   }
 }
 setInterval(pollAppInventor, 500);
@@ -2265,115 +1267,134 @@ function enviarNotificacaoNativa(titulo, mensagem) {
   if ('Notification' in window) {
     if (Notification.permission === 'granted') {
       navigator.serviceWorker.ready.then(function(registration) {
-        registration.showNotification(titulo, { body: mensagem, icon: '/imagens_app/ic_radar_cev_v2.png', vibrate: [200, 100, 200], tag: 'alerta-radar', renotify: true, requireInteraction: true });
+        registration.showNotification(titulo, { body: mensagem, icon: '/imagens_app/ic_radar_cev_v2.png', vibrate: [200,100,200], tag: 'alerta-radar', renotify: true, requireInteraction: true });
       }).catch(function() {});
-    } else if (Notification.permission === 'default') {
-      Notification.requestPermission().then(function(perm) { if (perm === 'granted') enviarNotificacaoNativa(titulo, mensagem); });
-    }
+    } else if (Notification.permission === 'default') { Notification.requestPermission().then(function(perm) { if (perm === 'granted') enviarNotificacaoNativa(titulo, mensagem); }); }
   }
-}
-
-function solicitarPermissaoNotificacao() {
-  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
 }
 
 async function solicitarWakeLock() {
-  try {
-    if ('wakeLock' in navigator) {
-      const wakeLock = await navigator.wakeLock.request('screen');
-      console.log('WakeLock ativado: Tela manter-se-á acessa.');
-      wakeLock.addEventListener('release', () => { console.log('WakeLock liberado.'); });
-    }
-  } catch (err) { console.error('Erro ao solicitar WakeLock:', err); }
+  try { if ('wakeLock' in navigator) { const wl = await navigator.wakeLock.request('screen'); wl.addEventListener('release', function() {}); } }
+  catch (err) {}
 }
 
 // ===================================================================
-// FUNÇÃO: tocarSomAlerta (CORRIGIDA E UNIFICADA)
+// SISTEMA DE SOM — CORRIGIDO
+// Problema original: áudio bloqueado por política do navegador.
+// Solução: desbloqueio explícito no primeiro toque/clique + fallback
+// via Web Audio API (beep sintético) se o arquivo MP3 não carregar.
 // ===================================================================
+
+// Contexto de áudio compartilhado
+var _audioCtx = null;
+function getAudioContext() {
+  if (!_audioCtx) {
+    try { _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { _audioCtx = null; }
+  }
+  if (_audioCtx && _audioCtx.state === 'suspended') {
+    _audioCtx.resume().catch(function(){});
+  }
+  return _audioCtx;
+}
+
+// Desbloqueio: toca silêncio em todos os elementos <audio> na primeira interação
+function desbloquearAudioMobile() {
+  if (audioDesbloqueado) return;
+  audioDesbloqueado = true;
+
+  // Desbloqueia WebAudioContext
+  getAudioContext();
+
+  // Desbloqueia elementos <audio>
+  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-mobilidade'].forEach(function(id) {
+    var som = document.getElementById(id);
+    if (!som) return;
+    var p = som.play();
+    if (p && typeof p.then === 'function') {
+      p.then(function() { som.pause(); som.currentTime = 0; }).catch(function(){});
+    } else {
+      som.pause(); som.currentTime = 0;
+    }
+  });
+  console.log('[Radar X9] ✅ Áudio desbloqueado na interação do usuário');
+}
+
+// Registrar desbloqueio na primeira interação
+['click', 'touchstart', 'touchend', 'keydown'].forEach(function(ev) {
+  document.addEventListener(ev, desbloquearAudioMobile, { once: true, passive: true });
+});
+
 function tocarSomAlerta(tipoAlerta) {
-  // 1. Tenta mandar o App Inventor tocar o som nativo
+  // 1. App Inventor: delega para o app nativo
   if (typeof AppInventor !== 'undefined') {
     enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
-    return; 
+    return;
   }
 
-  // 2. Fallback para PWA/Navegador
+  // 2. Navegador/PWA: tenta o elemento <audio> HTML5
   var soundId = 'alert-sound-radar';
   if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
-  else if (tipoAlerta === 'promocao') soundId = 'alert-sound-promo';
+  else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-mobilidade';
 
   var sound = document.getElementById(soundId);
   if (!sound) sound = document.getElementById('alert-sound-radar');
 
   if (sound) {
+    // Garante que o contexto esteja ativo
+    getAudioContext();
     sound.currentTime = 0;
-    sound.play().catch(function(err) {
-      console.warn('[Radar X9] Áudio bloqueado, tentando desbloquear:', err);
-      desbloquearAudioMobile();
-      // Segunda tentativa após delay
-      setTimeout(function() {
-        sound.currentTime = 0;
-        sound.play().catch(function() {
-          tocarBeepEmergencia(tipoAlerta);
-        });
-      }, 300);
-    });
+    var promessa = sound.play();
+    if (promessa && typeof promessa.then === 'function') {
+      promessa.then(function() {
+        console.log('[Radar X9] ✅ Som tocado: ' + soundId);
+      }).catch(function(err) {
+        console.warn('[Radar X9] Áudio bloqueado (' + soundId + '):', err.message);
+        // Fallback para beep sintético
+        tocarBeepEmergencia(tipoAlerta);
+      });
+    }
   } else {
     tocarBeepEmergencia(tipoAlerta);
   }
 }
 
-// ===================================================================
-// BEEP DE EMERGÊNCIA (Web Audio API)
-// ===================================================================
 function tocarBeepEmergencia(tipoAlerta) {
+  var ctx = getAudioContext();
+  if (!ctx) return;
   try {
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    var oscillator = audioCtx.createOscillator();
-    var gainNode = audioCtx.createGain();
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
 
     if (tipoAlerta === 'risco') {
-      oscillator.type = 'sawtooth';
-      oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+      // Dois beeps descendentes (atenção)
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(600, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.3);
+    } else if (tipoAlerta === 'mobilidade') {
+      // Beep suave ascendente (informativo)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(660, ctx.currentTime + 0.2);
     } else {
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+      // Beep radar (curto e alto)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.1);
     }
 
-    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-    oscillator.start(audioCtx.currentTime);
-    oscillator.stop(audioCtx.currentTime + 0.2);
-  } catch (e) {
-    console.error('[Radar X9] Falha total ao tocar beep:', e);
+    gain.gain.setValueAtTime(0.6, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch(e) {
+    console.error('[Radar X9] Falha total no beep de emergência:', e);
   }
 }
 
-// ===================================================================
-// DESBLOQUEIO DE ÁUDIO MOBILE
-// ===================================================================
-function desbloquearAudioMobile() {
-  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-promo'].forEach(function(id) {
-    var som = document.getElementById(id);
-    if (som) {
-      som.play().then(function() {
-        som.pause();
-        som.currentTime = 0;
-        console.log('[Radar X9] ✅ Áudio desbloqueado: ' + id);
-      }).catch(function() {});
-    }
-  });
-}
-
-['click', 'touchstart', 'touchend'].forEach(function(eventType) {
-  document.addEventListener(eventType, desbloquearAudioMobile, { once: true, passive: true });
-});
-
 window.onload = initMap;
 </script>
-
-  
 </body>
 </html>
