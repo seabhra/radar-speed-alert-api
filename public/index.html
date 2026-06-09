@@ -601,30 +601,26 @@
         pointer-events: none;
     }
 
-
-
     .speed-value {
-        /* ✅ Posição e Transform forçados para centralização perfeita */
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-64%, -60%) !important; /* O -55% ajusta o centro visual do km/h */
-        
-        font-size: 26px !important;
-        font-weight: 700 !important;
-        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif !important;
-        color: #000 !important;
-        line-height: 1 !important;
-        z-index: 2 !important;
-        white-space: nowrap !important;
-        text-align: center !important;
-        font-variant-numeric: tabular-nums !important;
-        letter-spacing: -0.5px !important;
-        
-        /* ✅ Cancela qualquer margem que tente desalnhar */
-        margin: 0 !important;
-        padding: 0 !important;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-64%, -60%);
+        font-size: 28px;
+        font-weight: 700;
+        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+        color: #000;
+        line-height: 1;
+        z-index: 2;
+        white-space: nowrap;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.5px;
+        min-width: 3ch;
     }
+
+
+   
 
     /* ===================================================================
        ALERT CONTAINER - RADAR (COR VERMELHO)
