@@ -570,18 +570,23 @@
         /* ===================================================================
        SPEED WIDGET - CENTRALIZAÇÃO ABSOLUTA E APENAS ANIMAÇÃO DE ALERTA
     =================================================================== */
+
     .speed-widget {
-        position: absolute !important;
-        bottom: -15px !important; 
-        left: -25px !important;
-        width: 130px !important;
-        height: 130px !important;
-        z-index: 500 !important;
+        position: absolute;
+        bottom: -15px;
+        left: -25px;
+        width: 150px;
+        height: 150px;
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         
         /* Apenas esta transição, para subir quando o alerta aparece */
         transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
+    
     /* ✅ Classe que faz o speed subir APENAS quando o alerta aparece */
     .speed-widget.alerta-ativo {
         bottom: 75px !important; 
