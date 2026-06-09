@@ -567,8 +567,7 @@
 
    
 
-
-/* ===================================================================
+        /* ===================================================================
        SPEED WIDGET - CENTRALIZAÇÃO ABSOLUTA E APENAS ANIMAÇÃO DE ALERTA
     =================================================================== */
     .speed-widget {
@@ -578,9 +577,6 @@
         width: 130px !important;
         height: 130px !important;
         z-index: 500 !important;
-        display: flex !important;
-        align-items: flex-start !important; /* Alinha o topo do texto */
-        justify-content: center !important; /* Centraliza horizontalmente */
         
         /* Apenas esta transição, para subir quando o alerta aparece */
         transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -601,18 +597,11 @@
     }
 
     .speed-value {
-        position: relative !important;
-        /* ✅ Força centralização horizontal e empurra exatamente pro centro do círculo */
-        margin-top: 38px !important; 
-        margin-left: auto !important;
-        margin-right: auto !important;
-        
-        /* ✅ Cancela qualquer posição ou transform forçado pelo navegador/leaflet */
-        top: auto !important;
-        left: auto !important;
-        bottom: auto !important;
-        right: auto !important;
-        transform: none !important; 
+        /* ✅ Posição e Transform forçados para centralização perfeita */
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-64%, -60%) !important; /* O -55% ajusta o centro visual do km/h */
         
         font-size: 26px !important;
         font-weight: 700 !important;
@@ -624,6 +613,10 @@
         text-align: center !important;
         font-variant-numeric: tabular-nums !important;
         letter-spacing: -0.5px !important;
+        
+        /* ✅ Cancela qualquer margem que tente desalnhar */
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     /* ===================================================================
@@ -2217,33 +2210,46 @@ function initMap() {
 
   $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
   
-  function fecharTodasBarras() { 
+   // ✅ Função garantida para fechar barras e descer a bússola
+   function fecharTodasBarras() { 
     searchActive = false; 
     routeActive = false; 
     document.getElementById('search-bar-radares').classList.remove('active'); 
     document.getElementById('search-bar-rota').classList.remove('active'); 
+    ajustarBussolaParaBusca(false); // Desce a bússola
   }
-
 
   $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
   $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
-  
 
+ 
   $("#btn-search-bar").click(function() {
     if (searchActive) { 
       fecharTodasBarras(); 
-      ajustarBussolaParaBusca(false); // ✅ Desce a bússola
       return; 
     }
     if (routeActive) routeActive = false; 
     searchActive = true;
-    $("#search-bar-rota").removeClass('active'); $("#search-bar-radares").addClass('active');
+    $("#search-bar-rota").removeClass('active'); 
+    $("#search-bar-radares").addClass('active');
     if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
     setTimeout(function() { $("#query").focus(); }, 300);
-    ajustarBussolaParaBusca(true); // ✅ Sobe a bússola
+    ajustarBussolaParaBusca(true); // Sobe a bússola
   });
   
- 
+  $("#btn-route-bar").click(function() {
+    if (routeActive) { 
+      fecharTodasBarras(); 
+      return; 
+    }
+    if (searchActive) searchActive = false; 
+    routeActive = true;
+    $("#search-bar-radares").removeClass('active'); 
+    $("#search-bar-rota").addClass('active');
+    if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
+    setTimeout(function() { $("#route-query").focus(); }, 300);
+    ajustarBussolaParaBusca(true); // Sobe a bússola
+  });
 
 
 
