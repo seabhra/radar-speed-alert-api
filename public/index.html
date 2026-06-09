@@ -339,12 +339,13 @@
     z-index: 1 !important; /* forçar abaixo da bússola */
 }
 
+    
     /* ===================================================================
-       BÚSSOLA - POSICIONAMENTO E ANIMAÇÃO
+       BÚSSOLA - POSICIONAMENTO CORRIGIDO (Sem animações de busca)
     =================================================================== */
     .compass-widget {
         position: absolute;
-        top: 10px; /* ✅ Subiu para ficar acima da linha dos botões */
+        top: 10px; /* Fica acima da linha dos botões */
         left: 5px;
         width: 65px;
         height: 65px;
@@ -355,14 +356,7 @@
         align-items: center;
         justify-content: center;
         pointer-events: none;
-        
-        /* ✅ Transição suave para descer quando a barra de busca abrir */
-        transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* ✅ Classe que faz a bússola descer quando a busca abre */
-    .compass-widget.busca-ativo {
-        top: 75px; 
+        /* Sem transition e sem top dinâmico - não desce mais ao buscar */
     }
 
     .compass-base {
@@ -562,59 +556,60 @@
     }
 
    
-  
+
     /* ===================================================================
-       SPEED WIDGET - TAMANHO CORRETO E CENTRALIZADO
+       SPEED WIDGET - CENTRALIZAÇÃO PERFEITA E APENAS ANIMAÇÃO DE ALERTA
     =================================================================== */
     .speed-widget {
-        position: absolute;
-        bottom: -15px; 
-        left: -25px;
-        width: 130px; /* ✅ Tamanho original restaurado */
-        height: 130px; /* ✅ Tamanho original restaurado */
-        z-index: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: absolute !important;
+        bottom: -15px !important; 
+        left: -25px !important;
+        width: 130px !important;
+        height: 130px !important;
+        z-index: 500 !important;
         
-        /* ✅ Transição suave para subir quando o alerta/busca abrir */
-        transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* ✅ Display Grid garante centralização perfeita em qualquer tela */
+        display: grid !important;
+        place-items: center !important; 
+        
+        /* Apenas esta transição, para subir quando o alerta aparece */
+        transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    /* ✅ Classe que faz o speed subir quando o alerta aparece */
+    /* ✅ Classe que faz o speed subir APENAS quando o alerta aparece */
     .speed-widget.alerta-ativo {
         bottom: 75px !important; 
     }
 
-    /* ✅ Classe que faz o speed subir quando a barra de busca aparece */
-    .speed-widget.busca-ativo {
-        bottom: 60px !important;
-    }
-
     .speed-bg {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        pointer-events: none;
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+        pointer-events: none !important;
     }
 
     .speed-value {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -55%); /* ✅ Centralizado perfeitamente */
-        font-size: 26px; /* ✅ Tamanho proporcional ao widget de 130px */
-        font-weight: 700;
-        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-        color: #000;
-        line-height: 1;
-        z-index: 2;
-        white-space: nowrap;
-        text-align: center;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: -0.5px;
+        /* ✅ Forçando centralização absoluta */
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        bottom: auto !important;
+        right: auto !important;
+        transform: none !important; 
+        margin-top: -8px !important; /* Ajuste fino para o centro visual do ícone km/h */
+        
+        font-size: 26px !important;
+        font-weight: 700 !important;
+        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif !important;
+        color: #000 !important;
+        line-height: 1 !important;
+        z-index: 2 !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+        font-variant-numeric: tabular-nums !important;
+        letter-spacing: -0.5px !important;
     }
 
 
@@ -1541,21 +1536,7 @@ function ajustarPosicaoSpeedWidget(subir) {
   }
 }
 
-// ===================================================================
-// FUNÇÃO AUXILIAR: Controla o deslocamento ao abrir buscas
-// ===================================================================
-function ajustarWidgetsParaBusca(ativo) {
-  var speedWidget = document.querySelector('.speed-widget');
-  var compassWidget = document.querySelector('.compass-widget');
-  
-  if (ativo) {
-    if(speedWidget) speedWidget.classList.add('busca-ativo');
-    if(compassWidget) compassWidget.classList.add('busca-ativo');
-  } else {
-    if(speedWidget) speedWidget.classList.remove('busca-ativo');
-    if(compassWidget) compassWidget.classList.remove('busca-ativo');
-  }
-}
+
 
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
