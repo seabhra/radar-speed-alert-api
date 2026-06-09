@@ -581,8 +581,9 @@
     }
 
     /* ✅ CLASSE QUE FAZ O SPEED SUBIR QUANDO O ALERTA APARECE */
+    
     .speed-widget.alerta-ativo {
-        bottom: 85px; /* Sobe para ficar acima da barra de alerta */
+        bottom: 90px !important; /* Sobe exatamente a altura da barra de alerta com padding */
     }
 
     /* ===================================================================
@@ -2546,6 +2547,59 @@ function tocarSomAlerta(tipoAlerta) {
   ].join('\n');
   document.head.appendChild(style);
 })();
+
+// ===================================================================
+// FUNÇÃO INICIALIZAR ROTAÇÃO DO MAPA
+//====================================================================
+
+function inicializarBotaoRotacaoMapa() {
+  const rotateBtn = document.getElementById('btn-rotate-map');
+  const rotateBtnIcon = document.getElementById('rotate-btn-icon');
+  if (!rotateBtn) return;
+  
+  if (rotateBtnIcon) {
+    rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
+    rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
+  }
+  
+  if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') {
+    console.error('[Radar X9] ERRO: leaflet-rotate NÃO carregou!');
+    rotateBtn.style.opacity = '0.3'; rotateBtn.style.pointerEvents = 'none';
+    rotateBtn.title = 'Rotação indisponível'; showNotification('Plugin de rotação não carregou.'); return;
+  }
+  
+  rotateBtn.addEventListener('click', async function () {
+    if (!map || typeof map.setBearing !== 'function') return;
+    if (!bussolaHardwareDisponivel) { await solicitarPermissaoBussolaIOS(); }
+    
+    if (!mapaRotacionado) {
+      mapaRotacionado = true;
+      var anguloRotacao = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 0;
+      bearingAlvo = anguloRotacao; bearingAtual = anguloRotacao;
+      map.setBearing(anguloRotacao); rotateBtn.classList.add('rotated');
+      
+      if (rotateBtnIcon) {
+        rotateBtnIcon.src = "/imagens_app/ic_girar_map.png";
+        rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
+        rotateBtnIcon.style.transform = 'rotate(' + anguloRotacao + 'deg)';
+      }
+      
+      if (bussolaHardwareDisponivel) showNotification('Mapa rotacionado — bússola ativa');
+      else if (currentHeading > 0) showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)');
+      else showNotification('Mapa rotacionado — aguardando direção...');
+    } else {
+      mapaRotacionado = false; bearingAlvo = 0; bearingAtual = 0;
+      map.setBearing(0); rotateBtn.classList.remove('rotated');
+      
+      if (rotateBtnIcon) {
+        rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
+        rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
+        rotateBtnIcon.style.transform = 'rotate(0deg)';
+      }
+      showNotification('Mapa resetado (Norte para cima)');
+    }
+  });
+}
 
 window.onload = initMap;
 </script>
