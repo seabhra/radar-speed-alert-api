@@ -340,12 +340,13 @@
 }
 
     
-    /* ===================================================================
-       BÚSSOLA - POSICIONAMENTO CORRIGIDO (Sem animações de busca)
+   
+        /* ===================================================================
+       BÚSSOLA - POSICIONAMENTO E ANIMAÇÃO COM BARRA DE BUSCA
     =================================================================== */
     .compass-widget {
         position: absolute;
-        top: 10px; /* Fica acima da linha dos botões */
+        top: 10px; 
         left: 5px;
         width: 65px;
         height: 65px;
@@ -356,7 +357,14 @@
         align-items: center;
         justify-content: center;
         pointer-events: none;
-        /* Sem transition e sem top dinâmico - não desce mais ao buscar */
+        
+        /* ✅ Devolve a transição suave para a bússola */
+        transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ✅ Classe que faz a bússola descer quando a busca/rota abre */
+    .compass-widget.busca-ativo {
+        top: 75px; 
     }
 
     .compass-base {
@@ -379,6 +387,8 @@
         object-fit: contain;
         transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
+
+    
 
     
 /* ===================================================================
@@ -557,8 +567,9 @@
 
    
 
-    /* ===================================================================
-       SPEED WIDGET - CENTRALIZAÇÃO PERFEITA E APENAS ANIMAÇÃO DE ALERTA
+
+/* ===================================================================
+       SPEED WIDGET - CENTRALIZAÇÃO ABSOLUTA E APENAS ANIMAÇÃO DE ALERTA
     =================================================================== */
     .speed-widget {
         position: absolute !important;
@@ -567,10 +578,9 @@
         width: 130px !important;
         height: 130px !important;
         z-index: 500 !important;
-        
-        /* ✅ Display Grid garante centralização perfeita em qualquer tela */
-        display: grid !important;
-        place-items: center !important; 
+        display: flex !important;
+        align-items: flex-start !important; /* Alinha o topo do texto */
+        justify-content: center !important; /* Centraliza horizontalmente */
         
         /* Apenas esta transição, para subir quando o alerta aparece */
         transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -591,14 +601,18 @@
     }
 
     .speed-value {
-        /* ✅ Forçando centralização absoluta */
         position: relative !important;
+        /* ✅ Força centralização horizontal e empurra exatamente pro centro do círculo */
+        margin-top: 38px !important; 
+        margin-left: auto !important;
+        margin-right: auto !important;
+        
+        /* ✅ Cancela qualquer posição ou transform forçado pelo navegador/leaflet */
         top: auto !important;
         left: auto !important;
         bottom: auto !important;
         right: auto !important;
         transform: none !important; 
-        margin-top: -8px !important; /* Ajuste fino para o centro visual do ícone km/h */
         
         font-size: 26px !important;
         font-weight: 700 !important;
@@ -611,7 +625,6 @@
         font-variant-numeric: tabular-nums !important;
         letter-spacing: -0.5px !important;
     }
-
 
     /* ===================================================================
        ALERT CONTAINER - RADAR (COR VERMELHO)
@@ -1536,7 +1549,17 @@ function ajustarPosicaoSpeedWidget(subir) {
   }
 }
 
-
+// ===================================================================
+// FUNÇÃO AUXILIAR: Controla o deslocamento da Bússola ao abrir buscas
+// ===================================================================
+function ajustarBussolaParaBusca(ativo) {
+  var compassWidget = document.querySelector('.compass-widget');
+  if (ativo) {
+    if(compassWidget) compassWidget.classList.add('busca-ativo');
+  } else {
+    if(compassWidget) compassWidget.classList.remove('busca-ativo');
+  }
+}
 
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
@@ -2209,7 +2232,7 @@ function initMap() {
   $("#btn-search-bar").click(function() {
     if (searchActive) { 
       fecharTodasBarras(); 
-      ajustarWidgetsParaBusca(false); // ✅ Desce os widgets
+      ajustarBussolaParaBusca(false); // ✅ Desce a bússola
       return; 
     }
     if (routeActive) routeActive = false; 
@@ -2217,22 +2240,10 @@ function initMap() {
     $("#search-bar-rota").removeClass('active'); $("#search-bar-radares").addClass('active');
     if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
     setTimeout(function() { $("#query").focus(); }, 300);
-    ajustarWidgetsParaBusca(true); // ✅ Sobe os widgets
+    ajustarBussolaParaBusca(true); // ✅ Sobe a bússola
   });
   
-  $("#btn-route-bar").click(function() {
-    if (routeActive) { 
-      fecharTodasBarras(); 
-      ajustarWidgetsParaBusca(false); // ✅ Desce os widgets
-      return; 
-    }
-    if (searchActive) searchActive = false; 
-    routeActive = true;
-    $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").addClass('active');
-    if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
-    setTimeout(function() { $("#route-query").focus(); }, 300);
-    ajustarWidgetsParaBusca(true); // ✅ Sobe os widgets
-  });
+ 
 
 
 
