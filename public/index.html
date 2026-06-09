@@ -2423,8 +2423,9 @@ async function solicitarWakeLock() {
   } catch (err) { console.error('Erro ao solicitar WakeLock:', err); }
 }
 
+
 // ===================================================================
-// BLOCO 1 — AUDIO ENGINE (substitui toda a lógica de som existente)
+// BLOCO 1 — AUDIO ENGINE (CORRIGIDO PARA WEBVIEW APP INVENTOR)
 // ===================================================================
 
 // ---- AudioContext singleton ----------------------------------------
@@ -2439,7 +2440,6 @@ function getAudioCtx() {
 }
 
 // Desbloqueia o contexto de áudio no primeiro gesto do usuário
-// e também pré-carrega todos os elementos <audio>
 function desbloquearAudioMobile() {
   if (_audioDesbloqueado) return;
   try {
@@ -2452,25 +2452,9 @@ function desbloquearAudioMobile() {
     } else {
       _audioDesbloqueado = true;
     }
-  } catch (e) {}
-
-  // Pré-carrega os <audio> com play/pause silencioso
-  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-promo'].forEach(function (id) {
-    var som = document.getElementById(id);
-    if (som) {
-      som.volume = 0;
-      var p = som.play();
-      if (p && p.then) {
-        p.then(function () {
-          som.pause();
-          som.currentTime = 0;
-          som.volume = 1;
-        }).catch(function () {
-          som.volume = 1;
-        });
-      }
-    }
-  });
+  } catch (e) {
+    console.error('[Radar X9] Falha ao desbloquear AudioContext:', e);
+  }
 }
 
 // Registra o desbloqueio em qualquer interação do usuário
@@ -2478,7 +2462,7 @@ function desbloquearAudioMobile() {
   document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
 });
 
-// ---- Beep de emergência via Web Audio API --------------------------
+// ---- Beep de emergência via Web Audio API (100% confiável no WebView) ---
 function tocarBeepEmergencia(tipoAlerta) {
   try {
     var ctx = getAudioCtx();
@@ -2542,31 +2526,39 @@ function _tocarBeep(ctx, tipoAlerta) {
   }
 }
 
-// ---- tocarSomAlerta principal (substitui a versão anterior) --------
+// ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW) --------
 function tocarSomAlerta(tipoAlerta) {
-  // 1. App Inventor nativo
+  // 1. Envia para o App Inventor nativo (Se os blocos estiverem configurados lá)
   if (typeof AppInventor !== 'undefined') {
     enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
-    return;
+    // NÃO DAMOS RETURN AQUI! Vamos tocar o beep do WebAudio também como fallback seguro.
   }
 
-  // 2. Tenta elemento <audio>
+  // 2. Tenta elemento <audio> (Funciona no navegador, pode falhar no WebView local)
   var soundId = 'alert-sound-radar';
-  if (tipoAlerta === 'risco')    soundId = 'alert-sound-risco';
+  if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
   else if (tipoAlerta === 'promocao') soundId = 'alert-sound-promo';
 
   var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
 
   if (sound && _audioDesbloqueado) {
     sound.currentTime = 0;
-    sound.play().catch(function () {
+    var playPromise = sound.play();
+    if (playPromise !== undefined) {
+      playPromise.then(function() {
+        // Deu certo no HTML5 audio, não precisa do beep
+      }).catch(function() {
+        // Falha (comum no WebView local), vai para o Web Audio API
+        tocarBeepEmergencia(tipoAlerta);
+      });
+    } else {
+      // Navegadores antigos, toca beep pra garantir
       tocarBeepEmergencia(tipoAlerta);
-    });
-    return;
+    }
+  } else {
+    // 3. Fallback imediato para Web Audio API (O que funciona 100% no WebView)
+    tocarBeepEmergencia(tipoAlerta);
   }
-
-  // 3. Fallback imediato para Web Audio API
-  tocarBeepEmergencia(tipoAlerta);
 }
 
 // ===================================================================
