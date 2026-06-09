@@ -339,54 +339,54 @@
     z-index: 1 !important; /* forçar abaixo da bússola */
 }
 
-/* ===================================================================
-   CORREÇÃO: BÚSSOLA SEMPRE NO TOPO - NENHUM ÍCONE ATRÁS
-   =================================================================== */
+    /* ===================================================================
+       BÚSSOLA - POSICIONAMENTO E ANIMAÇÃO
+    =================================================================== */
+    .compass-widget {
+        position: absolute;
+        top: 10px; /* ✅ Subiu para ficar acima da linha dos botões */
+        left: 5px;
+        width: 65px;
+        height: 65px;
+        z-index: 999999 !important;
+        transform: translateZ(0);
+        will-change: transform;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        
+        /* ✅ Transição suave para descer quando a barra de busca abrir */
+        transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-   /* ✅ BÚSSOLA: isolar em contexto de empilhamento próprio, acima de TUDO */
-.compass-widget {
-    position: absolute;
-    top: 65px;
-    left: 5px;
-    width: 65px;
-    height: 65px;
+    /* ✅ Classe que faz a bússola descer quando a busca abre */
+    .compass-widget.busca-ativo {
+        top: 75px; 
+    }
+
+    .compass-base {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        background-image: url('/imagens_app/ic_compass.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+        opacity: 0.9;
+    }
+
+    .compass-needle {
+        position: absolute;
+        width: 55%;
+        height: 55%;
+        z-index: 2;
+        object-fit: contain;
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
     
-    /* Criar novo contexto de empilhamento isolado, acima do mapa */
-    z-index: 999999 !important;
-    
-    /* Forçar composição em layer separado do GPU, acima de todos os panes */
-    transform: translateZ(0);
-    will-change: transform;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-}
-
-/* Base da bússola */
-.compass-base {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    background-image: url('/imagens_app/ic_compass.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    opacity: 0.9;
-}
-
-/* Ponteira da bússola */
-.compass-needle {
-    position: absolute;
-    width: 55%;
-    height: 55%;
-    z-index: 2; /* acima da base */
-    object-fit: contain;
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
 /* ===================================================================
    SE A BÚSSOLA ESTIVER DENTRO DE #map, FORÇAR SAÍDA DO FLUXO LEAFLET
    =================================================================== */
@@ -562,29 +562,61 @@
     }
 
    
+  
     /* ===================================================================
-       SPEED WIDGET
+       SPEED WIDGET - TAMANHO CORRETO E CENTRALIZADO
     =================================================================== */
     .speed-widget {
         position: absolute;
-        bottom: -15px; /* Posição original */
+        bottom: -15px; 
         left: -25px;
-        width: 150px;
-        height: 150px;
+        width: 130px; /* ✅ Tamanho original restaurado */
+        height: 130px; /* ✅ Tamanho original restaurado */
         z-index: 500;
         display: flex;
         align-items: center;
         justify-content: center;
         
-        /* ✅ TRANSIÇÃO SUAVE DE SUBIDA E DESCIDA */
+        /* ✅ Transição suave para subir quando o alerta/busca abrir */
         transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* ✅ CLASSE QUE FAZ O SPEED SUBIR QUANDO O ALERTA APARECE */
-    
+    /* ✅ Classe que faz o speed subir quando o alerta aparece */
     .speed-widget.alerta-ativo {
-        bottom: 90px !important; /* Sobe exatamente a altura da barra de alerta com padding */
+        bottom: 75px !important; 
     }
+
+    /* ✅ Classe que faz o speed subir quando a barra de busca aparece */
+    .speed-widget.busca-ativo {
+        bottom: 60px !important;
+    }
+
+    .speed-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        pointer-events: none;
+    }
+
+    .speed-value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -55%); /* ✅ Centralizado perfeitamente */
+        font-size: 26px; /* ✅ Tamanho proporcional ao widget de 130px */
+        font-weight: 700;
+        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+        color: #000;
+        line-height: 1;
+        z-index: 2;
+        white-space: nowrap;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.5px;
+    }
+
 
     /* ===================================================================
        ALERT CONTAINER - RADAR (COR VERMELHO)
@@ -1509,6 +1541,21 @@ function ajustarPosicaoSpeedWidget(subir) {
   }
 }
 
+// ===================================================================
+// FUNÇÃO AUXILIAR: Controla o deslocamento ao abrir buscas
+// ===================================================================
+function ajustarWidgetsParaBusca(ativo) {
+  var speedWidget = document.querySelector('.speed-widget');
+  var compassWidget = document.querySelector('.compass-widget');
+  
+  if (ativo) {
+    if(speedWidget) speedWidget.classList.add('busca-ativo');
+    if(compassWidget) compassWidget.classList.add('busca-ativo');
+  } else {
+    if(speedWidget) speedWidget.classList.remove('busca-ativo');
+    if(compassWidget) compassWidget.classList.remove('busca-ativo');
+  }
+}
 
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
@@ -2163,31 +2210,58 @@ function initMap() {
     if (coords) { esconderAlertaVisual(); criarRota(coords.lat, coords.lng); }
     else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
   });
+
   $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
   
-  function fecharTodasBarras() { searchActive = false; routeActive = false; document.getElementById('search-bar-radares').classList.remove('active'); document.getElementById('search-bar-rota').classList.remove('active'); }
+  function fecharTodasBarras() { 
+    searchActive = false; 
+    routeActive = false; 
+    document.getElementById('search-bar-radares').classList.remove('active'); 
+    document.getElementById('search-bar-rota').classList.remove('active'); 
+  }
+
+
   $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
   $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
+  
+
   $("#btn-search-bar").click(function() {
-    if (searchActive) { fecharTodasBarras(); return; }
-    if (routeActive) routeActive = false; searchActive = true;
+    if (searchActive) { 
+      fecharTodasBarras(); 
+      ajustarWidgetsParaBusca(false); // ✅ Desce os widgets
+      return; 
+    }
+    if (routeActive) routeActive = false; 
+    searchActive = true;
     $("#search-bar-rota").removeClass('active'); $("#search-bar-radares").addClass('active');
     if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
     setTimeout(function() { $("#query").focus(); }, 300);
+    ajustarWidgetsParaBusca(true); // ✅ Sobe os widgets
   });
+  
   $("#btn-route-bar").click(function() {
-    if (routeActive) { fecharTodasBarras(); return; }
-    if (searchActive) searchActive = false; routeActive = true;
+    if (routeActive) { 
+      fecharTodasBarras(); 
+      ajustarWidgetsParaBusca(false); // ✅ Desce os widgets
+      return; 
+    }
+    if (searchActive) searchActive = false; 
+    routeActive = true;
     $("#search-bar-radares").removeClass('active'); $("#search-bar-rota").addClass('active');
     if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
     setTimeout(function() { $("#route-query").focus(); }, 300);
+    ajustarWidgetsParaBusca(true); // ✅ Sobe os widgets
   });
+
+
+
   $("#btn-center").click(function() {
     fecharTodasBarras(); isFollowing = true;
     var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
     if (marcadorAtivo) { map.flyTo(marcadorAtivo.getLatLng(), 17, { duration: 0.5 }); showNotification("Centralizando na sua posição"); }
     else showNotification("Aguardando sinal GPS...");
   });
+
   $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
   $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
   $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
