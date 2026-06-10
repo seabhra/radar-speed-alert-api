@@ -2123,13 +2123,20 @@ function atualizarDistanciaAlerta(distancia) {
   $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
   
   const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
-  if (isNewAlert) { 
-    $("#alert-container").fadeIn(200); 
+if (isNewAlert) { 
+    $("#alert-container").fadeIn(200);   // ← tarja aparece
     contagemTocarSom = 0; 
-    
     // ✅ FAZ O SPEED SUBIR ACIMA DO ALERTA
     ajustarPosicaoSpeedWidget(true);
-  }
+}
+
+if (alertaHabilitado) {
+    var deveTocar = false;
+    if (tipoAlerta === 'radar')   { if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; }
+    else                          { if (isNewAlert) deveTocar = true; }
+    if (deveTocar) { tocarSomAlerta(tipoAlerta); contagemTocarSom++; }  // ← som toca
+}
+ 
   
   if (alertaHabilitado) {
     var deveTocar = false;
@@ -2573,41 +2580,57 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc2.stop(ctx.currentTime + 0.43);
   }
 }
+//==============================================================
+// ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW) 
+//==============================================================
 
-// ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW) --------
 function tocarSomAlerta(tipoAlerta) {
-  // 1. Envia para o App Inventor nativo (Se os blocos estiverem configurados lá)
   if (typeof AppInventor !== 'undefined') {
     enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
-    // NÃO DAMOS RETURN AQUI! Vamos tocar o beep do WebAudio também como fallback seguro.
   }
 
-  // 2. Tenta elemento <audio> (Funciona no navegador, pode falhar no WebView local)
   var soundId = 'alert-sound-radar';
-  if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
+  if (tipoAlerta === 'risco')   soundId = 'alert-sound-risco';
   else if (tipoAlerta === 'promocao') soundId = 'alert-sound-promo';
 
   var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
 
   if (sound && _audioDesbloqueado) {
-    sound.currentTime = 0;
-    var playPromise = sound.play();
-    if (playPromise !== undefined) {
-      playPromise.then(function() {
-        // Deu certo no HTML5 audio, não precisa do beep
-      }).catch(function() {
-        // Falha (comum no WebView local), vai para o Web Audio API
-        tocarBeepEmergencia(tipoAlerta);
-      });
-    } else {
-      // Navegadores antigos, toca beep pra garantir
-      tocarBeepEmergencia(tipoAlerta);
+    // Toca 3 vezes em sequência usando o evento 'ended'
+    var toques = 0;
+    var numToques = 3;
+
+    function tocarUmaVez() {
+      sound.currentTime = 0;
+      var p = sound.play();
+      if (p !== undefined) {
+        p.then(function () {
+          // aguarda o fim do mp3 para tocar novamente
+        }).catch(function () {
+          tocarBeepEmergencia(tipoAlerta); // fallback beep também 3x
+        });
+      }
     }
+
+    function onEnded() {
+      toques++;
+      if (toques < numToques) {
+        tocarUmaVez();
+      } else {
+        sound.removeEventListener('ended', onEnded);
+      }
+    }
+
+    sound.removeEventListener('ended', onEnded); // limpa listener anterior
+    sound.addEventListener('ended', onEnded);
+    tocarUmaVez(); // dispara o primeiro toque
+
   } else {
-    // 3. Fallback imediato para Web Audio API (O que funciona 100% no WebView)
+    // fallback: beep sintetizado 3x (já tem o loop interno)
     tocarBeepEmergencia(tipoAlerta);
   }
 }
+
 
 // ===================================================================
 // BLOCO 4 — CSS inline para transição suave do ícone de navegação
