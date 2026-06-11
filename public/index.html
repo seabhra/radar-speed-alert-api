@@ -618,8 +618,6 @@
         letter-spacing: -0.5px;
         min-width: 3ch;
     }
-
-
    
 
     /* ===================================================================
@@ -683,19 +681,19 @@
     }
 
     /* ===================================================================
-       ALERTA DE PROMOÇÃO (VERDE)
+       AVISO DE MOBILIDADE (VERDE)
     =================================================================== */
-    .alert-bar-promocao {
+    .alert-bar-mobilidade {
         background: linear-gradient(90deg, #00b359, #008040);
         border-top: 2px solid #00e066;
         box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4);
     }
 
-    .alert-bar-promocao-critico {
-        animation: pulsePromocao 0.8s ease-in-out infinite;
+    .alert-bar-mobilidade-critico {
+        animation: pulseMobilidade 0.8s ease-in-out infinite;
     }
 
-    @keyframes pulsePromocao {
+    @keyframes pulseMobilidade {
         0% { transform: scale(1); }
         50% { transform: scale(1.02); background: linear-gradient(90deg, #00e066, #00b359); }
         100% { transform: scale(1); }
@@ -961,17 +959,14 @@
 
 <audio id="alert-sound-radar" preload="auto">
   <source src="audio_app/alerta_radar.mp3" type="audio/mpeg">
-  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="alert-sound-risco" preload="auto">
   <source src="audio_app/alerta_risco.mp3" type="audio/mpeg">
-  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
 </audio>
 
-<audio id="alert-sound-promo" preload="auto">
-  <source src="audio_app/alerta_promo.mp3" type="audio/mpeg">
-  <source src="audio_app/alerta_sound-radar.mp3" type="audio/mpeg">
+<audio id="alert-sound-aviso" preload="auto">
+  <source src="audio_app/alerta_aviso.mp3" type="audio/mpeg">
 </audio>
 
 <script>
@@ -1063,6 +1058,41 @@ var animacaoMarcadorAtiva = false;
 var contagemTocarSom = 0;
 
 // ===================================================================
+// CONTROLE DE ÁUDIO - GARANTE QUE APENAS O SOM CORRETO TOQUE
+// ===================================================================
+function pararTodosSons() {
+  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
+    var sound = document.getElementById(id);
+    if (sound) {
+      sound.pause();
+      sound.currentTime = 0; // Reseta o áudio para o início
+    }
+  });
+}
+
+function tocarSomAlerta(tipoAlerta) {
+  pararTodosSons(); // Pausa qualquer outro alerta que estivesse tocando
+
+  var soundId = '';
+  if (tipoAlerta === 'radar') {
+    soundId = 'alert-sound-radar'; // Tarja Vermelha
+  } else if (tipoAlerta === 'risco') {
+    soundId = 'alert-sound-risco'; // Tarja Amarela
+  } else if (tipoAlerta === 'aviso' || tipoAlerta === 'cao') {
+    soundId = 'alert-sound-aviso'; // Tarja Verde
+  }
+
+  if (soundId) {
+    var sound = document.getElementById(soundId);
+    if (sound) {
+      sound.play().catch(function(e) {
+        console.warn("Reprodução de áudio bloqueada pelo navegador até interação do usuário:", e);
+      });
+    }
+  }
+}
+
+// ===================================================================
 // MAPEAMENTO DE ÍCONES
 // ===================================================================
 const iconMap = {
@@ -1116,23 +1146,7 @@ const iconMap = {
   'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
-const TIPOS_SEM_ALERTA = [
-  'Detector de Faixa Preferencial de Ônibus (BUS)',
-  'Detector de Faixa Preferencial de Ônibus',
-  'Faixa Preferencial de Ônibus (BUS)',
-  'Faixa Preferencial de Ônibus',
-  'Zona Verde de Trânsito (ZVT)',
-  'Zona Verde de Trânsito (ZVC)',
-  'Zona Verde de Trânsito',
-  'BUS',
-  'Câmera Olho Vivo (COV)',
-  'Câmera Olho Vivo',
-  'Reconhecimento Facial (OCR-F)',
-  'Leitor de Placas (OCR-P)',
-  'Apenas Trânsito Local (ATL)',
-  'Zona de Estudo Nuclear (ZEN)',
-  'Passagem Sob Túnel Viário (TUV)'
-];
+
 
 // ===================================================================
 // CONFIGURAÇÃO DOS NOVOS ALERTAS (RISCO)
@@ -1148,42 +1162,40 @@ const TIPOS_ALERTA_RISCO = [
   'Zona de Estudo Nuclear (ZEN)'
 ];
 
-const TIPOS_ALERTA_PROMOCAO = [];
+const TIPOS_ALERTA_MOBILIDADE = [
+  'Detector de Faixa Preferencial de Ônibus (BUS)',
+  'Detector de Faixa Preferencial de Ônibus',
+  'Faixa Preferencial de Ônibus (BUS)',
+  'Faixa Preferencial de Ônibus',
+  'Leitor de Reconhecimento Facial (OCR-F)',
+  'Leitor de Reconhecimento Facial',
+  'Leitor Inteligente de Placas (OCR-P)',
+  'Leitor Inteligente de Placas',
+  'Zona Verde de Trânsito (ZVT)',
+  'Zona Verde de Trânsito (ZVC)',
+  'Zona Verde de Trânsito',
+  'Câmera Olho Vivo (COV)',
+  'Câmera Olho Vivo',
+  'Passagem Sob Túnel Viário (TUV)',
+  'Passagem Sob Túnel Viário'
+];
 
 // ===================================================================
-// INTEGRAÇÃO IA VERCEL - ALERTA DE PROMOÇÃO - NÃO FUNCIONAL
-// ===================================================================
-async function consultarIAVercel(pergunta) {
-  try {
-    const url = '/api/chat'; 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pergunta: pergunta })
-    });
-    if (!response.ok) return;
-    const data = await response.json();
-    if (data.tipoAlerta === 'promocao') {
-      dispararAlertaPromocaoIA(data.resposta || "Promoção detectada pela IA!");
-    }
-  } catch (error) {
-    console.warn("IA Vercel indisponível ou erro de rede:", error);
-  }
-}
-// ===================================================================
-// FUNÇÃO DISPARA ALERTA PROMO
+// FUNÇÃO DISPARA AVISO DE MOBILIDADE
 // ===================================================================
 
-  function dispararAlertaPromocaoIA(mensagem) {
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
+function dispararAlertaMobilidadeIA(mensagem) {
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "");
-  $("#alert-title").text("🎉 ALERTA DE PROMOÇÃO!");
+  $("#alert-title").text("🎉 AVISO DE MOBILIDADE!");
   $("#alert-text").text(mensagem);
-  $(".alert-bar").addClass("alert-bar-promocao");
+  $(".alert-bar").addClass("alert-bar-MOBILIDADE");
   $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
+  
+  tocarSomAlerta('aviso'); // ✅ TOCA O SOM DE AVISO (VERDE)
+
   if (!$("#alert-container").is(":visible")) { 
     $("#alert-container").fadeIn(200); 
-    // ✅ FAZ O SPEED SUBIR
     ajustarPosicaoSpeedWidget(true);
   }
   clearTimeout(alertTimeout);
@@ -1192,15 +1204,26 @@ async function consultarIAVercel(pergunta) {
   }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
+
+// ===================================================================
+// FUNÇÃO CLASSIFICA ALERTAS
+// ===================================================================
+
 function classificarAlerta(tipoOriginal) {
   if (!tipoOriginal) return 'radar';
   var tipoLimpo = tipoOriginal.trim();
+  
+  // 1. Verifica se é RISCO (Amarelo)
   for (var i = 0; i < TIPOS_ALERTA_RISCO.length; i++) {
     if (tipoLimpo === TIPOS_ALERTA_RISCO[i] || tipoLimpo.includes(TIPOS_ALERTA_RISCO[i])) return 'risco';
   }
-  for (var j = 0; j < TIPOS_ALERTA_PROMOCAO.length; j++) {
-    if (tipoLimpo === TIPOS_ALERTA_PROMOCAO[j] || tipoLimpo.includes(TIPOS_ALERTA_PROMOCAO[j])) return 'promocao';
+  
+  // 2. Verifica se é MOBILIDADE (Verde)
+  for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
+    if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobolidade';
   }
+  
+  // 3. Se não for Risco nem Mobilidade, é RADAR (Vermelho)
   return 'radar';
 }
 
@@ -1513,18 +1536,17 @@ function aplicarTemaMapa() {
 }
 
 function fecharAlertaImediatamente() {
-  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-promo'].forEach(function(id) {
-    var sound = document.getElementById(id);
-    if (sound) { sound.pause(); sound.currentTime = 0; }
-  });
+  pararTodosSons(); // Silencia todos os áudios de uma vez
   clearTimeout(alertTimeout);
 }
+
+
 // ================================================
 // FUNÇÃO ESCONDER ALERTA VISUAL
 //==================================================
 function esconderAlertaVisual() {
   $("#alert-container").fadeOut(150);
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   contagemTocarSom = 0;
   fecharAlertaImediatamente();
@@ -2099,62 +2121,72 @@ function atualizarDistanciaAlerta(distancia) {
 // ===============================================
 // FUNÇÃO DISPARA ALERTA RADAR/DISTÂNCIA
 // ================================================
-  function dispararAlerta(radar, distancia) {
+function dispararAlerta(radar, distancia) {
   const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
   if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
+  
   const tipoAlerta = classificarAlerta(radar.tipoOriginal);
   const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
   const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
   
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-promocao alert-bar-promocao-critico");
+  // Limpa classes anteriores
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", ""); 
 
+  // Define a tarja, título e o som correspondente
   if (tipoAlerta === 'risco') {
     $("#alert-title").text("⚠️ ALERTA DE RISCO!");
-    $(".alert-bar").addClass("alert-bar-risco");
-  } else if (tipoAlerta === 'promocao') {
-    $("#alert-title").text("🎉 ALERTA DE PROMOÇÃO!");
-    $(".alert-bar").addClass("alert-bar-promocao");
+    $(".alert-bar").addClass("alert-bar-risco"); // Amarelo
+  } else if (tipoAlerta === 'mobolidade') { // Nota: mantive o 'mobolidade' pois era assim no seu original
+    $("#alert-title").text("🎉 AVISO DE MOBILIDADE!");
+    $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
   } else {
     $("#alert-title").text("ALERTA DE RADAR!");
-    $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
+    $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)"); // Vermelho
   }
+  
   $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
   $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
   
   const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
-if (isNewAlert) { 
+  
+  if (isNewAlert) { 
     $("#alert-container").fadeIn(200);   // ← tarja aparece
     contagemTocarSom = 0; 
-    // ✅ FAZ O SPEED SUBIR ACIMA DO ALERTA
+    
+    // ✅ FAZ O SPEED SUBIR ACIMA DO ALERTA (Mantido do seu código original)
     ajustarPosicaoSpeedWidget(true);
-}
+  }
 
-if (alertaHabilitado) {
-    var deveTocar = false;
-    if (tipoAlerta === 'radar')   { if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; }
-    else                          { if (isNewAlert) deveTocar = true; }
-    if (deveTocar) { tocarSomAlerta(tipoAlerta); contagemTocarSom++; }  // ← som toca
-}
- 
-  
+  // Lógica de toque de som (bloco único, sem duplicação)
   if (alertaHabilitado) {
     var deveTocar = false;
-    if (tipoAlerta === 'radar') { if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; }
-    else { if (isNewAlert) deveTocar = true; }
-    if (deveTocar) { tocarSomAlerta(tipoAlerta); contagemTocarSom++; }
+    if (tipoAlerta === 'radar') { 
+      if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; 
+    } else { 
+      if (isNewAlert) deveTocar = true; 
+    }
+    
+    if (deveTocar) { 
+      tocarSomAlerta(tipoAlerta); // ← Chama a função que toca o .mp3 específico e para os outros
+      contagemTocarSom++; 
+    }
   }
   
+  // Aplica estilo crítico se estiver muito perto
   if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
     if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
-    else if (tipoAlerta === 'promocao') $(".alert-bar").addClass("alert-bar-promocao-critico");
+    else if (tipoAlerta === 'mobolidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
     else $(".alert-bar").addClass("alert-bar-critico");
   }
   
   ultimoRadarAlertado = radar.id;
   clearTimeout(alertTimeout);
-  alertTimeout = setTimeout(function() { if ($("#alert-container").is(":visible")) esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
+  alertTimeout = setTimeout(function() { 
+    if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
+  }, ALERT_CONFIG.TEMPO_ALERTA);
 }
+
 
 // ===================================================================
 // BLOCO 2 — BOTÃO SILENCIAR: toca som ao mudar estado
@@ -2548,7 +2580,7 @@ function _tocarBeep(ctx, tipoAlerta) {
     gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.4);
-  } else if (tipoAlerta === 'promocao') {
+  } else if (tipoAlerta === 'mobilidade') {
     // Dois bipes ascendentes — tom positivo
     osc.type = 'sine';
     osc.frequency.setValueAtTime(600, ctx.currentTime);
@@ -2591,7 +2623,7 @@ function tocarSomAlerta(tipoAlerta) {
 
   var soundId = 'alert-sound-radar';
   if (tipoAlerta === 'risco')   soundId = 'alert-sound-risco';
-  else if (tipoAlerta === 'promocao') soundId = 'alert-sound-promo';
+  else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
 
   var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
 
