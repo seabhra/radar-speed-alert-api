@@ -620,102 +620,99 @@
     }
    
 
-    /* ===================================================================
-       ALERT CONTAINER - RADAR (COR VERMELHO)
-    =================================================================== */
-    #alert-container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-        display: none;
-        animation: slideUp 0.3s ease-out;
-        pointer-events: none;
-    }
+/* ===================================================================
+   ALERT CONTAINER (BASE)
+=================================================================== */
+#alert-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: none;
+    animation: slideUp 0.3s ease-out;
+    pointer-events: none;
+}
 
-    @keyframes slideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-    }
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
 
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); background: linear-gradient(90deg, #ff2200, #ee0000); }
-        100% { transform: scale(1); }
-    }
+/* Animação única e otimizada para todos os alertas críticos */
+@keyframes pulseAlerta {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.02); filter: brightness(1.4); } /* Clareia a cor que já estiver no fundo */
+    100% { transform: scale(1); filter: brightness(1); }
+}
 
-    .alert-bar {
-        background: linear-gradient(90deg, #cc0000, #990000);
-        color: white;
-        padding: 18px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
-        border-top: 2px solid #ff5555;
-        transition: all 0.2s ease;
-    }
+/* Estilo Base da Tarja (Serve como padrão para o Radar Vermelho) */
+.alert-bar {
+    color: white;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.2s ease;
+}
 
-    .alert-bar-critico {
-        animation: pulse 0.8s ease-in-out infinite;
-    }
+/* ===================================================================
+   ALERTA DE RADAR (VERMELHO)
+=================================================================== */
+.alert-bar-radar,
+.alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]) {
+    background: linear-gradient(90deg, #cc0000, #990000);
+    border-top: 2px solid #ff5555;
+    box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
+}
 
-    /* ===================================================================
-       ALERTA DE RISCO (AMARELO)
-    =================================================================== */
-    .alert-bar-risco {
-        background: linear-gradient(90deg, #e6a800, #b38600);
-        border-top: 2px solid #ffcc00;
-        box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4);
-    }
+/* ===================================================================
+   ALERTA DE RISCO (AMARELO)
+=================================================================== */
+.alert-bar-risco {
+    background: linear-gradient(90deg, #e6a800, #b38600);
+    border-top: 2px solid #ffcc00;
+    box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4);
+}
 
-    .alert-bar-risco-critico {
-        animation: pulseRisco 0.8s ease-in-out infinite;
-    }
+/* ===================================================================
+   AVISO DE MOBILIDADE (VERDE)
+=================================================================== */
+.alert-bar-mobilidade {
+    background: linear-gradient(90deg, #00b359, #008040);
+    border-top: 2px solid #00e066;
+    box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4);
+}
 
-    @keyframes pulseRisco {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); background: linear-gradient(90deg, #ffcc00, #e6a800); }
-        100% { transform: scale(1); }
-    }
+/* ===================================================================
+   ESTILO CRÍTICO (MUITO PERTO) - Unificado
+=================================================================== */
+.alert-bar-critico,
+.alert-bar-risco-critico,
+.alert-bar-mobilidade-critico {
+    animation: pulseAlerta 0.8s ease-in-out infinite;
+}
 
-    /* ===================================================================
-       AVISO DE MOBILIDADE (VERDE)
-    =================================================================== */
-    .alert-bar-mobilidade {
-        background: linear-gradient(90deg, #00b359, #008040);
-        border-top: 2px solid #00e066;
-        box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4);
-    }
+/* ===================================================================
+   ELEMENTOS INTERNOS DO ALERTA
+=================================================================== */
+.alert-bar img {
+    width: 50px;
+    height: 50px;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
 
-    .alert-bar-mobilidade-critico {
-        animation: pulseMobilidade 0.8s ease-in-out infinite;
-    }
+.alert-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    font-weight: 800;
+}
 
-    @keyframes pulseMobilidade {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.02); background: linear-gradient(90deg, #00e066, #00b359); }
-        100% { transform: scale(1); }
-    }
-
-    .alert-bar img {
-        width: 50px;
-        height: 50px;
-        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
-    }
-
-    .alert-info h3 {
-        font-size: 1.2rem;
-        margin-bottom: 3px;
-        text-transform: uppercase;
-        font-weight: 800;
-    }
-
-    .alert-info p {
-        font-size: 0.95rem;
-        opacity: 0.95;
-    }
+.alert-info p {
+    font-size: 0.95rem;
+    opacity: 0.95;
+}
 
     /* ===================================================================
        TOAST NOTIFICATION
@@ -1187,7 +1184,7 @@ const TIPOS_ALERTA_MOBILIDADE = [
 function dispararAlertaMobilidadeIA(mensagem) {
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "");
-  $("#alert-title").text("🎉 AVISO DE MOBILIDADE!");
+  $("#alert-title").text("✅ AVISO DE MOBILIDADE!");
   $("#alert-text").text(mensagem);
   $(".alert-bar").addClass("alert-bar-MOBILIDADE");
   $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
@@ -2121,6 +2118,9 @@ function atualizarDistanciaAlerta(distancia) {
 // ===============================================
 // FUNÇÃO DISPARA ALERTA RADAR/DISTÂNCIA
 // ================================================
+// ===============================================
+// FUNÇÃO DISPARA ALERTA RADAR/DISTÂNCIA
+// ================================================
 function dispararAlerta(radar, distancia) {
   const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
   if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
@@ -2129,20 +2129,20 @@ function dispararAlerta(radar, distancia) {
   const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
   const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
   
-  // Limpa classes anteriores
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico");
-  $(".alert-bar").css("background", ""); 
+  // Limpa classes e estilos inline anteriores
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-radar");
+  $(".alert-bar").css("background", ""); // Garante que não reste lixo de CSS inline
 
-  // Define a tarja, título e o som correspondente
+  // Define a tarja, título e adiciona a classe correspondente
   if (tipoAlerta === 'risco') {
     $("#alert-title").text("⚠️ ALERTA DE RISCO!");
     $(".alert-bar").addClass("alert-bar-risco"); // Amarelo
-  } else if (tipoAlerta === 'mobolidade') { // Nota: mantive o 'mobolidade' pois era assim no seu original
-    $("#alert-title").text("🎉 AVISO DE MOBILIDADE!");
+  } else if (tipoAlerta === 'mobolidade') { 
+    $("#alert-title").text("✅ AVISO DE MOBILIDADE!");
     $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
   } else {
-    $("#alert-title").text("ALERTA DE RADAR!");
-    $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)"); // Vermelho
+    $("#alert-title").text("📢ALERTA DE RADAR!");
+    $(".alert-bar").addClass("alert-bar-radar"); // ← MUDANÇA AQUI: Adiciona classe em vez de CSS inline
   }
   
   $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
@@ -2151,14 +2151,12 @@ function dispararAlerta(radar, distancia) {
   const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
   
   if (isNewAlert) { 
-    $("#alert-container").fadeIn(200);   // ← tarja aparece
+    $("#alert-container").fadeIn(200);   
     contagemTocarSom = 0; 
-    
-    // ✅ FAZ O SPEED SUBIR ACIMA DO ALERTA (Mantido do seu código original)
     ajustarPosicaoSpeedWidget(true);
   }
 
-  // Lógica de toque de som (bloco único, sem duplicação)
+  // Lógica de toque de som
   if (alertaHabilitado) {
     var deveTocar = false;
     if (tipoAlerta === 'radar') { 
@@ -2168,7 +2166,7 @@ function dispararAlerta(radar, distancia) {
     }
     
     if (deveTocar) { 
-      tocarSomAlerta(tipoAlerta); // ← Chama a função que toca o .mp3 específico e para os outros
+      tocarSomAlerta(tipoAlerta); 
       contagemTocarSom++; 
     }
   }
@@ -2177,7 +2175,7 @@ function dispararAlerta(radar, distancia) {
   if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
     if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
     else if (tipoAlerta === 'mobolidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
-    else $(".alert-bar").addClass("alert-bar-critico");
+    else $(".alert-bar").addClass("alert-bar-critico"); // Vai funcionar perfeitamente agora sem o CSS inline bloqueando
   }
   
   ultimoRadarAlertado = radar.id;
