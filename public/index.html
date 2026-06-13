@@ -1071,11 +1071,12 @@ function tocarSomAlerta(tipoAlerta) {
   pararTodosSons(); // Pausa qualquer outro alerta que estivesse tocando
 
   var soundId = '';
+
   if (tipoAlerta === 'radar') {
     soundId = 'alert-sound-radar'; // Tarja Vermelha
   } else if (tipoAlerta === 'risco') {
     soundId = 'alert-sound-risco'; // Tarja Amarela
-  } else if (tipoAlerta === 'aviso' || tipoAlerta === 'cao') {
+  } else if (tipoAlerta === 'aviso') {
     soundId = 'alert-sound-aviso'; // Tarja Verde
   }
 
@@ -1148,6 +1149,27 @@ const iconMap = {
 // ===================================================================
 // CONFIGURAÇÃO DOS NOVOS ALERTAS (RISCO)
 // ===================================================================
+
+
+const TIPOS_ALERTA_RADAR = [
+'Detector de Parada sobre Faixa de Pedestres  (DPFP)',
+'Detector de Conversão em Local Proibido (DCP)',
+'Detector de Redução de Velocidade (REV)',
+'Verificador de Cinto de Segurança (VCS)',
+'Detector de Uso de Celular (DUC)',
+'Controlador Eletrônico Misto (CEV) + (DAS)',
+'Controlador Eletrônico Misto (DAS) + (DCP)',
+'Controlador Eletrônico Misto (DAS) + (MOVE)',
+'Controlador Eletrônico de Velocidade (CEV)',
+'Detector de Avanço de Semáforo (DAS)',
+'Detector de Tráfego em Local Proibido  (DTLP)',
+'Detector de Invasão de Faixa Exclusiva (MOVE)',
+'Detector de Invasão de Faixa Exclusiva (DIFEX)',
+'Controle Inteligente de Velocidade (CIV)',
+'Apenas Trânsito Local (ATL)'
+];
+
+
 const TIPOS_ALERTA_RISCO = [
   'Zona de Perigo e Violência (ZPV)',
   'Zona de Perigo e Violência',
@@ -1176,6 +1198,27 @@ const TIPOS_ALERTA_MOBILIDADE = [
   'Passagem Sob Túnel Viário (TUV)',
   'Passagem Sob Túnel Viário'
 ];
+
+// ===================================================================
+// TIPOS QUE NÃO GERAM ALERTA (lista de exclusão)
+// ===================================================================
+const TIPOS_SEM_ALERTA = [
+  // adicione aqui tipos que não devem disparar alerta, ex:
+ 
+];
+
+// ===================================================================
+// FUNÇÃO DEVE ALERTAR RADAR
+// ===================================================================
+
+function deveAlertaRadar(tipoOriginal) {
+  if (!tipoOriginal) return false;
+  var tipoLimpo = tipoOriginal.trim();
+  for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {  // ← TIPOS_SEM_ALERTA NUNCA FOI DECLARADO
+    if (tipoLimpo === TIPOS_SEM_ALERTA[i]) return false;
+  }
+  return true;
+}
 
 // ===================================================================
 // FUNÇÃO DISPARA AVISO DE MOBILIDADE
@@ -1217,7 +1260,7 @@ function classificarAlerta(tipoOriginal) {
   
   // 2. Verifica se é MOBILIDADE (Verde)
   for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
-    if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobolidade';
+    if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobilidade';
   }
   
   // 3. Se não for Risco nem Mobilidade, é RADAR (Vermelho)
@@ -2137,7 +2180,7 @@ function dispararAlerta(radar, distancia) {
   if (tipoAlerta === 'risco') {
     $("#alert-title").text("⚠️ ALERTA DE RISCO!");
     $(".alert-bar").addClass("alert-bar-risco"); // Amarelo
-  } else if (tipoAlerta === 'mobolidade') { 
+  } else if (tipoAlerta === 'mobilidade') { 
     $("#alert-title").text("✅ AVISO DE MOBILIDADE!");
     $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
   } else {
@@ -2174,7 +2217,7 @@ function dispararAlerta(radar, distancia) {
   // Aplica estilo crítico se estiver muito perto
   if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
     if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
-    else if (tipoAlerta === 'mobolidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
+    else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
     else $(".alert-bar").addClass("alert-bar-critico"); // Vai funcionar perfeitamente agora sem o CSS inline bloqueando
   }
   
@@ -2568,6 +2611,7 @@ function _tocarBeep(ctx, tipoAlerta) {
   gain.connect(ctx.destination);
 
   if (tipoAlerta === 'risco') {
+
     // Dois bipes descendentes — tom de perigo
     osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(600, ctx.currentTime);
@@ -2579,6 +2623,7 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.4);
   } else if (tipoAlerta === 'mobilidade') {
+
     // Dois bipes ascendentes — tom positivo
     osc.type = 'sine';
     osc.frequency.setValueAtTime(600, ctx.currentTime);
@@ -2590,6 +2635,7 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.35);
   } else {
+
     // Bipe padrão radar — curto e alto
     osc.type = 'sine';
     osc.frequency.setValueAtTime(1050, ctx.currentTime);
@@ -2618,10 +2664,10 @@ function tocarSomAlerta(tipoAlerta) {
   if (typeof AppInventor !== 'undefined') {
     enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
   }
-
   var soundId = 'alert-sound-radar';
-  if (tipoAlerta === 'risco')   soundId = 'alert-sound-risco';
-  else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
+if (tipoAlerta === 'risco')   soundId = 'alert-sound-risco';
+else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';  // ← corrigido
+
 
   var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
 
