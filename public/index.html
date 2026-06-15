@@ -953,6 +953,9 @@
 <!-- =================================================================== -->
 <!-- ÁUDIOS DE ALERTA 
 <!-- =================================================================== -->
+<!-- =================================================================== -->
+<!-- ÁUDIOS DE ALERTA 
+<!-- =================================================================== -->
 
 <audio id="alert-sound-radar" preload="auto">
   <source src="audio_app/alerta_radar.mp3" type="audio/mpeg">
@@ -1055,38 +1058,40 @@ var animacaoMarcadorAtiva = false;
 // ===================================================================
 // CONTROLE DE ÁUDIO - 3 TIPOS DE ALERTA, TOCA 3 VEZES, SEM BEEP
 // ===================================================================
-var contagemTocarSom = 0;
-var timerProximoSom = null;
-var tipoSomTocando = null; // Guarda qual tipo está tocando para não misturar
+var alertTimers = [];
+var tipoSomTocando = null; 
+var tocandoAlerta = false;
 
 function pararTodosSons() {
-  // Cancela a repetição agendada
-  if (timerProximoSom) {
-    clearTimeout(timerProximoSom);
-    timerProximoSom = null;
-  }
-  contagemTocarSom = 0;
+  // Limpa os agendamentos de repetição
+  alertTimers.forEach(function(t) { clearTimeout(t); });
+  alertTimers = [];
+  tocandoAlerta = false;
   tipoSomTocando = null;
 
+  // Pausa e reseta os elementos originais
   ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
     var sound = document.getElementById(id);
     if (sound) {
       sound.pause();
       sound.currentTime = 0;
-      sound.onended = null; // Remove o listener para não disparar novamente
     }
   });
+
+  // Remove clones antigos para não acumular na memória
+  var clones = document.querySelectorAll('.audio-clone');
+  clones.forEach(function(c) { c.remove(); });
 }
 
 // Função que gerencia a reprodução do .mp3 3 vezes seguidas
 function tocarSomAlerta(tipoAlerta) {
-  // Se já está tocando o som do mesmo radar, não reinicia a contagem
-  if (tipoSomTocando === tipoAlerta && contagemTocarSom > 0 && contagemTocarSom < 3) {
-    return;
-  }
-
-  // Se mudou o tipo de alerta ou é um novo alerta, reseta tudo
-  pararTodosSons();
+  // Evita re-disparar se já está tocando o mesmo alerta
+  if (tocandoAlerta && tipoSomTocando === tipoAlerta) return;
+  
+  pararTodosSons(); // Limpa qualquer som anterior
+  
+  tipoSomTocando = tipoAlerta;
+  tocandoAlerta = true;
 
   var soundId = '';
   if (tipoAlerta === 'radar') {
@@ -1097,33 +1102,32 @@ function tocarSomAlerta(tipoAlerta) {
     soundId = 'alert-sound-aviso'; // Tarja Verde
   }
 
-  if (soundId) {
-    contagemTocarSom = 1;
-    tipoSomTocando = tipoAlerta;
-    var sound = document.getElementById(soundId);
-    
-    if (sound) {
-      sound.play().catch(function(e) {
-        console.warn("Reprodução bloqueada pelo navegador até interação do usuário:", e);
-      });
+  var originalSound = document.getElementById(soundId);
+  if (!originalSound) return;
 
-      // Quando o áudio terminar, verifica se já tocou 3 vezes
-      sound.onended = function() {
-        if (contagemTocarSom < 3) {
-          contagemTocarSom++;
-          sound.currentTime = 0;
-          // Pausa de 300ms entre os toques para não emendar o áudio
-          timerProximoSom = setTimeout(function() {
-            sound.play().catch(function(e) { console.warn(e); });
-          }, 300);
-        } else {
-          // Finalizou as 3 vezes
-          contagemTocarSom = 0;
-          tipoSomTocando = null;
-          sound.onended = null;
+  // Estratégia à prova de falhas: Clona o áudio para tocar por cima sem travar o evento
+  for (var i = 0; i < 3; i++) {
+    (function(index) {
+      var timer = setTimeout(function() {
+        var clone = originalSound.cloneNode(true);
+        clone.classList.add('audio-clone');
+        clone.volume = 1.0;
+        document.body.appendChild(clone);
+        
+        var playPromise = clone.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(function(e) {
+            console.warn("Bloqueado:", e);
+          });
         }
-      };
-    }
+        
+        // Remove o clone após terminar de tocar
+        clone.onended = function() {
+          clone.remove();
+        };
+      }, index * 600); // 600ms de intervalo entre os 3 toques
+      alertTimers.push(timer);
+    })(i);
   }
 }
 
@@ -1234,9 +1238,7 @@ const TIPOS_ALERTA_MOBILIDADE = [
 // ===================================================================
 // TIPOS QUE NÃO GERAM ALERTA
 // ===================================================================
-const TIPOS_SEM_ALERTA = [
-  // adicione aqui tipos que não devem disparar alerta
-];
+const TIPOS_SEM_ALERTA = [];
 
 // ===================================================================
 // FUNÇÕES DE CLASSIFICAÇÃO E VERIFICAÇÃO
@@ -1341,22 +1343,24 @@ const ajusteNomes = {
 (function() {
   var btnMenu = document.getElementById('btn-menu-toggle');
   var sidebar = document.getElementById('sidebar-controls');
-  btnMenu.addEventListener('click', function() {
-    sidebarAberta = !sidebarAberta;
-    if (sidebarAberta) {
-      sidebar.classList.remove('retracted');
-      btnMenu.classList.remove('active');
-    } else {
-      sidebar.classList.add('retracted');
-      btnMenu.classList.add('active');
-      if (searchActive || routeActive) {
-        searchActive = false;
-        routeActive = false;
-        document.getElementById('search-bar-radares').classList.remove('active');
-        document.getElementById('search-bar-rota').classList.remove('active');
+  if(btnMenu) {
+    btnMenu.addEventListener('click', function() {
+      sidebarAberta = !sidebarAberta;
+      if (sidebarAberta) {
+        sidebar.classList.remove('retracted');
+        btnMenu.classList.remove('active');
+      } else {
+        sidebar.classList.add('retracted');
+        btnMenu.classList.add('active');
+        if (searchActive || routeActive) {
+          searchActive = false;
+          routeActive = false;
+          document.getElementById('search-bar-radares').classList.remove('active');
+          document.getElementById('search-bar-rota').classList.remove('active');
+        }
       }
-    }
-  });
+    });
+  }
 })();
 
 // ===================================================================
@@ -1411,22 +1415,22 @@ function getIconUrl(tipo, velocidade) {
   if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
 
   var substrings = [
-    { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
-    { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
-    { keys: ['OCR-P', 'Placas'],                 icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
-    { keys: ['Celular', 'DUC'],                  icon: iconMap['Detector de Uso de Celular'] },
-    { keys: ['Cinto', 'VCS'],                    icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
-    { keys: ['Acidente', 'AIA'],                 icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
-    { keys: ['Média', 'RIV'],                    icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
-    { keys: ['Apenas', 'ATL'],                    icon: iconMap['Apenas Trânsito Local (ATL)'] },
-    { keys: ['Perigo', 'ZPV'],                   icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
-    { keys: ['Inundaç', 'ZIR'],                  icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
-    { keys: ['Redução', 'Redutor', 'DRV', 'CRV'],icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
-    { keys: ['Conversão'],                       icon: iconMap['Detector de Conversão em Local Proibido'] },
+    { keys: ['Olho Vivo', 'COV'], icon: iconMap['Câmera Olho Vivo (COV)'] },
+    { keys: ['Facial'], icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
+    { keys: ['OCR-P', 'Placas'], icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
+    { keys: ['Celular', 'DUC'], icon: iconMap['Detector de Uso de Celular'] },
+    { keys: ['Cinto', 'VCS'], icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
+    { keys: ['Acidente', 'AIA'], icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
+    { keys: ['Média', 'RIV'], icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
+    { keys: ['Apenas', 'ATL'], icon: iconMap['Apenas Trânsito Local (ATL)'] },
+    { keys: ['Perigo', 'ZPV'], icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
+    { keys: ['Inundaç', 'ZIR'], icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
+    { keys: ['Redução', 'Redutor', 'DRV', 'CRV'], icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
+    { keys: ['Conversão'], icon: iconMap['Detector de Conversão em Local Proibido'] },
     { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
-    { keys: ['Tráfego Proibido', 'DTLP'],       icon: iconMap['Detector de Tráfego em Local Proibido'] },
-    { keys: ['BUS', 'Faixa Preferencial'],       icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
-    { keys: ['Túnel', 'TUV'],                    icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
+    { keys: ['Tráfego Proibido', 'DTLP'], icon: iconMap['Detector de Tráfego em Local Proibido'] },
+    { keys: ['BUS', 'Faixa Preferencial'], icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
+    { keys: ['Túnel', 'TUV'], icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
   ];
   for (var s = 0; s < substrings.length; s++) {
     var entry = substrings[s];
@@ -1591,7 +1595,7 @@ function aplicarTemaMapa() {
 }
 
 function fecharAlertaImediatamente() {
-  pararTodosSons(); // Silencia os áudios e cancela repetições
+  pararTodosSons();
   clearTimeout(alertTimeout);
 }
 
@@ -1599,18 +1603,15 @@ function esconderAlertaVisual() {
   $("#alert-container").fadeOut(150);
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico alert-bar-MOBILIDADE");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
-  contagemTocarSom = 0;
-  tipoSomTocando = null;
   fecharAlertaImediatamente();
   ajustarPosicaoSpeedWidget(false);
 }
 
 function ajustarPosicaoSpeedWidget(subir) {
   var speedWidget = document.querySelector('.speed-widget');
-  if (subir) {
-    speedWidget.classList.add('alerta-ativo');
-  } else {
-    speedWidget.classList.remove('alerta-ativo');
+  if (speedWidget) {
+    if (subir) speedWidget.classList.add('alerta-ativo');
+    else speedWidget.classList.remove('alerta-ativo');
   }
 }
 
@@ -1755,7 +1756,7 @@ function criarRota(destLat, destLng) {
       var heading = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
       headingIconeNavegacao = heading;
       headingIconeSuavizado = heading;
-      _navAnim.headingAlvo      = heading;
+      _navAnim.headingAlvo = heading;
       _navAnim.headingSuavizado = heading;
       bearingAlvo = heading;
       bearingAtual = heading;
@@ -1896,7 +1897,7 @@ function extrairCoordenadas(record, index) {
     let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); });
     if (parts.length === 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
   }
-  if (lat === null || isNaN(lat) || lng === null || isNaN(lg)) {
+  if (lat === null || isNaN(lat) || lng === null || isNaN(lng)) {
     for (var f = Math.max(0, geomIndex - 2); f < Math.min(record.length, geomIndex + 3); f++) {
       if (f === geomIndex) continue;
       var campo = String(record[f]).trim();
@@ -2054,7 +2055,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
     }
   }
   verificarChegadaDestino();
-  verificarAlertasRadares(); // Chamada central da verificação
+  verificarAlertasRadares();
 
   if (estaEmNavegacao && isFollowing) {
     atualizarCameraNavegacaoSuave();
@@ -2115,7 +2116,7 @@ function verificarAlertasRadares() {
 
   if (ultimoRadarAlertado !== rId) {
     ultimoRadarAlertado = rId;
-    contagemTocarSom = 0;
+    tocandoAlerta = false;
     tipoSomTocando = null;
   }
 
