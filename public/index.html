@@ -2636,7 +2636,7 @@ function tocarBeepEmergencia(tipoAlerta) {
   }
 }
 
-function _tocarBeep(ctx) {
+function _tocarBeep(ctx, tipoAlerta) {
   var osc = ctx.createOscillator();
   var gain = ctx.createGain();
   osc.connect(gain);
