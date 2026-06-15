@@ -955,6 +955,8 @@
      ÁUDIOS DE ALERTA (CORRIGIDO OS NOMES DOS ARQUIVOS)
 =================================================================== -->
 
+
+
 <audio id="alert-sound-radar" preload="auto">
   <source src="audio_app/alerta_sound_radar.mp3" type="audio/mpeg">
 </audio>
@@ -1028,10 +1030,10 @@ const TEMPO_REFRESH_DELAY = 5000;
 let sidebarAberta = true;
 
 // ===================================================================
-// CONFIGURAÇÃO DE ALERTAS (ALTERADO DISTANCIA_MAXIMA PARA 180)
+// CONFIGURAÇÃO DE ALERTAS (ALTERADO PARA 180m)
 // ===================================================================
 const ALERT_CONFIG = {
-  DISTANCIA_MAXIMA: 180,
+  DISTANCIA_MAXIMA: 180, // ALTERADO AQUI
   DISTANCIA_CRITICA: 100,
   TEMPO_ALERTA: 15000,
   DISTANCIA_PASSAR_RADAR: 30,
@@ -1039,8 +1041,7 @@ const ALERT_CONFIG = {
   ANGULO_AFASTANDO: 140,
   HISTORICO_TAMANHO: 5,
   SUAVIZACAO_FATOR: 0.6,
-  DISTANCIA_MINIMA_MOVIMENTO: 2,
-  DISPAROS_SOM_ANTES_DE_SILENCIAR: 2
+  DISTANCIA_MINIMA_MOVIMENTO: 2
 };
 
 let currentHeading = 0;
@@ -1053,20 +1054,19 @@ var historicoPosicoes = [];
 var historicoDistanciasRadar = {};
 var ultimaPosicaoMarcador = { lat: null, lng: null };
 var animacaoMarcadorAtiva = false;
+var contagemTocarSom = 0;
 
 // ===================================================================
-// CONTROLE DE ÁUDIO - GARANTE QUE APENAS O SOM CORRETO TOQUE 3 VEZES
+// CONTROLE DE ÁUDIO - SUBSTITUI O BEEP, TOCA MP3 3 VEZES
 // ===================================================================
 var alertTimers = [];
 var tipoSomTocando = null; 
 
 function pararTodosSons() {
-  // Limpa os agendamentos de repetição
   alertTimers.forEach(function(t) { clearTimeout(t); });
   alertTimers = [];
   tipoSomTocando = null;
 
-  // Pausa e reseta os elementos originais
   ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
     var sound = document.getElementById(id);
     if (sound) {
@@ -1075,33 +1075,24 @@ function pararTodosSons() {
     }
   });
 
-  // Remove clones antigos para não acumular na memória
   var clones = document.querySelectorAll('.audio-clone');
   clones.forEach(function(c) { c.remove(); });
 }
 
-// Função que gerencia a reprodução do .mp3 3 vezes seguidas
 function tocarSomAlerta(tipoAlerta) {
-  // Evita re-disparar se já está tocando o mesmo alerta
   if (tipoSomTocando === tipoAlerta && alertTimers.length > 0) return;
   
-  pararTodosSons(); // Limpa qualquer som anterior
-  
+  pararTodosSons();
   tipoSomTocando = tipoAlerta;
 
   var soundId = '';
-  if (tipoAlerta === 'radar') {
-    soundId = 'alert-sound-radar'; // Tarja Vermelha
-  } else if (tipoAlerta === 'risco') {
-    soundId = 'alert-sound-risco'; // Tarja Amarela
-  } else if (tipoAlerta === 'aviso') {
-    soundId = 'alert-sound-aviso'; // Tarja Verde
-  }
+  if (tipoAlerta === 'radar') soundId = 'alert-sound-radar';
+  else if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
+  else if (tipoAlerta === 'aviso') soundId = 'alert-sound-aviso';
 
   var originalSound = document.getElementById(soundId);
   if (!originalSound) return;
 
-  // Estratégia que funciona mesmo no Chrome mobile: clona o áudio para tocar por cima
   for (var i = 0; i < 3; i++) {
     (function(index) {
       var timer = setTimeout(function() {
@@ -1113,15 +1104,14 @@ function tocarSomAlerta(tipoAlerta) {
         var playPromise = clone.play();
         if (playPromise !== undefined) {
           playPromise.catch(function(e) {
-            console.warn("Reprodução bloqueada pelo navegador até interação do usuário:", e);
+            console.warn("Bloqueado:", e);
           });
         }
         
-        // Remove o clone após terminar para limpar a memória
         clone.onended = function() {
           clone.remove();
         };
-      }, index * 700); // 700ms de intervalo entre os 3 toques
+      }, index * 700); 
       alertTimers.push(timer);
     })(i);
   }
@@ -1181,13 +1171,9 @@ const iconMap = {
   'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
-
-
 // ===================================================================
 // CONFIGURAÇÃO DOS NOVOS ALERTAS (RISCO)
 // ===================================================================
-
-
 const TIPOS_ALERTA_RADAR = [
 'Detector de Parada sobre Faixa de Pedestres  (DPFP)',
 'Detector de Conversão em Local Proibido (DCP)',
@@ -1205,7 +1191,6 @@ const TIPOS_ALERTA_RADAR = [
 'Controle Inteligente de Velocidade (CIV)',
 'Apenas Trânsito Local (ATL)'
 ];
-
 
 const TIPOS_ALERTA_RISCO = [
   'Zona de Perigo e Violência (ZPV)',
@@ -1236,17 +1221,7 @@ const TIPOS_ALERTA_MOBILIDADE = [
   'Passagem Sob Túnel Viário'
 ];
 
-// ===================================================================
-// TIPOS QUE NÃO GERAM ALERTA (lista de exclusão)
-// ===================================================================
-const TIPOS_SEM_ALERTA = [
-  // adicione aqui tipos que não devem disparar alerta, ex:
- 
-];
-
-// ===================================================================
-// FUNÇÃO DEVE ALERTAR RADAR
-// ===================================================================
+const TIPOS_SEM_ALERTA = [];
 
 function deveAlertaRadar(tipoOriginal) {
   if (!tipoOriginal) return false;
@@ -1257,9 +1232,17 @@ function deveAlertaRadar(tipoOriginal) {
   return true;
 }
 
-// ===================================================================
-// FUNÇÃO DISPARA AVISO DE MOBILIDADE
-// ===================================================================
+function classificarAlerta(tipoOriginal) {
+  if (!tipoOriginal) return 'radar';
+  var tipoLimpo = tipoOriginal.trim();
+  for (var i = 0; i < TIPOS_ALERTA_RISCO.length; i++) {
+    if (tipoLimpo === TIPOS_ALERTA_RISCO[i] || tipoLimpo.includes(TIPOS_ALERTA_RISCO[i])) return 'risco';
+  }
+  for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
+    if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobilidade';
+  }
+  return 'radar';
+}
 
 function dispararAlertaMobilidadeIA(mensagem) {
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico");
@@ -1269,7 +1252,7 @@ function dispararAlertaMobilidadeIA(mensagem) {
   $(".alert-bar").addClass("alert-bar-mobilidade");
   $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
   
-  tocarSomAlerta('aviso'); // ✅ TOCA O SOM DE AVISO (VERDE)
+  tocarSomAlerta('aviso'); // TOCA O SOM DE AVISO (VERDE)
 
   if (!$("#alert-container").is(":visible")) { 
     $("#alert-container").fadeIn(200); 
@@ -1281,32 +1264,6 @@ function dispararAlertaMobilidadeIA(mensagem) {
   }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
-
-// ===================================================================
-// FUNÇÃO CLASSIFICA ALERTAS
-// ===================================================================
-
-function classificarAlerta(tipoOriginal) {
-  if (!tipoOriginal) return 'radar';
-  var tipoLimpo = tipoOriginal.trim();
-  
-  // 1. Verifica se é RISCO (Amarelo)
-  for (var i = 0; i < TIPOS_ALERTA_RISCO.length; i++) {
-    if (tipoLimpo === TIPOS_ALERTA_RISCO[i] || tipoLimpo.includes(TIPOS_ALERTA_RISCO[i])) return 'risco';
-  }
-  
-  // 2. Verifica se é MOBILIDADE (Verde)
-  for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
-    if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobilidade';
-  }
-  
-  // 3. Se não for Risco nem Mobilidade, é RADAR (Vermelho)
-  return 'radar';
-}
-
-// ===================================================================
-// AJUSTE DE NOMES
-// ===================================================================
 const ajusteNomes = {
   'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
   'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
@@ -1348,9 +1305,6 @@ const ajusteNomes = {
   'Leitor de Reconhecimento Facial (OCR-F)': 'Reconhecimento Facial (OCR-F)'
 };
 
-// ===================================================================
-// BOTÃO MENU
-// ===================================================================
 (function() {
   var btnMenu = document.getElementById('btn-menu-toggle');
   var sidebar = document.getElementById('sidebar-controls');
@@ -1372,9 +1326,6 @@ const ajusteNomes = {
   });
 })();
 
-// ===================================================================
-// FUNÇÕES AUXILIARES
-// ===================================================================
 function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
   return L.icon({
     iconUrl: iconUrl,
@@ -1424,22 +1375,22 @@ function getIconUrl(tipo, velocidade) {
   if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
 
   var substrings = [
-    { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
-    { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
-    { keys: ['OCR-P', 'Placas'],                 icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
-    { keys: ['Celular', 'DUC'],                  icon: iconMap['Detector de Uso de Celular'] },
-    { keys: ['Cinto', 'VCS'],                    icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
-    { keys: ['Acidente', 'AIA'],                 icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
-    { keys: ['Média', 'RIV'],                    icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
-    { keys: ['Apenas', 'ATL'],                    icon: iconMap['Apenas Trânsito Local (ATL)'] },
-    { keys: ['Perigo', 'ZPV'],                   icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
-    { keys: ['Inundaç', 'ZIR'],                  icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
-    { keys: ['Redução', 'Redutor', 'DRV', 'CRV'],icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
-    { keys: ['Conversão'],                       icon: iconMap['Detector de Conversão em Local Proibido'] },
+    { keys: ['Olho Vivo', 'COV'], icon: iconMap['Câmera Olho Vivo (COV)'] },
+    { keys: ['Facial'], icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
+    { keys: ['OCR-P', 'Placas'], icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
+    { keys: ['Celular', 'DUC'], icon: iconMap['Detector de Uso de Celular'] },
+    { keys: ['Cinto', 'VCS'], icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
+    { keys: ['Acidente', 'AIA'], icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
+    { keys: ['Média', 'RIV'], icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
+    { keys: ['Apenas', 'ATL'], icon: iconMap['Apenas Trânsito Local (ATL)'] },
+    { keys: ['Perigo', 'ZPV'], icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
+    { keys: ['Inundaç', 'ZIR'], icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
+    { keys: ['Redução', 'Redutor', 'DRV', 'CRV'], icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
+    { keys: ['Conversão'], icon: iconMap['Detector de Conversão em Local Proibido'] },
     { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
-    { keys: ['Tráfego Proibido', 'DTLP'],       icon: iconMap['Detector de Tráfego em Local Proibido'] },
-    { keys: ['BUS', 'Faixa Preferencial'],       icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
-    { keys: ['Túnel', 'TUV'],                    icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
+    { keys: ['Tráfego Proibido', 'DTLP'], icon: iconMap['Detector de Tráfego em Local Proibido'] },
+    { keys: ['BUS', 'Faixa Preferencial'], icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
+    { keys: ['Túnel', 'TUV'], icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
   ];
   for (var s = 0; s < substrings.length; s++) {
     var entry = substrings[s];
@@ -1604,27 +1555,19 @@ function aplicarTemaMapa() {
 }
 
 function fecharAlertaImediatamente() {
-  pararTodosSons(); // Silencia todos os áudios de uma vez
+  pararTodosSons();
   clearTimeout(alertTimeout);
 }
 
-
-// ================================================
-// FUNÇÃO ESCONDER ALERTA VISUAL
-//==================================================
 function esconderAlertaVisual() {
   $("#alert-container").fadeOut(150);
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
+  contagemTocarSom = 0;
   fecharAlertaImediatamente();
-  
-  // ✅ FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
   ajustarPosicaoSpeedWidget(false);
 }
 
-// ===================================================================
-// FUNÇÃO AUXILIAR: Controla o deslocamento do Speed Widget
-// ===================================================================
 function ajustarPosicaoSpeedWidget(subir) {
   var speedWidget = document.querySelector('.speed-widget');
   if (subir) {
@@ -1634,9 +1577,6 @@ function ajustarPosicaoSpeedWidget(subir) {
   }
 }
 
-// ===================================================================
-// FUNÇÃO AUXILIAR: Controla o deslocamento da Bússola ao abrir buscas
-// ===================================================================
 function ajustarBussolaParaBusca(ativo) {
   var compassWidget = document.querySelector('.compass-widget');
   if (ativo) {
@@ -1689,9 +1629,6 @@ function verificarChegadaDestino() {
   }
 }
 
-// ===================================================================
-// finalizarNavegacao CORRIGIDA
-// ===================================================================
 function finalizarNavegacao() {
   if (!map) return;
   if (routingControl) { map.removeControl(routingControl); routingControl = null; }
@@ -1702,7 +1639,6 @@ function finalizarNavegacao() {
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
   if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
   
-  // ADICIONADO: Cancela animação de navegação ativa
   if (_navAnim.rafId) { cancelAnimationFrame(_navAnim.rafId); _navAnim.rafId = null; }
   _navAnim.fromLat = null; _navAnim.fromLng = null;
 
@@ -1751,9 +1687,6 @@ function finalizarNavegacao() {
 
 function removerRota() { finalizarNavegacao(); }
 
-// ===================================================================
-// criarRota CORRIGIDA
-// ===================================================================
 function criarRota(destLat, destLng) {
   if (!userLat || !userLng) { showNotification("Aguardando posição GPS..."); return; }
   if (routingControl) { map.removeControl(routingControl); routingControl = null; }
@@ -1785,7 +1718,6 @@ function criarRota(destLat, destLng) {
       var heading = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
       headingIconeNavegacao = heading;
       headingIconeSuavizado = heading;
-      // ADICIONADO: Sincroniza animação de navegação com a direção da rota
       _navAnim.headingAlvo      = heading;
       _navAnim.headingSuavizado = heading;
       bearingAlvo = heading;
@@ -1949,56 +1881,31 @@ function atualizarBussola(headingDegrees) {
   if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
 }
 
-// ===================================================================
-// BLOCO 3 — GPS / ÍCONE DE ROTA FLUIDO (Substitui processarNovaPosicao)
-// ===================================================================
-
-// ---- Estado interno da animação -----------------------------------
 var _navAnim = {
-  rafId: null,          // requestAnimationFrame handle
+  rafId: null,
   fromLat: null,
   fromLng: null,
   toLat: null,
   toLng: null,
   startTime: null,
-  duration: 600,        // ms — interpolação suave entre posições GPS
+  duration: 600,
   headingAlvo: 0,
   headingSuavizado: 0
 };
 
-// Interpola suavemente o ícone de navegação entre posições GPS
 function _animarIconeNavegacao() {
   if (!estaEmNavegacao || !startRouteMarker) return;
-
   var agora = performance.now();
   var progresso = Math.min((agora - _navAnim.startTime) / _navAnim.duration, 1);
-
-  // Easing cúbico suave
   var t = 1 - Math.pow(1 - progresso, 3);
-
   var latAtual = _navAnim.fromLat + (_navAnim.toLat - _navAnim.fromLat) * t;
   var lngAtual = _navAnim.fromLng + (_navAnim.toLng - _navAnim.fromLng) * t;
-
-  // Suaviza o heading do ícone
-  _navAnim.headingSuavizado = suavizarBearing(
-    _navAnim.headingAlvo,
-    _navAnim.headingSuavizado,
-    0.12   // fator de suavização — menor = mais suave
-  );
-
-  // Atualiza posição do marcador
+  _navAnim.headingSuavizado = suavizarBearing(_navAnim.headingAlvo, _navAnim.headingSuavizado, 0.12);
   startRouteMarker.setLatLng([latAtual, lngAtual]);
-
-  // Atualiza rotação do ícone HTML
   var imgNav = document.getElementById('nav-icon-img');
-  if (imgNav) {
-    imgNav.style.transform = 'rotate(' + _navAnim.headingSuavizado + 'deg)';
-  }
-
-  // Atualiza posição suavizada para câmera
+  if (imgNav) imgNav.style.transform = 'rotate(' + _navAnim.headingSuavizado + 'deg)';
   posicaoSuavizadaGPS = { lat: latAtual, lng: lngAtual };
   ultimaPosicaoMarcador = { lat: latAtual, lng: lngAtual };
-
   if (progresso < 1) {
     _navAnim.rafId = requestAnimationFrame(_animarIconeNavegacao);
   } else {
@@ -2007,45 +1914,29 @@ function _animarIconeNavegacao() {
   }
 }
 
-// Lança nova animação de deslocamento para o ícone de rota
 function _iniciarAnimacaoNavegacao(toLat, toLng, novoHeading) {
-  // Cancela animação anterior
-  if (_navAnim.rafId) {
-    cancelAnimationFrame(_navAnim.rafId);
-    _navAnim.rafId = null;
-  }
-
-  // Ponto de partida = posição atual interpolada (sem saltos)
+  if (_navAnim.rafId) { cancelAnimationFrame(_navAnim.rafId); _navAnim.rafId = null; }
   var pos = startRouteMarker ? startRouteMarker.getLatLng() : null;
   _navAnim.fromLat = pos ? pos.lat : toLat;
   _navAnim.fromLng = pos ? pos.lng : toLng;
   _navAnim.toLat = toLat;
   _navAnim.toLng = toLng;
   _navAnim.startTime = performance.now();
-
   if (novoHeading !== null && !isNaN(novoHeading)) {
     _navAnim.headingAlvo = novoHeading;
     headingIconeNavegacao = novoHeading;
   }
-
   _navAnim.rafId = requestAnimationFrame(_animarIconeNavegacao);
 }
 
-// ---- processarNovaPosicao CORRIGIDA --------------------------------
 function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   if (!map) return;
-
   var currentTime = Date.now();
   var dist = 0;
-
   adicionarAoHistorico(newLat, newLng, currentTime);
-
-  // Suaviza posição para câmera (não para o marcador — ele tem animação própria)
   var posSuave = suavizarPosicao(newLat, newLng);
   var smoothLat = posSuave.lat;
   var smoothLng = posSuave.lng;
-
-  // Calcula velocidade
   if (prevLat !== null) {
     dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
     if (speedKmh === 0 && prevTime !== null) {
@@ -2057,10 +1948,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   velocidadeAtual = speedKmh;
   $('#speed-display').text(speedKmh);
   estaEmMovimento = speedKmh > 3 || dist > 2;
-
-  // Calcula heading
   var novoHeading = null;
-
   if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
     if (!bussolaHardwareDisponivel) { currentHeading = hardwareHeading; bussolaHardwareDisponivel = true; }
     novoHeading = hardwareHeading;
@@ -2073,29 +1961,19 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
       novoHeading = calcHeading;
     }
   }
-
   if (novoHeading !== null && estaEmMovimento) {
     bearingAlvo = novoHeading;
     headingIconeNavegacao = novoHeading;
   }
-
   if (currentHeading !== null) atualizarBussola(currentHeading);
-
   prevLat = newLat;
   prevLng = newLng;
   prevTime = currentTime;
   userLat = newLat;
   userLng = newLng;
-
-  // ---- Atualiza marcador de posição ----
   if (estaEmNavegacao && startRouteMarker) {
-    // Usa animação suave dedicada — sem setLatLng direto aqui
     _iniciarAnimacaoNavegacao(smoothLat, smoothLng, novoHeading);
-
-    if (!gpsInitialized) {
-      gpsInitialized = true;
-      hideFullscreenLoading();
-    }
+    if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
   } else if (!estaEmNavegacao) {
     if (!userMarker) {
       var defaultIcon = L.divIcon({
@@ -2108,34 +1986,25 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
       userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
       userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
       ultimaPosicaoMarcador = { lat: smoothLat, lng: smoothLng };
-      if (!gpsInitialized) {
-        gpsInitialized = true;
-        hideFullscreenLoading();
-      }
+      if (!gpsInitialized) { gpsInitialized = true; hideFullscreenLoading(); }
     } else {
       moverMarcadorSuavemente(smoothLat, smoothLng);
     }
   }
-
-  // Atualiza rota periodicamente
   if (destinoAtual && routingControl && estaEmNavegacao) {
     if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
       atualizarRota();
       window.ultimaAtualizacaoRota = currentTime;
     }
   }
-
-  // Câmera
   if (estaEmNavegacao && isFollowing) {
     atualizarCameraNavegacaoSuave();
   } else if (isFollowing && !estaEmNavegacao) {
     map.setView([smoothLat, smoothLng], map.getZoom(), { animate: false, duration: 0 });
   }
-  
   verificarChegadaDestino();
   verificarAlertasRadares();
 }
-
 
 // ===================================================================
 // VERIFICAÇÃO PRINCIPAL DE ALERTAS A 180 METROS
@@ -2150,16 +2019,12 @@ function verificarAlertasRadares() {
   for (var i = 0; i < radarMarkers.length; i++) {
     var m = radarMarkers[i];
     if (!m.options || !m.options.record) continue;
-    
     var rData = m.options.record;
     var tipoOriginal = rData.tipo || rData.tipo_equipamento || "";
-    
     if (!deveAlertaRadar(tipoOriginal)) continue;
-
     var rLat = m.getLatLng().lat;
     var rLng = m.getLatLng().lng;
     var dist = calcularDistancia(userLat, userLng, rLat, rLng);
-
     if (dist < menorDistancia) {
       menorDistancia = dist;
       radarMaisProximo = m;
@@ -2178,7 +2043,6 @@ function verificarAlertasRadares() {
   var rData = radarMaisProximo.options.record;
   var rId = radarMaisProximo.options.id;
   var tipoClassificado = classificarAlerta(tipoAlertaMaisProximo);
-
   var direcao = verificarDirecaoMelhorada(userLat, userLng, currentHeading, radarMaisProximo.getLatLng().lat, radarMaisProximo.getLatLng().lng, rId, menorDistancia);
 
   if (direcao.estaAfastando && menorDistancia > ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
@@ -2189,7 +2053,7 @@ function verificarAlertasRadares() {
 
   if (ultimoRadarAlertado !== rId) {
     ultimoRadarAlertado = rId;
-    tipoSomTocando = null; // Reseta para o novo radar poder tocar
+    tipoSomTocando = null;
   }
 
   if (direcao.estaAproximando && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
@@ -2204,16 +2068,16 @@ function verificarAlertasRadares() {
       $("#alert-title").text("⚠️ ATENÇÃO RADAR!");
       $(".alert-bar").addClass("alert-bar-critico");
       $("#alert-icon").attr("src", getIconUrl(tipoAlertaMaisProximo, velRadar));
-      tocarSomAlerta('radar'); // VERMELHO: toca .mp3 3 vezes
+      tocarSomAlerta('radar'); 
     } 
     else if (tipoClassificado === 'risco') {
       $("#alert-title").text("⚠️ RISCO!");
       $(".alert-bar").addClass("alert-bar-risco");
       $("#alert-icon").attr("src", getIconUrl(tipoAlertaMaisProximo, velRadar));
-      tocarSomAlerta('risco'); // AMARELO: toca .mp3 3 vezes
+      tocarSomAlerta('risco'); 
     } 
     else if (tipoClassificado === 'mobilidade') {
-      dispararAlertaMobilidadeIA(msgAlerta); // VERDE: chama função própria que usa 'aviso' 3 vezes
+      dispararAlertaMobilidadeIA(msgAlerta);
       return;
     }
 
