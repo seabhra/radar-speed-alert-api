@@ -1052,12 +1052,22 @@ var historicoPosicoes = [];
 var historicoDistanciasRadar = {};
 var ultimaPosicaoMarcador = { lat: null, lng: null };
 var animacaoMarcadorAtiva = false;
-var contagemTocarSom = 0;
+
 
 // ===================================================================
-// CONTROLE DE ÁUDIO - GARANTE QUE APENAS O SOM CORRETO TOQUE
+// CONTROLE DE ÁUDIO - GARANTE QUE APENAS O SOM CORRETO TOQUE 3 VEZES
 // ===================================================================
+var contagemTocarSom = 0;
+var timerProximoSom = null;
+
 function pararTodosSons() {
+  // Cancela a repetição agendada
+  if (timerProximoSom) {
+    clearTimeout(timerProximoSom);
+    timerProximoSom = null;
+  }
+  contagemTocarSom = 0;
+
   ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
     var sound = document.getElementById(id);
     if (sound) {
@@ -1067,6 +1077,8 @@ function pararTodosSons() {
   });
 }
 
+
+// Função que toca o .mp3 3 vezes
 function tocarSomAlerta(tipoAlerta) {
   pararTodosSons(); // Pausa qualquer outro alerta que estivesse tocando
 
@@ -1081,11 +1093,28 @@ function tocarSomAlerta(tipoAlerta) {
   }
 
   if (soundId) {
+    contagemTocarSom = 1; // Inicia a contagem
     var sound = document.getElementById(soundId);
+    
     if (sound) {
       sound.play().catch(function(e) {
         console.warn("Reprodução de áudio bloqueada pelo navegador até interação do usuário:", e);
       });
+
+      // Quando o áudio terminar, verifica se já tocou 3 vezes
+      sound.onended = function() {
+        if (contagemTocarSom < 3) {
+          contagemTocarSom++;
+          sound.currentTime = 0;
+          // Pequeno delay de 300ms entre os toques para não emendar o som
+          timerProximoSom = setTimeout(function() {
+            sound.play().catch(function(e) { console.warn(e); });
+          }, 300);
+        } else {
+          contagemTocarSom = 0; // Reseta a contagem após a 3ª vez
+          sound.onended = null;
+        }
+      };
     }
   }
 }
@@ -1575,25 +1604,31 @@ function aplicarTemaMapa() {
   }
 }
 
+// ================================================
+// FUNÇÃO FECHAR ALERTA IMEDIATAMENTE
+//==================================================
+
 function fecharAlertaImediatamente() {
-  pararTodosSons(); // Silencia todos os áudios de uma vez
+  pararTodosSons(); // Silencia todos os áudios e cancela a repetição
   clearTimeout(alertTimeout);
 }
-
-
 // ================================================
 // FUNÇÃO ESCONDER ALERTA VISUAL
 //==================================================
+
 function esconderAlertaVisual() {
   $("#alert-container").fadeOut(150);
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   contagemTocarSom = 0;
-  fecharAlertaImediatamente();
+  fecharAlertaImediatamente(); // Garante que o som pare ao fechar visualmente
   
-  // ✅ FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
+  // FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
   ajustarPosicaoSpeedWidget(false);
 }
+
+
+
 
 // ===================================================================
 // FUNÇÃO AUXILIAR: Controla o deslocamento do Speed Widget
@@ -2161,9 +2196,6 @@ function atualizarDistanciaAlerta(distancia) {
 // ===============================================
 // FUNÇÃO DISPARA ALERTA RADAR/DISTÂNCIA
 // ================================================
-// ===============================================
-// FUNÇÃO DISPARA ALERTA RADAR/DISTÂNCIA
-// ================================================
 function dispararAlerta(radar, distancia) {
   const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
   if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
@@ -2181,10 +2213,10 @@ function dispararAlerta(radar, distancia) {
     $("#alert-title").text("⚠️ ALERTA DE RISCO!");
     $(".alert-bar").addClass("alert-bar-risco"); // Amarelo
   } else if (tipoAlerta === 'mobilidade') { 
-    $("#alert-title").text("✅ AVISO DE MOBILIDADE!");
+    $("#alert-title").text("📢 AVISO DE MOBILIDADE!");
     $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
   } else {
-    $("#alert-title").text("📢ALERTA DE RADAR!");
+    $("#alert-title").text("🚨 ALERTA DE RADAR!");
     $(".alert-bar").addClass("alert-bar-radar"); // ← MUDANÇA AQUI: Adiciona classe em vez de CSS inline
   }
   
@@ -2604,7 +2636,7 @@ function tocarBeepEmergencia(tipoAlerta) {
   }
 }
 
-function _tocarBeep(ctx, tipoAlerta) {
+function _tocarBeep(ctx) {
   var osc = ctx.createOscillator();
   var gain = ctx.createGain();
   osc.connect(gain);
