@@ -1052,7 +1052,7 @@ var historicoPosicoes = [];
 var historicoDistanciasRadar = {};
 var ultimaPosicaoMarcador = { lat: null, lng: null };
 var animacaoMarcadorAtiva = false;
-
+var tipoAlertaAtivo = null;
 
 // ===================================================================
 // CONTROLE DE ÁUDIO - GARANTE QUE APENAS O SOM CORRETO TOQUE 3 VEZES
@@ -1617,6 +1617,8 @@ function fecharAlertaImediatamente() {
 //==================================================
 
 function esconderAlertaVisual() {
+  silenciarAlertaComBeep(tipoAlertaAtivo); // ADICIONE ESTA LINHA AQUI
+
   $("#alert-container").fadeOut(150);
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
@@ -1626,9 +1628,6 @@ function esconderAlertaVisual() {
   // FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
   ajustarPosicaoSpeedWidget(false);
 }
-
-
-
 
 // ===================================================================
 // FUNÇÃO AUXILIAR: Controla o deslocamento do Speed Widget
@@ -2706,7 +2705,107 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc2.stop(ctx.currentTime + 0.43);
   }
 }
+// ===================================================================
+// VERIFICAÇÃO PRINCIPAL DE ALERTAS A 180 METROS
+// ===================================================================
+function verificarAlertasRadares() {
+  if (!alertaHabilitado || !userLat || !userLng) return;
 
+  var radarMaisProximo = null;
+  var menorDistancia = Infinity;
+  var tipoAlertaMaisProximo = null;
+
+  for (var i = 0; i < radarMarkers.length; i++) {
+    var m = radarMarkers[i];
+    if (!m.options || !m.options.record) continue;
+    
+    var rData = m.options.record;
+    var tipoOriginal = rData.tipo || rData.tipo_equipamento || "";
+    
+    if (!deveAlertaRadar(tipoOriginal)) continue;
+
+    var rLat = m.getLatLng().lat;
+    var rLng = m.getLatLng().lng;
+    var dist = calcularDistancia(userLat, userLng, rLat, rLng);
+
+    if (dist < menorDistancia) {
+      menorDistancia = dist;
+      radarMaisProximo = m;
+      tipoAlertaMaisProximo = tipoOriginal;
+    }
+  }
+
+  if (!radarMaisProximo || menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA) {
+    if ($("#alert-container").is(":visible") && ultimoRadarAlertado === (radarMaisProximo ? radarMaisProximo.options.id : null)) {
+      esconderAlertaVisual();
+    }
+    ultimoRadarAlertado = null;
+    tipoAlertaAtivo = null;
+    return;
+  }
+
+  var rData = radarMaisProximo.options.record;
+  var rId = radarMaisProximo.options.id;
+  var tipoClassificado = classificarAlerta(tipoAlertaMaisProximo);
+
+  var direcao = verificarDirecaoMelhorada(userLat, userLng, currentHeading, radarMaisProximo.getLatLng().lat, radarMaisProximo.getLatLng().lng, rId, menorDistancia);
+
+  if (direcao.estaAfastando && menorDistancia > ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
+    if (ultimoRadarAlertado === rId) esconderAlertaVisual();
+    ultimoRadarAlertado = null;
+    tipoAlertaAtivo = null;
+    return;
+  }
+
+  if (ultimoRadarAlertado !== rId) {
+    ultimoRadarAlertado = rId;
+  }
+
+  if (direcao.estaAproximando && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
+    var nomeFormatado = ajusteNomes[tipoAlertaMaisProximo.trim()] || tipoAlertaMaisProximo;
+    var velRadar = rData.velocidade || rData.vel || "";
+    var msgAlerta = nomeFormatado + (velRadar ? " - " + velRadar + " km/h" : "") + " a " + Math.round(menorDistancia) + "m";
+
+    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-MOBILIDADE");
+    $(".alert-bar").css("background", "");
+    
+    if (tipoClassificado === 'radar') {
+      tipoAlertaAtivo = 'radar';
+      $("#alert-title").text("⚠️ ATENÇÃO RADAR!");
+      $(".alert-bar").addClass("alert-bar-critico");
+      $("#alert-icon").attr("src", getIconUrl(tipoAlertaMaisProximo, velRadar));
+      tocarSomAlerta('radar'); 
+    } 
+    else if (tipoClassificado === 'risco') {
+      tipoAlertaAtivo = 'risco';
+      $("#alert-title").text("⚠️ RISCO!");
+      $(".alert-bar").addClass("alert-bar-risco");
+      $("#alert-icon").attr("src", getIconUrl(tipoAlertaMaisProximo, velRadar));
+      tocarSomAlerta('risco'); 
+    } 
+    else if (tipoClassificado === 'mobilidade') {
+      tipoAlertaAtivo = 'mobilidade';
+      dispararAlertaMobilidadeIA(msgAlerta);
+      return;
+    }
+
+    $("#alert-text").text(msgAlerta);
+
+    if (!$("#alert-container").is(":visible")) { 
+      $("#alert-container").fadeIn(200); 
+      ajustarPosicaoSpeedWidget(true);
+    }
+
+    if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+      $(".alert-bar").addClass(tipoClassificado === 'radar' ? "alert-bar-critico" : "alert-bar-risco-critico");
+    }
+
+    clearTimeout(alertTimeout);
+    alertTimeout = setTimeout(function() { 
+      if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
+    }, ALERT_CONFIG.TEMPO_ALERTA);
+  }
+}
 //==============================================================
 // ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW) 
 //==============================================================
