@@ -953,7 +953,7 @@
 
 <!-- =================================================================== -->
 <!-- ÁUDIOS DE ALERTA (CORRIGIDO OS NOMES DOS ARQUIVOS)
-<!-- =================================================================== -->
+< !-- =================================================================== -->
 
 <audio id="alert-sound-radar" preload="auto">
   <source src="audio_app/alerta_sound_radar.mp3" type="audio/mpeg">
@@ -1266,7 +1266,7 @@ function dispararAlertaMobilidadeIA(mensagem) {
   $(".alert-bar").css("background", "");
   $("#alert-title").text("✅ AVISO DE MOBILIDADE!");
   $("#alert-text").text(mensagem);
-  $(".alert-bar").addClass("alert-bar-MOBILIDADE");
+  $(".alert-bar").addClass("alert-bar-mobilidade");
   $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
   
   tocarSomAlerta('aviso'); // ✅ TOCA O SOM DE AVISO (VERDE)
