@@ -2636,58 +2636,51 @@ function tocarBeepEmergencia(tipoAlerta) {
   }
 }
 
-function _tocarBeep(ctx, tipoAlerta) {
+// ===================================================================
+// FUNÇÃO TOCAR BEEP PARA BOTÃO SILENCIAR APENAS
+// ===================================================================
+
+function silenciarAlertaComBeep() {
+  // 1. Para os arquivos .mp3 do alerta (radar/risco/aviso) imediatamente
+  pararTodosSons(); 
+
+  // 2. Toca apenas o Bipe padrão de confirmação de silenciamento
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    _tocarBeepSilenciar(ctx);
+  } catch(e) {
+    console.warn("Áudio não suportado para o beep:", e);
+  }
+}
+
+// Função isolada que só faz o som de "fechar", sem identificar tipo de alerta
+function _tocarBeepSilenciar(ctx) {
   var osc = ctx.createOscillator();
   var gain = ctx.createGain();
   osc.connect(gain);
   gain.connect(ctx.destination);
 
-  if (tipoAlerta === 'risco') {
-
-    // Dois bipes descendentes — tom de perigo
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(600, ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.15);
-    osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
-    osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.35);
-    gain.gain.setValueAtTime(0.6, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.4);
-  } else if (tipoAlerta === 'mobilidade') {
-
-    // Dois bipes ascendentes — tom positivo
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(600, ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.12);
-    osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
-    osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.32);
-    gain.gain.setValueAtTime(0.5, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.35);
-  } else {
-
-    // Bipe padrão radar — curto e alto
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1050, ctx.currentTime);
-    gain.gain.setValueAtTime(0.6, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.18);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.18);
-    // Segundo bipe
-    var osc2 = ctx.createOscillator();
-    var gain2 = ctx.createGain();
-    osc2.connect(gain2);
-    gain2.connect(ctx.destination);
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(1050, ctx.currentTime + 0.25);
-    gain2.gain.setValueAtTime(0.6, ctx.currentTime + 0.25);
-    gain2.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.43);
-    osc2.start(ctx.currentTime + 0.25);
-    osc2.stop(ctx.currentTime + 0.43);
-  }
+  // Bipe padrão de confirmação de silenciamento — curto e limpo
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(800, ctx.currentTime);
+  gain.gain.setValueAtTime(0.5, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.15);
+  
+  // Segundo bipe
+  var osc2 = ctx.createOscillator();
+  var gain2 = ctx.createGain();
+  osc2.connect(gain2);
+  gain2.connect(ctx.destination);
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(800, ctx.currentTime + 0.2);
+  gain2.gain.setValueAtTime(0.5, ctx.currentTime + 0.2);
+  gain2.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
+  osc2.start(ctx.currentTime + 0.2);
+  osc2.stop(ctx.currentTime + 0.35);
 }
+
 //==============================================================
 // ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW) 
 //==============================================================
