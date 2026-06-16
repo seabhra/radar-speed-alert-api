@@ -447,7 +447,7 @@
       [430, "1723","Rodovia BR-356, Próx. Anel Rodoviário ","Controlador Eletrônico de Velocidade (CEV)","80","BH Shopping/Rio de Janeiro","1001046","KBH5301046"," -19.99547, -43.96078"],
       [431, "1724","Anel Rodoviário, Próx. Rodovia BR-356","Controlador Eletrônico de Velocidade (CEV)","70","Rio de Janeiro/ BH Shopping","1001047","KBH5301047","-19.99729, -43.96156"],
       [432, "1725","Campus da UFMG, Próx Av. Perimetral Sul","Zona de Estudo Nuclear (ZEN)","30","UFMG/Centro","1001048","KBH5301048","-19.87316, -43.96663"],
-      [433, "1726","Anel Rodoviário Celso Mello Azevedo, Próx Av. Cristiano Machado","Radar de Caminhão na Faixa Esquerda (CFE)","30","Vila Suzana/Av. Antônio Carlos","1001049","KBH5301049","-19.86711, -43.93375"],
+      [433, "1726","Anel Rodoviário Celso Mello Azevedo, Próx Av. Cristiano Machado","Radar de Caminhão na Faixa Esquerda (CFE)","60","Vila Suzana/Av. Antônio Carlos","1001049","KBH5301049","-19.86711, -43.93375"],
       [434, "1727","Av. Cristovão Colombo, Próx Rua Sergipe","Detector de Invasão de Faixa Exclusiva (DIFEX)","60","Praça da Liberdade/Savassi","1001050","KBH5301050","-19.93532, -43.93740"],
       [435, "1728"," Av. Tereza Cristina, Próximo à Rua Bastilha: Em caso de chuva forte entre na próxima rua à direita", "Zona de Risco de Inundações Recorrentes (ZIR)", "60","Barreiro/Centro","1001051","KBH5301051", "-19.95372, -44.01372"],
       [436, "1729"," Av. Amazonas, Próximo à Rua Sararé", "Detector de Uso de Celular (DUC)", "60","Centro/Contagem","1001052","KBH5301052", "-19.94051, -44.00210"],
@@ -552,8 +552,9 @@
       [535, "1823","Av. Padre Argemiro Moreira, Próx. Rodovia BR-381","Passagem Sob Túnel Viário (TUV)","60","Distrito Industrial Betim/BR-381","1001039","KBH53010139","-19.95620, -44.12727"],
       [536, "1824","Rua dos Emboabas, Sob Rodovia BR-040","Passagem Sob Túnel Viário (TUV)","60","Água Branca/Jardim Laguna","1001040","KBH53010140","-19.92134, -44.03653"],
       [537, "1825","Rua Vinte e Oito, Próx. Rodovia BR-040","Passagem Sob Túnel Viário (TUV)","60","Jardim Laguna/BR-040","1001041","KBH53010141","-19.92092, -44.03665"],
-      [538, "1826","Rua Vinte e Oito, Próx. Rodovia BR-040","Controlador Eletrônico de Velocidade (CEV)", "30","Jardim Laguna/BR-040","1001042","KBH53010142","-19.92001, -44.03689"]
+      [538, "1826","Rua Vinte e Oito, Próx. Rodovia BR-040","Controlador Eletrônico de Velocidade (CEV)", "30","Jardim Laguna/BR-040","1001042","KBH53010142","-19.92001, -44.03689"],
+      [539, "1827", "Av. Cristiano Machado, Prox. Rua Nair Pentagna Guimarães", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Venda Nova/Centro","1001043", "KBH53010143", "-19.840692, -43.935953"],
+      [540, "1828","Anel Rodoviário Celso Mello Azevedo, Próx Rua Taperi","Radar de Caminhão na Faixa Esquerda (CFE)","70","Av. Amazonas/Via Expressa","1001050","KBH5301050"," -19.936274, -44.007521"]
 
-      
     ]
   }
