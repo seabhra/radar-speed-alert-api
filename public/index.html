@@ -1060,12 +1060,30 @@ var tipoAlertaAtivo = null;
 var contagemTocarSom = 0;
 var timerProximoSom = null;
 
+
+
+//==============================================================
+// ---- PARA TODOS OS SONS (ATUALIZADA - remove listeners pendentes)
+//==============================================================
+
 function pararTodosSons() {
-  // Cancela a repetição agendada
-  if (timerProximoSom) {
-    clearTimeout(timerProximoSom);
-    timerProximoSom = null;
-  }
+  // Para TODOS os elementos de áudio da página
+  var todosSons = document.querySelectorAll('audio');
+  todosSons.forEach(function(som) {
+    som.pause();
+    som.currentTime = 0;
+    
+    // Remove o listener de ended se for o alerta atual
+    if (_audioAlertaListenerAtivo) {
+      som.removeEventListener('ended', _audioAlertaListenerAtivo);
+    }
+  });
+  
+  // Limpa a referência do listener ativo
+  _audioAlertaListenerAtivo = null;
+  
+  console.log('[Radar X9] Todos os sons parados e listeners removidos.');
+}
   contagemTocarSom = 0;
 
   ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
@@ -1075,49 +1093,71 @@ function pararTodosSons() {
       sound.currentTime = 0; // Reseta o áudio para o início
     }
   });
-}
 
 
-// Função que toca o .mp3 3 vezes
+//==============================================================
+// ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW) 
+//==============================================================
+
+// Variável global para controlar o listener ativo do áudio
+var _audioAlertaListenerAtivo = null;
+
 function tocarSomAlerta(tipoAlerta) {
-  pararTodosSons(); // Pausa qualquer outro alerta que estivesse tocando
-
-  var soundId = '';
-
-  if (tipoAlerta === 'radar') {
-    soundId = 'alert-sound-radar'; // Tarja Vermelha
-  } else if (tipoAlerta === 'risco') {
-    soundId = 'alert-sound-risco'; // Tarja Amarela
-  } else if (tipoAlerta === 'aviso') {
-    soundId = 'alert-sound-aviso'; // Tarja Verde
+  if (typeof AppInventor !== 'undefined') {
+    enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
   }
+  
+  var soundId = 'alert-sound-radar';
+  if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
+  else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
 
-  if (soundId) {
-    contagemTocarSom = 1; // Inicia a contagem
-    var sound = document.getElementById(soundId);
-    
-    if (sound) {
-      sound.play().catch(function(e) {
-        console.warn("Reprodução de áudio bloqueada pelo navegador até interação do usuário:", e);
-      });
+  var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
 
-      // Quando o áudio terminar, verifica se já tocou 3 vezes
-      sound.onended = function() {
-        if (contagemTocarSom < 3) {
-          contagemTocarSom++;
-          sound.currentTime = 0;
-          // Pequeno delay de 300ms entre os toques para não emendar o som
-          timerProximoSom = setTimeout(function() {
-            sound.play().catch(function(e) { console.warn(e); });
-          }, 300);
-        } else {
-          contagemTocarSom = 0; // Reseta a contagem após a 3ª vez
-          sound.onended = null;
-        }
-      };
+  if (sound && _audioDesbloqueado) {
+
+    // Remove listener anterior se existir (evita acúmulo)
+    if (_audioAlertaListenerAtivo) {
+      sound.removeEventListener('ended', _audioAlertaListenerAtivo);
+      _audioAlertaListenerAtivo = null;
     }
+
+    var toques = 0;
+    var numToques = 3;
+
+    function tocarUmaVez() {
+      sound.currentTime = 0;
+      var p = sound.play();
+      if (p !== undefined) {
+        p.then(function () {
+          // aguarda o fim do mp3 para tocar novamente
+        }).catch(function () {
+          tocarBeepEmergencia(tipoAlerta); // fallback beep também 3x
+        });
+      }
+    }
+
+    function onEnded() {
+      toques++;
+      if (toques < numToques) {
+        tocarUmaVez();
+      } else {
+        sound.removeEventListener('ended', onEnded);
+        _audioAlertaListenerAtivo = null;
+      }
+    }
+
+    // Guarda referência do listener para poder removê-lo externamente
+    _audioAlertaListenerAtivo = onEnded;
+    sound.addEventListener('ended', onEnded);
+    tocarUmaVez(); // dispara o primeiro toque
+
+  } else {
+    // fallback: beep sintetizado 3x (já tem o loop interno)
+    tocarBeepEmergencia(tipoAlerta);
   }
 }
+
+
 
 // ===================================================================
 // MAPEAMENTO DE ÍCONES
@@ -1653,6 +1693,10 @@ function ajustarBussolaParaBusca(ativo) {
   }
 }
 
+// ===================================================================
+// FUNÇÃO ADICIONAR MARCADORES NA ROTA
+// ===================================================================
+
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
   if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
@@ -1680,6 +1724,9 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   endRouteMarker.bindPopup("<b>DESTINO</b><br>Você chegou ao seu destino!", { closeButton: false, autoClose: true, closeOnClick: true });
 }
 
+// ===================================================================
+// FUNÇÃO ATUALIZAR ROTA
+// ===================================================================
 function atualizarRota() {
   if (!destinoAtual || !userLat || !userLng || !routingControl) return;
   routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
@@ -1866,15 +1913,25 @@ function atualizarCameraNavegacaoSuave() {
   map.setView([c.lat, c.lng], zoomArredondado, { animate: false, duration: 0 });
 }
 
-async function buscarCoordenadas(endereco) {
-  try {
-    var url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil');
-    var response = await fetch(url);
-    var data = await response.json();
-    if (data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
-    return null;
-  } catch (e) { console.error("Erro ao buscar coordenadas:", e); return null; }
-}
+// ===================================================================
+// FUNÇÃO BUSCAR ENDEREÇO DE BH E FORA COM AUTOCOMPLETE
+// ===================================================================
+async function buscarCoordenadas(endereco){
+  try{var response=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(endereco));
+  var data=await response.json();
+  if(data&&data.length>0)
+  return{lat:parseFloat(data[0].lat),lng:parseFloat(data[0].lon)};
+  response=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(endereco+', Belo Horizonte, Minas Gerais, Brasil'));
+  data=await response.json();
+  if(data&&data.length>0)
+  return{lat:parseFloat(data[0].lat),lng:parseFloat(data[0].lon)};
+ return null}
+ catch(e){console.error("Erro ao buscar coordenadas:",e);
+ return null}}
+
+// ===================================================================
+// FUNÇÃO RESETAR MAPA
+// ===================================================================
 
 function resetarMapa() {
   if (!map) return;
@@ -1906,7 +1963,9 @@ function resetarMapa() {
   esconderAlertaVisual();
   showNotification("Mapa resetado");
 }
-
+// ===================================================================
+// FUNÇÃO EXTRAIR COORDENADAS
+// ===================================================================
 function extrairCoordenadas(record, index) {
   if (!record || record.length < 9) return null;
   let geomIndex = (record.length >= 10) ? 9 : 8;
@@ -2145,6 +2204,9 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   if (destinoAtual) verificarChegadaDestino();
 }
 
+// ===================================================================
+// FUNÇÃO INICIAR ROTA DO GPS
+// ===================================================================
 function startGPSTracking() {
   if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
   if (watchId !== null) navigator.geolocation.clearWatch(watchId);
@@ -2160,6 +2222,10 @@ function startGPSTracking() {
     if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); }
   }, 8000);
 }
+
+// ===================================================================
+// FUNÇÃO VERIFICAR PROXIMIDADES RADARES
+// ===================================================================
 
 function verificarProximidadeRadares() {
   if (!alertaHabilitado || radarMarkers.length === 0) return;
@@ -2184,7 +2250,9 @@ function verificarProximidadeRadares() {
     if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA + 80) { ultimoRadarAlertado = null; historicoDistanciasRadar = {}; }
   }
 }
-
+// ===================================================================
+// FUNÇÃO ATUALIZA DISTANCIA ALERTAS
+// ===================================================================
 function atualizarDistanciaAlerta(distancia) {
   if (!$("#alert-container").is(":visible")) return;
   var textoAtual = $("#alert-text").text();
@@ -2209,13 +2277,13 @@ function dispararAlerta(radar, distancia) {
 
   // Define a tarja, título e adiciona a classe correspondente
   if (tipoAlerta === 'risco') {
-    $("#alert-title").text("⚠️ ALERTA DE RISCO!");
+    $("#alert-title").text("🚧 ALERTA DE RISCO!");
     $(".alert-bar").addClass("alert-bar-risco"); // Amarelo
   } else if (tipoAlerta === 'mobilidade') { 
     $("#alert-title").text("📢 AVISO DE MOBILIDADE!");
     $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
   } else {
-    $("#alert-title").text("🚨 ALERTA DE RADAR!");
+    $("#alert-title").text("⚠️ ALERTA DE RADAR!");
     $(".alert-bar").addClass("alert-bar-radar"); // ← MUDANÇA AQUI: Adiciona classe em vez de CSS inline
   }
   
@@ -2262,7 +2330,6 @@ function dispararAlerta(radar, distancia) {
 
 // ===================================================================
 // BLOCO 2 — BOTÃO SILENCIAR: toca som ao mudar estado
-//   Substitui a função inicializarBotaoAlertaToggle()
 // ===================================================================
 function inicializarBotaoAlertaToggle() {
   var alertBtn  = document.getElementById('btn-alert-toggle');
@@ -2295,7 +2362,9 @@ function inicializarBotaoAlertaToggle() {
     esconderAlertaVisual();
   });
 }
-
+// ===============================================
+// FUNÇÃO INICIAR MAPA DE RADARES
+// ================================================
 function initMap() {
   if (typeof L === 'undefined') { hideFullscreenLoading(); showNotification("Erro de conexão. Os mapas não puderam carregar."); return; }
   map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
@@ -2323,6 +2392,10 @@ function initMap() {
   });
 
   $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
+
+// ===============================================
+// FUNÇÃO FECHAR BARRAS DE BUSCA E DESCER BÚSSOLA
+// ================================================
   
    // ✅ Função garantida para fechar barras e descer a bússola
    function fecharTodasBarras() { 
@@ -2365,8 +2438,6 @@ function initMap() {
     ajustarBussolaParaBusca(true); // Sobe a bússola
   });
 
-
-
   $("#btn-center").click(function() {
     fecharTodasBarras(); isFollowing = true;
     var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
@@ -2384,10 +2455,13 @@ function initMap() {
   carregarRadares();
 }
 
+// ===============================================
+// FUNÇÃO CARREGAR RADARES
+// ================================================
 async function carregarRadares() {
   if (!map) return;
   if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
-  $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando radares...</div>");
+  $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas...</div>");
   try {
     var response = await fetch('radares.json?v=' + Date.now());
     if (!response.ok) throw new Error("Arquivo não encontrado (HTTP " + response.status + ")");
@@ -2452,7 +2526,9 @@ function renderizarRadaresNoMapa(records, origem) {
   if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
   else showNotification("Nenhum radar encontrado.");
 }
-
+// ===============================================
+// FUNÇÃO BUSCAR RADARES
+// ================================================
 function buscarRadares(query) {
   if (!query || query.length < 2) return;
   var encontrou = false;
@@ -2621,6 +2697,9 @@ function desbloquearAudioMobile() {
   document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
 });
 
+// ======================================================
+// FUNÇÃO DISPARA ALERTA BEEP DE EMERGENCIA VIA WEB AUDIO
+// ======================================================
 // ---- Beep de emergência via Web Audio API (100% confiável no WebView) ---
 function tocarBeepEmergencia(tipoAlerta) {
   try {
