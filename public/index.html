@@ -1054,11 +1054,19 @@ var ultimaPosicaoMarcador = { lat: null, lng: null };
 var animacaoMarcadorAtiva = false;
 var tipoAlertaAtivo = null;
 
+
 // ===================================================================
 // CONTROLE DE ÁUDIO - GARANTE QUE APENAS O SOM CORRETO TOQUE 3 VEZES
 // ===================================================================
 var contagemTocarSom = 0;
 var timerProximoSom = null;
+
+// Variável global para controlar o listener ativo do áudio
+var _audioAlertaListenerAtivo = null;
+
+// Flag para evitar que o beep de confirmação do botão silenciar
+// interfira no alerta principal que está tocando
+var _alertaPrincipalEstaTocando = false;
 
 
 
@@ -1072,41 +1080,46 @@ function pararTodosSons() {
   todosSons.forEach(function(som) {
     som.pause();
     som.currentTime = 0;
-    
+
     // Remove o listener de ended se for o alerta atual
     if (_audioAlertaListenerAtivo) {
       som.removeEventListener('ended', _audioAlertaListenerAtivo);
     }
   });
-  
+
   // Limpa a referência do listener ativo
   _audioAlertaListenerAtivo = null;
-  
-  console.log('[Radar X9] Todos os sons parados e listeners removidos.');
-}
+
+  // Reseta flag de alerta principal
+  _alertaPrincipalEstaTocando = false;
+
+  // Reseta contagem de toques
   contagemTocarSom = 0;
 
+  // Para os áudios específicos de alerta
   ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
     var sound = document.getElementById(id);
     if (sound) {
       sound.pause();
-      sound.currentTime = 0; // Reseta o áudio para o início
+      sound.currentTime = 0;
     }
   });
 
+  console.log('[Radar X9] Todos os sons parados e listeners removidos.');
+}
+
+
+
 
 //==============================================================
-// ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW) 
+// ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW)
 //==============================================================
-
-// Variável global para controlar o listener ativo do áudio
-var _audioAlertaListenerAtivo = null;
 
 function tocarSomAlerta(tipoAlerta) {
   if (typeof AppInventor !== 'undefined') {
     enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
   }
-  
+
   var soundId = 'alert-sound-radar';
   if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
   else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
@@ -1114,6 +1127,9 @@ function tocarSomAlerta(tipoAlerta) {
   var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
 
   if (sound && _audioDesbloqueado) {
+
+    // Marca que um alerta principal está tocando
+    _alertaPrincipalEstaTocando = true;
 
     // Remove listener anterior se existir (evita acúmulo)
     if (_audioAlertaListenerAtivo) {
@@ -1143,6 +1159,7 @@ function tocarSomAlerta(tipoAlerta) {
       } else {
         sound.removeEventListener('ended', onEnded);
         _audioAlertaListenerAtivo = null;
+        _alertaPrincipalEstaTocando = false; // Libera após tocar 3x
       }
     }
 
@@ -1153,10 +1170,14 @@ function tocarSomAlerta(tipoAlerta) {
 
   } else {
     // fallback: beep sintetizado 3x (já tem o loop interno)
+    _alertaPrincipalEstaTocando = true;
     tocarBeepEmergencia(tipoAlerta);
+    // O beep precisa ter sua própria lógica de liberação
+    setTimeout(function() {
+      _alertaPrincipalEstaTocando = false;
+    }, 2000); // Tempo estimado para 3 beeps
   }
 }
-
 
 
 // ===================================================================
@@ -1222,6 +1243,7 @@ const iconMap = {
 
 const TIPOS_ALERTA_RADAR = [
 'Detector de Parada sobre Faixa de Pedestres  (DPFP)',
+'Radar de Caminhão na Faixa Esquerda (CFE)',
 'Detector de Conversão em Local Proibido (DCP)',
 'Detector de Redução de Velocidade (REV)',
 'Verificador de Cinto de Segurança (VCS)',
@@ -1283,7 +1305,7 @@ const TIPOS_SEM_ALERTA = [
 function deveAlertaRadar(tipoOriginal) {
   if (!tipoOriginal) return false;
   var tipoLimpo = tipoOriginal.trim();
-  for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {  // ← TIPOS_SEM_ALERTA NUNCA FOI DECLARADO
+  for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {  
     if (tipoLimpo === TIPOS_SEM_ALERTA[i]) return false;
   }
   return true;
@@ -1631,6 +1653,10 @@ function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, rad
   };
 }
 
+// ================================================
+// FUNÇA APLICAR TEMA MAPA
+//==================================================
+
 function aplicarTemaMapa() {
   if (!map) return;
   var hora = new Date().getHours();
@@ -1642,31 +1668,6 @@ function aplicarTemaMapa() {
   } else {
     tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
   }
-}
-
-// ================================================
-// FUNÇÃO FECHAR ALERTA IMEDIATAMENTE
-//==================================================
-
-function fecharAlertaImediatamente() {
-  pararTodosSons(); // Silencia todos os áudios e cancela a repetição
-  clearTimeout(alertTimeout);
-}
-// ================================================
-// FUNÇÃO ESCONDER ALERTA VISUAL
-//==================================================
-
-function esconderAlertaVisual() {
-  silenciarAlertaComBeep(tipoAlertaAtivo); // ADICIONE ESTA LINHA AQUI
-
-  $("#alert-container").fadeOut(150);
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
-  $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
-  contagemTocarSom = 0;
-  fecharAlertaImediatamente(); // Garante que o som pare ao fechar visualmente
-  
-  // FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
-  ajustarPosicaoSpeedWidget(false);
 }
 
 // ===================================================================
@@ -2250,118 +2251,8 @@ function verificarProximidadeRadares() {
     if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA + 80) { ultimoRadarAlertado = null; historicoDistanciasRadar = {}; }
   }
 }
-// ===================================================================
-// FUNÇÃO ATUALIZA DISTANCIA ALERTAS
-// ===================================================================
-function atualizarDistanciaAlerta(distancia) {
-  if (!$("#alert-container").is(":visible")) return;
-  var textoAtual = $("#alert-text").text();
-  var partes = textoAtual.split(" - a ");
-  if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
-}
-
-// ===============================================
-// FUNÇÃO DISPARA ALERTA RADAR/DISTÂNCIA
-// ================================================
-function dispararAlerta(radar, distancia) {
-  const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
-  if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
-  
-  const tipoAlerta = classificarAlerta(radar.tipoOriginal);
-  const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
-  const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
-  
-  // Limpa classes e estilos inline anteriores
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-radar");
-  $(".alert-bar").css("background", ""); // Garante que não reste lixo de CSS inline
-
-  // Define a tarja, título e adiciona a classe correspondente
-  if (tipoAlerta === 'risco') {
-    $("#alert-title").text("🚧 ALERTA DE RISCO!");
-    $(".alert-bar").addClass("alert-bar-risco"); // Amarelo
-  } else if (tipoAlerta === 'mobilidade') { 
-    $("#alert-title").text("📢 AVISO DE MOBILIDADE!");
-    $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
-  } else {
-    $("#alert-title").text("⚠️ ALERTA DE RADAR!");
-    $(".alert-bar").addClass("alert-bar-radar"); // ← MUDANÇA AQUI: Adiciona classe em vez de CSS inline
-  }
-  
-  $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
-  $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
-  
-  const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
-  
-  if (isNewAlert) { 
-    $("#alert-container").fadeIn(200);   
-    contagemTocarSom = 0; 
-    ajustarPosicaoSpeedWidget(true);
-  }
-
-  // Lógica de toque de som
-  if (alertaHabilitado) {
-    var deveTocar = false;
-    if (tipoAlerta === 'radar') { 
-      if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; 
-    } else { 
-      if (isNewAlert) deveTocar = true; 
-    }
-    
-    if (deveTocar) { 
-      tocarSomAlerta(tipoAlerta); 
-      contagemTocarSom++; 
-    }
-  }
-  
-  // Aplica estilo crítico se estiver muito perto
-  if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
-    if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
-    else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
-    else $(".alert-bar").addClass("alert-bar-critico"); // Vai funcionar perfeitamente agora sem o CSS inline bloqueando
-  }
-  
-  ultimoRadarAlertado = radar.id;
-  clearTimeout(alertTimeout);
-  alertTimeout = setTimeout(function() { 
-    if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
-  }, ALERT_CONFIG.TEMPO_ALERTA);
-}
 
 
-// ===================================================================
-// BLOCO 2 — BOTÃO SILENCIAR: toca som ao mudar estado
-// ===================================================================
-function inicializarBotaoAlertaToggle() {
-  var alertBtn  = document.getElementById('btn-alert-toggle');
-  var alertIcon = document.getElementById('alert-toggle-icon');
-  if (!alertBtn) return;
-
-  alertBtn.addEventListener('click', function () {
-    alertaHabilitado = !alertaHabilitado;
-
-    if (alertaHabilitado) {
-      alertBtn.classList.remove('alert-off');
-      if (alertIcon) {
-        alertIcon.src = '/imagens_app/ic_sound_on.png';
-        alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
-      }
-      // ✅ Som de confirmação ao LIGAR
-      tocarSomAlerta('radar');
-      showNotification('Alerta LIGADO');
-    } else {
-      alertBtn.classList.add('alert-off');
-      if (alertIcon) {
-        alertIcon.src = '/imagens_app/ic_sound_off.png';
-        alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
-      }
-      // ✅ Som de confirmação ao DESLIGAR (tipo risco para distinguir)
-      tocarSomAlerta('risco');
-      showNotification('Alerta DESLIGADO');
-    }
-
-    esconderAlertaVisual();
-  });
-}
 // ===============================================
 // FUNÇÃO INICIAR MAPA DE RADARES
 // ================================================
@@ -2583,6 +2474,136 @@ async function solicitarPermissaoBussolaIOS() {
   return false;
 }
 
+//=================================================
+// ================================================
+// FUNÇÃO FECHAR ALERTA IMEDIATAMENTE
+//==================================================
+//==================================================
+
+
+function fecharAlertaImediatamente() {
+  pararTodosSons(); // Silencia todos os áudios e cancela a repetição
+  clearTimeout(alertTimeout);
+}
+
+// ===================================================================
+// ESCONDER ALERTA VISUAL SEM BEEP (para uso no botão toggle)
+// ===================================================================
+function esconderAlertaVisualSemBeep() {
+  // NÃO chama silenciarAlertaComBeep aqui
+  // NÃO chama fecharAlertaImediatamente() para não matar o alerta principal
+  
+  $("#alert-container").fadeOut(150);
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
+  $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
+  contagemTocarSom = 0;
+  
+  // Limpa o timeout do alerta para não disparar esconder depois
+  clearTimeout(alertTimeout);
+  
+  // Reseta o radar alertado para permitir novo alerta depois
+  ultimoRadarAlertado = null;
+  tipoAlertaAtivo = null;
+
+  // FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
+  ajustarPosicaoSpeedWidget(false);
+}
+
+// ================================================
+// FUNÇÃO ESCONDER ALERTA VISUAL (original)
+//=================================================
+
+function esconderAlertaVisual() {
+  silenciarAlertaComBeep(tipoAlertaAtivo); // Beep de confirmação ao fechar
+
+  $("#alert-container").fadeOut(150);
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
+  $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
+  contagemTocarSom = 0;
+  fecharAlertaImediatamente(); // Garante que o som pare ao fechar visualmente
+
+  // FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
+  ajustarPosicaoSpeedWidget(false);
+}
+
+// ================================================
+// FUNÇÃO DISPARA ALERTA RADAR/DISTÂNCIA
+// ================================================
+function dispararAlerta(radar, distancia) {
+  const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
+  if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) return;
+
+  const tipoAlerta = classificarAlerta(radar.tipoOriginal);
+  const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
+  const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
+
+  // Limpa classes e estilos inline anteriores
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-radar");
+  $(".alert-bar").css("background", ""); // Garante que não reste lixo de CSS inline
+
+  // Define a tarja, título e adiciona a classe correspondente
+  if (tipoAlerta === 'risco') {
+    $("#alert-title").text("🚧 ALERTA DE RISCO!");
+    $(".alert-bar").addClass("alert-bar-risco"); // Amarelo
+  } else if (tipoAlerta === 'mobilidade') { 
+    $("#alert-title").text("📢 AVISO DE MOBILIDADE!");
+    $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
+  } else {
+    $("#alert-title").text("⚠️ ALERTA DE RADAR!");
+    $(".alert-bar").addClass("alert-bar-radar"); // ← MUDANÇA AQUI: Adiciona classe em vez de CSS inline
+  }
+
+  $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
+  $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
+
+  const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
+
+  if (isNewAlert) { 
+    $("#alert-container").fadeIn(200);   
+    contagemTocarSom = 0; 
+    ajustarPosicaoSpeedWidget(true);
+  }
+
+  // Lógica de toque de som
+  if (alertaHabilitado) {
+    var deveTocar = false;
+    if (tipoAlerta === 'radar') { 
+      if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; 
+    } else { 
+      if (isNewAlert) deveTocar = true; 
+    }
+
+    if (deveTocar) { 
+      tocarSomAlerta(tipoAlerta); 
+      contagemTocarSom++; 
+    }
+  }
+
+  // Aplica estilo crítico se estiver muito perto
+  if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+    if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
+    else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
+    else $(".alert-bar").addClass("alert-bar-critico"); // Vai funcionar perfeitamente agora sem o CSS inline bloqueando
+  }
+
+  ultimoRadarAlertado = radar.id;
+  clearTimeout(alertTimeout);
+  alertTimeout = setTimeout(function() { 
+    if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
+  }, ALERT_CONFIG.TEMPO_ALERTA);
+}
+
+// ===================================================================
+// FUNÇÃO ATUALIZA DISTANCIA ALERTAS
+// ===================================================================
+function atualizarDistanciaAlerta(distancia) {
+  if (!$("#alert-container").is(":visible")) return;
+  var textoAtual = $("#alert-text").text();
+  var partes = textoAtual.split(" - a ");
+  if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
+}
+
+
 // ===================================================================
 // INTEGRAÇÃO APP INVENTOR & PWA - NOTIFICAÇÃO NATIVA
 // ===================================================================
@@ -2697,10 +2718,86 @@ function desbloquearAudioMobile() {
   document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
 });
 
+
+// ===================================================================
+// BLOCO 2 — BOTÃO SILENCIAR: toca som ao mudar estado (CORRIGIDO)
+// ===================================================================
+function inicializarBotaoAlertaToggle() {
+  var alertBtn  = document.getElementById('btn-alert-toggle');
+  var alertIcon = document.getElementById('alert-toggle-icon');
+  if (!alertBtn) return;
+
+  alertBtn.addEventListener('click', function () {
+    alertaHabilitado = !alertaHabilitado;
+
+    if (alertaHabilitado) {
+      alertBtn.classList.remove('alert-off');
+      if (alertIcon) {
+        alertIcon.src = '/imagens_app/ic_sound_on.png';
+        alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
+      }
+      // ✅ Som de confirmação ao LIGAR
+      // Usa beep leve em vez de tocarSomAlerta para não conflitar
+      tocarBeepConfirmacao('on');
+      showNotification('Alerta LIGADO');
+    } else {
+      alertBtn.classList.add('alert-off');
+      if (alertIcon) {
+        alertIcon.src = '/imagens_app/ic_sound_off.png';
+        alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
+      }
+      // ✅ Som de confirmação ao DESLIGAR (tipo risco para distinguir)
+      tocarBeepConfirmacao('off');
+      showNotification('Alerta DESLIGADO');
+    }
+
+    // NÃO chama esconderAlertaVisual() aqui se um alerta está ativo
+    // pois ela chama silenciarAlertaComBeep que pode matar o som do alerta
+    if ($("#alert-container").is(":visible")) {
+      esconderAlertaVisualSemBeep();
+    }
+  });
+}
+
+// ===================================================================
+// BEEP DE CONFIRMAÇÃO DO BOTÃO (novo — não interfere nos alertas)
+// ===================================================================
+function tocarBeepConfirmacao(estado) {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (estado === 'on') {
+      // Bipe curto e agudo — ligado
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200, ctx.currentTime);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.1);
+    } else {
+      // Bipe descendente — desligado
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.2);
+    }
+  } catch(e) {
+    console.warn("Beep de confirmação falhou:", e);
+  }
+}
+
+
 // ======================================================
 // FUNÇÃO DISPARA ALERTA BEEP DE EMERGENCIA VIA WEB AUDIO
 // ======================================================
-// ---- Beep de emergência via Web Audio API (100% confiável no WebView) ---
+
 function tocarBeepEmergencia(tipoAlerta) {
   try {
     var ctx = getAudioCtx();
@@ -2713,16 +2810,23 @@ function tocarBeepEmergencia(tipoAlerta) {
     console.error('[Radar X9] Falha total ao tocar beep:', e);
   }
 }
-
 // ===================================================================
-// FUNÇÃO TOCAR BEEP PARA BOTÃO SILENCIAR APENAS
+// FUNÇÃO TOCAR BEEP PARA BOTÃO SILENCIAR APENAS (CORRIGIDA)
 // ===================================================================
 
 function silenciarAlertaComBeep(tipoAlerta) {
   // 1. Para os arquivos .mp3 do alerta (radar/risco/aviso) imediatamente
-  pararTodosSons(); 
+  pararTodosSons();
 
   // 2. Toca o Bipe específico do tipo de alerta que estava tocando
+  // MAS SÓ SE NÃO HOUVER ALERTA PRINCIPAL TOCANDO AGORA
+  // Isso evita que o beep de confirmação do botão "LIGAR" 
+  // interfira no alerta principal que acabou de começar
+  if (_alertaPrincipalEstaTocando) {
+    console.log('[Radar X9] Beep de silenciar suprimido: alerta principal está tocando.');
+    return;
+  }
+
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
     _tocarBeep(ctx, tipoAlerta);
@@ -2731,7 +2835,9 @@ function silenciarAlertaComBeep(tipoAlerta) {
   }
 }
 
-// Sua função original de Beep restaurada intacta
+//==============================================
+// FUNÇÃO ORIGINAL DE BEEP RESTAURADA INTACTA
+//===============================================
 function _tocarBeep(ctx, tipoAlerta) {
   var osc = ctx.createOscillator();
   var gain = ctx.createGain();
@@ -2739,7 +2845,6 @@ function _tocarBeep(ctx, tipoAlerta) {
   gain.connect(ctx.destination);
 
   if (tipoAlerta === 'risco') {
-
     // Dois bipes descendentes — tom de perigo
     osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(600, ctx.currentTime);
@@ -2751,7 +2856,6 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.4);
   } else if (tipoAlerta === 'mobilidade') {
-
     // Dois bipes ascendentes — tom positivo
     osc.type = 'sine';
     osc.frequency.setValueAtTime(600, ctx.currentTime);
@@ -2763,7 +2867,6 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.35);
   } else {
-
     // Bipe padrão radar — curto e alto
     osc.type = 'sine';
     osc.frequency.setValueAtTime(1050, ctx.currentTime);
@@ -2784,6 +2887,7 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc2.stop(ctx.currentTime + 0.43);
   }
 }
+
 // ===================================================================
 // VERIFICAÇÃO PRINCIPAL DE ALERTAS A 180 METROS
 // ===================================================================
@@ -2797,10 +2901,10 @@ function verificarAlertasRadares() {
   for (var i = 0; i < radarMarkers.length; i++) {
     var m = radarMarkers[i];
     if (!m.options || !m.options.record) continue;
-    
+
     var rData = m.options.record;
     var tipoOriginal = rData.tipo || rData.tipo_equipamento || "";
-    
+
     if (!deveAlertaRadar(tipoOriginal)) continue;
 
     var rLat = m.getLatLng().lat;
@@ -2847,7 +2951,7 @@ function verificarAlertasRadares() {
 
     $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-MOBILIDADE");
     $(".alert-bar").css("background", "");
-    
+
     if (tipoClassificado === 'radar') {
       tipoAlertaAtivo = 'radar';
       $("#alert-title").text("⚠️ ATENÇÃO RADAR!");
