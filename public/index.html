@@ -2474,12 +2474,12 @@ async function solicitarPermissaoBussolaIOS() {
   return false;
 }
 
+
 //=================================================
 // ================================================
 // FUNÇÃO FECHAR ALERTA IMEDIATAMENTE
 //==================================================
 //==================================================
-
 
 function fecharAlertaImediatamente() {
   pararTodosSons(); // Silencia todos os áudios e cancela a repetição
@@ -2487,14 +2487,21 @@ function fecharAlertaImediatamente() {
 }
 
 // ===================================================================
-// ESCONDER ALERTA VISUAL SEM BEEP (para uso no botão toggle)
+// ESCONDER ALERTA VISUAL SEM BEEP (Usado ao passar radar ou botão)
 // ===================================================================
 function esconderAlertaVisualSemBeep() {
-  // NÃO chama silenciarAlertaComBeep aqui
-  // NÃO chama fecharAlertaImediatamente() para não matar o alerta principal
-  
+  // Para o áudio explicitamente (HTML5 Audio tags)
+  var audios = ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'];
+  audios.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.pause();
+      el.currentTime = 0;
+    }
+  });
+
   $("#alert-container").fadeOut(150);
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   contagemTocarSom = 0;
   
@@ -2510,11 +2517,13 @@ function esconderAlertaVisualSemBeep() {
 }
 
 // ================================================
-// FUNÇÃO ESCONDER ALERTA VISUAL (original)
+// FUNÇÃO ESCONDER ALERTA VISUAL (com beep de fechamento)
+// NOTA: Esta função NÃO é mais usada para passar o radar,
+// apenas para interações manuais que exijam feedback sonoro diferente.
 //=================================================
 
 function esconderAlertaVisual() {
-  silenciarAlertaComBeep(tipoAlertaAtivo); // Beep de confirmação ao fechar
+  silenciarAlertaComBeep(tipoAlertaAtivo); // Beep de confirmação ao fechar manual (se desejado)
 
   $("#alert-container").fadeOut(150);
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
@@ -2538,7 +2547,7 @@ function dispararAlerta(radar, distancia) {
   const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
 
   // Limpa classes e estilos inline anteriores
-  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-radar");
+  $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-radar");
   $(".alert-bar").css("background", ""); // Garante que não reste lixo de CSS inline
 
   // Define a tarja, título e adiciona a classe correspondente
@@ -2550,7 +2559,7 @@ function dispararAlerta(radar, distancia) {
     $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
   } else {
     $("#alert-title").text("⚠️ ALERTA DE RADAR!");
-    $(".alert-bar").addClass("alert-bar-radar"); // ← MUDANÇA AQUI: Adiciona classe em vez de CSS inline
+    $(".alert-bar").addClass("alert-bar-radar");
   }
 
   $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
@@ -2583,13 +2592,15 @@ function dispararAlerta(radar, distancia) {
   if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
     if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
     else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
-    else $(".alert-bar").addClass("alert-bar-critico"); // Vai funcionar perfeitamente agora sem o CSS inline bloqueando
+    else $(".alert-bar").addClass("alert-bar-critico");
   }
 
   ultimoRadarAlertado = radar.id;
   clearTimeout(alertTimeout);
+  
+  // CORREÇÃO: Usar esconderAlertaVisualSemBeep para não tocar beep ao expirar o tempo
   alertTimeout = setTimeout(function() { 
-    if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
+    if ($("#alert-container").is(":visible")) esconderAlertaVisualSemBeep(); 
   }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
@@ -2628,7 +2639,7 @@ function receberDadosAppInventor(dadosStr) {
     var lng = parseFloat(partes[2]);
     var speed = partes[3] ? parseFloat(partes[3]) : 0;
     var heading = partes[4] ? parseFloat(partes[4]) : null;
-    if (heading === -1 || isNaN(heading)) heading = null; // Tratamento Azimuth
+    if (heading === -1 || isNaN(heading)) heading = null;
     if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
       gpsSource = 'appinventor';
       processarNovaPosicao(lat, lng, speed, heading);
@@ -2681,10 +2692,9 @@ async function solicitarWakeLock() {
 
 
 // ===================================================================
-// BLOCO 1 — AUDIO ENGINE (CORRIGIDO PARA WEBVIEW APP INVENTOR)
+// BLOCO 1 — AUDIO ENGINE
 // ===================================================================
 
-// ---- AudioContext singleton ----------------------------------------
 var _audioCtx = null;
 var _audioDesbloqueado = false;
 
@@ -2695,7 +2705,6 @@ function getAudioCtx() {
   return _audioCtx;
 }
 
-// Desbloqueia o contexto de áudio no primeiro gesto do usuário
 function desbloquearAudioMobile() {
   if (_audioDesbloqueado) return;
   try {
@@ -2713,14 +2722,13 @@ function desbloquearAudioMobile() {
   }
 }
 
-// Registra o desbloqueio em qualquer interação do usuário
 ['click', 'touchstart', 'touchend', 'keydown'].forEach(function (evt) {
   document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
 });
 
 
 // ===================================================================
-// BLOCO 2 — BOTÃO SILENCIAR: toca som ao mudar estado (CORRIGIDO)
+// BLOCO 2 — BOTÃO SILENCIAR (CORRIGIDO: Beeps Diferentes On/Off)
 // ===================================================================
 function inicializarBotaoAlertaToggle() {
   var alertBtn  = document.getElementById('btn-alert-toggle');
@@ -2728,31 +2736,32 @@ function inicializarBotaoAlertaToggle() {
   if (!alertBtn) return;
 
   alertBtn.addEventListener('click', function () {
+    // Toca o beep correspondente ANTES de mudar o estado visual se preferir, ou depois. Aqui estamos mudando estado.
     alertaHabilitado = !alertaHabilitado;
 
     if (alertaHabilitado) {
+      // LIGAR
       alertBtn.classList.remove('alert-off');
       if (alertIcon) {
         alertIcon.src = '/imagens_app/ic_sound_on.png';
         alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
       }
-      // ✅ Som de confirmação ao LIGAR
-      // Usa beep leve em vez de tocarSomAlerta para não conflitar
+      // Beep Agudo (Ligado)
       tocarBeepConfirmacao('on');
       showNotification('Alerta LIGADO');
     } else {
+      // DESLIGAR
       alertBtn.classList.add('alert-off');
       if (alertIcon) {
         alertIcon.src = '/imagens_app/ic_sound_off.png';
         alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
       }
-      // ✅ Som de confirmação ao DESLIGAR (tipo risco para distinguir)
+      // Beep Descendente (Desligado)
       tocarBeepConfirmacao('off');
       showNotification('Alerta DESLIGADO');
     }
 
-    // NÃO chama esconderAlertaVisual() aqui se um alerta está ativo
-    // pois ela chama silenciarAlertaComBeep que pode matar o som do alerta
+    // Se houver alerta visual aberto, fecha sem beep de radar
     if ($("#alert-container").is(":visible")) {
       esconderAlertaVisualSemBeep();
     }
@@ -2760,33 +2769,38 @@ function inicializarBotaoAlertaToggle() {
 }
 
 // ===================================================================
-// BEEP DE CONFIRMAÇÃO DO BOTÃO (novo — não interfere nos alertas)
+// BEEP DE CONFIRMAÇÃO DO BOTÃO (Sintetizado)
 // ===================================================================
 function tocarBeepConfirmacao(estado) {
   try {
-    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var ctx = getAudioCtx(); // Reusa o contexto global
+    if (ctx.state === 'suspended') ctx.resume();
+
     var osc = ctx.createOscillator();
     var gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
 
+    var agora = ctx.currentTime;
+
     if (estado === 'on') {
-      // Bipe curto e agudo — ligado
+      // Bipe curto e agudo — Ligou
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(1200, ctx.currentTime);
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(1000, agora);
+      osc.frequency.exponentialRampToValueAtTime(1500, agora + 0.1);
+      gain.gain.setValueAtTime(0.3, agora);
+      gain.gain.linearRampToValueAtTime(0, agora + 0.15);
+      osc.start(agora);
+      osc.stop(agora + 0.15);
     } else {
-      // Bipe descendente — desligado
+      // Bipe descendente — Desligou
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.2);
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.2);
+      osc.frequency.setValueAtTime(800, agora);
+      osc.frequency.linearRampToValueAtTime(300, agora + 0.25);
+      gain.gain.setValueAtTime(0.3, agora);
+      gain.gain.linearRampToValueAtTime(0, agora + 0.25);
+      osc.start(agora);
+      osc.stop(agora + 0.25);
     }
   } catch(e) {
     console.warn("Beep de confirmação falhou:", e);
@@ -2795,7 +2809,7 @@ function tocarBeepConfirmacao(estado) {
 
 
 // ======================================================
-// FUNÇÃO DISPARA ALERTA BEEP DE EMERGENCIA VIA WEB AUDIO
+// FUNÇÃO DISPARA ALERTA BEEP DE EMERGENCIA (Fallback)
 // ======================================================
 
 function tocarBeepEmergencia(tipoAlerta) {
@@ -2810,20 +2824,19 @@ function tocarBeepEmergencia(tipoAlerta) {
     console.error('[Radar X9] Falha total ao tocar beep:', e);
   }
 }
+
 // ===================================================================
-// FUNÇÃO TOCAR BEEP PARA BOTÃO SILENCIAR APENAS (CORRIGIDA)
+// FUNÇÃO SILÊNCIAR COM BEEP (Apenas se chamada manualmente)
 // ===================================================================
 
 function silenciarAlertaComBeep(tipoAlerta) {
-  // 1. Para os arquivos .mp3 do alerta (radar/risco/aviso) imediatamente
   pararTodosSons();
-
-  // 2. Toca o Bipe específico do tipo de alerta que estava tocando
-  // MAS SÓ SE NÃO HOUVER ALERTA PRINCIPAL TOCANDO AGORA
-  // Isso evita que o beep de confirmação do botão "LIGAR" 
-  // interfira no alerta principal que acabou de começar
+  // Esta função toca o beep do alerta sendo encerrado.
+  // Se não for usada pelo botão, pode ser usada para fechamento manual.
+  // Mas para passar radar, usamos esconderAlertaVisualSemBeep.
+  
   if (_alertaPrincipalEstaTocando) {
-    console.log('[Radar X9] Beep de silenciar suprimido: alerta principal está tocando.');
+    console.log('[Radar X9] Beep de silenciar suprimido.');
     return;
   }
 
@@ -2836,7 +2849,7 @@ function silenciarAlertaComBeep(tipoAlerta) {
 }
 
 //==============================================
-// FUNÇÃO ORIGINAL DE BEEP RESTAURADA INTACTA
+// FUNÇÃO ORIGINAL DE BEEP RESTAURADA
 //===============================================
 function _tocarBeep(ctx, tipoAlerta) {
   var osc = ctx.createOscillator();
@@ -2845,7 +2858,6 @@ function _tocarBeep(ctx, tipoAlerta) {
   gain.connect(ctx.destination);
 
   if (tipoAlerta === 'risco') {
-    // Dois bipes descendentes — tom de perigo
     osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(600, ctx.currentTime);
     osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.15);
@@ -2856,7 +2868,6 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.4);
   } else if (tipoAlerta === 'mobilidade') {
-    // Dois bipes ascendentes — tom positivo
     osc.type = 'sine';
     osc.frequency.setValueAtTime(600, ctx.currentTime);
     osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.12);
@@ -2867,14 +2878,14 @@ function _tocarBeep(ctx, tipoAlerta) {
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.35);
   } else {
-    // Bipe padrão radar — curto e alto
+    // Padrão Radar
     osc.type = 'sine';
     osc.frequency.setValueAtTime(1050, ctx.currentTime);
     gain.gain.setValueAtTime(0.6, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.18);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.18);
-    // Segundo bipe
+    
     var osc2 = ctx.createOscillator();
     var gain2 = ctx.createGain();
     osc2.connect(gain2);
@@ -2889,7 +2900,7 @@ function _tocarBeep(ctx, tipoAlerta) {
 }
 
 // ===================================================================
-// VERIFICAÇÃO PRINCIPAL DE ALERTAS A 180 METROS
+// VERIFICAÇÃO PRINCIPAL DE ALERTAS A 180 METROS (CORRIGIDA)
 // ===================================================================
 function verificarAlertasRadares() {
   if (!alertaHabilitado || !userLat || !userLng) return;
@@ -2898,6 +2909,7 @@ function verificarAlertasRadares() {
   var menorDistancia = Infinity;
   var tipoAlertaMaisProximo = null;
 
+  // Encontra o radar mais próximo
   for (var i = 0; i < radarMarkers.length; i++) {
     var m = radarMarkers[i];
     if (!m.options || !m.options.record) continue;
@@ -2918,9 +2930,11 @@ function verificarAlertasRadares() {
     }
   }
 
+  // Se não há radar perto ou está muito longe
   if (!radarMaisProximo || menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA) {
     if ($("#alert-container").is(":visible") && ultimoRadarAlertado === (radarMaisProximo ? radarMaisProximo.options.id : null)) {
-      esconderAlertaVisual();
+      // CORREÇÃO: Fecha sem beep ao sair da área
+      esconderAlertaVisualSemBeep();
     }
     ultimoRadarAlertado = null;
     tipoAlertaAtivo = null;
@@ -2933,8 +2947,12 @@ function verificarAlertasRadares() {
 
   var direcao = verificarDirecaoMelhorada(userLat, userLng, currentHeading, radarMaisProximo.getLatLng().lat, radarMaisProximo.getLatLng().lng, rId, menorDistancia);
 
+  // Se estiver se afastando e já passou do ponto
   if (direcao.estaAfastando && menorDistancia > ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
-    if (ultimoRadarAlertado === rId) esconderAlertaVisual();
+    if (ultimoRadarAlertado === rId) {
+      // CORREÇÃO: Fecha sem beep ao PASSAR o radar
+      esconderAlertaVisualSemBeep();
+    }
     ultimoRadarAlertado = null;
     tipoAlertaAtivo = null;
     return;
@@ -2944,6 +2962,7 @@ function verificarAlertasRadares() {
     ultimoRadarAlertado = rId;
   }
 
+  // Dispara alerta se estiver se aproximando
   if (direcao.estaAproximando && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
     var nomeFormatado = ajusteNomes[tipoAlertaMaisProximo.trim()] || tipoAlertaMaisProximo;
     var velRadar = rData.velocidade || rData.vel || "";
@@ -2984,39 +3003,49 @@ function verificarAlertasRadares() {
     }
 
     clearTimeout(alertTimeout);
+    // CORREÇÃO: Timeout usa função sem beep
     alertTimeout = setTimeout(function() { 
-      if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
+      if ($("#alert-container").is(":visible")) esconderAlertaVisualSemBeep(); 
     }, ALERT_CONFIG.TEMPO_ALERTA);
   }
 }
+
 //==============================================================
-// ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW) 
+// FUNÇÃO TOCAR SOM ALERTA (MP3)
 //==============================================================
 
 function tocarSomAlerta(tipoAlerta) {
+  // Envia comando para App Inventor se existir
   if (typeof AppInventor !== 'undefined') {
     enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
   }
+
+  // Identifica o ID do elemento de áudio HTML5
   var soundId = 'alert-sound-radar';
-if (tipoAlerta === 'risco')   soundId = 'alert-sound-risco';
-else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';  // ← corrigido
+  if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
+  else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
 
+  var sound = document.getElementById(soundId);
 
-  var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
-
+  // Toca MP3 se disponível
   if (sound && _audioDesbloqueado) {
-    // Toca 3 vezes em sequência usando o evento 'ended'
     var toques = 0;
     var numToques = 3;
 
     function tocarUmaVez() {
+      // Reinicia o áudio
       sound.currentTime = 0;
-      var p = sound.play();
-      if (p !== undefined) {
-        p.then(function () {
-          // aguarda o fim do mp3 para tocar novamente
-        }).catch(function () {
-          tocarBeepEmergencia(tipoAlerta); // fallback beep também 3x
+      var promessaDeSom = sound.play();
+
+      if (promessaDeSom !== undefined) {
+        promessaDeSom.then(function () {
+          // Sucesso ao tocar
+          console.log('[Radar X9] Tocando MP3:', soundId);
+        }).catch(function (erro) {
+          // Erro ao tocar (ex: arquivo não encontrado ou bloqueio)
+          console.warn('[Radar X9] Falha ao tocar MP3 (' + soundId + '):', erro);
+          // Fallback para beep sintetizado APENAS se falhar o MP3
+          if (toques === 0) tocarBeepEmergencia(tipoAlerta);
         });
       }
     }
@@ -3024,18 +3053,19 @@ else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';  // ← cor
     function onEnded() {
       toques++;
       if (toques < numToques) {
-        tocarUmaVez();
+        tocarUmaVoz();
       } else {
         sound.removeEventListener('ended', onEnded);
       }
     }
 
-    sound.removeEventListener('ended', onEnded); // limpa listener anterior
+    sound.removeEventListener('ended', onEnded);
     sound.addEventListener('ended', onEnded);
-    tocarUmaVez(); // dispara o primeiro toque
+    tocarUmaVoz();
 
   } else {
-    // fallback: beep sintetizado 3x (já tem o loop interno)
+    // Se o elemento de áudio não existe ou áudio não desbloqueado, usa fallback beep
+    console.warn('[Radar X9] Elemento de áudio não encontrado ou contexto bloqueado. Usando fallback.');
     tocarBeepEmergencia(tipoAlerta);
   }
 }
