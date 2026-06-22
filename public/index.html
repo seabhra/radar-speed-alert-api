@@ -1056,127 +1056,128 @@ var tipoAlertaAtivo = null;
 
 
 // ===================================================================
-// CONTROLE DE ÁUDIO - GARANTE QUE APENAS O SOM CORRETO TOQUE 3 VEZES
+// ✅ BLOCO CORRIGIDO — CONTROLE DE ESTADO DA SEQUÊNCIA DE SOM
 // ===================================================================
-var contagemTocarSom = 0;
-var timerProximoSom = null;
 
-// Variável global para controlar o listener ativo do áudio
-var _audioAlertaListenerAtivo = null;
-
-// Flag para evitar que o beep de confirmação do botão silenciar
-// interfira no alerta principal que está tocando
 var _alertaPrincipalEstaTocando = false;
+var _sequenciaSomId = 0;
 
+// Mapa de listeners ativos por elemento de áudio
+// Permite remover o listener correto sem acumular lixo
+var _soundListeners = {};
 
+function cancelarSequenciaSom() {
+  _sequenciaSomId++;
+  _alertaPrincipalEstaTocando = false;
+  // Remove qualquer listener 'ended' pendente em todos os elementos de áudio
+  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && _soundListeners[id]) {
+      el.removeEventListener('ended', _soundListeners[id]);
+      delete _soundListeners[id];
+      el.pause();
+      el.currentTime = 0;
+    }
+  });
+}
 
 //==============================================================
 // ---- PARA TODOS OS SONS (ATUALIZADA - remove listeners pendentes)
 //==============================================================
 
+// ===================================================================
+// ✅ pararTodosSons CORRIGIDA
+// — Deve pausar TODOS os elementos de áudio e cancelar a sequência
+// ===================================================================
 function pararTodosSons() {
-  // Para TODOS os elementos de áudio da página
-  var todosSons = document.querySelectorAll('audio');
-  todosSons.forEach(function(som) {
-    som.pause();
-    som.currentTime = 0;
-
-    // Remove o listener de ended se for o alerta atual
-    if (_audioAlertaListenerAtivo) {
-      som.removeEventListener('ended', _audioAlertaListenerAtivo);
-    }
-  });
-
-  // Limpa a referência do listener ativo
-  _audioAlertaListenerAtivo = null;
-
-  // Reseta flag de alerta principal
-  _alertaPrincipalEstaTocando = false;
-
-  // Reseta contagem de toques
-  contagemTocarSom = 0;
-
-  // Para os áudios específicos de alerta
+  cancelarSequenciaSom(); // Invalida a sequência antes de pausar
   ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
-    var sound = document.getElementById(id);
-    if (sound) {
-      sound.pause();
-      sound.currentTime = 0;
+    var el = document.getElementById(id);
+    if (el) {
+      el.pause();
+      el.currentTime = 0;
     }
   });
-
-  console.log('[Radar X9] Todos os sons parados e listeners removidos.');
 }
 
-
-
-
-//==============================================================
-// ---- tocarSomAlerta principal (CORRIGIDA PARA WEBVIEW)
-//==============================================================
-
+// ===================================================================
+// ✅ tocarSomAlerta CORRIGIDA
+// — Garante que apenas UMA sequência de 3 toques rode por vez
+// — O listener 'ended' é registrado no mapa e removido corretamente
+// — Não cai para beep em caso de falha de play()
+// ===================================================================
 function tocarSomAlerta(tipoAlerta) {
+  // Envia comando para AppInventor se disponível
   if (typeof AppInventor !== 'undefined') {
     enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
   }
 
+  // Se uma sequência já está tocando, não inicia outra
+  if (_alertaPrincipalEstaTocando) return;
+
   var soundId = 'alert-sound-radar';
-  if (tipoAlerta === 'risco') soundId = 'alert-sound-risco';
+  if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
   else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
 
-  var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
+  var sound = document.getElementById(soundId)
+           || document.getElementById('alert-sound-radar');
 
-  if (sound && _audioDesbloqueado) {
-
-    // Marca que um alerta principal está tocando
-    _alertaPrincipalEstaTocando = true;
-
-    // Remove listener anterior se existir (evita acúmulo)
-    if (_audioAlertaListenerAtivo) {
-      sound.removeEventListener('ended', _audioAlertaListenerAtivo);
-      _audioAlertaListenerAtivo = null;
-    }
-
-    var toques = 0;
-    var numToques = 3;
-
-    function tocarUmaVez() {
-      sound.currentTime = 0;
-      var p = sound.play();
-      if (p !== undefined) {
-        p.then(function () {
-          // aguarda o fim do mp3 para tocar novamente
-        }).catch(function () {
-          tocarBeepEmergencia(tipoAlerta); // fallback beep também 3x
-        });
-      }
-    }
-
-    function onEnded() {
-      toques++;
-      if (toques < numToques) {
-        tocarUmaVez();
-      } else {
-        sound.removeEventListener('ended', onEnded);
-        _audioAlertaListenerAtivo = null;
-        _alertaPrincipalEstaTocando = false; // Libera após tocar 3x
-      }
-    }
-
-    // Guarda referência do listener para poder removê-lo externamente
-    _audioAlertaListenerAtivo = onEnded;
-    sound.addEventListener('ended', onEnded);
-    tocarUmaVez(); // dispara o primeiro toque
-
-  } else {
-    // fallback: beep sintetizado 3x (já tem o loop interno)
-    _alertaPrincipalEstaTocando = true;
-    tocarBeepEmergencia(tipoAlerta);
-    // O beep precisa ter sua própria lógica de liberação
-    setTimeout(function() {
-      _alertaPrincipalEstaTocando = false;
-    }, 2000); // Tempo estimado para 3 beeps
+  if (!sound) {
+    console.warn('[Radar X9] Elemento de áudio não encontrado:', soundId);
+    return;
   }
+
+  // Nova rodada: invalida sequências anteriores e registra o ID desta
+  _sequenciaSomId++;
+  var meuId = _sequenciaSomId;
+  _alertaPrincipalEstaTocando = true;
+
+  var toques = 0;
+  var numToques = 3;
+
+  // Remove listener anterior registrado para este elemento (se houver)
+  if (_soundListeners[soundId]) {
+    sound.removeEventListener('ended', _soundListeners[soundId]);
+    delete _soundListeners[soundId];
+  }
+
+  function onEnded() {
+    // Sequência foi cancelada externamente (botão, passou pelo radar, etc.)
+    if (meuId !== _sequenciaSomId) {
+      sound.removeEventListener('ended', onEnded);
+      delete _soundListeners[soundId];
+      _alertaPrincipalEstaTocando = false;
+      return;
+    }
+
+    toques++;
+    if (toques < numToques) {
+      // Próximo toque da sequência
+      sound.currentTime = 0;
+      sound.play().catch(function(err) {
+        console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
+        // Não substitui por beep — tenta continuar na sequência
+      });
+    } else {
+      // Sequência de 3 toques concluída normalmente
+      sound.removeEventListener('ended', onEnded);
+      delete _soundListeners[soundId];
+      _alertaPrincipalEstaTocando = false;
+    }
+  }
+
+  // Registra o listener no mapa global para poder removê-lo depois
+  _soundListeners[soundId] = onEnded;
+  sound.addEventListener('ended', onEnded);
+
+  // Dispara o primeiro toque
+  sound.currentTime = 0;
+  sound.play().catch(function(err) {
+    console.warn('[Radar X9] Falha ao iniciar mp3 (' + soundId + '):', err);
+    sound.removeEventListener('ended', onEnded);
+    delete _soundListeners[soundId];
+    _alertaPrincipalEstaTocando = false;
+  });
 }
 
 
@@ -2723,24 +2724,9 @@ function desbloquearAudioMobile() {
 // ===================================================================
 // ✅ NOVO BLOCO — CONTROLE DE ESTADO DA SEQUÊNCIA DE SOM (mp3)
 // ===================================================================
-// Esta é a peça que faltava: o código original referenciava
-// `_alertaPrincipalEstaTocando` em silenciarAlertaComBeep() mas nunca
-// declarava nem atualizava essa variável em lugar nenhum. Resultado:
-// depois de religar o botão, o estado ficava "preso" e o ciclo de
-// toques do mp3 não voltava a funcionar direito.
-//
-// Agora `tocarSomAlerta` é o único responsável por ligar/desligar
-// `_alertaPrincipalEstaTocando`, e `cancelarSequenciaSom()` é o único
-// ponto que interrompe a sequência de 3 toques (deixando o toque
-// atual terminar, mas impedindo o próximo).
-// ===================================================================
-var _alertaPrincipalEstaTocando = false;
+
 var _sequenciaSomId = 0; // identifica cada "rodada" de 3 toques
 
-function cancelarSequenciaSom() {
-  _sequenciaSomId++; // invalida qualquer sequência de toques em andamento
-  _alertaPrincipalEstaTocando = false;
-}
 
 // ===================================================================
 // BLOCO 2 — BOTÃO SILENCIAR: toca som ao mudar estado (CORRIGIDO)
@@ -2825,21 +2811,31 @@ function tocarBeepConfirmacao(estado) {
 // ===================================================================
 // FUNÇÃO TOCAR BEEP PARA BOTÃO SILENCIAR APENAS (CORRIGIDA)
 // ===================================================================
+// ===================================================================
+// ✅ silenciarAlertaComBeep CORRIGIDA
+// — Cancela a sequência mp3 ANTES de criar o AudioContext do beep
+// — Fecha o AudioContext após o uso para não vazar recursos
+// ===================================================================
 function silenciarAlertaComBeep(tipoAlerta) {
-  // 1. Para os arquivos .mp3 do alerta (radar/risco/aviso) imediatamente
-  //    e cancela qualquer sequência de toques pendente
-  pararTodosSons();
+  // 1. Para imediatamente qualquer sequência mp3 em andamento
   cancelarSequenciaSom();
 
-  // 2. Toca o bipe de confirmação curto ao fechar o alerta
+  // 2. Toca o bipe de confirmação curto
+  var ctx;
   try {
-    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
     _tocarBeep(ctx, tipoAlerta);
+    // Fecha o contexto depois que os osciladores terminarem (~500ms)
+    setTimeout(function() {
+      if (ctx && ctx.state !== 'closed') {
+        ctx.close().catch(function(){});
+      }
+    }, 600);
   } catch(e) {
-    console.warn("Áudio não suportado para o beep:", e);
+    console.warn('[Radar X9] Áudio não suportado para o beep:', e);
+    if (ctx) ctx.close().catch(function(){});
   }
 }
-
 //==============================================
 // FUNÇÃO ORIGINAL DE BEEP RESTAURADA INTACTA
 //===============================================
@@ -2993,83 +2989,13 @@ function verificarAlertasRadares() {
   }
 }
 
-//==============================================================
-// ---- tocarSomAlerta principal (CORRIGIDA: SEMPRE MP3, sem
-// fallback de beep "engasgado", e cancelável no meio da sequência)
-//==============================================================
 
-function tocarSomAlerta(tipoAlerta) {
-  if (typeof AppInventor !== 'undefined') {
-    enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
-  }
-
-  var soundId = 'alert-sound-radar';
-  if (tipoAlerta === 'risco')   soundId = 'alert-sound-risco';
-  else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
-
-  var sound = document.getElementById(soundId) || document.getElementById('alert-sound-radar');
-
-  // ✅ NOVO: marca o início de uma nova "rodada" de 3 toques.
-  // Qualquer rodada anterior em andamento é automaticamente invalidada
-  // porque o id muda — isso é o que permite religar o botão e voltar
-  // a tocar mp3 normalmente, sem depender de _alertaPrincipalEstaTocando
-  // ter sido deixada "presa" em true por engano.
-  _sequenciaSomId++;
-  var meuSequenciaId = _sequenciaSomId;
-  _alertaPrincipalEstaTocando = true;
-
-  if (!sound) {
-    console.warn('[Radar X9] Elemento de áudio não encontrado para:', soundId);
-    _alertaPrincipalEstaTocando = false;
-    return;
-  }
-
-  var toques = 0;
-  var numToques = 3;
-
-  function sequenciaAindaValida() {
-    return meuSequenciaId === _sequenciaSomId;
-  }
-
-  function tocarUmaVez() {
-    if (!sequenciaAindaValida()) {
-      _alertaPrincipalEstaTocando = false;
-      return;
-    }
-    sound.currentTime = 0;
-    var p = sound.play();
-    if (p !== undefined) {
-      p.catch(function (err) {
-        console.warn('[Radar X9] Falha ao tocar mp3 (' + soundId + '):', err);
-        // Não cai mais para o beep aqui — o desbloqueio de áudio no
-        // primeiro toque do usuário já garante que o play() funcione.
-        // Se falhar mesmo assim, tentamos novamente no próximo toque
-        // da sequência em vez de substituir por beep.
-      });
-    }
-  }
-
-  function onEnded() {
-    toques++;
-    if (toques < numToques && sequenciaAindaValida()) {
-      tocarUmaVez();
-    } else {
-      sound.removeEventListener('ended', onEnded);
-      if (sequenciaAindaValida()) {
-        _alertaPrincipalEstaTocando = false;
-      }
-    }
-  }
-
-  sound.removeEventListener('ended', onEnded); // limpa listener anterior
-  sound.addEventListener('ended', onEnded);
-  tocarUmaVez(); // dispara o primeiro toque
-}
-
-
+//===================================================================
 // ===================================================================
 // BLOCO 4 — CSS inline para transição suave do ícone de navegação
 // ===================================================================
+//====================================================================
+
 (function injetarCSSNavIcon() {
   var style = document.createElement('style');
   style.textContent = [
