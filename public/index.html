@@ -910,6 +910,51 @@
         padding: 8px;
     }
 
+    /* ===================================================================
+       BOTÕES DE VELOCIDADE
+    =================================================================== */
+    .speed-buttons-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+
+    .speed-btn {
+        padding: 10px 0;
+        border: 2px solid #333;
+        border-radius: 10px;
+        background: #0f1115;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .speed-btn:hover {
+        border-color: var(--accent-color);
+        color: var(--text-main);
+        background: rgba(0, 255, 136, 0.05);
+    }
+
+    .speed-btn.selected {
+        border-color: var(--accent-color);
+        background: rgba(0, 255, 136, 0.15);
+        color: var(--accent-color);
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+    }
+
+    .speed-btn.selected-30 { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+    .speed-btn.selected-40 { border-color: #ffa94d; color: #ffa94d; background: rgba(255, 169, 77, 0.1); }
+    .speed-btn.selected-50 { border-color: #ffd93d; color: #ffd93d; background: rgba(255, 217, 61, 0.1); }
+    .speed-btn.selected-60 { border-color: #6bcb77; color: #6bcb77; background: rgba(107, 203, 119, 0.1); }
+    .speed-btn.selected-70 { border-color: #4d96ff; color: #4d96ff; background: rgba(77, 150, 255, 0.1); }
+    .speed-btn.selected-80 { border-color: #9b59b6; color: #9b59b6; background: rgba(155, 89, 182, 0.1); }
+    .speed-btn.selected-100 { border-color: #ff6b9d; color: #ff6b9d; background: rgba(255, 107, 157, 0.1); }
+    .speed-btn.selected-110 { border-color: #ff4757; color: #ff4757; background: rgba(255, 71, 87, 0.1); }
+
     .icon-preview {
         display: flex;
         align-items: center;
@@ -1014,6 +1059,14 @@
         .form-input {
             padding: 10px 14px;
             font-size: 0.95rem;
+        }
+        .speed-buttons-container {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .speed-btn {
+            padding: 8px 0;
+            font-size: 0.85rem;
         }
     }
 </style>
@@ -1125,6 +1178,7 @@
         </div>
         
         <div class="modal-body">
+          <!-- Seletor de Tipo com Ícones -->
           <div class="form-group">
             <label for="radar-type">Tipo de Radar</label>
             <select id="radar-type" class="form-select">
@@ -1155,6 +1209,23 @@
             </select>
           </div>
 
+          <!-- Velocidade Máxima (vem antes do ícone) -->
+          <div class="form-group" id="speed-group" style="display:none;">
+            <label for="radar-speed">Velocidade Máxima (km/h)</label>
+            <div class="speed-buttons-container" id="speed-buttons-container">
+              <button type="button" class="speed-btn" data-speed="30">30</button>
+              <button type="button" class="speed-btn" data-speed="40">40</button>
+              <button type="button" class="speed-btn" data-speed="50">50</button>
+              <button type="button" class="speed-btn" data-speed="60">60</button>
+              <button type="button" class="speed-btn" data-speed="70">70</button>
+              <button type="button" class="speed-btn" data-speed="80">80</button>
+              <button type="button" class="speed-btn" data-speed="100">100</button>
+              <button type="button" class="speed-btn" data-speed="110">110</button>
+            </div>
+            <input type="number" id="radar-speed" class="form-input" placeholder="Ou digite outra velocidade..." min="0" max="120" style="margin-top: 8px;">
+          </div>
+
+          <!-- Preview do Ícone do Radar Selecionado -->
           <div class="form-group" id="icon-preview-group" style="display:none;">
             <label>Ícone do Radar</label>
             <div class="icon-preview">
@@ -1163,16 +1234,13 @@
             </div>
           </div>
 
+          <!-- Endereço -->
           <div class="form-group">
             <label for="radar-address">Endereço / Localização</label>
             <input type="text" id="radar-address" class="form-input" placeholder="Buscando endereço automaticamente...">
           </div>
 
-          <div class="form-group">
-            <label for="radar-speed">Velocidade Máxima (km/h)</label>
-            <input type="number" id="radar-speed" class="form-input" placeholder="Ex: 60" min="0" max="120">
-          </div>
-
+          <!-- Posição atual -->
           <div class="form-group">
             <label>📍 Posição Atual</label>
             <div class="current-position" id="current-position">
@@ -1182,6 +1250,7 @@
             <div class="current-position-status" id="pos-status">Aguardando coordenadas...</div>
           </div>
 
+          <!-- Botão de Inclusão -->
           <button class="btn-submit-radar" id="btn-submit-radar">
             ✅ Incluir Radar
           </button>
@@ -2720,7 +2789,6 @@ function inicializarMenuToggle() {
       sidebar.classList.add('retracted');
       btnMenu.classList.add('active');
       
-      // Fecha as barras de busca se estiverem abertas
       if (searchActive || routeActive) {
         searchActive = false;
         routeActive = false;
@@ -2785,7 +2853,7 @@ function inicializarBotaoRotacaoMapa() {
 }
 
 // ===================================================================
-// INICIALIZAR BOTÃO ADICIONAR RADAR (VERSÃO CORRIGIDA)
+// INICIALIZAR BOTÃO ADICIONAR RADAR (COM BOTÕES DE VELOCIDADE)
 // ===================================================================
 function inicializarBotaoAddRadar() {
   const btnAddRadar = document.getElementById('btn-add-radar');
@@ -2801,9 +2869,87 @@ function inicializarBotaoAddRadar() {
   const iconPreviewGroup = document.getElementById('icon-preview-group');
   const iconPreviewImg = document.getElementById('icon-preview-img');
   const iconPreviewName = document.getElementById('icon-preview-name');
+  const speedButtons = document.querySelectorAll('.speed-btn');
+  const speedGroup = document.getElementById('speed-group');
 
   let currentPosition = { lat: null, lng: null };
   let gpsObtido = false;
+  let velocidadeSelecionada = '';
+  let tipoAtual = '';
+
+  // ===================================================================
+  // CONFIGURAR BOTÕES DE VELOCIDADE
+  // ===================================================================
+  function configurarBotoesVelocidade() {
+    speedButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const velocidade = this.dataset.speed;
+        
+        speedButtons.forEach(b => {
+          b.classList.remove('selected');
+          b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
+                            'selected-70', 'selected-80', 'selected-100', 'selected-110');
+        });
+        
+        this.classList.add('selected');
+        this.classList.add(`selected-${velocidade}`);
+        
+        radarSpeed.value = velocidade;
+        velocidadeSelecionada = velocidade;
+        
+        atualizarPreviewIcone(tipoAtual, velocidade);
+      });
+    });
+  }
+
+  // ===================================================================
+  // ATUALIZAR PREVIEW DO ÍCONE
+  // ===================================================================
+  function atualizarPreviewIcone(tipo, velocidade) {
+    if (!tipo) {
+      iconPreviewGroup.style.display = 'none';
+      return;
+    }
+    
+    const iconUrl = getIconUrl(tipo, velocidade || '');
+    if (iconUrl) {
+      iconPreviewImg.src = iconUrl;
+      iconPreviewImg.onerror = function() {
+        this.src = '/imagens_app/ic_radar_cev_v2.png';
+      };
+      
+      let nomeExibicao = tipo;
+      if (tipo.includes('Controlador Eletrônico') || tipo.includes('CEV')) {
+        const vel = velocidade || radarSpeed.value || '';
+        nomeExibicao = vel ? `${tipo} - ${vel} km/h` : tipo;
+      }
+      iconPreviewName.textContent = nomeExibicao;
+      iconPreviewGroup.style.display = 'block';
+    } else {
+      iconPreviewGroup.style.display = 'none';
+    }
+  }
+
+  // ===================================================================
+  // GERENCIAR BOTÕES DE VELOCIDADE
+  // ===================================================================
+  function gerenciarBotoesVelocidade(tipo) {
+    const isCEV = tipo && (tipo.includes('Controlador Eletrônico') || 
+                          tipo.includes('CEV') || 
+                          tipo === 'Controlador Eletrônico de Velocidade' ||
+                          tipo === 'Controlador Eletrônico de Velocidade (CEV)');
+    
+    if (isCEV) {
+      speedGroup.style.display = 'block';
+    } else {
+      speedGroup.style.display = 'none';
+      speedButtons.forEach(b => {
+        b.classList.remove('selected');
+        b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
+                          'selected-70', 'selected-80', 'selected-100', 'selected-110');
+      });
+    }
+  }
 
   // ===================================================================
   // BUSCAR ENDEREÇO POR COORDENADAS
@@ -2846,7 +2992,6 @@ function inicializarBotaoAddRadar() {
     let lat = userLat;
     let lng = userLng;
     
-    // Se não tiver posição do app, tenta GPS do navegador
     if (!lat || !lng || (lat === -19.919055 && lng === -43.938641)) {
       posStatus.textContent = '🔄 Aguardando sinal GPS...';
       try {
@@ -2873,7 +3018,6 @@ function inicializarBotaoAddRadar() {
       gpsObtido = true;
       posStatus.textContent = '✅ Coordenadas atualizadas';
       
-      // Busca endereço automaticamente
       posStatus.textContent = '🔄 Buscando endereço...';
       try {
         const endereco = await buscarEnderecoPorCoordenadas(lat, lng);
@@ -2901,20 +3045,26 @@ function inicializarBotaoAddRadar() {
     modalAddRadar.classList.add('active');
     ocultarBussola(true);
     
-    // Limpa campos
     radarType.value = '';
     radarAddress.value = '';
     radarSpeed.value = '';
+    velocidadeSelecionada = '';
+    tipoAtual = '';
     iconPreviewGroup.style.display = 'none';
+    speedGroup.style.display = 'none';
+    
+    speedButtons.forEach(b => {
+      b.classList.remove('selected');
+      b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
+                        'selected-70', 'selected-80', 'selected-100', 'selected-110');
+    });
     
     posLat.textContent = '🔄 Buscando GPS...';
     posLng.textContent = '';
     posStatus.textContent = '🔄 Aguardando coordenadas...';
     
-    // Tenta obter posição
     await atualizarPosicaoAtual();
     
-    // Se não conseguiu GPS, tenta novamente após 2 segundos
     if (!gpsObtido) {
       setTimeout(async () => {
         await atualizarPosicaoAtual();
@@ -2939,26 +3089,40 @@ function inicializarBotaoAddRadar() {
   });
 
   // ===================================================================
-  // PREVIEW DO ÍCONE
+  // PREVIEW DO ÍCONE AO SELECIONAR O TIPO
   // ===================================================================
   radarType.addEventListener('change', function() {
     const tipoSelecionado = this.value;
-    if (tipoSelecionado) {
-      const iconUrl = getIconUrl(tipoSelecionado, '');
-      if (iconUrl) {
-        iconPreviewImg.src = iconUrl;
-        iconPreviewImg.onerror = function() {
-          this.src = '/imagens_app/ic_radar_cev_v2.png';
-        };
-        iconPreviewName.textContent = tipoSelecionado;
-        iconPreviewGroup.style.display = 'block';
-      } else {
-        iconPreviewGroup.style.display = 'none';
-      }
+    tipoAtual = tipoSelecionado;
+    
+    gerenciarBotoesVelocidade(tipoSelecionado);
+    
+    if (tipoSelecionado && (tipoSelecionado.includes('Controlador Eletrônico') || 
+                            tipoSelecionado.includes('CEV'))) {
+      const velocidade = radarSpeed.value || velocidadeSelecionada || '';
+      atualizarPreviewIcone(tipoSelecionado, velocidade);
+    } else if (tipoSelecionado) {
+      atualizarPreviewIcone(tipoSelecionado, '');
     } else {
       iconPreviewGroup.style.display = 'none';
     }
   });
+
+  // ===================================================================
+  // ATUALIZAR PREVIEW QUANDO VELOCIDADE MUDA
+  // ===================================================================
+  radarSpeed.addEventListener('input', function() {
+    const velocidade = this.value;
+    if (tipoAtual && (tipoAtual.includes('Controlador Eletrônico') || 
+                      tipoAtual.includes('CEV'))) {
+      atualizarPreviewIcone(tipoAtual, velocidade);
+    }
+  });
+
+  // ===================================================================
+  // CONFIGURAR BOTÕES DE VELOCIDADE
+  // ===================================================================
+  configurarBotoesVelocidade();
 
   // ===================================================================
   // SALVAR NO GITHUB
@@ -2986,7 +3150,6 @@ function inicializarBotaoAddRadar() {
         jsonData.records = [];
       }
 
-      // Encontra o próximo ID
       let proximoId = 541;
       jsonData.records.forEach(record => {
         if (record[0] && typeof record[0] === 'number' && record[0] >= proximoId) {
@@ -3044,7 +3207,6 @@ function inicializarBotaoAddRadar() {
     const endereco = radarAddress.value.trim();
     const velocidade = radarSpeed.value.trim();
 
-    // Validações
     if (!tipo) {
       showNotification('❌ Selecione o tipo de radar.');
       radarType.focus();
@@ -3061,11 +3223,19 @@ function inicializarBotaoAddRadar() {
       return;
     }
     if (!currentPosition.lat || !currentPosition.lng) {
-      showNotification('❌ Aguardando posição GPS. Clique em "Atualizar Posição" ou aguarde.');
+      showNotification('❌ Aguardando posição GPS. Aguarde ou feche e reabra o formulário.');
       return;
     }
 
-    // Confirmação
+    const isCEV = tipo && (tipo.includes('Controlador Eletrônico') || 
+                          tipo.includes('CEV') || 
+                          tipo === 'Controlador Eletrônico de Velocidade');
+    if (isCEV && !velocidade) {
+      showNotification('❌ Selecione ou digite a velocidade máxima para o CEV.');
+      radarSpeed.focus();
+      return;
+    }
+
     if (!confirm(
       `⚠️ Confirmar inclusão do radar?\n\n` +
       `📌 Tipo: ${tipo}\n` +
@@ -3100,7 +3270,17 @@ function inicializarBotaoAddRadar() {
       radarType.value = '';
       radarAddress.value = '';
       radarSpeed.value = '';
+      velocidadeSelecionada = '';
+      tipoAtual = '';
       iconPreviewGroup.style.display = 'none';
+      speedGroup.style.display = 'none';
+      
+      speedButtons.forEach(b => {
+        b.classList.remove('selected');
+        b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
+                          'selected-70', 'selected-80', 'selected-100', 'selected-110');
+      });
+      
       btnSubmitRadar.disabled = false;
       btnSubmitRadar.textContent = '✅ Incluir Radar';
 
