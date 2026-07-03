@@ -757,11 +757,13 @@
 
     /* ===================================================================
        BOTÃO + (ADICIONAR RADAR)
+       Reposicionado mais à esquerda, afastado da coluna de botões do
+       menu lateral (sidebar-controls, que ocupa os 68px da direita).
     =================================================================== */
     .btn-add-radar {
         position: absolute;
         bottom: 25px;
-        right: 80px;
+        right: 110px;
         width: 65px;
         height: 65px;
         border-radius: 50%;
@@ -1042,7 +1044,7 @@
     @media (max-width: 600px) {
         .btn-add-radar {
             bottom: 20px;
-            right: 20px;
+            right: 92px;
             width: 56px;
             height: 56px;
         }
@@ -1412,7 +1414,13 @@ const iconMap = {
 };
 
 // ===================================================================
-// CONFIGURAÇÃO DO GITHUB (SUBSTITUA COM SEUS DADOS)
+// CONFIGURAÇÃO DO GITHUB
+// ⚠️ ATENÇÃO: preencha com seu owner/repo/token reais antes de usar.
+// Um Personal Access Token com escopo de escrita fica exposto no
+// código-fonte do lado do cliente. Para produção, o recomendado é
+// mover essa gravação para uma função server-side (ex: Supabase com
+// RLS, ou uma Vercel Function) em vez de chamar a GitHub API direto
+// do navegador com um token hardcoded.
 // ===================================================================
 const GITHUB_CONFIG = {
     owner: 'SEU_USUARIO',
@@ -3256,17 +3264,6 @@ function inicializarBotaoAddRadar() {
       }
     }
   });
-
-  // ===================================================================
-  // FUNÇÕES DE CODIFICAÇÃO
-  // ===================================================================
-  window.btoa = function(str) {
-    return window.btoa(unescape(encodeURIComponent(str)));
-  };
-
-  window.atob = function(str) {
-    return decodeURIComponent(escape(window.atob(str)));
-  };
 
   console.log('[Radar X9] ✅ Módulo de inclusão manual de radares carregado!');
 }
