@@ -36,7 +36,7 @@
     }
 
     /* ===================================================================
-       RESET GLOBAL — remove paddings/margins padrão do navegador
+       RESET GLOBAL — remove paddings/margens padrão do navegador
     =================================================================== */
     * {
         box-sizing: border-box;
@@ -312,9 +312,7 @@
 /* Esconde o ícone de rotação padrão do leaflet-rotate */
 .leaflet-control-rotate,
 .leaflet-rotate-control,
-.leaflet-control-rotate-icon,
 .leaflet-rotate-control-icon,
-.leaflet-control-rotate-toggle,
 .leaflet-rotate-toggle,
 .leaflet-control-rotate a,
 .leaflet-rotate-control a {
@@ -860,6 +858,275 @@
     .leaflet-routing-container {
         display: none !important;
     }
+
+    /* ===================================================================
+       BOTÃO + (ADICIONAR RADAR)
+    =================================================================== */
+    .btn-add-radar {
+        position: absolute;
+        bottom: 90px;
+        right: 80px;
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00cc66, #00994d);
+        border: 2px solid rgba(0, 255, 136, 0.4);
+        box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
+        cursor: pointer;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: pulsePlus 2s ease-in-out infinite;
+    }
+
+    @keyframes pulsePlus {
+        0%, 100% { box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5); }
+        50% { box-shadow: 0 4px 35px rgba(0, 204, 102, 0.8); }
+    }
+
+    .btn-add-radar:hover {
+        transform: scale(1.12);
+        box-shadow: 0 4px 30px rgba(0, 204, 102, 0.7);
+    }
+
+    .btn-add-radar:active {
+        transform: scale(0.92);
+    }
+
+    .btn-add-radar .plus-icon {
+        font-size: 40px;
+        font-weight: 300;
+        color: white;
+        line-height: 1;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        margin-top: -2px;
+    }
+
+    /* ===================================================================
+       MODAL DE INCLUSÃO
+    =================================================================== */
+    .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        animation: modalFadeIn 0.3s ease-out;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content {
+        background: #1a1d24;
+        border: 1px solid #333;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        border-bottom: 1px solid #333;
+    }
+
+    .modal-header h2 {
+        font-size: 1.2rem;
+        color: var(--accent-color);
+        margin: 0;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: #888;
+        font-size: 28px;
+        cursor: pointer;
+        padding: 4px 10px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-select,
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid #333;
+        background: #0f1115;
+        color: #fff;
+        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        transition: border-color 0.3s ease;
+        outline: none;
+    }
+
+    .form-select:focus,
+    .form-input:focus {
+        border-color: var(--accent-color);
+    }
+
+    .form-select option {
+        background: #1a1d24;
+        color: #fff;
+        padding: 8px;
+    }
+
+    /* Preview do Ícone */
+    .icon-preview {
+        display: flex;
+        align-items: center;
+        background: #0f1115;
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid #333;
+    }
+
+    .icon-preview img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+    }
+
+    .icon-preview span {
+        font-size: 0.95rem;
+        color: var(--text-main);
+    }
+
+    .current-position {
+        background: #0f1115;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .current-position span {
+        font-family: 'Courier New', monospace;
+        color: var(--accent-color);
+    }
+
+    .btn-gps-position {
+        background: rgba(0, 255, 136, 0.12);
+        border: 1px solid rgba(0, 255, 136, 0.3);
+        color: var(--accent-color);
+        padding: 8px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        width: 100%;
+    }
+
+    .btn-gps-position:hover {
+        background: rgba(0, 255, 136, 0.2);
+    }
+
+    .btn-submit-radar {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #00cc66, #00994d);
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 204, 102, 0.3);
+        margin-top: 10px;
+    }
+
+    .btn-submit-radar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 204, 102, 0.5);
+    }
+
+    .btn-submit-radar:active {
+        transform: scale(0.97);
+    }
+
+    .btn-submit-radar:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* ===================================================================
+       RESPONSIVIDADE
+    =================================================================== */
+    @media (max-width: 600px) {
+        .btn-add-radar {
+            bottom: 80px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+        }
+        .btn-add-radar .plus-icon {
+            font-size: 32px;
+        }
+        .modal-content {
+            max-width: 100%;
+            margin: 10px;
+            border-radius: 16px;
+        }
+        .modal-body {
+            padding: 16px;
+        }
+        .form-select,
+        .form-input {
+            padding: 10px 14px;
+            font-size: 0.95rem;
+        }
+    }
 </style>
 
 
@@ -947,6 +1214,90 @@
     <div class="loading-overlay" id="loading" style="display:none;">
       <div class="loading-spinner"></div>
       <div style="margin-top:10px; color:#fff;">Processando...</div>
+    </div>
+
+    <!-- BOTÃO + PARA ADICIONAR RADAR -->
+    <button class="btn-add-radar" id="btn-add-radar">
+      <span class="plus-icon">+</span>
+    </button>
+    
+    <!-- MODAL DE INCLUSÃO DE RADAR -->
+    <div class="modal-overlay" id="modal-add-radar">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>➕ Adicionar Radar Manual</h2>
+          <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Seletor de Tipo com Ícones -->
+          <div class="form-group">
+            <label for="radar-type">Tipo de Radar</label>
+            <select id="radar-type" class="form-select">
+              <option value="">Selecione o tipo...</option>
+              <option value="Controlador Eletrônico de Velocidade (CEV)">🚗 Radar de Velocidade (CEV)</option>
+              <option value="Detector de Avanço de Semáforo (DAS)">🚦 Radar de Semáforo (DAS)</option>
+              <option value="Detector de Conversão em Local Proibido (DCP)">🔄 Conversão Proibida (DCP)</option>
+              <option value="Detector de Tráfego em Local Proibido (DTLP)">⛔ Tráfego Proibido (DTLP)</option>
+              <option value="Detector de Invasão de Faixa Exclusiva (DIFEX)">🚌 Faixa Exclusiva (DIFEX)</option>
+              <option value="Detector de Parada sobre Faixa de Pedestres (DPFP)">🚶 Parada em Faixa (DPFP)</option>
+              <option value="Detector de Faixa Preferencial de Ônibus (BUS)">🚍 Faixa Preferencial (BUS)</option>
+              <option value="Zona Verde de Trânsito (ZVT)">🌿 Zona Verde (ZVT)</option>
+              <option value="Zona de Risco de Inundações Recorrentes (ZIR)">🌊 Risco de Inundação (ZIR)</option>
+              <option value="Zona de Perigo e Violência (ZPV)">⚠️ Zona de Perigo (ZPV)</option>
+              <option value="Detector de Uso de Celular (DUC)">📱 Uso de Celular (DUC)</option>
+              <option value="Verificador de Cinto de Segurança (VCS)">🔒 Cinto de Segurança (VCS)</option>
+              <option value="Leitor Inteligente de Placas (OCR-P)">📷 Leitor de Placas (OCR-P)</option>
+              <option value="Leitor de Reconhecimento Facial (OCR-F)">👤 Reconhecimento Facial (OCR-F)</option>
+              <option value="Câmera Olho Vivo (COV)">👁️ Olho Vivo (COV)</option>
+              <option value="Alerta de Alto Índice de Acidente (AIA)">💥 Alto Índice de Acidentes (AIA)</option>
+              <option value="Radar Inteligente de Velocidade Média (RIV)">📊 Velocidade Média (RIV)</option>
+              <option value="Passagem Sob Túnel Viário (TUV)">🚇 Túnel Viário (TUV)</option>
+              <option value="Apenas Trânsito Local (ATL)">🏘️ Trânsito Local (ATL)</option>
+              <option value="Área de Escape Caminhões (ARE)">🚛 Área de Escape (ARE)</option>
+              <option value="Radar de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
+              <option value="Zona de Estudo Nuclear (ZEN)">☢️ Zona de Estudo Nuclear (ZEN)</option>
+              <option value="Controle de Redução de Velocidade (CRV)">⬇️ Redução de Velocidade (CRV)</option>
+            </select>
+          </div>
+
+          <!-- Preview do Ícone do Radar Selecionado -->
+          <div class="form-group" id="icon-preview-group" style="display:none;">
+            <label>Ícone do Radar</label>
+            <div class="icon-preview">
+              <img id="icon-preview-img" src="" alt="Ícone do Radar">
+              <span id="icon-preview-name" style="color:var(--text-muted);margin-left:12px;"></span>
+            </div>
+          </div>
+
+          <!-- Endereço -->
+          <div class="form-group">
+            <label for="radar-address">Endereço / Localização</label>
+            <input type="text" id="radar-address" class="form-input" placeholder="Ex: Av. Amazonas, 1234, BH">
+          </div>
+
+          <!-- Velocidade Máxima -->
+          <div class="form-group">
+            <label for="radar-speed">Velocidade Máxima (km/h)</label>
+            <input type="number" id="radar-speed" class="form-input" placeholder="Ex: 60" min="0" max="120">
+          </div>
+
+          <!-- Posição atual -->
+          <div class="form-group">
+            <label>📍 Posição Atual</label>
+            <div class="current-position" id="current-position">
+              <span id="pos-lat">Aguardando GPS...</span>
+              <span id="pos-lng"></span>
+            </div>
+            <button class="btn-gps-position" id="btn-gps-position">🔄 Atualizar Posição</button>
+          </div>
+
+          <!-- Botão de Inclusão -->
+          <button class="btn-submit-radar" id="btn-submit-radar">
+            ✅ Incluir Radar
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1054,133 +1405,6 @@ var ultimaPosicaoMarcador = { lat: null, lng: null };
 var animacaoMarcadorAtiva = false;
 var tipoAlertaAtivo = null;
 
-
-// ===================================================================
-// ✅ BLOCO CORRIGIDO — CONTROLE DE ESTADO DA SEQUÊNCIA DE SOM
-// ===================================================================
-
-var _alertaPrincipalEstaTocando = false;
-var _sequenciaSomId = 0;
-
-// Mapa de listeners ativos por elemento de áudio
-// Permite remover o listener correto sem acumular lixo
-var _soundListeners = {};
-
-function cancelarSequenciaSom() {
-  _sequenciaSomId++;
-  _alertaPrincipalEstaTocando = false;
-  // Remove qualquer listener 'ended' pendente em todos os elementos de áudio
-  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el && _soundListeners[id]) {
-      el.removeEventListener('ended', _soundListeners[id]);
-      delete _soundListeners[id];
-      el.pause();
-      el.currentTime = 0;
-    }
-  });
-}
-
-//==============================================================
-// ---- PARA TODOS OS SONS (ATUALIZADA - remove listeners pendentes)
-//==============================================================
-
-// ===================================================================
-// ✅ pararTodosSons CORRIGIDA
-// — Deve pausar TODOS os elementos de áudio e cancelar a sequência
-// ===================================================================
-function pararTodosSons() {
-  cancelarSequenciaSom(); // Invalida a sequência antes de pausar
-  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) {
-      el.pause();
-      el.currentTime = 0;
-    }
-  });
-}
-
-// ===================================================================
-// ✅ tocarSomAlerta CORRIGIDA
-// — Garante que apenas UMA sequência de 3 toques rode por vez
-// — O listener 'ended' é registrado no mapa e removido corretamente
-// — Não cai para beep em caso de falha de play()
-// ===================================================================
-function tocarSomAlerta(tipoAlerta) {
-  // Envia comando para AppInventor se disponível
-  if (typeof AppInventor !== 'undefined') {
-    enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
-  }
-
-  // Se uma sequência já está tocando, não inicia outra
-  if (_alertaPrincipalEstaTocando) return;
-
-  var soundId = 'alert-sound-radar';
-  if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
-  else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
-
-  var sound = document.getElementById(soundId)
-           || document.getElementById('alert-sound-radar');
-
-  if (!sound) {
-    console.warn('[Radar X9] Elemento de áudio não encontrado:', soundId);
-    return;
-  }
-
-  // Nova rodada: invalida sequências anteriores e registra o ID desta
-  _sequenciaSomId++;
-  var meuId = _sequenciaSomId;
-  _alertaPrincipalEstaTocando = true;
-
-  var toques = 0;
-  var numToques = 3;
-
-  // Remove listener anterior registrado para este elemento (se houver)
-  if (_soundListeners[soundId]) {
-    sound.removeEventListener('ended', _soundListeners[soundId]);
-    delete _soundListeners[soundId];
-  }
-
-  function onEnded() {
-    // Sequência foi cancelada externamente (botão, passou pelo radar, etc.)
-    if (meuId !== _sequenciaSomId) {
-      sound.removeEventListener('ended', onEnded);
-      delete _soundListeners[soundId];
-      _alertaPrincipalEstaTocando = false;
-      return;
-    }
-
-    toques++;
-    if (toques < numToques) {
-      // Próximo toque da sequência
-      sound.currentTime = 0;
-      sound.play().catch(function(err) {
-        console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
-        // Não substitui por beep — tenta continuar na sequência
-      });
-    } else {
-      // Sequência de 3 toques concluída normalmente
-      sound.removeEventListener('ended', onEnded);
-      delete _soundListeners[soundId];
-      _alertaPrincipalEstaTocando = false;
-    }
-  }
-
-  // Registra o listener no mapa global para poder removê-lo depois
-  _soundListeners[soundId] = onEnded;
-  sound.addEventListener('ended', onEnded);
-
-  // Dispara o primeiro toque
-  sound.currentTime = 0;
-  sound.play().catch(function(err) {
-    console.warn('[Radar X9] Falha ao iniciar mp3 (' + soundId + '):', err);
-    sound.removeEventListener('ended', onEnded);
-    delete _soundListeners[soundId];
-    _alertaPrincipalEstaTocando = false;
-  });
-}
-
-
 // ===================================================================
 // MAPEAMENTO DE ÍCONES
 // ===================================================================
@@ -1235,13 +1459,19 @@ const iconMap = {
   'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
-
+// ===================================================================
+// CONFIGURAÇÃO DO GITHUB (SUBSTITUA COM SEUS DADOS)
+// ===================================================================
+const GITHUB_CONFIG = {
+    owner: 'SEU_USUARIO',      // Substitua pelo seu usuário do GitHub
+    repo: 'SEU_REPOSITORIO',   // Substitua pelo nome do repositório
+    path: 'radares.json',
+    token: 'SEU_TOKEN_GITHUB'  // Substitua pelo token pessoal
+};
 
 // ===================================================================
 // CONFIGURAÇÃO DOS NOVOS ALERTAS (RISCO)
 // ===================================================================
-
-
 const TIPOS_ALERTA_RADAR = [
 'Detector de Parada sobre Faixa de Pedestres  (DPFP)',
 'Radar de Caminhão na Faixa Esquerda (CFE)',
@@ -1260,7 +1490,6 @@ const TIPOS_ALERTA_RADAR = [
 'Controle Inteligente de Velocidade (CIV)',
 'Apenas Trânsito Local (ATL)'
 ];
-
 
 const TIPOS_ALERTA_RISCO = [
   'Zona de Perigo e Violência (ZPV)',
@@ -1296,13 +1525,11 @@ const TIPOS_ALERTA_MOBILIDADE = [
 // ===================================================================
 const TIPOS_SEM_ALERTA = [
   // adicione aqui tipos que não devem disparar alerta, ex:
- 
 ];
 
 // ===================================================================
 // FUNÇÃO DEVE ALERTAR RADAR
 // ===================================================================
-
 function deveAlertaRadar(tipoOriginal) {
   if (!tipoOriginal) return false;
   var tipoLimpo = tipoOriginal.trim();
@@ -1315,7 +1542,6 @@ function deveAlertaRadar(tipoOriginal) {
 // ===================================================================
 // FUNÇÃO DISPARA AVISO DE MOBILIDADE
 // ===================================================================
-
 function dispararAlertaMobilidadeIA(mensagem) {
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "");
@@ -1324,7 +1550,7 @@ function dispararAlertaMobilidadeIA(mensagem) {
   $(".alert-bar").addClass("alert-bar-mobilidade");
   $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
   
-  tocarSomAlerta('aviso'); // ✅ TOCA O SOM DE AVISO (VERDE)
+  tocarSomAlerta('aviso');
 
   if (!$("#alert-container").is(":visible")) { 
     $("#alert-container").fadeIn(200); 
@@ -1336,26 +1562,21 @@ function dispararAlertaMobilidadeIA(mensagem) {
   }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
-
 // ===================================================================
 // FUNÇÃO CLASSIFICA ALERTAS
 // ===================================================================
-
 function classificarAlerta(tipoOriginal) {
   if (!tipoOriginal) return 'radar';
   var tipoLimpo = tipoOriginal.trim();
   
-  // 1. Verifica se é RISCO (Amarelo)
   for (var i = 0; i < TIPOS_ALERTA_RISCO.length; i++) {
     if (tipoLimpo === TIPOS_ALERTA_RISCO[i] || tipoLimpo.includes(TIPOS_ALERTA_RISCO[i])) return 'risco';
   }
   
-  // 2. Verifica se é MOBILIDADE (Verde)
   for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
     if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobilidade';
   }
   
-  // 3. Se não for Risco nem Mobilidade, é RADAR (Vermelho)
   return 'radar';
 }
 
@@ -1404,30 +1625,6 @@ const ajusteNomes = {
 };
 
 // ===================================================================
-// BOTÃO MENU
-// ===================================================================
-(function() {
-  var btnMenu = document.getElementById('btn-menu-toggle');
-  var sidebar = document.getElementById('sidebar-controls');
-  btnMenu.addEventListener('click', function() {
-    sidebarAberta = !sidebarAberta;
-    if (sidebarAberta) {
-      sidebar.classList.remove('retracted');
-      btnMenu.classList.remove('active');
-    } else {
-      sidebar.classList.add('retracted');
-      btnMenu.classList.add('active');
-      if (searchActive || routeActive) {
-        searchActive = false;
-        routeActive = false;
-        document.getElementById('search-bar-radares').classList.remove('active');
-        document.getElementById('search-bar-rota').classList.remove('active');
-      }
-    }
-  });
-})();
-
-// ===================================================================
 // FUNÇÕES AUXILIARES
 // ===================================================================
 function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
@@ -1439,15 +1636,6 @@ function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
     className: 'radar-marker-icon',
     iconUrlFallback: fallbackUrl || '/imagens_app/ic_radar_cev_v2.png'
   });
-}
-
-function deveAlertaRadar(tipoOriginal) {
-  if (!tipoOriginal) return false;
-  var tipoLimpo = tipoOriginal.trim();
-  for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {
-    if (tipoLimpo === TIPOS_SEM_ALERTA[i]) return false;
-  }
-  return true;
 }
 
 function getIconUrl(tipo, velocidade) {
@@ -1657,7 +1845,6 @@ function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, rad
 // ================================================
 // FUNÇA APLICAR TEMA MAPA
 //==================================================
-
 function aplicarTemaMapa() {
   if (!map) return;
   var hora = new Date().getHours();
@@ -1698,7 +1885,6 @@ function ajustarBussolaParaBusca(ativo) {
 // ===================================================================
 // FUNÇÃO ADICIONAR MARCADORES NA ROTA
 // ===================================================================
-
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
   if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
@@ -1746,7 +1932,7 @@ function verificarChegadaDestino() {
 }
 
 // ===================================================================
-// finalizarNavegacao CORRIGIDA
+// finalizarNavegacao
 // ===================================================================
 function finalizarNavegacao() {
   if (!map) return;
@@ -1758,7 +1944,6 @@ function finalizarNavegacao() {
   if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
   if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
   
-  // ADICIONADO: Cancela animação de navegação ativa
   if (_navAnim.rafId) { cancelAnimationFrame(_navAnim.rafId); _navAnim.rafId = null; }
   _navAnim.fromLat = null; _navAnim.fromLng = null;
 
@@ -1808,7 +1993,7 @@ function finalizarNavegacao() {
 function removerRota() { finalizarNavegacao(); }
 
 // ===================================================================
-// criarRota CORRIGIDA
+// criarRota
 // ===================================================================
 function criarRota(destLat, destLng) {
   if (!userLat || !userLng) { showNotification("Aguardando posição GPS..."); return; }
@@ -1841,7 +2026,6 @@ function criarRota(destLat, destLng) {
       var heading = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
       headingIconeNavegacao = heading;
       headingIconeSuavizado = heading;
-      // ADICIONADO: Sincroniza animação de navegação com a direção da rota
       _navAnim.headingAlvo      = heading;
       _navAnim.headingSuavizado = heading;
       bearingAlvo = heading;
@@ -1934,7 +2118,6 @@ async function buscarCoordenadas(endereco){
 // ===================================================================
 // FUNÇÃO RESETAR MAPA
 // ===================================================================
-
 function resetarMapa() {
   if (!map) return;
   mapaRotacionado = false;
@@ -1965,6 +2148,7 @@ function resetarMapa() {
   esconderAlertaVisual();
   showNotification("Mapa resetado");
 }
+
 // ===================================================================
 // FUNÇÃO EXTRAIR COORDENADAS
 // ===================================================================
@@ -2018,52 +2202,43 @@ function atualizarBussola(headingDegrees) {
 }
 
 // ===================================================================
-// BLOCO 3 — GPS / ÍCONE DE ROTA FLUIDO (Substitui processarNovaPosicao)
+// BLOCO 3 — GPS / ÍCONE DE ROTA FLUIDO
 // ===================================================================
-
-// ---- Estado interno da animação -----------------------------------
 var _navAnim = {
-  rafId: null,          // requestAnimationFrame handle
+  rafId: null,
   fromLat: null,
   fromLng: null,
   toLat: null,
   toLng: null,
   startTime: null,
-  duration: 600,        // ms — interpolação suave entre posições GPS
+  duration: 600,
   headingAlvo: 0,
   headingSuavizado: 0
 };
 
-// Interpola suavemente o ícone de navegação entre posições GPS
 function _animarIconeNavegacao() {
   if (!estaEmNavegacao || !startRouteMarker) return;
 
   var agora = performance.now();
   var progresso = Math.min((agora - _navAnim.startTime) / _navAnim.duration, 1);
-
-  // Easing cúbico suave
   var t = 1 - Math.pow(1 - progresso, 3);
 
   var latAtual = _navAnim.fromLat + (_navAnim.toLat - _navAnim.fromLat) * t;
   var lngAtual = _navAnim.fromLng + (_navAnim.toLng - _navAnim.fromLng) * t;
 
-  // Suaviza o heading do ícone
   _navAnim.headingSuavizado = suavizarBearing(
     _navAnim.headingAlvo,
     _navAnim.headingSuavizado,
-    0.12   // fator de suavização — menor = mais suave
+    0.12
   );
 
-  // Atualiza posição do marcador
   startRouteMarker.setLatLng([latAtual, lngAtual]);
 
-  // Atualiza rotação do ícone HTML
   var imgNav = document.getElementById('nav-icon-img');
   if (imgNav) {
     imgNav.style.transform = 'rotate(' + _navAnim.headingSuavizado + 'deg)';
   }
 
-  // Atualiza posição suavizada para câmera
   posicaoSuavizadaGPS = { lat: latAtual, lng: lngAtual };
   ultimaPosicaoMarcador = { lat: latAtual, lng: lngAtual };
 
@@ -2075,15 +2250,12 @@ function _animarIconeNavegacao() {
   }
 }
 
-// Lança nova animação de deslocamento para o ícone de rota
 function _iniciarAnimacaoNavegacao(toLat, toLng, novoHeading) {
-  // Cancela animação anterior
   if (_navAnim.rafId) {
     cancelAnimationFrame(_navAnim.rafId);
     _navAnim.rafId = null;
   }
 
-  // Ponto de partida = posição atual interpolada (sem saltos)
   var pos = startRouteMarker ? startRouteMarker.getLatLng() : null;
   _navAnim.fromLat = pos ? pos.lat : toLat;
   _navAnim.fromLng = pos ? pos.lng : toLng;
@@ -2099,7 +2271,6 @@ function _iniciarAnimacaoNavegacao(toLat, toLng, novoHeading) {
   _navAnim.rafId = requestAnimationFrame(_animarIconeNavegacao);
 }
 
-// ---- processarNovaPosicao CORRIGIDA --------------------------------
 function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   if (!map) return;
 
@@ -2108,12 +2279,10 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
 
   adicionarAoHistorico(newLat, newLng, currentTime);
 
-  // Suaviza posição para câmera (não para o marcador — ele tem animação própria)
   var posSuave = suavizarPosicao(newLat, newLng);
   var smoothLat = posSuave.lat;
   var smoothLng = posSuave.lng;
 
-  // Calcula velocidade
   if (prevLat !== null) {
     dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
     if (speedKmh === 0 && prevTime !== null) {
@@ -2126,7 +2295,6 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   $('#speed-display').text(speedKmh);
   estaEmMovimento = speedKmh > 3 || dist > 2;
 
-  // Calcula heading
   var novoHeading = null;
 
   if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
@@ -2155,9 +2323,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
   userLat = newLat;
   userLng = newLng;
 
-  // ---- Atualiza marcador de posição ----
   if (estaEmNavegacao && startRouteMarker) {
-    // Usa animação suave dedicada — sem setLatLng direto aqui
     _iniciarAnimacaoNavegacao(smoothLat, smoothLng, novoHeading);
 
     if (!gpsInitialized) {
@@ -2185,7 +2351,6 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
     }
   }
 
-  // Atualiza rota periodicamente
   if (destinoAtual && routingControl && estaEmNavegacao) {
     if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
       atualizarRota();
@@ -2193,7 +2358,6 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
     }
   }
 
-  // Câmera
   if (estaEmNavegacao && isFollowing) {
     atualizarCameraNavegacaoSuave();
   } else if (isFollowing && !estaEmNavegacao) {
@@ -2228,7 +2392,6 @@ function startGPSTracking() {
 // ===================================================================
 // FUNÇÃO VERIFICAR PROXIMIDADES RADARES
 // ===================================================================
-
 function verificarProximidadeRadares() {
   if (!alertaHabilitado || radarMarkers.length === 0) return;
   let radarMaisProximo = null;
@@ -2252,7 +2415,6 @@ function verificarProximidadeRadares() {
     if (menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA + 80) { ultimoRadarAlertado = null; historicoDistanciasRadar = {}; }
   }
 }
-
 
 // ===============================================
 // FUNÇÃO INICIAR MAPA DE RADARES
@@ -2285,23 +2447,17 @@ function initMap() {
 
   $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
 
-// ===============================================
-// FUNÇÃO FECHAR BARRAS DE BUSCA E DESCER BÚSSOLA
-// ================================================
-  
-   // ✅ Função garantida para fechar barras e descer a bússola
-   function fecharTodasBarras() { 
+  function fecharTodasBarras() { 
     searchActive = false; 
     routeActive = false; 
     document.getElementById('search-bar-radares').classList.remove('active'); 
     document.getElementById('search-bar-rota').classList.remove('active'); 
-    ajustarBussolaParaBusca(false); // Desce a bússola
+    ajustarBussolaParaBusca(false);
   }
 
   $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
   $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
 
- 
   $("#btn-search-bar").click(function() {
     if (searchActive) { 
       fecharTodasBarras(); 
@@ -2313,7 +2469,7 @@ function initMap() {
     $("#search-bar-radares").addClass('active');
     if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
     setTimeout(function() { $("#query").focus(); }, 300);
-    ajustarBussolaParaBusca(true); // Sobe a bússola
+    ajustarBussolaParaBusca(true);
   });
   
   $("#btn-route-bar").click(function() {
@@ -2327,7 +2483,7 @@ function initMap() {
     $("#search-bar-rota").addClass('active');
     if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
     setTimeout(function() { $("#route-query").focus(); }, 300);
-    ajustarBussolaParaBusca(true); // Sobe a bússola
+    ajustarBussolaParaBusca(true);
   });
 
   $("#btn-center").click(function() {
@@ -2343,6 +2499,7 @@ function initMap() {
   
   inicializarBotaoRotacaoMapa();
   inicializarBotaoAlertaToggle();
+  inicializarBotaoAddRadar(); // NOVO: Inicializa botão de adicionar radar
   startGPSTracking();
   carregarRadares();
 }
@@ -2418,6 +2575,7 @@ function renderizarRadaresNoMapa(records, origem) {
   if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
   else showNotification("Nenhum radar encontrado.");
 }
+
 // ===============================================
 // FUNÇÃO BUSCAR RADARES
 // ================================================
@@ -2476,54 +2634,38 @@ async function solicitarPermissaoBussolaIOS() {
 }
 
 //=================================================
-// ================================================
 // FUNÇÃO FECHAR ALERTA IMEDIATAMENTE
 //==================================================
-//==================================================
-
 function fecharAlertaImediatamente() {
-  pararTodosSons(); // Silencia todos os áudios e cancela a repetição
+  pararTodosSons();
   clearTimeout(alertTimeout);
-  cancelarSequenciaSom(); // ✅ NOVO: garante que a sequência de 3 toques não continue
+  cancelarSequenciaSom();
 }
 
 // ===================================================================
-// ESCONDER ALERTA VISUAL SEM BEEP (para uso no botão toggle)
+// ESCONDER ALERTA VISUAL SEM BEEP
 // ===================================================================
 function esconderAlertaVisualSemBeep() {
-  // NÃO chama silenciarAlertaComBeep aqui
-  // NÃO chama fecharAlertaImediatamente() para não matar o alerta principal
-  
   $("#alert-container").fadeOut(150);
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   contagemTocarSom = 0;
-  
-  // Limpa o timeout do alerta para não disparar esconder depois
   clearTimeout(alertTimeout);
-  
-  // Reseta o radar alertado para permitir novo alerta depois
   ultimoRadarAlertado = null;
   tipoAlertaAtivo = null;
-
-  // FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
   ajustarPosicaoSpeedWidget(false);
 }
 
 // ================================================
 // FUNÇÃO ESCONDER ALERTA VISUAL (original)
 //=================================================
-
 function esconderAlertaVisual() {
-  silenciarAlertaComBeep(tipoAlertaAtivo); // Beep de confirmação ao fechar
-
+  silenciarAlertaComBeep(tipoAlertaAtivo);
   $("#alert-container").fadeOut(150);
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
   $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
   contagemTocarSom = 0;
-  fecharAlertaImediatamente(); // Garante que o som pare ao fechar visualmente
-
-  // FAZ O SPEED DESCER DE VOLTA PARA A POSIÇÃO ORIGINAL
+  fecharAlertaImediatamente();
   ajustarPosicaoSpeedWidget(false);
 }
 
@@ -2533,7 +2675,6 @@ function esconderAlertaVisual() {
 function dispararAlerta(radar, distancia) {
   const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
   if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
-    // ✅ NOVO: se já passou do radar, corta a sequência de toques em andamento
     cancelarSequenciaSom();
     return;
   }
@@ -2542,17 +2683,15 @@ function dispararAlerta(radar, distancia) {
   const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
   const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
 
-  // Limpa classes e estilos inline anteriores
   $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-radar");
-  $(".alert-bar").css("background", ""); // Garante que não reste lixo de CSS inline
+  $(".alert-bar").css("background", "");
 
-  // Define a tarja, título e adiciona a classe correspondente
   if (tipoAlerta === 'risco') {
     $("#alert-title").text("🚧 ALERTA DE RISCO!");
-    $(".alert-bar").addClass("alert-bar-risco"); // Amarelo
+    $(".alert-bar").addClass("alert-bar-risco");
   } else if (tipoAlerta === 'mobilidade') { 
     $("#alert-title").text("📢 AVISO DE MOBILIDADE!");
-    $(".alert-bar").addClass("alert-bar-mobilidade"); // Verde
+    $(".alert-bar").addClass("alert-bar-mobilidade");
   } else {
     $("#alert-title").text("⚠️ ALERTA DE RADAR!");
     $(".alert-bar").addClass("alert-bar-radar");
@@ -2569,7 +2708,6 @@ function dispararAlerta(radar, distancia) {
     ajustarPosicaoSpeedWidget(true);
   }
 
-  // Lógica de toque de som
   if (alertaHabilitado) {
     var deveTocar = false;
     if (tipoAlerta === 'radar') { 
@@ -2584,7 +2722,6 @@ function dispararAlerta(radar, distancia) {
     }
   }
 
-  // Aplica estilo crítico se estiver muito perto
   if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
     if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
     else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
@@ -2632,7 +2769,7 @@ function receberDadosAppInventor(dadosStr) {
     var lng = parseFloat(partes[2]);
     var speed = partes[3] ? parseFloat(partes[3]) : 0;
     var heading = partes[4] ? parseFloat(partes[4]) : null;
-    if (heading === -1 || isNaN(heading)) heading = null; // Tratamento Azimuth
+    if (heading === -1 || isNaN(heading)) heading = null;
     if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
       gpsSource = 'appinventor';
       processarNovaPosicao(lat, lng, speed, heading);
@@ -2684,10 +2821,8 @@ async function solicitarWakeLock() {
 }
 
 // ===================================================================
-// BLOCO 1 — AUDIO ENGINE (CORRIGIDO PARA WEBVIEW APP INVENTOR)
+// BLOCO 1 — AUDIO ENGINE
 // ===================================================================
-
-// ---- AudioContext singleton ----------------------------------------
 var _audioCtx = null;
 var _audioDesbloqueado = false;
 
@@ -2698,7 +2833,6 @@ function getAudioCtx() {
   return _audioCtx;
 }
 
-// Desbloqueia o contexto de áudio no primeiro gesto do usuário
 function desbloquearAudioMobile() {
   if (_audioDesbloqueado) return;
   try {
@@ -2716,20 +2850,106 @@ function desbloquearAudioMobile() {
   }
 }
 
-// Registra o desbloqueio em qualquer interação do usuário
 ['click', 'touchstart', 'touchend', 'keydown'].forEach(function (evt) {
   document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
 });
 
-// ===================================================================
-// ✅ NOVO BLOCO — CONTROLE DE ESTADO DA SEQUÊNCIA DE SOM (mp3)
-// ===================================================================
+var _sequenciaSomId = 0;
+var _alertaPrincipalEstaTocando = false;
+var _soundListeners = {};
+var contagemTocarSom = 0;
 
-var _sequenciaSomId = 0; // identifica cada "rodada" de 3 toques
+function cancelarSequenciaSom() {
+  _sequenciaSomId++;
+  _alertaPrincipalEstaTocando = false;
+  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && _soundListeners[id]) {
+      el.removeEventListener('ended', _soundListeners[id]);
+      delete _soundListeners[id];
+      el.pause();
+      el.currentTime = 0;
+    }
+  });
+}
 
+function pararTodosSons() {
+  cancelarSequenciaSom();
+  ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.pause();
+      el.currentTime = 0;
+    }
+  });
+}
+
+function tocarSomAlerta(tipoAlerta) {
+  if (typeof AppInventor !== 'undefined') {
+    enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
+  }
+
+  if (_alertaPrincipalEstaTocando) return;
+
+  var soundId = 'alert-sound-radar';
+  if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
+  else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
+
+  var sound = document.getElementById(soundId)
+           || document.getElementById('alert-sound-radar');
+
+  if (!sound) {
+    console.warn('[Radar X9] Elemento de áudio não encontrado:', soundId);
+    return;
+  }
+
+  _sequenciaSomId++;
+  var meuId = _sequenciaSomId;
+  _alertaPrincipalEstaTocando = true;
+
+  var toques = 0;
+  var numToques = 3;
+
+  if (_soundListeners[soundId]) {
+    sound.removeEventListener('ended', _soundListeners[soundId]);
+    delete _soundListeners[soundId];
+  }
+
+  function onEnded() {
+    if (meuId !== _sequenciaSomId) {
+      sound.removeEventListener('ended', onEnded);
+      delete _soundListeners[soundId];
+      _alertaPrincipalEstaTocando = false;
+      return;
+    }
+
+    toques++;
+    if (toques < numToques) {
+      sound.currentTime = 0;
+      sound.play().catch(function(err) {
+        console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
+      });
+    } else {
+      sound.removeEventListener('ended', onEnded);
+      delete _soundListeners[soundId];
+      _alertaPrincipalEstaTocando = false;
+    }
+  }
+
+  _soundListeners[soundId] = onEnded;
+  sound.addEventListener('ended', onEnded);
+
+  sound.currentTime = 0;
+  sound.play().catch(function(err) {
+    console.warn('[Radar X9] Falha ao iniciar mp3 (' + soundId + '):', err);
+    sound.removeEventListener('ended', onEnded);
+    delete _soundListeners[soundId];
+    _alertaPrincipalEstaTocando = false;
+  });
+}
 
 // ===================================================================
-// BLOCO 2 — BOTÃO SILENCIAR: toca som ao mudar estado (CORRIGIDO)
+// BLOCO 2 — BOTÃO SILENCIAR
 // ===================================================================
 function inicializarBotaoAlertaToggle() {
   var alertBtn  = document.getElementById('btn-alert-toggle');
@@ -2745,12 +2965,8 @@ function inicializarBotaoAlertaToggle() {
         alertIcon.src = '/imagens_app/ic_sound_on.png';
         alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
       }
-      // ✅ NOVO: zera qualquer trava deixada por uma sequência anterior,
-      // garantindo que o próximo alerta volte a tocar o mp3 normalmente
       cancelarSequenciaSom();
       contagemTocarSom = 0;
-
-      // Som de confirmação ao LIGAR
       tocarBeepConfirmacao('on');
       showNotification('Alerta LIGADO');
     } else {
@@ -2759,26 +2975,18 @@ function inicializarBotaoAlertaToggle() {
         alertIcon.src = '/imagens_app/ic_sound_off.png';
         alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
       }
-      // Corta qualquer sequência de mp3 em andamento ao desligar
       cancelarSequenciaSom();
       pararTodosSons();
-
-      // Som de confirmação ao DESLIGAR
       tocarBeepConfirmacao('off');
       showNotification('Alerta DESLIGADO');
     }
 
-    // NÃO chama esconderAlertaVisual() aqui se um alerta está ativo
-    // pois ela chama silenciarAlertaComBeep que pode matar o som do alerta
     if ($("#alert-container").is(":visible")) {
       esconderAlertaVisualSemBeep();
     }
   });
 }
 
-// ===================================================================
-// BEEP DE CONFIRMAÇÃO DO BOTÃO (não interfere nos alertas)
-// ===================================================================
 function tocarBeepConfirmacao(estado) {
   try {
     var ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2808,24 +3016,13 @@ function tocarBeepConfirmacao(estado) {
   }
 }
 
-// ===================================================================
-// FUNÇÃO TOCAR BEEP PARA BOTÃO SILENCIAR APENAS (CORRIGIDA)
-// ===================================================================
-// ===================================================================
-// ✅ silenciarAlertaComBeep CORRIGIDA
-// — Cancela a sequência mp3 ANTES de criar o AudioContext do beep
-// — Fecha o AudioContext após o uso para não vazar recursos
-// ===================================================================
 function silenciarAlertaComBeep(tipoAlerta) {
-  // 1. Para imediatamente qualquer sequência mp3 em andamento
   cancelarSequenciaSom();
 
-  // 2. Toca o bipe de confirmação curto
   var ctx;
   try {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     _tocarBeep(ctx, tipoAlerta);
-    // Fecha o contexto depois que os osciladores terminarem (~500ms)
     setTimeout(function() {
       if (ctx && ctx.state !== 'closed') {
         ctx.close().catch(function(){});
@@ -2836,9 +3033,7 @@ function silenciarAlertaComBeep(tipoAlerta) {
     if (ctx) ctx.close().catch(function(){});
   }
 }
-//==============================================
-// FUNÇÃO ORIGINAL DE BEEP RESTAURADA INTACTA
-//===============================================
+
 function _tocarBeep(ctx, tipoAlerta) {
   var osc = ctx.createOscillator();
   var gain = ctx.createGain();
@@ -2885,123 +3080,15 @@ function _tocarBeep(ctx, tipoAlerta) {
   }
 }
 
-// ===================================================================
-// VERIFICAÇÃO PRINCIPAL DE ALERTAS A 180 METROS
-// ===================================================================
-function verificarAlertasRadares() {
-  if (!alertaHabilitado || !userLat || !userLng) return;
-
-  var radarMaisProximo = null;
-  var menorDistancia = Infinity;
-  var tipoAlertaMaisProximo = null;
-
-  for (var i = 0; i < radarMarkers.length; i++) {
-    var m = radarMarkers[i];
-    if (!m.options || !m.options.record) continue;
-
-    var rData = m.options.record;
-    var tipoOriginal = rData.tipo || rData.tipo_equipamento || "";
-
-    if (!deveAlertaRadar(tipoOriginal)) continue;
-
-    var rLat = m.getLatLng().lat;
-    var rLng = m.getLatLng().lng;
-    var dist = calcularDistancia(userLat, userLng, rLat, rLng);
-
-    if (dist < menorDistancia) {
-      menorDistancia = dist;
-      radarMaisProximo = m;
-      tipoAlertaMaisProximo = tipoOriginal;
-    }
-  }
-
-  if (!radarMaisProximo || menorDistancia > ALERT_CONFIG.DISTANCIA_MAXIMA) {
-    if ($("#alert-container").is(":visible") && ultimoRadarAlertado === (radarMaisProximo ? radarMaisProximo.options.id : null)) {
-      esconderAlertaVisual();
-    }
-    ultimoRadarAlertado = null;
-    tipoAlertaAtivo = null;
-    cancelarSequenciaSom(); // ✅ NOVO: fora de alcance, corta sequência pendente
-    return;
-  }
-
-  var rData = radarMaisProximo.options.record;
-  var rId = radarMaisProximo.options.id;
-  var tipoClassificado = classificarAlerta(tipoAlertaMaisProximo);
-
-  var direcao = verificarDirecaoMelhorada(userLat, userLng, currentHeading, radarMaisProximo.getLatLng().lat, radarMaisProximo.getLatLng().lng, rId, menorDistancia);
-
-  if (direcao.estaAfastando && menorDistancia > ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
-    if (ultimoRadarAlertado === rId) esconderAlertaVisual();
-    ultimoRadarAlertado = null;
-    tipoAlertaAtivo = null;
-    cancelarSequenciaSom(); // ✅ NOVO: passou do radar, corta sequência pendente
-    return;
-  }
-
-  if (ultimoRadarAlertado !== rId) {
-    ultimoRadarAlertado = rId;
-  }
-
-  if (direcao.estaAproximando && menorDistancia <= ALERT_CONFIG.DISTANCIA_MAXIMA) {
-    var nomeFormatado = ajusteNomes[tipoAlertaMaisProximo.trim()] || tipoAlertaMaisProximo;
-    var velRadar = rData.velocidade || rData.vel || "";
-    var msgAlerta = nomeFormatado + (velRadar ? " - " + velRadar + " km/h" : "") + " a " + Math.round(menorDistancia) + "m";
-
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-MOBILIDADE");
-    $(".alert-bar").css("background", "");
-
-    if (tipoClassificado === 'radar') {
-      tipoAlertaAtivo = 'radar';
-      $("#alert-title").text("⚠️ ATENÇÃO RADAR!");
-      $(".alert-bar").addClass("alert-bar-critico");
-      $("#alert-icon").attr("src", getIconUrl(tipoAlertaMaisProximo, velRadar));
-      tocarSomAlerta('radar'); 
-    } 
-    else if (tipoClassificado === 'risco') {
-      tipoAlertaAtivo = 'risco';
-      $("#alert-title").text("⚠️ RISCO!");
-      $(".alert-bar").addClass("alert-bar-risco");
-      $("#alert-icon").attr("src", getIconUrl(tipoAlertaMaisProximo, velRadar));
-      tocarSomAlerta('risco'); 
-    } 
-    else if (tipoClassificado === 'mobilidade') {
-      tipoAlertaAtivo = 'mobilidade';
-      dispararAlertaMobilidadeIA(msgAlerta);
-      return;
-    }
-
-    $("#alert-text").text(msgAlerta);
-
-    if (!$("#alert-container").is(":visible")) { 
-      $("#alert-container").fadeIn(200); 
-      ajustarPosicaoSpeedWidget(true);
-    }
-
-    if (menorDistancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
-      $(".alert-bar").addClass(tipoClassificado === 'radar' ? "alert-bar-critico" : "alert-bar-risco-critico");
-    }
-
-    clearTimeout(alertTimeout);
-    alertTimeout = setTimeout(function() { 
-      if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
-    }, ALERT_CONFIG.TEMPO_ALERTA);
-  }
-}
-
-
 //===================================================================
-// ===================================================================
 // BLOCO 4 — CSS inline para transição suave do ícone de navegação
-// ===================================================================
-//====================================================================
-
+//===================================================================
 (function injetarCSSNavIcon() {
   var style = document.createElement('style');
   style.textContent = [
     '#nav-icon-img {',
     '  will-change: transform;',
-    '  transition: none !important;', // a animação é feita via rAF, não CSS
+    '  transition: none !important;',
     '}'
   ].join('\n');
   document.head.appendChild(style);
@@ -3010,7 +3097,6 @@ function verificarAlertasRadares() {
 // ===================================================================
 // FUNÇÃO INICIALIZAR ROTAÇÃO DO MAPA
 //====================================================================
-
 function inicializarBotaoRotacaoMapa() {
   const rotateBtn = document.getElementById('btn-rotate-map');
   const rotateBtnIcon = document.getElementById('rotate-btn-icon');
@@ -3060,9 +3146,259 @@ function inicializarBotaoRotacaoMapa() {
   });
 }
 
+// ===================================================================
+// FUNÇÃO INICIALIZAR BOTÃO ADICIONAR RADAR
+// ===================================================================
+function inicializarBotaoAddRadar() {
+  const btnAddRadar = document.getElementById('btn-add-radar');
+  const modalAddRadar = document.getElementById('modal-add-radar');
+  const btnModalClose = document.getElementById('modal-close');
+  const btnSubmitRadar = document.getElementById('btn-submit-radar');
+  const btnGpsPosition = document.getElementById('btn-gps-position');
+  const radarType = document.getElementById('radar-type');
+  const radarAddress = document.getElementById('radar-address');
+  const radarSpeed = document.getElementById('radar-speed');
+  const posLat = document.getElementById('pos-lat');
+  const posLng = document.getElementById('pos-lng');
+  const iconPreviewGroup = document.getElementById('icon-preview-group');
+  const iconPreviewImg = document.getElementById('icon-preview-img');
+  const iconPreviewName = document.getElementById('icon-preview-name');
+
+  let currentPosition = { lat: null, lng: null };
+
+  // Abrir modal
+  btnAddRadar.addEventListener('click', () => {
+    modalAddRadar.classList.add('active');
+    atualizarPosicaoAtual();
+  });
+
+  // Fechar modal
+  btnModalClose.addEventListener('click', () => {
+    modalAddRadar.classList.remove('active');
+  });
+
+  modalAddRadar.addEventListener('click', (e) => {
+    if (e.target === modalAddRadar) {
+      modalAddRadar.classList.remove('active');
+    }
+  });
+
+  // Atualizar posição atual
+  function atualizarPosicaoAtual() {
+    if (userLat && userLng) {
+      currentPosition.lat = userLat;
+      currentPosition.lng = userLng;
+      posLat.textContent = userLat.toFixed(6);
+      posLng.textContent = userLng.toFixed(6);
+    } else {
+      posLat.textContent = 'Aguardando GPS...';
+      posLng.textContent = '';
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            currentPosition.lat = pos.coords.latitude;
+            currentPosition.lng = pos.coords.longitude;
+            posLat.textContent = pos.coords.latitude.toFixed(6);
+            posLng.textContent = pos.coords.longitude.toFixed(6);
+          },
+          () => {
+            posLat.textContent = 'GPS indisponível';
+          },
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      }
+    }
+  }
+
+  btnGpsPosition.addEventListener('click', atualizarPosicaoAtual);
+
+  // Preview do ícone ao selecionar o tipo
+  radarType.addEventListener('change', function() {
+    const tipoSelecionado = this.value;
+    if (tipoSelecionado) {
+      const iconUrl = getIconUrl(tipoSelecionado, '');
+      if (iconUrl) {
+        iconPreviewImg.src = iconUrl;
+        iconPreviewImg.onerror = function() {
+          this.src = '/imagens_app/ic_radar_cev_v2.png';
+        };
+        iconPreviewName.textContent = tipoSelecionado;
+        iconPreviewGroup.style.display = 'block';
+      } else {
+        iconPreviewGroup.style.display = 'none';
+      }
+    } else {
+      iconPreviewGroup.style.display = 'none';
+    }
+  });
+
+  // Função para salvar no GitHub
+  async function salvarRadarNoGitHub(novoRadar) {
+    try {
+      const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `token ${GITHUB_CONFIG.token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao buscar arquivo: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = atob(data.content);
+      let radares = JSON.parse(content);
+
+      if (!Array.isArray(radares)) {
+        radares = [];
+      }
+
+      const novoRegistro = [
+        "",
+        "",
+        novoRadar.endereco,
+        novoRadar.tipo,
+        String(novoRadar.velocidade),
+        "",
+        "",
+        "",
+        "",
+        `${novoRadar.latitude}, ${novoRadar.longitude}`
+      ];
+
+      radares.push(novoRegistro);
+
+      const updateResponse = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${GITHUB_CONFIG.token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: `Adicionado radar: ${novoRadar.tipo} em ${novoRadar.endereco}`,
+          content: btoa(unescape(encodeURIComponent(JSON.stringify(radares, null, 2)))),
+          sha: data.sha
+        })
+      });
+
+      if (!updateResponse.ok) {
+        throw new Error(`Erro ao salvar arquivo: ${updateResponse.status}`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[Radar X9] Erro ao salvar no GitHub:', error);
+      throw error;
+    }
+  }
+
+  // Função para incluir radar
+  async function incluirRadar() {
+    const tipo = radarType.value;
+    const endereco = radarAddress.value.trim();
+    const velocidade = radarSpeed.value.trim();
+
+    if (!tipo) {
+      showNotification('❌ Selecione o tipo de radar.');
+      radarType.focus();
+      return;
+    }
+    if (!endereco) {
+      showNotification('❌ Informe o endereço.');
+      radarAddress.focus();
+      return;
+    }
+    if (endereco.length < 5) {
+      showNotification('❌ Endereço muito curto. Seja mais específico.');
+      radarAddress.focus();
+      return;
+    }
+    if (!currentPosition.lat || !currentPosition.lng) {
+      showNotification('❌ Aguardando posição GPS. Clique em "Atualizar Posição".');
+      return;
+    }
+
+    if (!confirm(`⚠️ Confirmar inclusão do radar?\n\n📌 Tipo: ${tipo}\n📍 Endereço: ${endereco}\n🏎️ Velocidade: ${velocidade || 'N/I'} km/h\n🗺️ Posição: ${currentPosition.lat.toFixed(6)}, ${currentPosition.lng.toFixed(6)}`)) {
+      return;
+    }
+
+    btnSubmitRadar.disabled = true;
+    btnSubmitRadar.textContent = '⏳ Salvando...';
+
+    try {
+      const novoRadar = {
+        tipo: tipo,
+        endereco: endereco,
+        velocidade: velocidade || '0',
+        latitude: currentPosition.lat,
+        longitude: currentPosition.lng
+      };
+
+      await salvarRadarNoGitHub(novoRadar);
+
+      showNotification('✅ Radar incluído com sucesso! Recarregando...');
+      modalAddRadar.classList.remove('active');
+      
+      setTimeout(() => {
+        carregarRadares();
+      }, 1500);
+
+      radarType.value = '';
+      radarAddress.value = '';
+      radarSpeed.value = '';
+      iconPreviewGroup.style.display = 'none';
+      btnSubmitRadar.disabled = false;
+      btnSubmitRadar.textContent = '✅ Incluir Radar';
+
+    } catch (error) {
+      showNotification('❌ Erro ao salvar: ' + error.message);
+      btnSubmitRadar.disabled = false;
+      btnSubmitRadar.textContent = '✅ Incluir Radar';
+    }
+  }
+
+  btnSubmitRadar.addEventListener('click', incluirRadar);
+
+  // Atalho de teclado
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modalAddRadar.classList.contains('active')) {
+      modalAddRadar.classList.remove('active');
+    }
+    if (e.key === 'Enter' && modalAddRadar.classList.contains('active')) {
+      const activeElement = document.activeElement;
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'SELECT')) {
+        if (activeElement.id !== 'radar-address' && activeElement.id !== 'radar-speed') {
+          incluirRadar();
+        } else if (activeElement.id === 'radar-speed') {
+          incluirRadar();
+        }
+      } else {
+        incluirRadar();
+      }
+    }
+  });
+
+  // Funções de codificação para suporte a caracteres especiais
+  window.btoa = function(str) {
+    return window.btoa(unescape(encodeURIComponent(str)));
+  };
+
+  window.atob = function(str) {
+    return decodeURIComponent(escape(window.atob(str)));
+  };
+
+  console.log('[Radar X9] ✅ Módulo de inclusão manual de radares carregado!');
+}
+
+// ===================================================================
+// INICIALIZAÇÃO
+// ===================================================================
 window.onload = initMap;
 </script>
 
-  
 </body>
 </html>
