@@ -1349,32 +1349,39 @@ let GITHUB_CONFIG = {
     token: ''
 };
 
-// Buscar token do servidor
 async function carregarConfigGitHub() {
+
+    console.log('[Radar X9] 🔄 Carregando configuração...');
+
     try {
-        console.log('[Radar X9] 🔄 Carregando configuração do GitHub...');
+
         const response = await fetch('/api/config');
-        if (!response.ok) throw new Error('Erro ao buscar config: ' + response.status);
-        const config = await response.json();
-        
-        GITHUB_CONFIG.token = config.githubToken;
-        GITHUB_CONFIG.owner = config.githubOwner || GITHUB_CONFIG.owner;
-        GITHUB_CONFIG.repo = config.githubRepo || GITHUB_CONFIG.repo;
-        
-        console.log('[Radar X9] ✅ Configuração do GitHub carregada!');
-        console.log(`[Radar X9] 📁 Repositório: ${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`);
-        console.log(`[Radar X9] 🔑 Token: ${GITHUB_CONFIG.token ? '✅ Presente' : '❌ Ausente'}`);
-        return true;
-    } catch (error) {
-        console.warn('[Radar X9] ⚠️ Erro ao carregar config do servidor:', error);
-        // Fallback para desenvolvimento
-        if (typeof process !== 'undefined' && process.env && process.env.GITHUB_TOKEN) {
-            GITHUB_CONFIG.token = process.env.GITHUB_TOKEN;
-            console.log('[Radar X9] ✅ Token carregado via fallback');
-            return true;
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
+
+        const config = await response.json();
+
+        Object.assign(GITHUB_CONFIG, {
+            owner: config.githubOwner || GITHUB_CONFIG.owner,
+            repo: config.githubRepo || GITHUB_CONFIG.repo,
+            token: config.githubToken || ''
+        });
+
+        console.log('[Radar X9] ✅ Configuração carregada.');
+
+        return true;
+
+    } catch (err) {
+
+        console.warn('[Radar X9] API indisponível.');
+
+        // continua usando owner/repo já definidos
         return false;
+
     }
+
 }
 
 // ===================================================================
