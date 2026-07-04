@@ -763,27 +763,24 @@
 
     /* ===================================================================
        BOTÃO + (ADICIONAR RADAR)
-       Reposicionado mais à esquerda, afastado da coluna de botões do
-       menu lateral (sidebar-controls, que ocupa os 68px da direita).
-      
     =================================================================== */
     .btn-add-radar {
         position: absolute;
-        bottom: 10px;
-        right: 10px; /* ← MANTIDO, mas com sidebar retraída o botão fica mais à esquerda */
+        bottom: 20px;
+        right: 90px;
         width: 60px;
         height: 60px;
         border-radius: 50%;
-       background: linear-gradient(135deg, #00cc66, #00994d);
-       border: 2px solid rgba(0, 255, 136, 0.4);
-       box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
-       cursor: pointer;
-       z-index: 1000;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-       animation: pulsePlus 2s ease-in-out infinite;
+        background: linear-gradient(135deg, #00cc66, #00994d);
+        border: 2px solid rgba(0, 255, 136, 0.4);
+        box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
+        cursor: pointer;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: pulsePlus 2s ease-in-out infinite;
     }
 
     @keyframes pulsePlus {
@@ -922,7 +919,7 @@
     }
 
     /* ===================================================================
-       BOTÕES DE VELOCIDADE - AGORA PARA TODOS OS TIPOS
+       BOTÕES DE VELOCIDADE
     =================================================================== */
     .speed-buttons-container {
         display: grid;
@@ -1178,9 +1175,7 @@
     <!-- BOTÃO + PARA ADICIONAR RADAR -->
     <button class="btn-add-radar" id="btn-add-radar">
       <span class="plus-icon">+</span>
-  </button>
-
-
+    </button>
 
     <!-- MODAL DE INCLUSÃO DE RADAR -->
     <div class="modal-overlay" id="modal-add-radar">
@@ -1222,7 +1217,7 @@
             </select>
           </div>
 
-          <!-- Velocidade Máxima - SEMPRE VISÍVEL PARA TODOS OS TIPOS -->
+          <!-- Velocidade Máxima -->
           <div class="form-group" id="speed-group">
             <label for="radar-speed">Velocidade Máxima (km/h)</label>
             <div class="speed-buttons-container" id="speed-buttons-container">
@@ -1235,8 +1230,8 @@
               <button type="button" class="speed-btn" data-speed="100">100</button>
               <button type="button" class="speed-btn" data-speed="110">110</button>
             </div>
-            <input type="number" id="radar-speed" class="form-input" placeholder="" min="0" max="120" style="margin-top: 8px;">    
-           </div>
+            <input type="number" id="radar-speed" class="form-input" placeholder="Digite a velocidade" min="0" max="120" style="margin-top: 8px;">
+          </div>
 
           <!-- Preview do Ícone do Radar Selecionado -->
           <div class="form-group" id="icon-preview-group" style="display:none;">
@@ -1263,7 +1258,7 @@
             <div class="current-position-status" id="pos-status">Aguardando coordenadas...</div>
           </div>
 
-          <!-- Botão de Inclusão - AÇÃO DIRETA, SEM CONFIRMAÇÃO ADICIONAL -->
+          <!-- Botão de Inclusão -->
           <button class="btn-submit-radar" id="btn-submit-radar">
             ✅ Incluir Radar
           </button>
@@ -1284,7 +1279,14 @@
   </audio>
 
 <script>
- // ===================================================================
+// ===================================================================
+// TODO: COLE AQUI O SCRIPT COMPLETO QUE EU FORNECI ANTERIORMENTE
+// ===================================================================
+// O script é muito longo para ser colocado duas vezes, mas você deve
+// substituir TODO o conteúdo da tag <script> pelo código JavaScript
+// completo que eu forneci na resposta anterior.
+// ===================================================================
+  // ===================================================================
 // VARIÁVEIS GLOBAIS
 // ===================================================================
 let map;
@@ -3586,8 +3588,6 @@ setInterval(pollAppInventor, 500);
 // INICIALIZAÇÃO
 // ===================================================================
 window.onload = initMap;
-
-
 </script>
 </body>
 </html>
