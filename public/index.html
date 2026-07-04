@@ -1350,6 +1350,7 @@ let GITHUB_CONFIG = {
 };
 
 async function carregarConfigGitHub() {
+  
 
     console.log('[Radar X9] 🔄 Carregando configuração...');
 
@@ -2816,6 +2817,7 @@ async function initMap() {
     
     // Carregar configuração do GitHub
     await carregarConfigGitHub();
+    console.log("CONFIG:", GITHUB_CONFIG);
     
     if (typeof L === 'undefined') { 
         hideFullscreenLoading(); 
@@ -3220,86 +3222,96 @@ function inicializarBotaoAddRadar() {
     // CONFIGURAR BOTÕES DE VELOCIDADE
     configurarBotoesVelocidade();
 
-    // SALVAR NO GITHUB
-    async function salvarRadarNoGitHub(novoRadar) {
-        try {
-            console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
-            
-            if (!GITHUB_CONFIG.token) {
-                throw new Error('Token do GitHub não configurado. Verifique o arquivo .env');
-            }
-            
-            const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-            
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`Erro ao buscar arquivo: ${response.status}`);
-            }
-
-            const data = await response.json();
-            const content = atob(data.content);
-            const jsonData = JSON.parse(content);
-            
-            if (!jsonData.records) {
-                jsonData.records = [];
-            }
-
-            let proximoId = 541;
-            jsonData.records.forEach(record => {
-                if (record[0] && typeof record[0] === 'number' && record[0] >= proximoId) {
-                    proximoId = record[0] + 1;
-                }
-            });
-
-            const idFiscalizacao = String(proximoId);
-
-            const novoRegistro = [
-                proximoId,
-                idFiscalizacao,
-                novoRadar.endereco,
-                novoRadar.tipo,
-                String(novoRadar.velocidade),
-                "Único",
-                "Único",
-                `M${String(proximoId).padStart(6, '0')}`,
-                `KBH${String(proximoId).padStart(6, '0')}`,
-                `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
-            ];
-
-            jsonData.records.push(novoRegistro);
-
-            const updateResponse = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
-                    content: btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2)))),
-                    sha: data.sha
-                })
-            });
-
-            if (!updateResponse.ok) {
-                throw new Error(`Erro ao salvar arquivo: ${updateResponse.status}`);
-            }
-
-            console.log('[Radar X9] ✅ Radar salvo com sucesso no GitHub! ID:', proximoId);
-            return { success: true, id: proximoId };
-        } catch (error) {
-            console.error('[Radar X9] ❌ Erro ao salvar no GitHub:', error);
-            throw error;
+    
+    // SALVAR NO GITHUB - VERSÃO CORRIGIDA
+async function salvarRadarNoGitHub(novoRadar) {
+    try {
+        console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
+        
+        if (!GITHUB_CONFIG.token) {
+            throw new Error('Token do GitHub não configurado. Verifique o arquivo .env');
         }
-    }
+        
+        console.log('[Radar X9] Token:', GITHUB_CONFIG.token.substring(0, 20) + '...');
+        console.log('[Radar X9] Owner:', GITHUB_CONFIG.owner);
+        console.log('[Radar X9] Repo:', GITHUB_CONFIG.repo);
+        
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+        console.log('[Radar X9] URL:', url);
+        
+        // 🔥 CORREÇÃO: Usar 'token' em vez de 'Bearer'
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
 
+        if (!response.ok) {
+            const erro = await response.text();
+            console.error('[Radar X9] GitHub GET erro:', response.status, erro);
+            throw new Error(`Erro ao buscar arquivo: ${response.status} - ${erro}`);
+        }
+
+        const data = await response.json();
+        const content = atob(data.content);
+        const jsonData = JSON.parse(content);
+        
+        if (!jsonData.records) {
+            jsonData.records = [];
+        }
+
+        let proximoId = 541;
+        jsonData.records.forEach(record => {
+            if (record[0] && typeof record[0] === 'number' && record[0] >= proximoId) {
+                proximoId = record[0] + 1;
+            }
+        });
+
+        const idFiscalizacao = String(proximoId);
+
+        const novoRegistro = [
+            proximoId,
+            idFiscalizacao,
+            novoRadar.endereco,
+            novoRadar.tipo,
+            String(novoRadar.velocidade),
+            "Único",
+            "Único",
+            `M${String(proximoId).padStart(6, '0')}`,
+            `KBH${String(proximoId).padStart(6, '0')}`,
+            `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
+        ];
+
+        jsonData.records.push(novoRegistro);
+
+        const updateResponse = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
+                content: btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2)))),
+                sha: data.sha
+            })
+        });
+
+        if (!updateResponse.ok) {
+            const erro = await updateResponse.text();
+            console.error('[Radar X9] GitHub PUT erro:', updateResponse.status, erro);
+            throw new Error(`Erro ao salvar arquivo: ${updateResponse.status} - ${erro}`);
+        }
+
+        console.log('[Radar X9] ✅ Radar salvo com sucesso no GitHub! ID:', proximoId);
+        return { success: true, id: proximoId };
+    } catch (error) {
+        console.error('[Radar X9] ❌ Erro ao salvar no GitHub:', error);
+        throw error;
+    }
+}
     
    
 // INCLUIR RADAR - VERSÃO CORRIGIDA (sem radarSpeed)
