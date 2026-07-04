@@ -3030,8 +3030,6 @@ function inicializarBotaoAddRadar() {
                 this.classList.add('selected');
                 this.classList.add(`selected-${velocidade}`);
                 
-                radarSpeed.value = velocidade;
-                
                 atualizarPreviewIcone(tipoAtual, velocidade);
             });
         });
@@ -3052,7 +3050,8 @@ function inicializarBotaoAddRadar() {
             };
             
             let nomeExibicao = tipo;
-            const vel = velocidade || radarSpeed.value || '';
+            const speedBtnAtual = document.querySelector('.speed-btn.selected');
+            const vel = velocidade || (speedBtnAtual ? speedBtnAtual.dataset.speed : '') || '';
             if (vel) {
                 nomeExibicao = `${tipo} - ${vel} km/h`;
             }
@@ -3153,7 +3152,6 @@ function inicializarBotaoAddRadar() {
         
         radarType.value = '';
         radarAddress.value = '';
-        radarSpeed.value = '';
         tipoAtual = '';
         iconPreviewGroup.style.display = 'none';
         
@@ -3204,18 +3202,11 @@ function inicializarBotaoAddRadar() {
         tipoAtual = tipoSelecionado;
         
         if (tipoSelecionado) {
-            const velocidade = radarSpeed.value || '';
+            const speedBtnAtual = document.querySelector('.speed-btn.selected');
+            const velocidade = speedBtnAtual ? speedBtnAtual.dataset.speed : '';
             atualizarPreviewIcone(tipoSelecionado, velocidade);
         } else {
             iconPreviewGroup.style.display = 'none';
-        }
-    });
-
-    // ATUALIZAR PREVIEW QUANDO VELOCIDADE MUDA
-    radarSpeed.addEventListener('input', function() {
-        const velocidade = this.value;
-        if (tipoAtual) {
-            atualizarPreviewIcone(tipoAtual, velocidade);
         }
     });
 
@@ -3402,7 +3393,7 @@ async function incluirRadar() {
         }
         if (e.key === 'Enter' && modalAddRadar.classList.contains('active')) {
             const activeElement = document.activeElement;
-            if (activeElement && activeElement.id === 'radar-speed') {
+            if (activeElement && activeElement.classList && activeElement.classList.contains('speed-btn')) {
                 incluirRadar();
             }
         }
