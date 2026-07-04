@@ -19,13 +19,13 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js" crossorigin="anonymous"></script>
 
-
-  <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
+   <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png">
   <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
   <link rel="manifest" href="/favicon_io/site.webmanifest">
   
+
   <style>
     /* ===================================================================
        VARIÁVEIS DE TEMA (cores globais do app)
@@ -763,13 +763,18 @@
 
     /* ===================================================================
        BOTÃO + (ADICIONAR RADAR)
-       Reposicionado mais à esquerda, afastado da coluna de botões do
-       menu lateral (sidebar-controls, que ocupa os 68px da direita).
+       Ancorado de forma relativa à largura da sidebar (--sidebar-width),
+       em vez de usar breakpoints fixos de media query. Isso garante a
+       MESMA posição (logo à esquerda da coluna de botões, "abaixo do
+       menu") tanto no navegador desktop quanto dentro do WebView do
+       App Inventor, que reporta uma largura de viewport estreita e
+       antes disparava a regra @media (max-width:600px) deslocando o
+       botão bem mais para a esquerda.
     =================================================================== */
     .btn-add-radar {
         position: absolute;
         bottom: 10px;
-        right: 10px;
+        right: calc(var(--sidebar-width) + 6px);
         width: 60px;
         height: 60px;
         border-radius: 50%;
@@ -781,7 +786,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease, border-color 0.4s ease;
         animation: pulsePlus 2s ease-in-out infinite;
     }
 
@@ -797,6 +802,14 @@
 
     .btn-add-radar:active {
         transform: scale(0.92);
+    }
+
+    /* Estado de sucesso: some por alguns segundos após salvar com êxito */
+    .btn-add-radar.success {
+        background: linear-gradient(135deg, #1e90ff, #0059b3);
+        border-color: rgba(30, 144, 255, 0.6);
+        animation: none;
+        box-shadow: 0 4px 25px rgba(30, 144, 255, 0.7);
     }
 
     .btn-add-radar .plus-icon {
@@ -1018,7 +1031,7 @@
         font-size: 1.1rem;
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.3s ease, background 0.4s ease;
         box-shadow: 0 4px 15px rgba(0, 204, 102, 0.3);
         margin-top: 10px;
     }
@@ -1038,6 +1051,13 @@
         transform: none;
     }
 
+    /* Estado de sucesso do botão de envio do formulário */
+    .btn-submit-radar.success {
+        background: linear-gradient(135deg, #1e90ff, #0059b3);
+        box-shadow: 0 4px 20px rgba(30, 144, 255, 0.5);
+        opacity: 1;
+    }
+
     .status-loading {
         color: var(--accent-color);
         font-size: 0.85rem;
@@ -1050,7 +1070,6 @@
     @media (max-width: 600px) {
         .btn-add-radar {
             bottom: 20px;
-            right: 92px;
             width: 56px;
             height: 56px;
         }
@@ -3112,6 +3131,15 @@ function inicializarBotaoAddRadar() {
   // SALVAR NO GITHUB
   // ===================================================================
   async function salvarRadarNoGitHub(novoRadar) {
+    // Aviso amigável caso o app ainda esteja com as credenciais de exemplo.
+    if (
+      !GITHUB_CONFIG.owner || GITHUB_CONFIG.owner === 'SEU_USUARIO' ||
+      !GITHUB_CONFIG.repo || GITHUB_CONFIG.repo === 'SEU_REPOSITORIO' ||
+      !GITHUB_CONFIG.token || GITHUB_CONFIG.token === 'SEU_TOKEN_GITHUB'
+    ) {
+      throw new Error('GITHUB_CONFIG não configurado (owner/repo/token). Preencha as credenciais reais no topo do script.');
+    }
+
     try {
       const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
       
@@ -3129,13 +3157,30 @@ function inicializarBotaoAddRadar() {
       const data = await response.json();
       const content = atob(data.content);
       const jsonData = JSON.parse(content);
-      
-      if (!jsonData.records) {
+
+      // -----------------------------------------------------------------
+      // Detecta ONDE fica o array de registros dentro do JSON.
+      // Datasets no formato "open data" (ex: Socrata/BHTRANS) costumam vir
+      // como { result: { records: [...] } }. Antes este código assumia
+      // sempre `jsonData.records` e, se essa chave não existisse, criava
+      // um array `records` novo e vazio no nível raiz — o radar então era
+      // salvo numa chave que o carregarRadares() nunca lê (que prioriza
+      // data.result.records), então o radar "sumia": o commit ia para o
+      // GitHub, mas nunca aparecia no mapa.
+      // -----------------------------------------------------------------
+      let recordsArray;
+      if (jsonData.result && Array.isArray(jsonData.result.records)) {
+        recordsArray = jsonData.result.records;
+      } else if (Array.isArray(jsonData.records)) {
+        recordsArray = jsonData.records;
+      } else {
+        // Nenhuma estrutura reconhecida: cria records na raiz (comportamento antigo, como fallback)
         jsonData.records = [];
+        recordsArray = jsonData.records;
       }
 
       let proximoId = 541;
-      jsonData.records.forEach(record => {
+      recordsArray.forEach(record => {
         if (record[0] && typeof record[0] === 'number' && record[0] >= proximoId) {
           proximoId = record[0] + 1;
         }
@@ -3156,7 +3201,7 @@ function inicializarBotaoAddRadar() {
         `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
       ];
 
-      jsonData.records.push(novoRegistro);
+      recordsArray.push(novoRegistro);
 
       const updateResponse = await fetch(url, {
         method: 'PUT',
@@ -3173,7 +3218,8 @@ function inicializarBotaoAddRadar() {
       });
 
       if (!updateResponse.ok) {
-        throw new Error(`Erro ao salvar arquivo: ${updateResponse.status}`);
+        const errBody = await updateResponse.text().catch(() => '');
+        throw new Error(`Erro ao salvar arquivo: ${updateResponse.status} ${errBody}`);
       }
 
       return { success: true, id: proximoId };
@@ -3181,6 +3227,25 @@ function inicializarBotaoAddRadar() {
       console.error('[Radar X9] Erro ao salvar no GitHub:', error);
       throw error;
     }
+  }
+
+  // ===================================================================
+  // FEEDBACK VISUAL DE SUCESSO NOS BOTÕES (verde -> azul "Adicionado" -> volta)
+  // ===================================================================
+  function mostrarSucessoBotoes(idRadar) {
+    // Botão dentro do modal
+    btnSubmitRadar.classList.add('success');
+    btnSubmitRadar.textContent = `✅ Radar #${idRadar} Adicionado!`;
+
+    // Botão flutuante "+" no mapa
+    btnAddRadar.classList.add('success');
+
+    setTimeout(() => {
+      btnSubmitRadar.classList.remove('success');
+      btnSubmitRadar.disabled = false;
+      btnSubmitRadar.textContent = '✅ Incluir Radar';
+      btnAddRadar.classList.remove('success');
+    }, 2200);
   }
 
   // ===================================================================
@@ -3212,6 +3277,7 @@ function inicializarBotaoAddRadar() {
     }
 
     btnSubmitRadar.disabled = true;
+    btnSubmitRadar.classList.remove('success');
     btnSubmitRadar.textContent = '⏳ Salvando...';
 
     try {
@@ -3226,30 +3292,30 @@ function inicializarBotaoAddRadar() {
       const resultado = await salvarRadarNoGitHub(novoRadar);
 
       showNotification(`✅ Radar #${resultado.id} incluído com sucesso!`);
-      fecharModal();
-      
-      setTimeout(() => {
-        carregarRadares();
-      }, 1500);
+      mostrarSucessoBotoes(resultado.id);
 
-      radarType.value = '';
-      radarAddress.value = '';
-      radarSpeed.value = '';
-      tipoAtual = '';
-      iconPreviewGroup.style.display = 'none';
-      
-      speedButtons.forEach(b => {
-        b.classList.remove('selected');
-        b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
-                          'selected-70', 'selected-80', 'selected-100', 'selected-110');
-      });
-      
-      btnSubmitRadar.disabled = false;
-      btnSubmitRadar.textContent = '✅ Incluir Radar';
+      // Só fecha o modal e recarrega depois de o usuário ver a confirmação visual
+      setTimeout(() => {
+        fecharModal();
+        carregarRadares();
+
+        radarType.value = '';
+        radarAddress.value = '';
+        radarSpeed.value = '';
+        tipoAtual = '';
+        iconPreviewGroup.style.display = 'none';
+
+        speedButtons.forEach(b => {
+          b.classList.remove('selected');
+          b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60',
+                            'selected-70', 'selected-80', 'selected-100', 'selected-110');
+        });
+      }, 1500);
 
     } catch (error) {
       showNotification('❌ Erro ao salvar: ' + error.message);
       btnSubmitRadar.disabled = false;
+      btnSubmitRadar.classList.remove('success');
       btnSubmitRadar.textContent = '✅ Incluir Radar';
     }
   }
