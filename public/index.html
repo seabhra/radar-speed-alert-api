@@ -3303,14 +3303,15 @@ function inicializarBotaoAddRadar() {
     }
 
     
-    // INCLUIR RADAR - Versão corrigida
+   
+// INCLUIR RADAR - VERSÃO CORRIGIDA (sem radarSpeed)
 async function incluirRadar() {
     const tipo = radarType.value;
     const endereco = radarAddress.value.trim();
     
     // Pega a velocidade do botão selecionado
     const speedBtnSelected = document.querySelector('.speed-btn.selected');
-    const velocidade = speedBtnSelected ? speedBtnSelected.dataset.speed : '0';
+    const velocidade = speedBtnSelected ? speedBtnSelected.dataset.speed : '';
 
     if (!tipo) {
         showNotification('❌ Selecione o tipo de radar.');
@@ -3331,7 +3332,7 @@ async function incluirRadar() {
         showNotification('❌ Aguardando posição GPS. Aguarde ou feche e reabra o formulário.');
         return;
     }
-    if (!velocidade || velocidade === '0') {
+    if (!velocidade) {
         showNotification('❌ Selecione a velocidade máxima.');
         return;
     }
@@ -3350,8 +3351,10 @@ async function incluirRadar() {
 
         const resultado = await salvarRadarNoGitHub(novoRadar);
         
+        // ANIMA O BOTÃO + COM SUCESSO
         animarBotaoRadar(true);
 
+        // ADICIONA O RADAR NO MAPA IMEDIATAMENTE
         const novoMarker = criarRadarNoMapa(novoRadar);
         if (novoMarker) {
             radarMarkers.push(novoMarker);
