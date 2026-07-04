@@ -763,24 +763,27 @@
 
     /* ===================================================================
        BOTÃO + (ADICIONAR RADAR)
+       Reposicionado mais à esquerda, afastado da coluna de botões do
+       menu lateral (sidebar-controls, que ocupa os 68px da direita).
+      
     =================================================================== */
     .btn-add-radar {
         position: absolute;
-        bottom: 20px;
-        right: 90px;
+        bottom: 10px;
+        right: 10px !important; /* ← MANTIDO, mas com sidebar retraída o botão fica mais à esquerda */
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #00cc66, #00994d);
-        border: 2px solid rgba(0, 255, 136, 0.4);
-        box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
-        cursor: pointer;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        animation: pulsePlus 2s ease-in-out infinite;
+       background: linear-gradient(135deg, #00cc66, #00994d);
+       border: 2px solid rgba(0, 255, 136, 0.4);
+       box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
+       cursor: pointer;
+       z-index: 1000;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+       animation: pulsePlus 2s ease-in-out infinite;
     }
 
     @keyframes pulsePlus {
@@ -919,7 +922,7 @@
     }
 
     /* ===================================================================
-       BOTÕES DE VELOCIDADE
+       BOTÕES DE VELOCIDADE - AGORA PARA TODOS OS TIPOS
     =================================================================== */
     .speed-buttons-container {
         display: grid;
@@ -1175,7 +1178,9 @@
     <!-- BOTÃO + PARA ADICIONAR RADAR -->
     <button class="btn-add-radar" id="btn-add-radar">
       <span class="plus-icon">+</span>
-    </button>
+  </button>
+
+
 
     <!-- MODAL DE INCLUSÃO DE RADAR -->
     <div class="modal-overlay" id="modal-add-radar">
@@ -1217,21 +1222,20 @@
             </select>
           </div>
 
-          <!-- Velocidade Máxima -->
-          <div class="form-group" id="speed-group">
-            <label for="radar-speed">Velocidade Máxima (km/h)</label>
-            <div class="speed-buttons-container" id="speed-buttons-container">
-              <button type="button" class="speed-btn" data-speed="30">30</button>
-              <button type="button" class="speed-btn" data-speed="40">40</button>
-              <button type="button" class="speed-btn" data-speed="50">50</button>
-              <button type="button" class="speed-btn" data-speed="60">60</button>
-              <button type="button" class="speed-btn" data-speed="70">70</button>
-              <button type="button" class="speed-btn" data-speed="80">80</button>
-              <button type="button" class="speed-btn" data-speed="100">100</button>
-              <button type="button" class="speed-btn" data-speed="110">110</button>
-            </div>
-            <input type="number" id="radar-speed" class="form-input" placeholder="Digite a velocidade" min="0" max="120" style="margin-top: 8px;">
-          </div>
+       <!-- Velocidade Máxima -->
+<div class="form-group" id="speed-group">
+  <label for="radar-speed">Velocidade Máxima (km/h)</label>
+  <div class="speed-buttons-container" id="speed-buttons-container">
+      <button type="button" class="speed-btn" data-speed="30">30</button>
+      <button type="button" class="speed-btn" data-speed="40">40</button>
+      <button type="button" class="speed-btn" data-speed="50">50</button>
+      <button type="button" class="speed-btn" data-speed="60">60</button>
+      <button type="button" class="speed-btn" data-speed="70">70</button>
+      <button type="button" class="speed-btn" data-speed="80">80</button>
+      <button type="button" class="speed-btn" data-speed="100">100</button>
+      <button type="button" class="speed-btn" data-speed="110">110</button>
+  </div>
+</div>
 
           <!-- Preview do Ícone do Radar Selecionado -->
           <div class="form-group" id="icon-preview-group" style="display:none;">
@@ -1258,7 +1262,7 @@
             <div class="current-position-status" id="pos-status">Aguardando coordenadas...</div>
           </div>
 
-          <!-- Botão de Inclusão -->
+          <!-- Botão de Inclusão - AÇÃO DIRETA, SEM CONFIRMAÇÃO ADICIONAL -->
           <button class="btn-submit-radar" id="btn-submit-radar">
             ✅ Incluir Radar
           </button>
@@ -1279,14 +1283,7 @@
   </audio>
 
 <script>
-// ===================================================================
-// TODO: COLE AQUI O SCRIPT COMPLETO QUE EU FORNECI ANTERIORMENTE
-// ===================================================================
-// O script é muito longo para ser colocado duas vezes, mas você deve
-// substituir TODO o conteúdo da tag <script> pelo código JavaScript
-// completo que eu forneci na resposta anterior.
-// ===================================================================
-  // ===================================================================
+ // ===================================================================
 // VARIÁVEIS GLOBAIS
 // ===================================================================
 let map;
@@ -3005,7 +3002,7 @@ function inicializarBotaoAddRadar() {
     const btnSubmitRadar = document.getElementById('btn-submit-radar');
     const radarType = document.getElementById('radar-type');
     const radarAddress = document.getElementById('radar-address');
-    const radarSpeed = document.getElementById('radar-speed');
+
     const posLat = document.getElementById('pos-lat');
     const posLng = document.getElementById('pos-lng');
     const posStatus = document.getElementById('pos-status');
@@ -3305,93 +3302,93 @@ function inicializarBotaoAddRadar() {
         }
     }
 
-    // INCLUIR RADAR
-    async function incluirRadar() {
-        const tipo = radarType.value;
-        const endereco = radarAddress.value.trim();
-        const velocidade = radarSpeed.value.trim();
+    
+    // INCLUIR RADAR - Versão corrigida
+async function incluirRadar() {
+    const tipo = radarType.value;
+    const endereco = radarAddress.value.trim();
+    
+    // Pega a velocidade do botão selecionado
+    const speedBtnSelected = document.querySelector('.speed-btn.selected');
+    const velocidade = speedBtnSelected ? speedBtnSelected.dataset.speed : '0';
 
-        if (!tipo) {
-            showNotification('❌ Selecione o tipo de radar.');
-            radarType.focus();
-            return;
-        }
-        if (!endereco) {
-            showNotification('❌ Informe o endereço.');
-            radarAddress.focus();
-            return;
-        }
-        if (endereco.length < 5) {
-            showNotification('❌ Endereço muito curto. Seja mais específico.');
-            radarAddress.focus();
-            return;
-        }
-        if (!currentPosition.lat || !currentPosition.lng) {
-            showNotification('❌ Aguardando posição GPS. Aguarde ou feche e reabra o formulário.');
-            return;
-        }
-
-        btnSubmitRadar.disabled = true;
-        btnSubmitRadar.textContent = '⏳ Salvando...';
-
-        try {
-            const novoRadar = {
-                tipo: tipo,
-                endereco: endereco,
-                velocidade: velocidade || '0',
-                latitude: currentPosition.lat,
-                longitude: currentPosition.lng
-            };
-
-            const resultado = await salvarRadarNoGitHub(novoRadar);
-            
-            // ANIMA O BOTÃO + COM SUCESSO
-            animarBotaoRadar(true);
-
-            // ADICIONA O RADAR NO MAPA IMEDIATAMENTE
-            const novoMarker = criarRadarNoMapa(novoRadar);
-            if (novoMarker) {
-                radarMarkers.push(novoMarker);
-                showNotification(`✅ Radar #${resultado.id} incluído com sucesso!`);
-                
-                // Abrir popup do radar recém-adicionado
-                novoMarker.openPopup();
-            } else {
-                showNotification(`✅ Radar #${resultado.id} salvo, mas não pôde ser exibido no mapa.`);
-            }
-
-            fecharModal();
-            
-            // Recarrega a lista completa para manter consistência
-            setTimeout(() => {
-                carregarRadares();
-            }, 2000);
-
-            // Limpa o formulário
-            radarType.value = '';
-            radarAddress.value = '';
-            radarSpeed.value = '';
-            tipoAtual = '';
-            iconPreviewGroup.style.display = 'none';
-            
-            speedButtons.forEach(b => {
-                b.classList.remove('selected');
-                b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
-                                  'selected-70', 'selected-80', 'selected-100', 'selected-110');
-            });
-            
-            btnSubmitRadar.disabled = false;
-            btnSubmitRadar.textContent = '✅ Incluir Radar';
-
-        } catch (error) {
-            // ANIMA O BOTÃO + COM ERRO
-            animarBotaoRadar(false);
-            
-            showNotification('❌ Erro ao salvar: ' + error.message);
-            btnSubmitRadar.disabled = false;
-            btnSubmitRadar.textContent = '✅ Incluir Radar';
-        }
+    if (!tipo) {
+        showNotification('❌ Selecione o tipo de radar.');
+        radarType.focus();
+        return;
     }
+    if (!endereco) {
+        showNotification('❌ Informe o endereço.');
+        radarAddress.focus();
+        return;
+    }
+    if (endereco.length < 5) {
+        showNotification('❌ Endereço muito curto. Seja mais específico.');
+        radarAddress.focus();
+        return;
+    }
+    if (!currentPosition.lat || !currentPosition.lng) {
+        showNotification('❌ Aguardando posição GPS. Aguarde ou feche e reabra o formulário.');
+        return;
+    }
+    if (!velocidade || velocidade === '0') {
+        showNotification('❌ Selecione a velocidade máxima.');
+        return;
+    }
+
+    btnSubmitRadar.disabled = true;
+    btnSubmitRadar.textContent = '⏳ Salvando...';
+
+    try {
+        const novoRadar = {
+            tipo: tipo,
+            endereco: endereco,
+            velocidade: velocidade,
+            latitude: currentPosition.lat,
+            longitude: currentPosition.lng
+        };
+
+        const resultado = await salvarRadarNoGitHub(novoRadar);
+        
+        animarBotaoRadar(true);
+
+        const novoMarker = criarRadarNoMapa(novoRadar);
+        if (novoMarker) {
+            radarMarkers.push(novoMarker);
+            showNotification(`✅ Radar #${resultado.id} incluído com sucesso!`);
+            novoMarker.openPopup();
+        } else {
+            showNotification(`✅ Radar #${resultado.id} salvo, mas não pôde ser exibido no mapa.`);
+        }
+
+        fecharModal();
+        
+        setTimeout(() => {
+            carregarRadares();
+        }, 2000);
+
+        // Limpa o formulário
+        radarType.value = '';
+        radarAddress.value = '';
+        tipoAtual = '';
+        iconPreviewGroup.style.display = 'none';
+        
+        speedButtons.forEach(b => {
+            b.classList.remove('selected');
+            b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
+                              'selected-70', 'selected-80', 'selected-100', 'selected-110');
+        });
+        
+        btnSubmitRadar.disabled = false;
+        btnSubmitRadar.textContent = '✅ Incluir Radar';
+
+    } catch (error) {
+        animarBotaoRadar(false);
+        showNotification('❌ Erro ao salvar: ' + error.message);
+        btnSubmitRadar.disabled = false;
+        btnSubmitRadar.textContent = '✅ Incluir Radar';
+    }
+}
 
     btnSubmitRadar.addEventListener('click', incluirRadar);
 
@@ -3588,6 +3585,8 @@ setInterval(pollAppInventor, 500);
 // INICIALIZAÇÃO
 // ===================================================================
 window.onload = initMap;
+
+
 </script>
 </body>
 </html>
