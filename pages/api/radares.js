@@ -1,36 +1,27 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs/promises');
-const app = express();
+// api/radares.js - Radar X9 - Belo Horizonte
+// Endpoint para adicionar radares ao arquivo radares.json
 
-// Habilita o CORS
-app.use(cors());
+import fs from 'fs/promises';
+import path from 'path';
 
-// Middleware para parsear JSON
-app.use(express.json());
-
-// Serve arquivos estáticos da pasta public
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rota para servir o index.html em requisições para a raiz
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Suas rotas de API
-app.post('/api/chat', (req, res) => {
-    res.json({
-        choices: [{
-            message: {
-                content: "Resposta da API: Duelo entre filósofos sobre o tema..."
-            }
-        }]
-    });
-});
-
-// Endpoint para adicionar radares
-app.post('/api/radares', async (req, res) => {
+export default async function handler(req, res) {
+    // Configura os cabeçalhos CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // Trata a requisição pré-voo (OPTIONS) necessária para o CORS funcionar
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+    
+    // Somente aceita POST
+    if (req.method !== 'POST') {
+        return res.status(405).json({ 
+            error: 'Método não permitido. Use POST para adicionar radares.' 
+        });
+    }
+    
     try {
         const { tipo, endereco, velocidade, latitude, longitude } = req.body;
         
@@ -42,7 +33,7 @@ app.post('/api/radares', async (req, res) => {
         }
         
         // Caminho do arquivo radares.json
-        const filePath = path.join(__dirname, 'public', 'radares.json');
+        const filePath = path.join(process.cwd(), 'public', 'radares.json');
         
         // Lê o arquivo atual
         let jsonData;
@@ -120,10 +111,4 @@ app.post('/api/radares', async (req, res) => {
             details: error.message
         });
     }
-});
-
-// Inicia o servidor
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, ()=> {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
+}

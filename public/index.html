@@ -3199,55 +3199,36 @@ function inicializarBotaoAddRadar() {
     configurarBotoesVelocidade();
 
 // ===================================================================
-// SALVAR RADAR LOCALMENTE (para testes sem GitHub)
+// SALVAR RADAR VIA API (para salvar no servidor local)
 // ===================================================================
-async function salvarRadarLocalmente(novoRadar, proximoId) {
+async function salvarRadarViaAPI(novoRadar, proximoId) {
     try {
-        console.log('[Radar X9] 💾 Salvando radar localmente...');
-
-        // 🔍 BUSCA ARQUIVO LOCAL
-        const response = await fetch('radares.json?v=' + Date.now());
+        console.log("[Radar X9] 📤 Salvando radar via API local...", novoRadar);
+        const response = await fetch("/api/radares", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                tipo: novoRadar.tipo,
+                endereco: novoRadar.endereco,
+                velocidade: novoRadar.velocidade,
+                latitude: novoRadar.latitude,
+                longitude: novoRadar.longitude
+            })
+        });
         if (!response.ok) {
-            throw new Error('Arquivo radares.json não encontrado localmente.');
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Erro ao salvar radar via API");
         }
-
-        let jsonData = await response.json();
-
-        // 🔢 GARANTE QUE "records" EXISTE
-        if (!jsonData.records) {
-            jsonData.records = [];
-        }
-
-        // 🆕 CRIA NOVO REGISTRO
-        const idFiscalizacao = String(proximoId);
-        const novoRegistro = [
-            proximoId,
-            idFiscalizacao,
-            novoRadar.endereco,
-            novoRadar.tipo,
-            String(novoRadar.velocidade),
-            "Único",
-            "Único",
-            `M${String(proximoId).padStart(6, '0')}`,
-            `KBH${String(proximoId).padStart(6, '0')}`,
-            `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
-        ];
-
-        jsonData.records.push(novoRegistro);
-
-        // ⚠️ AVISO: Não é possível salvar localmente via fetch em navegadores
-        // (por restrições de segurança). Esta função é apenas para simular.
-        console.log('[Radar X9] ⚠️ Modo local: Radar não pode ser salvo no arquivo, mas foi adicionado ao mapa.');
-        showNotification(`⚠️ Radar #${proximoId} adicionado ao mapa (modo local). Para salvar permanentemente, configure o GitHub.`);
-        return { success: true, id: proximoId };
-
+        const resultado = await response.json();
+        console.log("[Radar X9] ✅ Radar salvo via API! ID:", resultado.id);
+        return { success: true, id: resultado.id };
     } catch (error) {
-        console.error('[Radar X9] ❌ Erro ao salvar localmente:', error);
+        console.error("[Radar X9] ❌ Erro ao salvar via API:", error);
         throw error;
     }
-}    
-
-// ===================================================================
+}
 // SALVAR RADAR NO GITHUB - VERSÃO CORRIGIDA (compatível com radares.json)
 // ===================================================================
 async function salvarRadarNoGitHub(novoRadar, proximoId) {
@@ -3397,7 +3378,7 @@ async function incluirRadar() {
             resultado = await salvarRadarNoGitHub(novoRadar, proximoId);
         } else {
             // 💾 SALVA LOCALMENTE (para testes)
-            resultado = await salvarRadarLocalmente(novoRadar, proximoId);
+            resultado = await salvarRadarViaAPI(novoRadar, proximoId);
         }
 
         // ✅ ANIMA O BOTÃO (LARANJA = SUCESSO)
