@@ -1339,6 +1339,7 @@ const TEMPO_REFRESH_DELAY = 5000;
 
 let sidebarAberta = true;
 
+
 // ===================================================================
 // CONFIGURAÇÃO DO GITHUB
 // ===================================================================
@@ -1350,12 +1351,9 @@ let GITHUB_CONFIG = {
 };
 
 async function carregarConfigGitHub() {
-  
-
     console.log('[Radar X9] 🔄 Carregando configuração...');
 
     try {
-
         const response = await fetch('/api/config');
 
         if (!response.ok) {
@@ -1367,23 +1365,19 @@ async function carregarConfigGitHub() {
         Object.assign(GITHUB_CONFIG, {
             owner: config.githubOwner || GITHUB_CONFIG.owner,
             repo: config.githubRepo || GITHUB_CONFIG.repo,
+            path: config.githubPath || GITHUB_CONFIG.path,
             token: config.githubToken || ''
         });
 
         console.log('[Radar X9] ✅ Configuração carregada.');
-
         return true;
 
     } catch (err) {
-
-        console.warn('[Radar X9] API indisponível.');
-
-        // continua usando owner/repo já definidos
+        console.warn('[Radar X9] API indisponível. Usando valores padrão.');
         return false;
-
     }
-
 }
+
 
 // ===================================================================
 // CONFIGURAÇÃO DE ALERTAS
@@ -2776,41 +2770,53 @@ function animarBotaoRadar(status) {
 // ===================================================================
 // FUNÇÃO PARA CRIAR RADAR NO MAPA (USADA APÓS INCLUSÃO)
 // ===================================================================
+// ===================================================================
+// CRIAR RADAR NO MAPA (corrigida)
+// ===================================================================
 function criarRadarNoMapa(radarData) {
     if (!map) {
         console.warn('[Radar X9] ⚠️ Mapa não inicializado ao criar radar');
         return null;
     }
-    
+
     console.log('[Radar X9] 📍 Criando radar no mapa:', radarData);
-    
+
     const iconeUrl = getIconUrl(radarData.tipo, radarData.velocidade);
     const fallbackUrl = '/imagens_app/ic_radar_cev_v2.png';
     const iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
-    
-    const radarMarker = L.marker([radarData.latitude, radarData.longitude], { icon: iconeRadar }).addTo(map);
-    
+
+    const radarMarker = L.marker([radarData.latitude, radarData.longitude], {
+        icon: iconeRadar,
+        zIndexOffset: 1000
+    }).addTo(map);
+
     const tipoExibicao = ajusteNomes[radarData.tipo] || radarData.tipo;
-    radarMarker.bindPopup(
-        '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' +
-        '<b>' + tipoExibicao + '</b><br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
-        radarData.endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + radarData.velocidade + ' km/h</div></div>'
-    );
-    
+    const velInfo = radarData.velocidade ? ` | ${radarData.velocidade} km/h` : '';
+    const popupContent = `
+        <div style="color:#222; font-family:'Inter'; text-align:center; min-width:200px;">
+            <b>${tipoExibicao}</b><br>
+            <hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">
+            ${radarData.endereco || 'Endereço não informado'}<br>
+            <div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ${radarData.velocidade || 'N/A'} km/h</div>
+        </div>
+    `;
+    radarMarker.bindPopup(popupContent);
+
     radarMarker.radarData = {
-        id: radarMarkers.length,
+        id: radarData.id || radarMarkers.length,
         latitude: radarData.latitude,
         longitude: radarData.longitude,
         endereco: radarData.endereco,
         velocidade_maxima: radarData.velocidade,
         tipoOriginal: radarData.tipo,
         tipoExibicao: tipoExibicao,
-        isIA: false
+        isIA: tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL')
     };
-    
+
     console.log('[Radar X9] ✅ Radar criado no mapa com sucesso!');
     return radarMarker;
 }
+    
 
 // ===================================================================
 // INICIALIZAÇÃO DO MAPA
@@ -3007,6 +3013,9 @@ function inicializarBotaoRotacaoMapa() {
 // ===================================================================
 // INICIALIZAR BOTÃO ADICIONAR RADAR
 // ===================================================================
+// ===================================================================
+// INICIALIZAR BOTÃO ADICIONAR RADAR (corrigido)
+// ===================================================================
 function inicializarBotaoAddRadar() {
     const btnAddRadar = document.getElementById('btn-add-radar');
     const modalAddRadar = document.getElementById('modal-add-radar');
@@ -3014,7 +3023,6 @@ function inicializarBotaoAddRadar() {
     const btnSubmitRadar = document.getElementById('btn-submit-radar');
     const radarType = document.getElementById('radar-type');
     const radarAddress = document.getElementById('radar-address');
-
     const posLat = document.getElementById('pos-lat');
     const posLng = document.getElementById('pos-lng');
     const posStatus = document.getElementById('pos-status');
@@ -3027,77 +3035,52 @@ function inicializarBotaoAddRadar() {
     let gpsObtido = false;
     let tipoAtual = '';
 
-    // CONFIGURAR BOTÕES DE VELOCIDADE
-    function configurarBotoesVelocidade() {
-        speedButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const velocidade = this.dataset.speed;
-                
-                speedButtons.forEach(b => {
-                    b.classList.remove('selected');
-                    b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
-                                      'selected-70', 'selected-80', 'selected-100', 'selected-110');
-                });
-                
-                this.classList.add('selected');
-                this.classList.add(`selected-${velocidade}`);
-                
-                atualizarPreviewIcone(tipoAtual, velocidade);
+    // 🔹 CONFIGURAR BOTÕES DE VELOCIDADE
+    speedButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const velocidade = this.dataset.speed;
+            speedButtons.forEach(b => {
+                b.classList.remove('selected', 'selected-30', 'selected-40', 'selected-50', 'selected-60',
+                                  'selected-70', 'selected-80', 'selected-100', 'selected-110');
             });
+            this.classList.add('selected', `selected-${velocidade}`);
+            atualizarPreviewIcone(tipoAtual, velocidade);
         });
-    }
+    });
 
-    // ATUALIZAR PREVIEW DO ÍCONE
+    // 🔹 ATUALIZAR PREVIEW DO ÍCONE
     function atualizarPreviewIcone(tipo, velocidade) {
         if (!tipo) {
             iconPreviewGroup.style.display = 'none';
             return;
         }
-        
         const iconUrl = getIconUrl(tipo, velocidade || '');
         if (iconUrl) {
             iconPreviewImg.src = iconUrl;
             iconPreviewImg.onerror = function() {
                 this.src = '/imagens_app/ic_radar_cev_v2.png';
             };
-            
-            let nomeExibicao = tipo;
             const speedBtnAtual = document.querySelector('.speed-btn.selected');
             const vel = velocidade || (speedBtnAtual ? speedBtnAtual.dataset.speed : '') || '';
-            if (vel) {
-                nomeExibicao = `${tipo} - ${vel} km/h`;
-            }
-            iconPreviewName.textContent = nomeExibicao;
+            iconPreviewName.textContent = vel ? `${tipo} - ${vel} km/h` : tipo;
             iconPreviewGroup.style.display = 'block';
         } else {
             iconPreviewGroup.style.display = 'none';
         }
     }
 
-    // BUSCAR ENDEREÇO POR COORDENADAS
+    // 🔹 BUSCAR ENDEREÇO POR COORDENADAS
     async function buscarEnderecoPorCoordenadas(lat, lng) {
         try {
             const response = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-                {
-                    headers: {
-                        'User-Agent': 'RadarX9/1.0'
-                    }
-                }
+                { headers: { 'User-Agent': 'RadarX9/1.0' } }
             );
-            
             if (!response.ok) throw new Error('Erro na geocodificação');
-            
             const data = await response.json();
-            
             if (data && data.display_name) {
-                let endereco = data.display_name;
-                const partes = endereco.split(',');
-                let enderecoLimpo = partes.slice(0, 3).join(',').trim();
-                if (partes.length > 3 && partes[3]) {
-                    enderecoLimpo = partes.slice(0, 4).join(',').trim();
-                }
-                return enderecoLimpo;
+                const partes = data.display_name.split(',');
+                return partes.slice(0, 3).join(',').trim();
             }
             return null;
         } catch (error) {
@@ -3106,11 +3089,11 @@ function inicializarBotaoAddRadar() {
         }
     }
 
-    // ATUALIZAR POSIÇÃO
+    // 🔹 ATUALIZAR POSIÇÃO ATUAL
     async function atualizarPosicaoAtual() {
         let lat = userLat;
         let lng = userLng;
-        
+
         if (!lat || !lng || (lat === -19.919055 && lng === -43.938641)) {
             posStatus.textContent = '🔄 Aguardando sinal GPS...';
             try {
@@ -3135,9 +3118,8 @@ function inicializarBotaoAddRadar() {
             posLat.textContent = lat.toFixed(6);
             posLng.textContent = lng.toFixed(6);
             gpsObtido = true;
-            posStatus.textContent = '✅ Coordenadas atualizadas';
-            
             posStatus.textContent = '🔄 Buscando endereço...';
+
             try {
                 const endereco = await buscarEnderecoPorCoordenadas(lat, lng);
                 if (endereco) {
@@ -3157,28 +3139,26 @@ function inicializarBotaoAddRadar() {
         }
     }
 
-    // ABRIR MODAL
+    // 🔹 ABRIR MODAL
     btnAddRadar.addEventListener('click', async () => {
         modalAddRadar.classList.add('active');
         ocultarBussola(true);
-        
+
         radarType.value = '';
         radarAddress.value = '';
         tipoAtual = '';
         iconPreviewGroup.style.display = 'none';
-        
+
         speedButtons.forEach(b => {
-            b.classList.remove('selected');
-            b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
+            b.classList.remove('selected', 'selected-30', 'selected-40', 'selected-50', 'selected-60',
                               'selected-70', 'selected-80', 'selected-100', 'selected-110');
         });
-        
+
         posLat.textContent = '🔄 Buscando GPS...';
         posLng.textContent = '';
         posStatus.textContent = '🔄 Aguardando coordenadas...';
-        
+
         await atualizarPosicaoAtual();
-        
         if (!gpsObtido) {
             setTimeout(async () => {
                 await atualizarPosicaoAtual();
@@ -3186,11 +3166,10 @@ function inicializarBotaoAddRadar() {
         }
     });
 
-    // FECHAR MODAL
+    // 🔹 FECHAR MODAL
     function fecharModal() {
         modalAddRadar.classList.remove('active');
         ocultarBussola(false);
-        // Resetar animação do botão
         const btn = document.getElementById('btn-add-radar');
         const icon = btn.querySelector('.plus-icon');
         icon.textContent = '+';
@@ -3201,83 +3180,46 @@ function inicializarBotaoAddRadar() {
     }
 
     btnModalClose.addEventListener('click', fecharModal);
-
     modalAddRadar.addEventListener('click', (e) => {
-        if (e.target === modalAddRadar) {
-            fecharModal();
-        }
+        if (e.target === modalAddRadar) fecharModal();
     });
 
-    // PREVIEW DO ÍCONE AO SELECIONAR O TIPO
+    // 🔹 PREVIEW DO ÍCONE AO SELECIONAR O TIPO
     radarType.addEventListener('change', function() {
-        const tipoSelecionado = this.value;
-        tipoAtual = tipoSelecionado;
-        
-        if (tipoSelecionado) {
-            const speedBtnAtual = document.querySelector('.speed-btn.selected');
-            const velocidade = speedBtnAtual ? speedBtnAtual.dataset.speed : '';
-            atualizarPreviewIcone(tipoSelecionado, velocidade);
-        } else {
-            iconPreviewGroup.style.display = 'none';
-        }
+        tipoAtual = this.value;
+        const speedBtnAtual = document.querySelector('.speed-btn.selected');
+        const velocidade = speedBtnAtual ? speedBtnAtual.dataset.speed : '';
+        atualizarPreviewIcone(tipoAtual, velocidade);
     });
 
+    // ✅ CONECTA O BOTÃO DE SUBMIT À FUNÇÃO INCLUIR RADAR
+    btnSubmitRadar.addEventListener('click', incluirRadar);
+}
     // CONFIGURAR BOTÕES DE VELOCIDADE
     configurarBotoesVelocidade();
 
-    
 // ===================================================================
-// SALVAR RADAR NO GITHUB - VERSÃO CORRIGIDA
+// SALVAR RADAR LOCALMENTE (para testes sem GitHub)
 // ===================================================================
-async function salvarRadarNoGitHub(novoRadar) {
+async function salvarRadarLocalmente(novoRadar, proximoId) {
     try {
-        console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
+        console.log('[Radar X9] 💾 Salvando radar localmente...');
 
-        if (!GITHUB_CONFIG.token) {
-            throw new Error('Token do GitHub não configurado. Verifique o arquivo .env');
+        // 🔍 BUSCA ARQUIVO LOCAL
+        const response = await fetch('radares.json?v=' + Date.now());
+        if (!response.ok) {
+            throw new Error('Arquivo radares.json não encontrado localmente.');
         }
 
-        console.log('[Radar X9] Config:', {
-            owner: GITHUB_CONFIG.owner,
-            repo: GITHUB_CONFIG.repo,
-            path: GITHUB_CONFIG.path
-        });
+        let jsonData = await response.json();
 
-        // Buscar arquivo atual do GitHub (branch: main)
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-
-        const getResponse = await fetch(`${url}?ref=main`, {
-            headers: {
-                Authorization: `token ${GITHUB_CONFIG.token}`,
-                Accept: 'application/vnd.github.v3+json'
-            }
-        });
-
-        if (!getResponse.ok) {
-            const erro = await getResponse.text();
-            console.error('[Radar X9] GitHub GET erro:', getResponse.status, erro);
-            throw new Error(`Erro ao buscar arquivo: ${getResponse.status} - ${erro}`);
-        }
-
-        const data = await getResponse.json();
-        const content = atob(data.content);
-        const jsonData = JSON.parse(content);
-
+        // 🔢 GARANTE QUE "records" EXISTE
         if (!jsonData.records) {
             jsonData.records = [];
         }
 
-        // Encontrar próximo ID
-        let proximoId = 541;
-        jsonData.records.forEach(record => {
-            if (record[0] && typeof record[0] === 'number' && record[0] >= proximoId) {
-                proximoId = record[0] + 1;
-            }
-        });
-
+        // 🆕 CRIA NOVO REGISTRO
         const idFiscalizacao = String(proximoId);
-
-        // Criar novo registro no formato do radares.json
         const novoRegistro = [
             proximoId,
             idFiscalizacao,
@@ -3293,7 +3235,77 @@ async function salvarRadarNoGitHub(novoRadar) {
 
         jsonData.records.push(novoRegistro);
 
-        // Salvar de volta no GitHub
+        // ⚠️ AVISO: Não é possível salvar localmente via fetch em navegadores
+        // (por restrições de segurança). Esta função é apenas para simular.
+        console.log('[Radar X9] ⚠️ Modo local: Radar não pode ser salvo no arquivo, mas foi adicionado ao mapa.');
+        showNotification(`⚠️ Radar #${proximoId} adicionado ao mapa (modo local). Para salvar permanentemente, configure o GitHub.`);
+        return { success: true, id: proximoId };
+
+    } catch (error) {
+        console.error('[Radar X9] ❌ Erro ao salvar localmente:', error);
+        throw error;
+    }
+}    
+
+// ===================================================================
+// SALVAR RADAR NO GITHUB - VERSÃO CORRIGIDA (compatível com radares.json)
+// ===================================================================
+async function salvarRadarNoGitHub(novoRadar, proximoId) {
+    try {
+        console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
+
+        if (!GITHUB_CONFIG.token) {
+            throw new Error('Token do GitHub não configurado. Verifique o arquivo .env ou use o modo local.');
+        }
+
+        // 🔍 BUSCA ARQUIVO ATUAL DO GITHUB (branch: main)
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+        const getResponse = await fetch(`${url}?ref=main`, {
+            headers: {
+                Authorization: `token ${GITHUB_CONFIG.token}`,
+                Accept: 'application/vnd.github.v3+json'
+            }
+        });
+
+        if (!getResponse.ok) {
+            throw new Error(`Erro ao buscar arquivo: ${getResponse.status} - ${getResponse.statusText}`);
+        }
+
+        const data = await getResponse.json();
+        let jsonData;
+
+        // 📄 PARSEIA O CONTEÚDO DO ARQUIVO
+        try {
+            const content = atob(data.content);
+            jsonData = JSON.parse(content);
+        } catch (e) {
+            throw new Error('Erro ao parsear o conteúdo do arquivo radares.json');
+        }
+
+        // 🔢 GARANTE QUE "records" EXISTE
+        if (!jsonData.records) {
+            jsonData.records = [];
+        }
+
+        // 🆕 CRIA NOVO REGISTRO NO FORMATO DO radares.json
+        const idFiscalizacao = String(proximoId);
+        const novoRegistro = [
+            proximoId,                                      // [0] ID (número sequencial)
+            idFiscalizacao,                                // [1] ID_FISCALIZACAO_ELETRONICA
+            novoRadar.endereco,                            // [2] DESC_LOC_CONTROLADOR_TRANSITO
+            novoRadar.tipo,                                // [3] DESC_TIPO_CONTROLADOR_TRANSITO
+            String(novoRadar.velocidade),                  // [4] VELOCIDADE_REGULAMENTAR
+            "Único",                                       // [5] SENTIDO
+            "Único",                                       // [6] SENTIDO_FISCALIZADO
+            `M${String(proximoId).padStart(6, '0')}`,      // [7] NUM_SERIE_ATUAL
+            `KBH${String(proximoId).padStart(6, '0')}`,    // [8] COD_SECUNDARIA
+            `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`  // [9] GEOMETRIA
+        ];
+
+        // ✅ ADICIONA NOVO REGISTRO
+        jsonData.records.push(novoRegistro);
+
+        // 💾 SALVA DE VOLTA NO GITHUB (branch: main)
         const updateResponse = await fetch(url, {
             method: 'PUT',
             headers: {
@@ -3305,17 +3317,16 @@ async function salvarRadarNoGitHub(novoRadar) {
                 message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
                 content: btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2)))),
                 sha: data.sha,
-                branch: 'main'  // ✅ Garante que salva no branch main
+                branch: 'main'
             })
         });
 
         if (!updateResponse.ok) {
             const erro = await updateResponse.text();
-            console.error('[Radar X9] GitHub PUT erro:', updateResponse.status, erro);
-            throw new Error(`Erro ao salvar arquivo: ${updateResponse.status} - ${erro}`);
+            throw new Error(`Erro ao salvar: ${updateResponse.status} - ${erro}`);
         }
 
-        console.log('[Radar X9] ✅ Radar salvo com sucesso no GitHub! ID:', proximoId);
+        console.log('[Radar X9] ✅ Radar salvo no GitHub! ID:', proximoId);
         return { success: true, id: proximoId };
 
     } catch (error) {
@@ -3323,35 +3334,30 @@ async function salvarRadarNoGitHub(novoRadar) {
         throw error;
     }
 }
-    
- //================================================  
-// INCLUIR RADAR - VERSÃO CORRIGIDA (sem radarSpeed)
-//==================================================
+ 
 // ===================================================================
-// INCLUIR RADAR - VERSÃO CORRIGIDA
+// INCLUIR RADAR - VERSÃO CORRIGIDA E FUNCIONAL
 // ===================================================================
 async function incluirRadar() {
-    const tipo = radarType.value;
-    const endereco = radarAddress.value.trim();
-
-    // Pega a velocidade do botão selecionado
+    const tipo = document.getElementById('radar-type').value;
+    const endereco = document.getElementById('radar-address').value.trim();
     const speedBtnSelected = document.querySelector('.speed-btn.selected');
     const velocidade = speedBtnSelected ? speedBtnSelected.dataset.speed : '';
 
-    // Validações
+    // 🔴 VALIDAÇÕES
     if (!tipo) {
         showNotification('❌ Selecione o tipo de radar.');
-        radarType.focus();
+        document.getElementById('radar-type').focus();
         return;
     }
     if (!endereco) {
         showNotification('❌ Informe o endereço.');
-        radarAddress.focus();
+        document.getElementById('radar-address').focus();
         return;
     }
     if (endereco.length < 5) {
         showNotification('❌ Endereço muito curto. Seja mais específico.');
-        radarAddress.focus();
+        document.getElementById('radar-address').focus();
         return;
     }
     if (!currentPosition.lat || !currentPosition.lng) {
@@ -3363,10 +3369,13 @@ async function incluirRadar() {
         return;
     }
 
+    // ⏳ DESABILITA BOTÃO ENQUANTO SALVA
+    const btnSubmitRadar = document.getElementById('btn-submit-radar');
     btnSubmitRadar.disabled = true;
     btnSubmitRadar.textContent = '⏳ Salvando...';
 
     try {
+        // 📍 CRIA OBJETO DO NOVO RADAR
         const novoRadar = {
             tipo: tipo,
             endereco: endereco,
@@ -3375,52 +3384,64 @@ async function incluirRadar() {
             longitude: currentPosition.lng
         };
 
-        // ✅ Salva no GitHub
-        const resultado = await salvarRadarNoGitHub(novoRadar);
-
-        // ✅ Anima o botão com LARANJA (status: 'adicionado')
-        animarBotaoRadar('adicionado');
-
-        // ✅ Adiciona o radar no mapa IMEDIATAMENTE
-        const novoMarker = criarRadarNoMapa(novoRadar);
-        if (novoMarker) {
-            radarMarkers.push(novoMarker);
-            showNotification(`✅ Radar #${resultado.id} incluído com sucesso!`);
-            novoMarker.openPopup();
-        } else {
-            showNotification(`✅ Radar #${resultado.id} salvo, mas não pôde ser exibido no mapa.`);
+        // 🔢 CALCULA PRÓXIMO ID (baseado no último registro do radares.json)
+        let proximoId = 541; // ID inicial (último do JSON é 540)
+        if (radarMarkers.length > 0) {
+            const idsExistentes = radarMarkers.map(m => m.radarData.id);
+            proximoId = Math.max(...idsExistentes) + 1;
         }
 
-        fecharModal();
+        // ✅ SALVA NO GITHUB (ou localmente se não tiver token)
+        let resultado;
+        if (GITHUB_CONFIG.token) {
+            resultado = await salvarRadarNoGitHub(novoRadar, proximoId);
+        } else {
+            // 💾 SALVA LOCALMENTE (para testes)
+            resultado = await salvarRadarLocalmente(novoRadar, proximoId);
+        }
 
-        // Recarrega radares após 2 segundos
+        // ✅ ANIMA O BOTÃO (LARANJA = SUCESSO)
+        animarBotaoRadar('adicionado');
+
+        // ✅ ADICIONA NO MAPA IMEDIATAMENTE
+        const novoMarker = criarRadarNoMapa({
+            ...novoRadar,
+            id: proximoId,
+            tipoOriginal: tipo
+        });
+        if (novoMarker) {
+            radarMarkers.push(novoMarker);
+            showNotification(`✅ Radar #${proximoId} incluído com sucesso!`);
+            novoMarker.openPopup();
+        } else {
+            showNotification(`✅ Radar #${proximoId} salvo, mas não pôde ser exibido no mapa.`);
+        }
+
+        // 🔄 FECHA MODAL E LIMPA FORMULÁRIO
+        fecharModal();
+        document.getElementById('radar-type').value = '';
+        document.getElementById('radar-address').value = '';
+        document.querySelectorAll('.speed-btn').forEach(b => {
+            b.classList.remove('selected', 'selected-30', 'selected-40', 'selected-50', 'selected-60',
+                              'selected-70', 'selected-80', 'selected-100', 'selected-110');
+        });
+        document.getElementById('icon-preview-group').style.display = 'none';
+
+        // 🔄 RECARREGA RADARES APÓS 2 SEGUNDOS
         setTimeout(() => {
             carregarRadares();
         }, 2000);
 
-        // Limpa o formulário
-        radarType.value = '';
-        radarAddress.value = '';
-        tipoAtual = '';
-        iconPreviewGroup.style.display = 'none';
-
-        speedButtons.forEach(b => {
-            b.classList.remove('selected');
-            b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60',
-                              'selected-70', 'selected-80', 'selected-100', 'selected-110');
-        });
-
-        btnSubmitRadar.disabled = false;
-        btnSubmitRadar.textContent = '✅ Incluir Radar';
-
     } catch (error) {
-        // ❌ Anima com vermelho em caso de erro
+        // ❌ ANIMA COM VERMELHO EM CASO DE ERRO
         animarBotaoRadar('erro');
-        showNotification('❌ Erro ao salvar: ' + error.message);
+        showNotification('❌ Erro ao salvar: ' + (error.message || error));
+        console.error('[Radar X9] Erro ao incluir radar:', error);
+    } finally {
+        // 🔄 REABILITA BOTÃO
         btnSubmitRadar.disabled = false;
         btnSubmitRadar.textContent = '✅ Incluir Radar';
     }
-}
 }
 
 // ===================================================================
