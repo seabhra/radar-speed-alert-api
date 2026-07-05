@@ -17,7 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js" crossorigin="anonymous"></script
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js" crossorigin="anonymous"></script>
 
 
   <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
@@ -774,9 +774,9 @@
         width: 60px;
         height: 60px;
         border-radius: 50%;
-       background: linear-gradient(135deg, #ff8c00, #ff4500);
-       border: 2px solid rgba(255, 140, 0, 0.4);
-       box-shadow: 0 4px 20px rgba(255, 140, 0, 0.5);
+       background: linear-gradient(135deg, #00cc66, #00994d);
+       border: 2px solid rgba(0, 255, 136, 0.4);
+       box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
        cursor: pointer;
        z-index: 1000;
        display: flex;
@@ -787,13 +787,13 @@
     }
 
     @keyframes pulsePlus {
-        0%, 100% { box-shadow: 0 4px 20px rgba(255, 140, 0, 0.5); }
-        50% { box-shadow: 0 4px 35px rgba(255, 140, 0, 0.8); }
+        0%, 100% { box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5); }
+        50% { box-shadow: 0 4px 35px rgba(0, 204, 102, 0.8); }
     }
 
     .btn-add-radar:hover {
         transform: scale(1.12);
-        box-shadow: 0 4px 30px rgba(255, 140, 0, 0.7);
+        box-shadow: 0 4px 30px rgba(0, 204, 102, 0.7);
     }
 
     .btn-add-radar:active {
@@ -1014,19 +1014,19 @@
         padding: 14px;
         border: none;
         border-radius: 14px;
-        background: linear-gradient(135deg, #ff8c00, #ff4500);
+        background: linear-gradient(135deg, #00cc66, #00994d);
         color: white;
         font-size: 1.1rem;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 204, 102, 0.3);
         margin-top: 10px;
     }
 
     .btn-submit-radar:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(255, 140, 0, 0.5);
+        box-shadow: 0 6px 25px rgba(0, 204, 102, 0.5);
     }
 
     .btn-submit-radar:active {
@@ -1080,7 +1080,7 @@
             font-size: 0.85rem;
         }
     }
-  </style>
+</style>
 </head>
 <body>
 
@@ -1869,6 +1869,9 @@ function finalizarNavegacao() {
     estaEmNavegacao = false;
     estaEmMovimento = false;
     velocidadeAtual = 0;
+    if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
+    if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
+    
     if (_navAnim.rafId) { cancelAnimationFrame(_navAnim.rafId); _navAnim.rafId = null; }
     _navAnim.fromLat = null; _navAnim.fromLng = null;
 
@@ -2092,7 +2095,20 @@ function extrairCoordenadas(record, index) {
         let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); });
         if (parts.length === 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
     }
-    if (lat === null || isNaN(lat) || lng === null || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    if (lat === null || isNaN(lat) || lng === null || isNaN(lng)) {
+        for (var f = Math.max(0, geomIndex - 2); f < Math.min(record.length, geomIndex + 3); f++) {
+            if (f === geomIndex) continue;
+            var campo = String(record[f]).trim();
+            if (campo.includes('.') && campo.includes(',')) {
+                let parts = campo.split(',').map(function(p) { return p.trim(); });
+                if (parts.length === 2) {
+                    var tLat = parseFloat(parts[0]); var tLng = parseFloat(parts[1]);
+                    if (!isNaN(tLat) && !isNaN(tLng) && tLat >= -90 && tLat <= 90) { lat = tLat; lng = tLng; break; }
+                }
+            }
+        }
+    }
+    if (isNaN(lat) || isNaN(lng) || lat === null || lng === null || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
     return { lat: lat, lng: lng };
 }
 
@@ -2330,7 +2346,7 @@ function dispararAlertaMobilidadeIA(mensagem) {
     tocarSomAlerta('aviso');
 
     if (!$("#alert-container").is(":visible")) { 
-        $("#alert-container").fadeIn(200);   
+        $("#alert-container").fadeIn(200); 
         ajustarPosicaoSpeedWidget(true);
     }
     clearTimeout(alertTimeout);
@@ -2714,39 +2730,42 @@ function _tocarBeep(ctx, tipoAlerta) {
 // ===================================================================
 // FUNÇÃO PARA ANIMAR O BOTÃO ADICIONAR RADAR
 // ===================================================================
-function animarBotaoRadar(sucesso) {
+// ===================================================================
+// FUNÇÃO PARA ANIMAR O BOTÃO ADICIONAR RADAR
+// ===================================================================
+function animarBotaoRadar(status) {
     const btn = document.getElementById('btn-add-radar');
     const icon = btn.querySelector('.plus-icon');
-    
-    if (sucesso) {
-        // Muda para "✓" e cor laranja
+
+    if (status === 'adicionado') {
+        // ✅ Muda para "✓" e cor LARANJA quando radar adicionado
         icon.textContent = '✓';
-        btn.style.background = 'linear-gradient(135deg, #ff8c00, #ff4500)';
+        btn.style.background = 'linear-gradient(135deg, #ffa500, #ff8c00)';
         btn.style.transform = 'scale(1.15)';
-        btn.style.boxShadow = '0 0 40px rgba(255, 140, 0, 0.9)';
-        btn.style.borderColor = '#ff8c00';
+        btn.style.boxShadow = '0 0 40px rgba(255, 165, 0, 0.9)';
+        btn.style.borderColor = '#ffa500';
         btn.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        
+
         // Volta ao normal após 2 segundos
         setTimeout(() => {
             icon.textContent = '+';
-            btn.style.background = 'linear-gradient(135deg, #ff8c00, #ff4500)';
+            btn.style.background = 'linear-gradient(135deg, #00cc66, #00994d)';
             btn.style.transform = 'scale(1)';
             btn.style.boxShadow = '0 4px 20px rgba(0, 204, 102, 0.5)';
             btn.style.borderColor = 'rgba(0, 255, 136, 0.4)';
         }, 2000);
-    } else {
-        // Em caso de erro, pisca em vermelho
+    } else if (status === 'erro') {
+        // ❌ Em caso de erro, pisca em vermelho
         icon.textContent = '✗';
         btn.style.background = 'linear-gradient(135deg, #ff4444, #cc0000)';
         btn.style.transform = 'scale(1.1)';
         btn.style.boxShadow = '0 0 40px rgba(255, 0, 0, 0.6)';
         btn.style.borderColor = '#ff0000';
         btn.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        
+
         setTimeout(() => {
             icon.textContent = '+';
-            btn.style.background = 'linear-gradient(135deg, #ff8c00, #ff4500)';
+            btn.style.background = 'linear-gradient(135deg, #00cc66, #00994d)';
             btn.style.transform = 'scale(1)';
             btn.style.boxShadow = '0 4px 20px rgba(0, 204, 102, 0.5)';
             btn.style.borderColor = 'rgba(0, 255, 136, 0.4)';
@@ -2826,7 +2845,7 @@ async function initMap() {
                 if (marcadorAtivo) { 
                     isFollowing = true; 
                     map.setView(marcadorAtivo.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 }); 
-                    showNotification("Retornando à sua posição atual"); 
+                    showNotification("Voltando à sua posição atual"); 
                 }
             }
         }, TEMPO_RETORNO_GPS);
@@ -2952,7 +2971,7 @@ function inicializarBotaoRotacaoMapa() {
         rotateBtn.title = 'Rotação indisponível'; showNotification('Plugin de rotação não carregou.'); return;
     }
     
-    rotateBtn.addEventListener('click', async function() {
+    rotateBtn.addEventListener('click', async function () {
         if (!map || typeof map.setBearing !== 'function') return;
         if (!bussolaHardwareDisponivel) { await solicitarPermissaoBussolaIOS(); }
         
@@ -3039,7 +3058,7 @@ function inicializarBotaoAddRadar() {
         if (iconUrl) {
             iconPreviewImg.src = iconUrl;
             iconPreviewImg.onerror = function() {
-                iconPreviewImg.src = '/imagens_app/ic_radar_cev_v2.png';
+                this.src = '/imagens_app/ic_radar_cev_v2.png';
             };
             
             let nomeExibicao = tipo;
@@ -3175,7 +3194,7 @@ function inicializarBotaoAddRadar() {
         const btn = document.getElementById('btn-add-radar');
         const icon = btn.querySelector('.plus-icon');
         icon.textContent = '+';
-        btn.style.background = 'linear-gradient(135deg, #ff8c00, #ff4500)';
+        btn.style.background = 'linear-gradient(135deg, #00cc66, #00994d)';
         btn.style.transform = 'scale(1)';
         btn.style.boxShadow = '0 4px 20px rgba(0, 204, 102, 0.5)';
         btn.style.borderColor = 'rgba(0, 255, 136, 0.4)';
@@ -3206,108 +3225,120 @@ function inicializarBotaoAddRadar() {
     // CONFIGURAR BOTÕES DE VELOCIDADE
     configurarBotoesVelocidade();
 
+    
+// ===================================================================
+// SALVAR RADAR NO GITHUB - VERSÃO CORRIGIDA
+// ===================================================================
+async function salvarRadarNoGitHub(novoRadar) {
+    try {
+        console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
 
-    // ===================================================================
-    // SALVAR NO GITHUB - VERSÃO CORRIGIDA
-    // ===================================================================
-    async function salvarRadarNoGitHub(novoRadar) {
-        try {
-            console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
-            
-            if (!GITHUB_CONFIG.token) {
-                throw new Error('Token do GitHub não configurado. Verifique o arquivo .env');
-            }
-            
-            console.log('[Radar X9] Token:', GITHUB_CONFIG.token.substring(0, 20) + '...');
-            console.log('[Radar X9] Owner:', GITHUB_CONFIG.owner);
-            console.log('[Radar X9] Repo:', GITHUB_CONFIG.repo);
-            
-            
-            // 🔥 CORREÇÃO: Usar 'token' em vez de 'Bearer'
-            const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+        if (!GITHUB_CONFIG.token) {
+            throw new Error('Token do GitHub não configurado. Verifique o arquivo .env');
+        }
 
-            // GET (leitura) – inclui a branch:
-            const getResponse = await fetch(`${url}?ref=main`, {
-              headers: {
+        console.log('[Radar X9] Config:', {
+            owner: GITHUB_CONFIG.owner,
+            repo: GITHUB_CONFIG.repo,
+            path: GITHUB_CONFIG.path
+        });
+
+        // Buscar arquivo atual do GitHub (branch: main)
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+
+        const getResponse = await fetch(`${url}?ref=main`, {
+            headers: {
                 Authorization: `token ${GITHUB_CONFIG.token}`,
                 Accept: 'application/vnd.github.v3+json'
-              }
-            });
-
-            if (!getResponse.ok) {
-                const erro = await getResponse.text();
-                console.error('[Radar X9] GitHub GET erro:', getResponse.status, erro);
-                throw new Error(`Erro ao buscar arquivo: ${getResponse.status} - ${erro}`);
             }
+        });
 
-            const data = await getResponse.json();
-            const content = atob(data.content);
-            const jsonData = JSON.parse(content);
-            
-            if (!jsonData.records) {
-                jsonData.records = [];
-            }
-
-            let proximoId = 541;
-            jsonData.records.forEach(record => {
-                if (record[0] && typeof record[0] === 'number' && record[0] >= proximoId) {
-                    proximoId = record[0] + 1;
-                }
-            });
-
-            const novoRegistro = [
-                proximoId,
-                String(proximoId),
-                novoRadar.endereco,
-                novoRadar.tipo,
-                String(novoRadar.velocidade),
-                "Único",
-                "Único",
-                `M${String(proximoId).padStart(6, '0')}`,
-                `KBH${String(proximoId).padStart(6, '0')}`,
-                `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
-            ];
-
-            jsonData.records.push(novoRegistro);
-
-            const updateResponse = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
-                    content: btoa(JSON.stringify(jsonData, null, 2)),
-                    sha: data.sha
-                })
-            });
-
-            if (!updateResponse.ok) {
-                const erro = await updateResponse.text();
-                console.error('[Radar X9] GitHub PUT erro:', updateResponse.status, erro);
-                throw new Error(`Erro ao salvar arquivo: ${updateResponse.status} - ${erro}`);
-            }
-
-            console.log('[Radar X9] ✅ Radar salvo com sucesso no GitHub! ID:', proximoId);
-            return { success: true, id: proximoId };
-        } catch (error) {
-            console.error('[Radar X9] ❌ Erro ao salvar no GitHub:', error);
-            throw error;
+        if (!getResponse.ok) {
+            const erro = await getResponse.text();
+            console.error('[Radar X9] GitHub GET erro:', getResponse.status, erro);
+            throw new Error(`Erro ao buscar arquivo: ${getResponse.status} - ${erro}`);
         }
+
+        const data = await getResponse.json();
+        const content = atob(data.content);
+        const jsonData = JSON.parse(content);
+
+        if (!jsonData.records) {
+            jsonData.records = [];
+        }
+
+        // Encontrar próximo ID
+        let proximoId = 541;
+        jsonData.records.forEach(record => {
+            if (record[0] && typeof record[0] === 'number' && record[0] >= proximoId) {
+                proximoId = record[0] + 1;
+            }
+        });
+
+        const idFiscalizacao = String(proximoId);
+
+        // Criar novo registro no formato do radares.json
+        const novoRegistro = [
+            proximoId,
+            idFiscalizacao,
+            novoRadar.endereco,
+            novoRadar.tipo,
+            String(novoRadar.velocidade),
+            "Único",
+            "Único",
+            `M${String(proximoId).padStart(6, '0')}`,
+            `KBH${String(proximoId).padStart(6, '0')}`,
+            `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
+        ];
+
+        jsonData.records.push(novoRegistro);
+
+        // Salvar de volta no GitHub
+        const updateResponse = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
+                content: btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2)))),
+                sha: data.sha,
+                branch: 'main'  // ✅ Garante que salva no branch main
+            })
+        });
+
+        if (!updateResponse.ok) {
+            const erro = await updateResponse.text();
+            console.error('[Radar X9] GitHub PUT erro:', updateResponse.status, erro);
+            throw new Error(`Erro ao salvar arquivo: ${updateResponse.status} - ${erro}`);
+        }
+
+        console.log('[Radar X9] ✅ Radar salvo com sucesso no GitHub! ID:', proximoId);
+        return { success: true, id: proximoId };
+
+    } catch (error) {
+        console.error('[Radar X9] ❌ Erro ao salvar no GitHub:', error);
+        throw error;
     }
+}
     
-   
+ //================================================  
 // INCLUIR RADAR - VERSÃO CORRIGIDA (sem radarSpeed)
+//==================================================
+// ===================================================================
+// INCLUIR RADAR - VERSÃO CORRIGIDA
+// ===================================================================
 async function incluirRadar() {
     const tipo = radarType.value;
     const endereco = radarAddress.value.trim();
-    
+
     // Pega a velocidade do botão selecionado
     const speedBtnSelected = document.querySelector('.speed-btn.selected');
     const velocidade = speedBtnSelected ? speedBtnSelected.dataset.speed : '';
 
+    // Validações
     if (!tipo) {
         showNotification('❌ Selecione o tipo de radar.');
         radarType.focus();
@@ -3344,32 +3375,27 @@ async function incluirRadar() {
             longitude: currentPosition.lng
         };
 
+        // ✅ Salva no GitHub
         const resultado = await salvarRadarNoGitHub(novoRadar);
-        
-        // ANIMA O BOTÃO + COM LARANJA
-        animarBotaoRadar(true);
 
-        // ADICIONA O RADAR NO MAPA IMEDIATAMENTE
+        // ✅ Anima o botão com LARANJA (status: 'adicionado')
+        animarBotaoRadar('adicionado');
+
+        // ✅ Adiciona o radar no mapa IMEDIATAMENTE
         const novoMarker = criarRadarNoMapa(novoRadar);
         if (novoMarker) {
             radarMarkers.push(novoMarker);
-            // ✅ MENSAGEM CORRIGIDA PARA "Radar Adicionado"
-            showNotification('✅ Radar Adicionado!');
+            showNotification(`✅ Radar #${resultado.id} incluído com sucesso!`);
             novoMarker.openPopup();
         } else {
-            showNotification('✅ Radar salvo, mas não pôde ser exibido no mapa.');
+            showNotification(`✅ Radar #${resultado.id} salvo, mas não pôde ser exibido no mapa.`);
         }
 
         fecharModal();
-        
-        // 🔥 CORREÇÃO: RETORNAR AO PONTO INICIAL DO USUÁRIO
+
+        // Recarrega radares após 2 segundos
         setTimeout(() => {
             carregarRadares();
-            // Voltar ao ponto inicial (GPS do usuário)
-            if (map && userLat && userLng) {
-                map.setView([userLat, userLng], 17, { animate: true, duration: 1 });
-                showNotification('🗺️ Retornado ao seu local atual');
-            }
         }, 2000);
 
         // Limpa o formulário
@@ -3377,40 +3403,24 @@ async function incluirRadar() {
         radarAddress.value = '';
         tipoAtual = '';
         iconPreviewGroup.style.display = 'none';
-        
+
         speedButtons.forEach(b => {
             b.classList.remove('selected');
-            b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60', 
+            b.classList.remove('selected-30', 'selected-40', 'selected-50', 'selected-60',
                               'selected-70', 'selected-80', 'selected-100', 'selected-110');
         });
-        
+
         btnSubmitRadar.disabled = false;
         btnSubmitRadar.textContent = '✅ Incluir Radar';
 
     } catch (error) {
-        animarBotaoRadar(false);
+        // ❌ Anima com vermelho em caso de erro
+        animarBotaoRadar('erro');
         showNotification('❌ Erro ao salvar: ' + error.message);
         btnSubmitRadar.disabled = false;
         btnSubmitRadar.textContent = '✅ Incluir Radar';
     }
 }
-
-    btnSubmitRadar.addEventListener('click', incluirRadar);
-
-    // ATALHO DE TECLADO
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modalAddRadar.classList.contains('active')) {
-            fecharModal();
-        }
-        if (e.key === 'Enter' && modalAddRadar.classList.contains('active')) {
-            const activeElement = document.activeElement;
-            if (activeElement && activeElement.classList && activeElement.classList.contains('speed-btn')) {
-                incluirRadar();
-            }
-        }
-    });
-
-    console.log('[Radar X9] ✅ Módulo de inclusão manual de radares carregado!');
 }
 
 // ===================================================================
@@ -3591,7 +3601,7 @@ setInterval(pollAppInventor, 500);
 // ===================================================================
 window.onload = initMap;
 
+
 </script>
 </body>
 </html>
-
