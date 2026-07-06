@@ -27,9 +27,6 @@
   <link rel="manifest" href="/favicon_io/site.webmanifest">
 
   <style>
-    /* ===================================================================
-       VARIÁVEIS DE TEMA (cores globais do app)
-    =================================================================== */
     :root {
         --bg-color: #0f1115;
         --panel-color: #1a1d24;
@@ -40,20 +37,12 @@
         --sidebar-width: 68px;
         --btn-size: 50px;
     }
-
-    /* ===================================================================
-       RESET GLOBAL — remove paddings/margens padrão do navegador
-    =================================================================== */
     * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
         -webkit-tap-highlight-color: transparent;
     }
-
-    /* ===================================================================
-       BODY — layout principal em coluna, tela cheia, sem scroll
-    =================================================================== */
     body {
         font-family: 'Inter', sans-serif;
         background-color: var(--bg-color);
@@ -63,10 +52,6 @@
         flex-direction: column;
         overflow: hidden;
     }
-
-    /* ===================================================================
-       HEADER — barra superior com logo, título e botão menu
-    =================================================================== */
     header {
         background-color: var(--panel-color);
         padding: 15px;
@@ -78,885 +63,198 @@
         z-index: 1000;
         flex-shrink: 0;
     }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .app-icon {
-        width: 50px;
-        height: 40px;
-        border-radius: 8px;
-        object-fit: contain;
-    }
-
-    h1 {
-        font-size: 1.2rem;
-        font-weight: 800;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    h1 span {
-        color: var(--accent-color);
-    }
-
-    /* ===================================================================
-       BOTÃO MENU TOGGLE — hamburger animado com label "MENU"
-    =================================================================== */
+    .header-left { display: flex; align-items: center; gap: 10px; }
+    .app-icon { width: 50px; height: 40px; border-radius: 8px; object-fit: contain; }
+    h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    h1 span { color: var(--accent-color); }
     .btn-menu-toggle {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 2px;
-        background: none;
-        border: 1.5px solid rgba(0, 255, 136, 0.3);
-        border-radius: 10px;
-        padding: 8px 14px 6px;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        user-select: none;
-        -webkit-user-select: none;
-        position: relative;
-        z-index: 1001;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 2px; background: none; border: 1.5px solid rgba(0, 255, 136, 0.3);
+        border-radius: 10px; padding: 8px 14px 6px; cursor: pointer;
+        transition: all 0.25s ease; user-select: none; -webkit-user-select: none;
+        position: relative; z-index: 1001;
     }
-
-    .btn-menu-toggle:hover {
-        border-color: var(--accent-color);
-        background: rgba(0, 255, 136, 0.06);
-    }
-
-    .btn-menu-toggle:active {
-        transform: scale(0.93);
-    }
-
-    .menu-hamburger {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        width: 22px;
-    }
-
+    .btn-menu-toggle:hover { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.06); }
+    .btn-menu-toggle:active { transform: scale(0.93); }
+    .menu-hamburger { display: flex; flex-direction: column; gap: 4px; width: 22px; }
     .menu-hamburger span {
-        display: block;
-        height: 2.5px;
-        width: 100%;
-        background-color: var(--accent-color);
-        border-radius: 2px;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        transform-origin: center;
+        display: block; height: 2.5px; width: 100%;
+        background-color: var(--accent-color); border-radius: 2px;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center;
     }
-
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
-        transform: translateY(6.5px) rotate(45deg);
-    }
-
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
-        opacity: 0;
-        transform: scaleX(0);
-    }
-
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
-        transform: translateY(-6.5px) rotate(-45deg);
-    }
-
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
     .menu-label {
-        font-size: 0.55rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        color: var(--accent-color);
-        text-transform: uppercase;
-        line-height: 1;
-        margin-top: 2px;
+        font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px;
+        color: var(--accent-color); text-transform: uppercase; line-height: 1; margin-top: 2px;
     }
-
-    /* ===================================================================
-       SIDEBAR CONTROLS — barra vertical à direita com botões de mapa
-    =================================================================== */
     .sidebar-controls {
-        position: absolute;
-        top: -30px;
-        right: 0;
-        height: 100%;
-        width: var(--sidebar-width);
-        z-index: 500;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 20px 0;
-        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateX(0);
-        pointer-events: auto;
+        position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width);
+        z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 10px; padding: 20px 0; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(0); pointer-events: auto;
     }
-
-    .sidebar-controls.retracted {
-        transform: translateX(calc(var(--sidebar-width) + 15px));
-        pointer-events: none;
-    }
-
-    .sidebar-controls .map-btn {
-        width: var(--btn-size);
-        height: var(--btn-size);
-        opacity: 1;
-        transition: opacity 0.3s ease 0s, transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    .sidebar-controls.retracted .map-btn {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease 0s, transform 0.2s ease, border-color 0.2s ease;
-    }
-
-    /* ===================================================================
-       BARRAS DE BUSCA
-    =================================================================== */
+    .sidebar-controls.retracted { transform: translateX(calc(var(--sidebar-width) + 15px)); pointer-events: none; }
+    .sidebar-controls .map-btn { width: var(--btn-size); height: var(--btn-size); opacity: 1; transition: opacity 0.3s ease 0s, transform 0.2s ease, border-color 0.2s ease; }
+    .sidebar-controls.retracted .map-btn { opacity: 0; pointer-events: none; transition: opacity 0.2s ease 0s, transform 0.2s ease, border-color 0.2s ease; }
     .search-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: rgba(26, 29, 36, 0.98);
-        backdrop-filter: blur(8px);
-        display: flex;
-        gap: 12px;
-        z-index: 1000;
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-        padding: 0 15px;
-        border-bottom: 1px solid transparent;
-        transition: all 0.3s ease;
-        align-items: center;
+        position: absolute; top: 0; left: 0; width: 100%; background-color: rgba(26, 29, 36, 0.98);
+        backdrop-filter: blur(8px); display: flex; gap: 12px; z-index: 1000; max-height: 0;
+        overflow: hidden; opacity: 0; padding: 0 15px; border-bottom: 1px solid transparent;
+        transition: all 0.3s ease; align-items: center;
     }
-
-    .search-container.active {
-        max-height: 90px;
-        opacity: 1;
-        padding: 15px;
-        border-bottom: 1px solid #333;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    }
-
+    .search-container.active { max-height: 90px; opacity: 1; padding: 15px; border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
     .search-container input {
-        flex: 1;
-        padding: 14px 20px;
-        border-radius: 30px;
-        border: 1px solid #444;
-        background-color: #000;
-        color: #fff;
-        font-size: 1rem;
-        outline: none;
-        font-family: 'Inter', sans-serif;
+        flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444;
+        background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
     }
-
-    .search-container input:focus {
-        border-color: var(--accent-color);
-    }
-
+    .search-container input:focus { border-color: var(--accent-color); }
     .btn-search {
-        position: relative;
-        flex-shrink: 0;
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        border: none;
-        cursor: pointer;
-        background: rgba(46, 102, 158, 0.95);
-        box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5);
-        transition: all 0.2s ease;
-        overflow: hidden;
+        position: relative; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%;
+        border: none; cursor: pointer; background: rgba(46, 102, 158, 0.95);
+        box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); transition: all 0.2s ease; overflow: hidden;
     }
-
-    .btn-search:active {
-        transform: scale(0.9);
-    }
-
-    .btn-search img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-        display: block;
-        transform: translate(-50%, -50%);
-    }
-
-    /* ===================================================================
-       MAP-WRAPPER
-    =================================================================== */
-    .map-wrapper {
-        position: relative;
-        flex: 1;
-        display: flex;
-        overflow: hidden;
-        width: 100%;
-    }
-
-    #map {
-        width: 100%;
-        height: 100%;
-        background-color: #2a2a2a;
-        z-index: 1;
-        position: relative;
-    }
-
-    /* ===================================================================
-       BÚSSOLA
-    =================================================================== */
+    .btn-search:active { transform: scale(0.9); }
+    .btn-search img { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; object-fit: contain; display: block; transform: translate(-50%, -50%); }
+    .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
+    #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; position: relative; }
     .compass-widget {
-        position: absolute;
-        top: 10px;
-        left: 5px;
-        width: 65px;
-        height: 65px;
-        z-index: 999999 !important;
-        transform: translateZ(0);
-        will-change: transform;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        pointer-events: none;
-        transition: opacity 0.3s ease, top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        opacity: 1;
+        position: absolute; top: 10px; left: 5px; width: 65px; height: 65px;
+        z-index: 999999 !important; transform: translateZ(0); will-change: transform;
+        display: flex; align-items: center; justify-content: center; pointer-events: none;
+        transition: opacity 0.3s ease, top 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1;
     }
-
-    .compass-widget.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .compass-widget.busca-ativo {
-        top: 75px;
-    }
-
+    .compass-widget.hidden { opacity: 0; pointer-events: none; }
+    .compass-widget.busca-ativo { top: 75px; }
     .compass-base {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        background-image: url('/imagens_app/ic_compass.png');
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-        opacity: 0.9;
+        position: absolute; width: 100%; height: 100%; z-index: 1;
+        background-image: url('/imagens_app/ic_compass.png'); background-size: contain;
+        background-repeat: no-repeat; background-position: center; opacity: 0.9;
     }
-
-    .compass-needle {
-        position: absolute;
-        width: 55%;
-        height: 55%;
-        z-index: 2;
-        object-fit: contain;
-        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    .leaflet-pane,
-    .leaflet-map-pane,
-    .leaflet-tile-pane,
-    .leaflet-overlay-pane,
-    .leaflet-shadow-pane,
-    .leaflet-marker-pane,
-    .leaflet-popup-pane,
-    .leaflet-control-pane,
-    .leaflet-tooltip-pane {
-        z-index: 1 !important;
-    }
-
-    /* ===================================================================
-       MAP-BTN
-    =================================================================== */
+    .compass-needle { position: absolute; width: 55%; height: 55%; z-index: 2; object-fit: contain; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+    .leaflet-pane, .leaflet-map-pane, .leaflet-tile-pane, .leaflet-overlay-pane, .leaflet-shadow-pane,
+    .leaflet-marker-pane, .leaflet-popup-pane, .leaflet-control-pane, .leaflet-tooltip-pane { z-index: 1 !important; }
     .map-btn {
-        width: var(--btn-size);
-        height: var(--btn-size);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        cursor: pointer;
-        background: rgba(20, 20, 20, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-        transition: all 0.2s ease;
-        flex-shrink: 0;
+        width: var(--btn-size); height: var(--btn-size); display: flex; align-items: center;
+        justify-content: center; border-radius: 50%; cursor: pointer; background: rgba(20, 20, 20, 0.92);
+        border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+        transition: all 0.2s ease; flex-shrink: 0;
     }
-
-    .map-btn:hover {
-        transform: scale(1.08);
-        border-color: var(--accent-color);
-    }
-
-    .map-btn:active {
-        transform: scale(0.92);
-    }
-
-    .map-btn img {
-        width: 30px;
-        height: 30px;
-        object-fit: contain;
-        pointer-events: none;
-    }
-
-    .sidebar-controls .map-btn {
-        border: 1px solid rgba(0, 255, 136, 0.35);
-    }
-
-    .alert-toggle-btn {
-        background: rgba(29, 28, 28, 0.9);
-        border: 2px solid rgba(255, 255, 255, 0.08);
-        transition: all 0.3s ease;
-    }
-
-    .alert-toggle-btn.alert-off {
-        background: rgba(222, 127, 127, 0.9);
-        border-color: #888;
-    }
-
-    .alert-toggle-btn.alert-off img {
-        filter: rgba(225, 82, 82, 0.9);
-    }
-
-    #btn-rotate-map {
-        transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    }
-
-    #btn-rotate-map.rotated {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1);
-        background-color: rgba(0, 255, 136, 0.08);
-    }
-
-    #btn-rotate-map.rotated img {
-        filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5));
-        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
-    }
-
-    /* ===================================================================
-       MARCADORES
-    =================================================================== */
-    .user-gps-marker,
-    .user-navigator-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .user-gps-marker img,
-    .user-navigator-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        transition: none !important;
-        will-change: transform;
-    }
-
-    .route-start-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .route-start-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        animation: pulseStart 1s ease-in-out infinite;
-    }
-
-    .route-end-marker {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .route-end-marker img {
-        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        animation: pulseEnd 1.2s ease-in-out infinite;
-    }
-
-    @keyframes pulseStart {
-        0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-        100% { transform: scale(1); opacity: 1; }
-    }
-
-    @keyframes pulseEnd {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-        100% { transform: scale(1); }
-    }
-
-    .radar-marker-icon {
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .radar-marker-icon img {
-        width: 40px !important;
-        height: 40px !important;
-        object-fit: contain !important;
-        display: block !important;
-    }
-
-    /* ===================================================================
-       SPEED WIDGET
-    =================================================================== */
-    .speed-widget {
-        position: absolute;
-        bottom: -15px;
-        left: -25px;
-        width: 150px;
-        height: 150px;
-        z-index: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-
-    .speed-widget.alerta-ativo {
-        bottom: 75px !important;
-    }
-
-    .speed-bg {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        pointer-events: none;
-    }
-
+    .map-btn:hover { transform: scale(1.08); border-color: var(--accent-color); }
+    .map-btn:active { transform: scale(0.92); }
+    .map-btn img { width: 30px; height: 30px; object-fit: contain; pointer-events: none; }
+    .sidebar-controls .map-btn { border: 1px solid rgba(0, 255, 136, 0.35); }
+    .alert-toggle-btn { background: rgba(29, 28, 28, 0.9); border: 2px solid rgba(255, 255, 255, 0.08); transition: all 0.3s ease; }
+    .alert-toggle-btn.alert-off { background: rgba(222, 127, 127, 0.9); border-color: #888; }
+    .alert-toggle-btn.alert-off img { filter: rgba(225, 82, 82, 0.9); }
+    #btn-rotate-map { transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; }
+    #btn-rotate-map.rotated { border-color: var(--accent-color); box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1); background-color: rgba(0, 255, 136, 0.08); }
+    #btn-rotate-map.rotated img { filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5)); transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease; }
+    .user-gps-marker, .user-navigator-marker { background: transparent !important; border: none !important; }
+    .user-gps-marker img, .user-navigator-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); transition: none !important; will-change: transform; }
+    .route-start-marker { background: transparent !important; border: none !important; }
+    .route-start-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); animation: pulseStart 1s ease-in-out infinite; }
+    .route-end-marker { background: transparent !important; border: none !important; }
+    .route-end-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); animation: pulseEnd 1.2s ease-in-out infinite; }
+    @keyframes pulseStart { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes pulseEnd { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    .radar-marker-icon { background: transparent !important; border: none !important; }
+    .radar-marker-icon img { width: 40px !important; height: 40px !important; object-fit: contain !important; display: block !important; }
+    .speed-widget { position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500; display: flex; align-items: center; justify-content: center; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+    .speed-widget.alerta-ativo { bottom: 75px !important; }
+    .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
     .speed-value {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-64%, -60%);
-        font-size: 28px;
-        font-weight: 700;
-        font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-        color: #000;
-        line-height: 1;
-        z-index: 2;
-        white-space: nowrap;
-        text-align: center;
-        font-variant-numeric: tabular-nums;
-        letter-spacing: -0.5px;
-        min-width: 3ch;
+        position: absolute; top: 50%; left: 50%; transform: translate(-64%, -60%);
+        font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+        color: #000; line-height: 1; z-index: 2; white-space: nowrap; text-align: center;
+        font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch;
     }
-
-    /* ===================================================================
-       ALERT CONTAINER
-    =================================================================== */
-    #alert-container {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-        display: none;
-        animation: slideUp 0.3s ease-out;
-        pointer-events: none;
-    }
-
-    @keyframes slideUp {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
-    }
-
-    @keyframes pulseAlerta {
-        0% { transform: scale(1); filter: brightness(1); }
-        50% { transform: scale(1.02); filter: brightness(1.4); }
-        100% { transform: scale(1); filter: brightness(1); }
-    }
-
-    .alert-bar {
-        color: white;
-        padding: 18px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        transition: all 0.2s ease;
-    }
-
-    .alert-bar-radar,
-    .alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]) {
-        background: linear-gradient(90deg, #cc0000, #990000);
-        border-top: 2px solid #ff5555;
-        box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);
-    }
-
-    .alert-bar-risco {
-        background: linear-gradient(90deg, #e6a800, #b38600);
-        border-top: 2px solid #ffcc00;
-        box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4);
-    }
-
-    .alert-bar-mobilidade {
-        background: linear-gradient(90deg, #00b359, #008040);
-        border-top: 2px solid #00e066;
-        box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4);
-    }
-
-    .alert-bar-critico,
-    .alert-bar-risco-critico,
-    .alert-bar-mobilidade-critico {
-        animation: pulseAlerta 0.8s ease-in-out infinite;
-    }
-
-    .alert-bar img {
-        width: 50px;
-        height: 50px;
-        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
-    }
-
-    .alert-info h3 {
-        font-size: 1.2rem;
-        margin-bottom: 3px;
-        text-transform: uppercase;
-        font-weight: 800;
-    }
-
-    .alert-info p {
-        font-size: 0.95rem;
-        opacity: 0.95;
-    }
-
-    /* ===================================================================
-       TOAST NOTIFICATION
-    =================================================================== */
+    #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
+    .alert-bar { color: white; padding: 18px; display: flex; align-items: center; gap: 15px; transition: all 0.2s ease; }
+    .alert-bar-radar, .alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]) { background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); }
+    .alert-bar-risco { background: linear-gradient(90deg, #e6a800, #b38600); border-top: 2px solid #ffcc00; box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); }
+    .alert-bar-mobilidade { background: linear-gradient(90deg, #00b359, #008040); border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
+    .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
+    .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
+    .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
+    .alert-info p { font-size: 0.95rem; opacity: 0.95; }
     .toast-notification {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%) translateY(-20px);
-        background-color: rgba(20, 20, 20, 0.95);
-        color: var(--text-main);
-        padding: 12px 25px;
-        border-radius: 50px;
-        border: 1px solid #444;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-        z-index: 2000;
-        opacity: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-align: center;
-        pointer-events: none;
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        white-space: nowrap;
+        position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+        background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px;
+        border-radius: 50px; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+        z-index: 2000; opacity: 0; font-size: 0.95rem; font-weight: 600; text-align: center;
+        pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; white-space: nowrap;
     }
-
-    .toast-notification.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-
-    /* ===================================================================
-       LOADING OVERLAY
-    =================================================================== */
+    .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .loading-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(20, 20, 20, 0.9);
-        padding: 20px 30px;
-        border-radius: 12px;
-        border: 1px solid var(--accent-color);
-        text-align: center;
-        z-index: 1001;
-        backdrop-filter: blur(5px);
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: rgba(20, 20, 20, 0.9); padding: 20px 30px; border-radius: 12px;
+        border: 1px solid var(--accent-color); text-align: center; z-index: 1001; backdrop-filter: blur(5px);
     }
-
-    .loading-spinner {
-        border: 3px solid #333;
-        border-top: 3px solid var(--accent-color);
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 10px;
-    }
-
-    @keyframes spin {
-        100% { transform: rotate(360deg); }
-    }
-
+    .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
     .loading-fullscreen {
-        position: fixed;
-        inset: 0;
-        background-color: var(--bg-color);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
+        position: fixed; inset: 0; background-color: var(--bg-color); display: flex;
+        flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
         transition: opacity 0.5s ease, visibility 0.5s ease;
     }
-
-    .loading-fullscreen.fade-out {
-        opacity: 0;
-        visibility: hidden;
+    .loading-fullscreen.fade-out { opacity: 0; visibility: hidden; }
+    .loading-fullscreen .spinner-ring { width: 60px; height: 60px; border-radius: 50%; position: relative; margin-bottom: 24px; }
+    .loading-fullscreen .spinner-ring::before, .loading-fullscreen .spinner-ring::after {
+        content: ''; position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent;
     }
-
-    .loading-fullscreen .spinner-ring {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        position: relative;
-        margin-bottom: 24px;
-    }
-
-    .loading-fullscreen .spinner-ring::before,
-    .loading-fullscreen .spinner-ring::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        border: 4px solid transparent;
-    }
-
-    .loading-fullscreen .spinner-ring::before {
-        border-top-color: var(--accent-color);
-        border-right-color: var(--accent-color);
-        animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite;
-    }
-
-    .loading-fullscreen .spinner-ring::after {
-        inset: 10px;
-        border-bottom-color: #ff3333;
-        border-left-color: #ff3333;
-        animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse;
-    }
-
-    @keyframes spinRing {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .loading-fullscreen .loading-text {
-        font-size: 1.1rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        text-align: center;
-    }
-
-    .loading-fullscreen .loading-text span {
-        color: var(--accent-color);
-    }
-
-    .loading-fullscreen .loading-sub {
-        margin-top: 8px;
-        font-size: 0.8rem;
-        color: #777;
-        animation: pulseText 1.8s ease-in-out infinite;
-    }
-
-    @keyframes pulseText {
-        0%, 100% { opacity: 0.4; }
-        50% { opacity: 1; }
-    }
-
-    .leaflet-control-zoom,
-    .leaflet-control-attribution,
-    .leaflet-routing-container {
-        display: none !important;
-    }
-
-    /* ===================================================================
-       BOTÃO + (ADICIONAR RADAR)
-       Reposicionado mais à esquerda, afastado da coluna de botões do
-       menu lateral (sidebar-controls, que ocupa os 68px da direita).
-      
-    =================================================================== */
+    .loading-fullscreen .spinner-ring::before { border-top-color: var(--accent-color); border-right-color: var(--accent-color); animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite; }
+    .loading-fullscreen .spinner-ring::after { inset: 10px; border-bottom-color: #ff3333; border-left-color: #ff3333; animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse; }
+    @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .loading-fullscreen .loading-text { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; text-align: center; }
+    .loading-fullscreen .loading-text span { color: var(--accent-color); }
+    .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.8rem; color: #777; animation: pulseText 1.8s ease-in-out infinite; }
+    @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+    .leaflet-control-zoom, .leaflet-control-attribution, .leaflet-routing-container { display: none !important; }
     .btn-add-radar {
-        position: absolute;
-        bottom: 10px;
-        right: 10px !important; /* ← MANTIDO, mas com sidebar retraída o botão fica mais à esquerda */
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-       background: linear-gradient(135deg, #00cc66, #00994d);
-       border: 2px solid rgba(0, 255, 136, 0.4);
-       box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
-       cursor: pointer;
-       z-index: 1000;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-       animation: pulsePlus 2s ease-in-out infinite;
+        position: absolute; bottom: 10px; right: 10px !important; width: 60px; height: 60px;
+        border-radius: 50%; background: linear-gradient(135deg, #00cc66, #00994d);
+        border: 2px solid rgba(0, 255, 136, 0.4); box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
+        cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); animation: pulsePlus 2s ease-in-out infinite;
     }
-
-    @keyframes pulsePlus {
-        0%, 100% { box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5); }
-        50% { box-shadow: 0 4px 35px rgba(0, 204, 102, 0.8); }
-    }
-
-    .btn-add-radar:hover {
-        transform: scale(1.12);
-        box-shadow: 0 4px 30px rgba(0, 204, 102, 0.7);
-    }
-
-    .btn-add-radar:active {
-        transform: scale(0.92);
-    }
-
-    .btn-add-radar .plus-icon {
-        font-size: 40px;
-        font-weight: 300;
-        color: white;
-        line-height: 1;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        margin-top: -2px;
-    }
-
-    /* ===================================================================
-       MODAL DE INCLUSÃO
-    =================================================================== */
+    @keyframes pulsePlus { 0%, 100% { box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5); } 50% { box-shadow: 0 4px 35px rgba(0, 204, 102, 0.8); } }
+    .btn-add-radar:hover { transform: scale(1.12); box-shadow: 0 4px 30px rgba(0, 204, 102, 0.7); }
+    .btn-add-radar:active { transform: scale(0.92); }
+    .btn-add-radar .plus-icon { font-size: 40px; font-weight: 300; color: white; line-height: 1; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); margin-top: -2px; }
     .modal-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(8px);
-        z-index: 2000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        animation: modalFadeIn 0.3s ease-out;
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center;
+        padding: 20px; animation: modalFadeIn 0.3s ease-out;
     }
-
-    .modal-overlay.active {
-        display: flex;
+    .modal-overlay.active { display: flex; }
+    @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .modal-content { background: #1a1d24; border: 1px solid #333; border-radius: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #333; }
+    .modal-header h2 { font-size: 1.2rem; color: var(--accent-color); margin: 0; }
+    .modal-close { background: none; border: none; color: #888; font-size: 28px; cursor: pointer; padding: 4px 10px; border-radius: 8px; transition: all 0.2s ease; }
+    .modal-close:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+    .modal-body { padding: 24px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-select, .form-input {
+        width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #333;
+        background: #0f1115; color: #fff; font-size: 1rem; font-family: 'Inter', sans-serif;
+        transition: border-color 0.3s ease; outline: none;
     }
-
-    @keyframes modalFadeIn {
-        from { opacity: 0; transform: scale(0.95); }
-        to { opacity: 1; transform: scale(1); }
-    }
-
-    .modal-content {
-        background: #1a1d24;
-        border: 1px solid #333;
-        border-radius: 20px;
-        max-width: 500px;
-        width: 100%;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-    }
-
-    .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 24px;
-        border-bottom: 1px solid #333;
-    }
-
-    .modal-header h2 {
-        font-size: 1.2rem;
-        color: var(--accent-color);
-        margin: 0;
-    }
-
-    .modal-close {
-        background: none;
-        border: none;
-        color: #888;
-        font-size: 28px;
-        cursor: pointer;
-        padding: 4px 10px;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-    }
-
-    .modal-close:hover {
-        color: #fff;
-        background: rgba(255, 255, 255, 0.08);
-    }
-
-    .modal-body {
-        padding: 24px;
-    }
-
-    .form-group {
-        margin-bottom: 18px;
-    }
-
-    .form-group label {
-        display: block;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        margin-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .form-select,
-    .form-input {
-        width: 100%;
-        padding: 12px 16px;
-        border-radius: 12px;
-        border: 1px solid #333;
-        background: #0f1115;
-        color: #fff;
-        font-size: 1rem;
-        font-family: 'Inter', sans-serif;
-        transition: border-color 0.3s ease;
-        outline: none;
-    }
-
-    .form-select:focus,
-    .form-input:focus {
-        border-color: var(--accent-color);
-    }
-
-    .form-select option {
-        background: #1a1d24;
-        color: #fff;
-        padding: 8px;
-    }
-
-    /* ===================================================================
-       BOTÕES DE VELOCIDADE - AGORA PARA TODOS OS TIPOS
-    =================================================================== */
-    .speed-buttons-container {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        margin-bottom: 4px;
-    }
-
+    .form-select:focus, .form-input:focus { border-color: var(--accent-color); }
+    .form-select option { background: #1a1d24; color: #fff; padding: 8px; }
+    .speed-buttons-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 4px; }
     .speed-btn {
-        padding: 10px 0;
-        border: 2px solid #333;
-        border-radius: 10px;
-        background: #0f1115;
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        font-family: 'Inter', sans-serif;
+        padding: 10px 0; border: 2px solid #333; border-radius: 10px; background: #0f1115;
+        color: var(--text-muted); font-size: 0.95rem; font-weight: 700; cursor: pointer;
+        transition: all 0.25s ease; font-family: 'Inter', sans-serif;
     }
-
-    .speed-btn:hover {
-        border-color: var(--accent-color);
-        color: var(--text-main);
-        background: rgba(0, 255, 136, 0.05);
-    }
-
-    .speed-btn.selected {
-        border-color: var(--accent-color);
-        background: rgba(0, 255, 136, 0.15);
-        color: var(--accent-color);
-        box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
-    }
-
+    .speed-btn:hover { border-color: var(--accent-color); color: var(--text-main); background: rgba(0, 255, 136, 0.05); }
+    .speed-btn.selected { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.15); color: var(--accent-color); box-shadow: 0 0 20px rgba(0, 255, 136, 0.15); }
     .speed-btn.selected-30 { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
     .speed-btn.selected-40 { border-color: #ffa94d; color: #ffa94d; background: rgba(255, 169, 77, 0.1); }
     .speed-btn.selected-50 { border-color: #ffd93d; color: #ffd93d; background: rgba(255, 217, 61, 0.1); }
@@ -965,184 +263,42 @@
     .speed-btn.selected-80 { border-color: #9b59b6; color: #9b59b6; background: rgba(155, 89, 182, 0.1); }
     .speed-btn.selected-100 { border-color: #ff6b9d; color: #ff6b9d; background: rgba(255, 107, 157, 0.1); }
     .speed-btn.selected-110 { border-color: #ff4757; color: #ff4757; background: rgba(255, 71, 87, 0.1); }
-
-    .icon-preview {
-        display: flex;
-        align-items: center;
-        background: #0f1115;
-        padding: 12px 16px;
-        border-radius: 12px;
-        border: 1px solid #333;
-    }
-
-    .icon-preview img {
-        width: 40px;
-        height: 40px;
-        object-fit: contain;
-    }
-
-    .icon-preview span {
-        font-size: 0.95rem;
-        color: var(--text-main);
-    }
-
-    .current-position {
-        background: #0f1115;
-        padding: 10px 14px;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 4px;
-    }
-
-    .current-position span {
-        font-family: 'Courier New', monospace;
-        color: var(--accent-color);
-    }
-
-    .current-position-status {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-        margin-top: 2px;
-        font-style: italic;
-    }
-
+    .icon-preview { display: flex; align-items: center; background: #0f1115; padding: 12px 16px; border-radius: 12px; border: 1px solid #333; }
+    .icon-preview img { width: 40px; height: 40px; object-fit: contain; }
+    .icon-preview span { font-size: 0.95rem; color: var(--text-main); }
+    .current-position { background: #0f1115; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .current-position span { font-family: 'Courier New', monospace; color: var(--accent-color); }
+    .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-style: italic; }
     .btn-submit-radar {
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #00cc66, #00994d);
-        color: white;
-        font-size: 1.1rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 204, 102, 0.3);
-        margin-top: 10px;
+        width: 100%; padding: 14px; border: none; border-radius: 14px;
+        background: linear-gradient(135deg, #00cc66, #00994d); color: white; font-size: 1.1rem;
+        font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 204, 102, 0.3); margin-top: 10px;
     }
-
-    .btn-submit-radar:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 25px rgba(0, 204, 102, 0.5);
-    }
-
-    .btn-submit-radar:active {
-        transform: scale(0.97);
-    }
-
-    .btn-submit-radar:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .status-loading {
-        color: var(--accent-color);
-        font-size: 0.85rem;
-        animation: pulseText 1.5s ease-in-out infinite;
-    }
-
-    /* ===================================================================
-       RESPONSIVIDADE
-    =================================================================== */
-    /* ===================================================================
-       MENU DROPDOWN
-    =================================================================== */
-    .menu-dropdown {
-        animation: menuSlideIn 0.2s ease-out;
-    }
-    @keyframes menuSlideIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .menu-item:hover {
-        background: rgba(0, 255, 136, 0.1);
-    }
-
-    /* ===================================================================
-       MODAL DE CONFIGURAÇÃO GITHUB
-    =================================================================== */
-    .config-github-form {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    .config-github-form label {
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        font-weight: 600;
-    }
-    .config-github-form input {
-        padding: 10px 14px;
-        border-radius: 10px;
-        border: 1px solid #333;
-        background: #0f1115;
-        color: #fff;
-        font-size: 0.9rem;
-        font-family: 'Inter', sans-serif;
-    }
-    .config-github-form input:focus {
-        border-color: var(--accent-color);
-        outline: none;
-    }
-    .btn-save-config {
-        padding: 12px;
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(135deg, #00cc66, #00994d);
-        color: white;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    .btn-save-config:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 204, 102, 0.4);
-    }
-    .config-status {
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        text-align: center;
-    }
+    .btn-submit-radar:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0, 204, 102, 0.5); }
+    .btn-submit-radar:active { transform: scale(0.97); }
+    .btn-submit-radar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .status-loading { color: var(--accent-color); font-size: 0.85rem; animation: pulseText 1.5s ease-in-out infinite; }
+    .menu-dropdown { animation: menuSlideIn 0.2s ease-out; }
+    @keyframes menuSlideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .menu-item:hover { background: rgba(0, 255, 136, 0.1); }
+    .config-github-form { display: flex; flex-direction: column; gap: 12px; }
+    .config-github-form label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+    .config-github-form input { padding: 10px 14px; border-radius: 10px; border: 1px solid #333; background: #0f1115; color: #fff; font-size: 0.9rem; font-family: 'Inter', sans-serif; }
+    .config-github-form input:focus { border-color: var(--accent-color); outline: none; }
+    .btn-save-config { padding: 12px; border-radius: 12px; border: none; background: linear-gradient(135deg, #00cc66, #00994d); color: white; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
+    .btn-save-config:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 204, 102, 0.4); }
+    .config-status { padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; text-align: center; }
     .config-status.ok { background: rgba(0, 204, 102, 0.15); color: #00cc66; }
     .config-status.erro { background: rgba(255, 68, 68, 0.15); color: #ff4444; }
     .config-status.aviso { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
-
     @media (max-width: 600px) {
-        .btn-add-radar {
-            bottom: 20px;
-            right: 92px;
-            width: 56px;
-            height: 56px;
-        }
-        .btn-add-radar .plus-icon {
-            font-size: 32px;
-        }
-        .modal-content {
-            max-width: 100%;
-            margin: 10px;
-            border-radius: 16px;
-        }
-        .modal-body {
-            padding: 16px;
-        }
-        .form-select,
-        .form-input {
-            padding: 10px 14px;
-            font-size: 0.95rem;
-        }
-        .speed-buttons-container {
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-        }
-        .speed-btn {
-            padding: 8px 0;
-            font-size: 0.85rem;
-        }
+        .btn-add-radar { bottom: 20px; right: 92px; width: 56px; height: 56px; }
+        .btn-add-radar .plus-icon { font-size: 32px; }
+        .modal-content { max-width: 100%; margin: 10px; border-radius: 16px; }
+        .modal-body { padding: 16px; }
+        .form-select, .form-input { padding: 10px 14px; font-size: 0.95rem; }
+        .speed-buttons-container { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .speed-btn { padding: 8px 0; font-size: 0.85rem; }
     }
 </style>
 <base target="_blank">
@@ -1462,6 +618,8 @@ let GITHUB_CONFIG = {
     token: '',
     // URL do proxy CORS para escrita (substitua pelo seu proxy)
     proxyUrl: '',
+    // Cache do branch padrão real do repositório (preenchido dinamicamente)
+    _branchCache: null,
     // URL base do raw GitHub para leitura via CDN
     get cdnUrl() {
         return `https://cdn.jsdelivr.net/gh/${this.owner}/${this.repo}@main/${this.path}`;
@@ -1524,6 +682,8 @@ async function carregarConfigGitHub() {
 function salvarConfigGitHub(config) {
     try {
         localStorage.setItem('radarx9_github_config', JSON.stringify(config));
+        // Zera o cache de branch: owner/repo podem ter mudado
+        GITHUB_CONFIG._branchCache = null;
         Object.assign(GITHUB_CONFIG, config);
         console.log('[Radar X9] ✅ Configuração salva.');
         return true;
@@ -1531,6 +691,34 @@ function salvarConfigGitHub(config) {
         console.error('[Radar X9] Erro ao salvar config:', err);
         return false;
     }
+}
+
+// ===================================================================
+// [CORREÇÃO] Descobrir o branch padrão real do repositório
+// Antes o código assumia 'main' fixo em todas as chamadas à API do
+// GitHub. Se o branch padrão do repo for outro (ex: 'master'), o GET
+// falhava com 404 e o erro real era mascarado pelo fallback local.
+// ===================================================================
+async function obterBranchPadrao() {
+    if (GITHUB_CONFIG._branchCache) return GITHUB_CONFIG._branchCache;
+    if (!GITHUB_CONFIG.token) {
+        throw new Error('Token do GitHub não configurado.');
+    }
+    const resp = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `token ${GITHUB_CONFIG.token}`,
+            'Accept': 'application/vnd.github.v3+json'
+        }
+    });
+    if (!resp.ok) {
+        const detalhe = await resp.text().catch(function () { return ''; });
+        throw new Error(`Não foi possível ler o repositório (${resp.status}): ${detalhe.slice(0, 200)}`);
+    }
+    const info = await resp.json();
+    GITHUB_CONFIG._branchCache = info.default_branch || 'main';
+    console.log('[Radar X9] 🔎 Branch padrão detectado:', GITHUB_CONFIG._branchCache);
+    return GITHUB_CONFIG._branchCache;
 }
 
 
@@ -2884,7 +2072,6 @@ function animarBotaoRadar(status) {
     const icon = btn.querySelector('.plus-icon');
 
     if (status === 'adicionado') {
-        // ✅ Muda para "✓" e cor LARANJA quando radar adicionado
         icon.textContent = '✓';
         btn.style.background = 'linear-gradient(135deg, #ffa500, #ff8c00)';
         btn.style.transform = 'scale(1.15)';
@@ -2974,6 +2161,8 @@ async function initMap() {
     // Carregar configuração do GitHub
     await carregarConfigGitHub();
     console.log("CONFIG:", GITHUB_CONFIG);
+    // Carregar pendentes salvos localmente (se existirem)
+    carregarRadaresPendentes();
     
     if (typeof L === 'undefined') { 
         hideFullscreenLoading(); 
@@ -3082,32 +2271,6 @@ async function initMap() {
 function inicializarMenuToggle() {
     var btnMenu = document.getElementById('btn-menu-toggle');
     var sidebar = document.getElementById('sidebar-controls');
-    
-    btnMenu.addEventListener('click', function(e) {
-        e.stopPropagation();
-        sidebarAberta = !sidebarAberta;
-        
-        if (sidebarAberta) {
-            sidebar.classList.remove('retracted');
-            btnMenu.classList.remove('active');
-        } else {
-            sidebar.classList.add('retracted');
-            btnMenu.classList.add('active');
-            
-            if (searchActive || routeActive) {
-                searchActive = false;
-                routeActive = false;
-                document.getElementById('search-bar-radares').classList.remove('active');
-                document.getElementById('search-bar-rota').classList.remove('active');
-                ajustarBussolaParaBusca(false);
-            }
-        }
-    });
-}
-
-function inicializarMenuToggle() {
-    var btnMenu = document.getElementById('btn-menu-toggle');
-    var sidebar = document.getElementById('sidebar-controls');
     var menuDropdown = document.getElementById('menu-dropdown');
 
     btnMenu.addEventListener('click', function(e) {
@@ -3203,7 +2366,7 @@ function abrirModalConfigGithub() {
     });
 
     // Salvar configuração
-    document.getElementById('btn-save-github-config').addEventListener('click', function() {
+    document.getElementById('btn-save-github-config').addEventListener('click', async function() {
         var config = {
             token: document.getElementById('github-token').value.trim(),
             owner: document.getElementById('github-owner').value.trim() || 'seabhra',
@@ -3219,13 +2382,29 @@ function abrirModalConfigGithub() {
         }
 
         salvarConfigGitHub(config);
-        document.getElementById('config-status-msg').textContent = '✅ Configuração salva com sucesso!';
-        document.getElementById('config-status-msg').className = 'config-status ok';
 
-        setTimeout(function() {
-            modal.classList.remove('active');
-            carregarRadares(); // Recarregar do GitHub
-        }, 1500);
+        // [CORREÇÃO] Validar imediatamente se o token/owner/repo funcionam de
+        // verdade contra a API do GitHub, em vez de só confiar que "salvou".
+        document.getElementById('config-status-msg').textContent = '🔄 Validando credenciais no GitHub...';
+        document.getElementById('config-status-msg').className = 'config-status aviso';
+
+        try {
+            const branch = await obterBranchPadrao();
+            document.getElementById('config-status-msg').textContent =
+                `✅ Conectado! Repositório encontrado (branch: ${branch}).`;
+            document.getElementById('config-status-msg').className = 'config-status ok';
+
+            setTimeout(function() {
+                modal.classList.remove('active');
+                carregarRadares(); // Recarregar do GitHub
+            }, 1500);
+        } catch (validationError) {
+            document.getElementById('config-status-msg').textContent =
+                '❌ Falha ao validar: ' + validationError.message;
+            document.getElementById('config-status-msg').className = 'config-status erro';
+            console.error('[Radar X9] Validação de config GitHub falhou:', validationError);
+            // Não fecha o modal — deixa o usuário corrigir owner/repo/token.
+        }
     });
 
     // Fechar ao clicar fora
@@ -3466,184 +2645,154 @@ function inicializarBotaoAddRadar() {
     });
 
     // ✅ CONECTA O BOTÃO DE SUBMIT À FUNÇÃO INCLUIR RADAR
-    btnSubmitRadar.addEventListener('click', incluirRadar);
+    // [CORREÇÃO] incluirRadar precisa ler currentPosition e fecharModal
+    // deste escopo — expostos via referências locais abaixo.
+    btnSubmitRadar.addEventListener('click', function() {
+        incluirRadar(currentPosition, fecharModal);
+    });
 }
 
 // ===================================================================
-// SALVAR RADAR LOCALMENTE (para testes sem GitHub)
+// SALVAR RADAR LOCALMENTE (fallback honesto)
+// [CORREÇÃO] A versão anterior fingia sucesso sem persistir nada em
+// lugar nenhum (nem arquivo, nem servidor). Isso fazia o app "achar"
+// que salvou quando na verdade o radar só existia na sessão atual e
+// sumia ao dar refresh. Agora essa função:
+//  1) Não finge sucesso — ela é claramente marcada como "somente
+//     nesta sessão" no toast e no console.
+//  2) Guarda o registro na fila de pendentes (localStorage), para que
+//     "Sincronizar Pendentes" no menu possa de fato gravá-lo no
+//     GitHub depois, quando o token/branch/permissões forem corrigidos.
 // ===================================================================
 async function salvarRadarLocalmente(novoRadar, proximoId) {
-    try {
-        console.log('[Radar X9] 💾 Salvando radar localmente...');
-
-        const response = await fetch('radares.json?v=' + Date.now());
-        if (!response.ok) {
-            throw new Error('Arquivo radares.json não encontrado localmente.');
-        }
-
-        let jsonData = await response.json();
-
-        if (!jsonData.records) {
-            jsonData.records = [];
-        }
-
-        const idFiscalizacao = String(proximoId);
-        const novoRegistro = [
-            proximoId,
-            idFiscalizacao,
-            novoRadar.endereco,
-            novoRadar.tipo,
-            String(novoRadar.velocidade),
-            "Único",
-            "Único",
-            `M${String(proximoId).padStart(6, '0')}`,
-            `KBH${String(proximoId).padStart(6, '0')}`,
-            `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
-        ];
-
-        jsonData.records.push(novoRegistro);
-
-        console.log('[Radar X9] ⚠️ Modo local: Radar não pode ser salvo no arquivo, mas foi adicionado ao mapa.');
-        showNotification(`⚠️ Radar #${proximoId} adicionado ao mapa (modo local). Para salvar permanentemente, configure o GitHub.`);
-        return { success: true, id: proximoId };
-
-    } catch (error) {
-        console.error('[Radar X9] ❌ Erro ao salvar localmente:', error);
-        throw error;
-    }
-}    
+    console.warn('[Radar X9] ⚠️ Radar NÃO foi salvo no GitHub — ficará somente nesta sessão até ser sincronizado.');
+    showNotification(`⚠️ Radar #${proximoId} adicionado só nesta sessão (não persistido). Configure/corrija o GitHub e sincronize depois.`);
+    return { success: true, id: proximoId, persistido: false };
+}
 
 // ===================================================================
 // SALVAR RADAR NO GITHUB
+// [CORREÇÃO] Usa branch dinâmico (obterBranchPadrao) em vez de 'main'
+// fixo, e propaga a mensagem de erro real para quem chamou.
 // ===================================================================
 async function salvarRadarNoGitHub(novoRadar, proximoId) {
-    try {
-        console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
+    console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
 
-        // Verificar se tem token configurado
-        if (!GITHUB_CONFIG.token) {
-            throw new Error('Token do GitHub não configurado. Configure no menu ou use o modo local.');
-        }
-
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-
-        // Tentar usar proxy CORS se configurado
-        let apiUrl = url;
-        let useProxy = false;
-        if (GITHUB_CONFIG.proxyUrl) {
-            apiUrl = GITHUB_CONFIG.proxyUrl + '/github';
-            useProxy = true;
-        }
-
-        // Buscar arquivo atual
-        const getHeaders = {
-            'Accept': 'application/vnd.github.v3+json'
-        };
-        if (!useProxy) {
-            getHeaders['Authorization'] = `token ${GITHUB_CONFIG.token}`;
-        }
-
-        const getResponse = await fetch(useProxy ? apiUrl + '?path=' + encodeURIComponent(GITHUB_CONFIG.path) : `${url}?ref=main`, {
-            method: 'GET',
-            headers: getHeaders
-        });
-
-        if (!getResponse.ok) {
-            throw new Error(`Erro ao buscar arquivo: ${getResponse.status} - ${getResponse.statusText}`);
-        }
-
-        const data = await getResponse.json();
-        let jsonData;
-
-        try {
-            const content = atob(data.content.replace(/\s/g, ''));
-            jsonData = JSON.parse(content);
-        } catch (e) {
-            throw new Error('Erro ao parsear o conteúdo do arquivo radares.json');
-        }
-
-        if (!jsonData.records) {
-            jsonData.records = [];
-        }
-
-        const idFiscalizacao = String(proximoId);
-        const novoRegistro = [
-            proximoId,
-            idFiscalizacao,
-            novoRadar.endereco,
-            novoRadar.tipo,
-            String(novoRadar.velocidade),
-            "Único",
-            "Único",
-            `M${String(proximoId).padStart(6, '0')}`,
-            `KBH${String(proximoId).padStart(6, '0')}`,
-            `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
-        ];
-
-        jsonData.records.push(novoRegistro);
-
-        // Preparar conteúdo atualizado
-        const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2))));
-
-        // Tentar salvar via proxy ou direto
-        let updateResponse;
-        if (useProxy) {
-            updateResponse = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    path: GITHUB_CONFIG.path,
-                    message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
-                    content: updatedContent,
-                    sha: data.sha,
-                    branch: 'main',
-                    token: GITHUB_CONFIG.token
-                })
-            });
-        } else {
-            updateResponse = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
-                    content: updatedContent,
-                    sha: data.sha,
-                    branch: 'main'
-                })
-            });
-        }
-
-        if (!updateResponse.ok) {
-            const erro = await updateResponse.text();
-            throw new Error(`Erro ao salvar: ${updateResponse.status} - ${erro}`);
-        }
-
-        console.log('[Radar X9] ✅ Radar salvo no GitHub! ID:', proximoId);
-        RADAR_MODO_OFFLINE = false;
-        return { success: true, id: proximoId };
-
-    } catch (error) {
-        console.error('[Radar X9] ❌ Erro ao salvar no GitHub:', error);
-        // Se falhou por CORS ou auth, marcar como offline
-        if (error.message.includes('CORS') || error.message.includes('Failed to fetch') || 
-            error.message.includes('NetworkError') || error.message.includes('401') ||
-            error.message.includes('403')) {
-            RADAR_MODO_OFFLINE = true;
-        }
-        throw error;
+    if (!GITHUB_CONFIG.token) {
+        throw new Error('Token do GitHub não configurado. Configure no menu (🔑 Configurar GitHub).');
     }
+
+    const branch = await obterBranchPadrao();
+
+    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
+
+    let apiUrl = url;
+    let useProxy = false;
+    if (GITHUB_CONFIG.proxyUrl) {
+        apiUrl = GITHUB_CONFIG.proxyUrl + '/github';
+        useProxy = true;
+    }
+
+    const getHeaders = {
+        'Accept': 'application/vnd.github.v3+json'
+    };
+    if (!useProxy) {
+        getHeaders['Authorization'] = `token ${GITHUB_CONFIG.token}`;
+    }
+
+    const getResponse = await fetch(
+        useProxy
+            ? apiUrl + '?path=' + encodeURIComponent(GITHUB_CONFIG.path) + '&ref=' + encodeURIComponent(branch)
+            : `${url}?ref=${encodeURIComponent(branch)}`,
+        { method: 'GET', headers: getHeaders }
+    );
+
+    if (!getResponse.ok) {
+        const detalheErro = await getResponse.text().catch(function () { return ''; });
+        throw new Error(`Erro ao buscar arquivo (${getResponse.status}): ${detalheErro.slice(0, 300)}`);
+    }
+
+    const data = await getResponse.json();
+    let jsonData;
+
+    try {
+        const content = atob(data.content.replace(/\s/g, ''));
+        jsonData = JSON.parse(content);
+    } catch (e) {
+        throw new Error('Erro ao parsear o conteúdo do arquivo radares.json: ' + e.message);
+    }
+
+    if (!jsonData.records) {
+        jsonData.records = [];
+    }
+
+    const idFiscalizacao = String(proximoId);
+    const novoRegistro = [
+        proximoId,
+        idFiscalizacao,
+        novoRadar.endereco,
+        novoRadar.tipo,
+        String(novoRadar.velocidade),
+        "Único",
+        "Único",
+        `M${String(proximoId).padStart(6, '0')}`,
+        `KBH${String(proximoId).padStart(6, '0')}`,
+        `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
+    ];
+
+    jsonData.records.push(novoRegistro);
+
+    const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2))));
+
+    let updateResponse;
+    if (useProxy) {
+        updateResponse = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                path: GITHUB_CONFIG.path,
+                message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
+                content: updatedContent,
+                sha: data.sha,
+                branch: branch,
+                token: GITHUB_CONFIG.token
+            })
+        });
+    } else {
+        updateResponse = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
+                content: updatedContent,
+                sha: data.sha,
+                branch: branch
+            })
+        });
+    }
+
+    if (!updateResponse.ok) {
+        const erro = await updateResponse.text().catch(function () { return ''; });
+        throw new Error(`Erro ao salvar (${updateResponse.status}): ${erro.slice(0, 300)}`);
+    }
+
+    console.log('[Radar X9] ✅ Radar salvo no GitHub! ID:', proximoId, '| branch:', branch);
+    RADAR_MODO_OFFLINE = false;
+    return { success: true, id: proximoId, persistido: true };
 }
  
 // ===================================================================
 // INCLUIR RADAR
+// [CORREÇÃO] Recebe currentPosition/fecharModal do escopo de
+// inicializarBotaoAddRadar (antes eram variáveis "fantasmas" fora de
+// escopo). Também para de mascarar falhas do GitHub: mostra o erro
+// real ao usuário em vez de cair silenciosamente no fallback fake.
 // ===================================================================
-async function incluirRadar() {
+async function incluirRadar(currentPosition, fecharModal) {
     const tipo = document.getElementById('radar-type').value;
     const endereco = document.getElementById('radar-address').value.trim();
     const speedBtnSelected = document.querySelector('.speed-btn.selected');
@@ -3664,7 +2813,7 @@ async function incluirRadar() {
         document.getElementById('radar-address').focus();
         return;
     }
-    if (!currentPosition.lat || !currentPosition.lng) {
+    if (!currentPosition || !currentPosition.lat || !currentPosition.lng) {
         showNotification('❌ Aguardando posição GPS. Aguarde ou feche e reabra o formulário.');
         return;
     }
@@ -3702,24 +2851,17 @@ async function incluirRadar() {
                 salvouNoGitHub = true;
                 console.log('[Radar X9] ✅ Salvo no GitHub');
             } catch (githubError) {
-                console.warn('[Radar X9] ⚠️ Falha ao salvar no GitHub:', githubError.message);
-                // Continuar para fallback
+                // [CORREÇÃO] Erro real mostrado ao usuário, não mais escondido
+                console.error('[Radar X9] ❌ Falha real ao salvar no GitHub:', githubError.message);
+                showNotification('❌ GitHub falhou: ' + githubError.message);
             }
+        } else {
+            showNotification('⚠️ Nenhum token GitHub configurado — configure no menu (🔑).');
         }
 
-        // TENTATIVA 2: Salvar localmente (se GitHub falhou ou não configurado)
+        // TENTATIVA 2: fallback apenas de sessão (não persiste), só se GitHub falhou
         if (!salvouNoGitHub) {
-            try {
-                resultado = await salvarRadarLocalmente(novoRadar, proximoId);
-                console.log('[Radar X9] ✅ Salvo localmente');
-            } catch (localError) {
-                console.error('[Radar X9] ❌ Falha ao salvar localmente:', localError);
-                throw new Error('Não foi possível salvar o radar. Verifique sua conexão.');
-            }
-        }
-
-        // Adicionar à lista de pendentes para sincronização futura
-        if (!salvouNoGitHub) {
+            resultado = await salvarRadarLocalmente(novoRadar, proximoId);
             RADAR_PENDENTES_SINCRONIZAR.push({
                 radar: novoRadar,
                 id: proximoId,
@@ -3730,9 +2872,9 @@ async function incluirRadar() {
             } catch (e) {}
         }
 
-        animarBotaoRadar('adicionado');
+        animarBotaoRadar(salvouNoGitHub ? 'adicionado' : 'erro');
 
-        // Criar marcador no mapa imediatamente
+        // Criar marcador no mapa imediatamente (em ambos os casos, para feedback visual)
         const novoMarker = criarRadarNoMapa({
             ...novoRadar,
             id: proximoId,
@@ -3742,14 +2884,12 @@ async function incluirRadar() {
             radarMarkers.push(novoMarker);
             if (salvouNoGitHub) {
                 showNotification(`✅ Radar #${proximoId} salvo no GitHub!`);
-            } else {
-                showNotification(`⚠️ Radar #${proximoId} salvo localmente. Sincronize com GitHub depois.`);
             }
             novoMarker.openPopup();
         }
 
         // Fechar modal e limpar formulário
-        fecharModal();
+        if (typeof fecharModal === 'function') fecharModal();
         document.getElementById('radar-type').value = '';
         document.getElementById('radar-address').value = '';
         document.querySelectorAll('.speed-btn').forEach(b => {
@@ -3758,10 +2898,12 @@ async function incluirRadar() {
         });
         document.getElementById('icon-preview-group').style.display = 'none';
 
-        // Recarregar radares do GitHub após 3 segundos (para sincronizar)
-        setTimeout(() => {
-            carregarRadares();
-        }, 3000);
+        // Recarregar radares do GitHub após alguns segundos, só se realmente salvou
+        if (salvouNoGitHub) {
+            setTimeout(() => {
+                carregarRadares();
+            }, 3000);
+        }
 
     } catch (error) {
         animarBotaoRadar('erro');
