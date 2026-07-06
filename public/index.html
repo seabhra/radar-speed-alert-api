@@ -2916,6 +2916,7 @@ async function incluirRadar(currentPosition, fecharModal) {
 }
 
 
+
 // ===================================================================
 // SINCRONIZAR RADARES PENDENTES COM GITHUB
 // ===================================================================
@@ -2954,8 +2955,8 @@ async function sincronizarRadaresPendentes() {
     } catch (e) {}
 
     if (sucessos > 0) {
-        showNotification(`✅ ${sucessos} radar(es) sincronizado(s) com GitHub!`);
-        carregarRadares(); // Recarregar do GitHub
+        showNotification(`✅ ${sucessos} radar(es) sincronizado(s)!`);
+        carregarRadares(); 
     }
     if (falhas > 0) {
         showNotification(`⚠️ ${falhas} radar(es) ainda pendente(s).`);
