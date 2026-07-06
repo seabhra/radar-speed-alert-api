@@ -1048,6 +1048,70 @@
     /* ===================================================================
        RESPONSIVIDADE
     =================================================================== */
+    /* ===================================================================
+       MENU DROPDOWN
+    =================================================================== */
+    .menu-dropdown {
+        animation: menuSlideIn 0.2s ease-out;
+    }
+    @keyframes menuSlideIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .menu-item:hover {
+        background: rgba(0, 255, 136, 0.1);
+    }
+
+    /* ===================================================================
+       MODAL DE CONFIGURAÇÃO GITHUB
+    =================================================================== */
+    .config-github-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .config-github-form label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+    .config-github-form input {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid #333;
+        background: #0f1115;
+        color: #fff;
+        font-size: 0.9rem;
+        font-family: 'Inter', sans-serif;
+    }
+    .config-github-form input:focus {
+        border-color: var(--accent-color);
+        outline: none;
+    }
+    .btn-save-config {
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #00cc66, #00994d);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .btn-save-config:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 204, 102, 0.4);
+    }
+    .config-status {
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        text-align: center;
+    }
+    .config-status.ok { background: rgba(0, 204, 102, 0.15); color: #00cc66; }
+    .config-status.erro { background: rgba(255, 68, 68, 0.15); color: #ff4444; }
+    .config-status.aviso { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+
     @media (max-width: 600px) {
         .btn-add-radar {
             bottom: 20px;
@@ -1081,6 +1145,7 @@
         }
     }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -1104,6 +1169,25 @@
       <div class="menu-label">MENU</div>
     </button>
   </header>
+
+  <!-- MENU DROPDOWN -->
+  <div class="menu-dropdown" id="menu-dropdown" style="display:none;position:absolute;top:70px;right:15px;background:#1a1d24;border:1px solid #333;border-radius:12px;z-index:2000;padding:10px;min-width:200px;box-shadow:0 10px 40px rgba(0,0,0,0.8);">
+    <div style="font-size:0.9rem;font-weight:700;color:var(--accent-color);padding:8px 12px;border-bottom:1px solid #333;margin-bottom:8px;">
+      ⚙️ Configurações
+    </div>
+    <button class="menu-item" id="menu-config-github" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:#fff;cursor:pointer;border-radius:8px;transition:all 0.2s;">
+      <span style="font-size:1.2rem;">🔑</span> Configurar GitHub
+    </button>
+    <button class="menu-item" id="menu-sync-pendentes" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:#fff;cursor:pointer;border-radius:8px;transition:all 0.2s;">
+      <span style="font-size:1.2rem;">🔄</span> Sincronizar Pendentes
+    </button>
+    <button class="menu-item" id="menu-status-github" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:#fff;cursor:pointer;border-radius:8px;transition:all 0.2s;">
+      <span style="font-size:1.2rem;">📡</span> Status: <span id="status-github-text">Verificando...</span>
+    </button>
+    <div style="border-top:1px solid #333;margin:8px 0;padding-top:8px;font-size:0.75rem;color:#888;padding:8px 12px;">
+      Radar X9 v2.0
+    </div>
+  </div>
 
   <div class="map-wrapper">
 
@@ -1181,6 +1265,34 @@
   </button>
 
 
+
+    <!-- MODAL DE CONFIGURAÇÃO GITHUB -->
+    <div class="modal-overlay" id="modal-config-github">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🔑 Configurar GitHub</h2>
+          <button class="modal-close" id="modal-config-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="config-status" id="config-status-msg">
+            Configure seu token do GitHub para sincronização em nuvem.
+          </div>
+          <div class="config-github-form" style="margin-top:16px;">
+            <label>Token de Acesso Pessoal (PAT)</label>
+            <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+            <label>Usuário/Organização</label>
+            <input type="text" id="github-owner" placeholder="seabhra" value="seabhra">
+            <label>Repositório</label>
+            <input type="text" id="github-repo" placeholder="radar-speed-alert-api" value="radar-speed-alert-api">
+            <label>Caminho do arquivo</label>
+            <input type="text" id="github-path" placeholder="radares.json" value="radares.json">
+            <label>URL do Proxy CORS (opcional)</label>
+            <input type="text" id="github-proxy" placeholder="https://seu-proxy.vercel.app/api">
+            <button class="btn-save-config" id="btn-save-github-config">💾 Salvar Configuração</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- MODAL DE INCLUSÃO DE RADAR -->
     <div class="modal-overlay" id="modal-add-radar">
@@ -1347,33 +1459,76 @@ let GITHUB_CONFIG = {
     owner: 'seabhra',
     repo: 'radar-speed-alert-api',
     path: 'radares.json',
-    token: ''
+    token: '',
+    // URL do proxy CORS para escrita (substitua pelo seu proxy)
+    proxyUrl: '',
+    // URL base do raw GitHub para leitura via CDN
+    get cdnUrl() {
+        return `https://cdn.jsdelivr.net/gh/${this.owner}/${this.repo}@main/${this.path}`;
+    },
+    get rawUrl() {
+        return `https://raw.githubusercontent.com/${this.owner}/${this.repo}/main/${this.path}`;
+    }
 };
+
+// Flag para controle de modo offline
+let RADAR_MODO_OFFLINE = false;
+let RADAR_PENDENTES_SINCRONIZAR = [];
 
 async function carregarConfigGitHub() {
     console.log('[Radar X9] 🔄 Carregando configuração...');
 
+    // Tentar carregar de /api/config (backend local)
     try {
         const response = await fetch('/api/config');
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+        if (response.ok) {
+            const config = await response.json();
+            Object.assign(GITHUB_CONFIG, {
+                owner: config.githubOwner || GITHUB_CONFIG.owner,
+                repo: config.githubRepo || GITHUB_CONFIG.repo,
+                path: config.githubPath || GITHUB_CONFIG.path,
+                token: config.githubToken || '',
+                proxyUrl: config.proxyUrl || ''
+            });
+            console.log('[Radar X9] ✅ Configuração carregada do backend.');
+            return true;
         }
-
-        const config = await response.json();
-
-        Object.assign(GITHUB_CONFIG, {
-            owner: config.githubOwner || GITHUB_CONFIG.owner,
-            repo: config.githubRepo || GITHUB_CONFIG.repo,
-            path: config.githubPath || GITHUB_CONFIG.path,
-            token: config.githubToken || ''
-        });
-
-        console.log('[Radar X9] ✅ Configuração carregada.');
-        return true;
-
     } catch (err) {
-        console.warn('[Radar X9] API indisponível. Usando valores padrão.');
+        console.warn('[Radar X9] Backend não disponível.');
+    }
+
+    // Tentar carregar de localStorage (configuração salva pelo usuário)
+    try {
+        const savedConfig = localStorage.getItem('radarx9_github_config');
+        if (savedConfig) {
+            const config = JSON.parse(savedConfig);
+            Object.assign(GITHUB_CONFIG, {
+                owner: config.owner || GITHUB_CONFIG.owner,
+                repo: config.repo || GITHUB_CONFIG.repo,
+                path: config.path || GITHUB_CONFIG.path,
+                token: config.token || '',
+                proxyUrl: config.proxyUrl || ''
+            });
+            console.log('[Radar X9] ✅ Configuração carregada do localStorage.');
+            return true;
+        }
+    } catch (err) {
+        console.warn('[Radar X9] localStorage não disponível.');
+    }
+
+    console.log('[Radar X9] ⚠️ Usando valores padrão. Configure o GitHub no menu.');
+    return false;
+}
+
+// Salvar configuração no localStorage
+function salvarConfigGitHub(config) {
+    try {
+        localStorage.setItem('radarx9_github_config', JSON.stringify(config));
+        Object.assign(GITHUB_CONFIG, config);
+        console.log('[Radar X9] ✅ Configuração salva.');
+        return true;
+    } catch (err) {
+        console.error('[Radar X9] Erro ao salvar config:', err);
         return false;
     }
 }
@@ -2950,6 +3105,135 @@ function inicializarMenuToggle() {
     });
 }
 
+function inicializarMenuToggle() {
+    var btnMenu = document.getElementById('btn-menu-toggle');
+    var sidebar = document.getElementById('sidebar-controls');
+    var menuDropdown = document.getElementById('menu-dropdown');
+
+    btnMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+
+        // Toggle do menu dropdown
+        if (menuDropdown) {
+            var isVisible = menuDropdown.style.display === 'block';
+            menuDropdown.style.display = isVisible ? 'none' : 'block';
+            btnMenu.classList.toggle('active', !isVisible);
+
+            // Atualizar status do GitHub
+            if (!isVisible) {
+                atualizarStatusGitHub();
+            }
+        }
+
+        // Também controla a sidebar
+        sidebarAberta = !sidebarAberta;
+        if (sidebarAberta) {
+            sidebar.classList.remove('retracted');
+        } else {
+            sidebar.classList.add('retracted');
+            if (searchActive || routeActive) {
+                searchActive = false;
+                routeActive = false;
+                document.getElementById('search-bar-radares').classList.remove('active');
+                document.getElementById('search-bar-rota').classList.remove('active');
+                ajustarBussolaParaBusca(false);
+            }
+        }
+    });
+
+    // Fechar menu ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (menuDropdown && !menuDropdown.contains(e.target) && e.target !== btnMenu && !btnMenu.contains(e.target)) {
+            menuDropdown.style.display = 'none';
+            btnMenu.classList.remove('active');
+        }
+    });
+
+    // Configurar GitHub
+    var btnConfigGithub = document.getElementById('menu-config-github');
+    if (btnConfigGithub) {
+        btnConfigGithub.addEventListener('click', function() {
+            abrirModalConfigGithub();
+            menuDropdown.style.display = 'none';
+        });
+    }
+
+    // Sincronizar pendentes
+    var btnSyncPendentes = document.getElementById('menu-sync-pendentes');
+    if (btnSyncPendentes) {
+        btnSyncPendentes.addEventListener('click', function() {
+            sincronizarRadaresPendentes();
+            menuDropdown.style.display = 'none';
+        });
+    }
+}
+
+function atualizarStatusGitHub() {
+    var statusText = document.getElementById('status-github-text');
+    if (!statusText) return;
+
+    if (RADAR_MODO_OFFLINE) {
+        statusText.textContent = 'Offline';
+        statusText.style.color = '#ff4444';
+    } else if (GITHUB_CONFIG.token) {
+        statusText.textContent = 'Conectado';
+        statusText.style.color = '#00cc66';
+    } else {
+        statusText.textContent = 'Não configurado';
+        statusText.style.color = '#ffc107';
+    }
+}
+
+function abrirModalConfigGithub() {
+    var modal = document.getElementById('modal-config-github');
+    if (!modal) return;
+
+    // Preencher campos com valores atuais
+    document.getElementById('github-token').value = GITHUB_CONFIG.token || '';
+    document.getElementById('github-owner').value = GITHUB_CONFIG.owner || 'seabhra';
+    document.getElementById('github-repo').value = GITHUB_CONFIG.repo || 'radar-speed-alert-api';
+    document.getElementById('github-path').value = GITHUB_CONFIG.path || 'radares.json';
+    document.getElementById('github-proxy').value = GITHUB_CONFIG.proxyUrl || '';
+
+    modal.classList.add('active');
+
+    // Fechar modal
+    document.getElementById('modal-config-close').addEventListener('click', function() {
+        modal.classList.remove('active');
+    });
+
+    // Salvar configuração
+    document.getElementById('btn-save-github-config').addEventListener('click', function() {
+        var config = {
+            token: document.getElementById('github-token').value.trim(),
+            owner: document.getElementById('github-owner').value.trim() || 'seabhra',
+            repo: document.getElementById('github-repo').value.trim() || 'radar-speed-alert-api',
+            path: document.getElementById('github-path').value.trim() || 'radares.json',
+            proxyUrl: document.getElementById('github-proxy').value.trim()
+        };
+
+        if (!config.token) {
+            document.getElementById('config-status-msg').textContent = '❌ Token é obrigatório!';
+            document.getElementById('config-status-msg').className = 'config-status erro';
+            return;
+        }
+
+        salvarConfigGitHub(config);
+        document.getElementById('config-status-msg').textContent = '✅ Configuração salva com sucesso!';
+        document.getElementById('config-status-msg').className = 'config-status ok';
+
+        setTimeout(function() {
+            modal.classList.remove('active');
+            carregarRadares(); // Recarregar do GitHub
+        }, 1500);
+    });
+
+    // Fechar ao clicar fora
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.classList.remove('active');
+    });
+}
+
 // ===================================================================
 // INICIALIZAR BOTÃO ROTAÇÃO
 // ===================================================================
@@ -3236,16 +3520,32 @@ async function salvarRadarNoGitHub(novoRadar, proximoId) {
     try {
         console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
 
+        // Verificar se tem token configurado
         if (!GITHUB_CONFIG.token) {
-            throw new Error('Token do GitHub não configurado. Verifique o arquivo .env ou use o modo local.');
+            throw new Error('Token do GitHub não configurado. Configure no menu ou use o modo local.');
         }
 
         const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-        const getResponse = await fetch(`${url}?ref=main`, {
-            headers: {
-                Authorization: `token ${GITHUB_CONFIG.token}`,
-                Accept: 'application/vnd.github.v3+json'
-            }
+
+        // Tentar usar proxy CORS se configurado
+        let apiUrl = url;
+        let useProxy = false;
+        if (GITHUB_CONFIG.proxyUrl) {
+            apiUrl = GITHUB_CONFIG.proxyUrl + '/github';
+            useProxy = true;
+        }
+
+        // Buscar arquivo atual
+        const getHeaders = {
+            'Accept': 'application/vnd.github.v3+json'
+        };
+        if (!useProxy) {
+            getHeaders['Authorization'] = `token ${GITHUB_CONFIG.token}`;
+        }
+
+        const getResponse = await fetch(useProxy ? apiUrl + '?path=' + encodeURIComponent(GITHUB_CONFIG.path) : `${url}?ref=main`, {
+            method: 'GET',
+            headers: getHeaders
         });
 
         if (!getResponse.ok) {
@@ -3256,7 +3556,7 @@ async function salvarRadarNoGitHub(novoRadar, proximoId) {
         let jsonData;
 
         try {
-            const content = atob(data.content);
+            const content = atob(data.content.replace(/\s/g, ''));
             jsonData = JSON.parse(content);
         } catch (e) {
             throw new Error('Erro ao parsear o conteúdo do arquivo radares.json');
@@ -3282,20 +3582,42 @@ async function salvarRadarNoGitHub(novoRadar, proximoId) {
 
         jsonData.records.push(novoRegistro);
 
-        const updateResponse = await fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `token ${GITHUB_CONFIG.token}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
-                content: btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2)))),
-                sha: data.sha,
-                branch: 'main'
-            })
-        });
+        // Preparar conteúdo atualizado
+        const updatedContent = btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2))));
+
+        // Tentar salvar via proxy ou direto
+        let updateResponse;
+        if (useProxy) {
+            updateResponse = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    path: GITHUB_CONFIG.path,
+                    message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
+                    content: updatedContent,
+                    sha: data.sha,
+                    branch: 'main',
+                    token: GITHUB_CONFIG.token
+                })
+            });
+        } else {
+            updateResponse = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
+                    content: updatedContent,
+                    sha: data.sha,
+                    branch: 'main'
+                })
+            });
+        }
 
         if (!updateResponse.ok) {
             const erro = await updateResponse.text();
@@ -3303,10 +3625,17 @@ async function salvarRadarNoGitHub(novoRadar, proximoId) {
         }
 
         console.log('[Radar X9] ✅ Radar salvo no GitHub! ID:', proximoId);
+        RADAR_MODO_OFFLINE = false;
         return { success: true, id: proximoId };
 
     } catch (error) {
         console.error('[Radar X9] ❌ Erro ao salvar no GitHub:', error);
+        // Se falhou por CORS ou auth, marcar como offline
+        if (error.message.includes('CORS') || error.message.includes('Failed to fetch') || 
+            error.message.includes('NetworkError') || error.message.includes('401') ||
+            error.message.includes('403')) {
+            RADAR_MODO_OFFLINE = true;
+        }
         throw error;
     }
 }
@@ -3363,15 +3692,47 @@ async function incluirRadar() {
             proximoId = Math.max(...idsExistentes) + 1;
         }
 
-        let resultado;
+        let resultado = null;
+        let salvouNoGitHub = false;
+
+        // TENTATIVA 1: Salvar no GitHub (se configurado)
         if (GITHUB_CONFIG.token) {
-            resultado = await salvarRadarNoGitHub(novoRadar, proximoId);
-        } else {
-            resultado = await salvarRadarLocalmente(novoRadar, proximoId);
+            try {
+                resultado = await salvarRadarNoGitHub(novoRadar, proximoId);
+                salvouNoGitHub = true;
+                console.log('[Radar X9] ✅ Salvo no GitHub');
+            } catch (githubError) {
+                console.warn('[Radar X9] ⚠️ Falha ao salvar no GitHub:', githubError.message);
+                // Continuar para fallback
+            }
+        }
+
+        // TENTATIVA 2: Salvar localmente (se GitHub falhou ou não configurado)
+        if (!salvouNoGitHub) {
+            try {
+                resultado = await salvarRadarLocalmente(novoRadar, proximoId);
+                console.log('[Radar X9] ✅ Salvo localmente');
+            } catch (localError) {
+                console.error('[Radar X9] ❌ Falha ao salvar localmente:', localError);
+                throw new Error('Não foi possível salvar o radar. Verifique sua conexão.');
+            }
+        }
+
+        // Adicionar à lista de pendentes para sincronização futura
+        if (!salvouNoGitHub) {
+            RADAR_PENDENTES_SINCRONIZAR.push({
+                radar: novoRadar,
+                id: proximoId,
+                timestamp: Date.now()
+            });
+            try {
+                localStorage.setItem('radarx9_pendentes', JSON.stringify(RADAR_PENDENTES_SINCRONIZAR));
+            } catch (e) {}
         }
 
         animarBotaoRadar('adicionado');
 
+        // Criar marcador no mapa imediatamente
         const novoMarker = criarRadarNoMapa({
             ...novoRadar,
             id: proximoId,
@@ -3379,12 +3740,15 @@ async function incluirRadar() {
         });
         if (novoMarker) {
             radarMarkers.push(novoMarker);
-            showNotification(`✅ Radar #${proximoId} incluído com sucesso!`);
+            if (salvouNoGitHub) {
+                showNotification(`✅ Radar #${proximoId} salvo no GitHub!`);
+            } else {
+                showNotification(`⚠️ Radar #${proximoId} salvo localmente. Sincronize com GitHub depois.`);
+            }
             novoMarker.openPopup();
-        } else {
-            showNotification(`✅ Radar #${proximoId} salvo, mas não pôde ser exibido no mapa.`);
         }
 
+        // Fechar modal e limpar formulário
         fecharModal();
         document.getElementById('radar-type').value = '';
         document.getElementById('radar-address').value = '';
@@ -3394,9 +3758,10 @@ async function incluirRadar() {
         });
         document.getElementById('icon-preview-group').style.display = 'none';
 
+        // Recarregar radares do GitHub após 3 segundos (para sincronizar)
         setTimeout(() => {
             carregarRadares();
-        }, 2000);
+        }, 3000);
 
     } catch (error) {
         animarBotaoRadar('erro');
@@ -3408,6 +3773,68 @@ async function incluirRadar() {
     }
 }
 
+
+// ===================================================================
+// SINCRONIZAR RADARES PENDENTES COM GITHUB
+// ===================================================================
+async function sincronizarRadaresPendentes() {
+    if (RADAR_PENDENTES_SINCRONIZAR.length === 0) {
+        showNotification('✅ Nenhum radar pendente de sincronização.');
+        return;
+    }
+
+    if (!GITHUB_CONFIG.token) {
+        showNotification('❌ Configure o token do GitHub primeiro.');
+        return;
+    }
+
+    showNotification(`🔄 Sincronizando ${RADAR_PENDENTES_SINCRONIZAR.length} radares pendentes...`);
+
+    let sucessos = 0;
+    let falhas = 0;
+    const aindaPendentes = [];
+
+    for (const pendente of RADAR_PENDENTES_SINCRONIZAR) {
+        try {
+            await salvarRadarNoGitHub(pendente.radar, pendente.id);
+            sucessos++;
+            console.log(`[Radar X9] ✅ Radar #${pendente.id} sincronizado.`);
+        } catch (error) {
+            falhas++;
+            aindaPendentes.push(pendente);
+            console.warn(`[Radar X9] ❌ Radar #${pendente.id} ainda pendente:`, error.message);
+        }
+    }
+
+    RADAR_PENDENTES_SINCRONIZAR = aindaPendentes;
+    try {
+        localStorage.setItem('radarx9_pendentes', JSON.stringify(RADAR_PENDENTES_SINCRONIZAR));
+    } catch (e) {}
+
+    if (sucessos > 0) {
+        showNotification(`✅ ${sucessos} radar(es) sincronizado(s) com GitHub!`);
+        carregarRadares(); // Recarregar do GitHub
+    }
+    if (falhas > 0) {
+        showNotification(`⚠️ ${falhas} radar(es) ainda pendente(s).`);
+    }
+}
+
+// ===================================================================
+// CARREGAR RADARES PENDENTES DO LOCALSTORAGE AO INICIAR
+// ===================================================================
+function carregarRadaresPendentes() {
+    try {
+        const pendentes = localStorage.getItem('radarx9_pendentes');
+        if (pendentes) {
+            RADAR_PENDENTES_SINCRONIZAR = JSON.parse(pendentes);
+            console.log('[Radar X9] 📦 Radares pendentes carregados:', RADAR_PENDENTES_SINCRONIZAR.length);
+        }
+    } catch (e) {
+        console.warn('[Radar X9] Erro ao carregar pendentes:', e);
+    }
+}
+
 // ===================================================================
 // CARREGAR RADARES
 // ===================================================================
@@ -3415,16 +3842,101 @@ async function carregarRadares() {
     if (!map) return;
     if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
     $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas...</div>");
+
+    let records = [];
+    let fonte = '';
+
+    // ESTRATÉGIA 1: Tentar carregar do GitHub via CDN (jsdelivr)
     try {
-        var response = await fetch('radares.json?v=' + Date.now());
-        if (!response.ok) throw new Error("Arquivo não encontrado (HTTP " + response.status + ")");
-        var data = await response.json();
-        var records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-        if (records.length > 0) renderizarRadaresNoMapa(records, "radares.json");
-        else throw new Error("Nenhum radar encontrado no JSON");
+        console.log('[Radar X9] 🔄 Tentando carregar do GitHub via CDN...');
+        const cdnResponse = await fetch(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        });
+        if (cdnResponse.ok) {
+            const data = await cdnResponse.json();
+            records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+            if (records.length > 0) {
+                fonte = 'GitHub (CDN)';
+                RADAR_MODO_OFFLINE = false;
+                console.log('[Radar X9] ✅ Radares carregados do GitHub via CDN:', records.length);
+            }
+        }
     } catch (e) {
-        console.warn("[Radar X9] Falha ao carregar radares.json:", e.message);
-        $("#loading").hide(); showNotification("Erro ao carregar radares: " + e.message);
+        console.warn('[Radar X9] CDN falhou:', e.message);
+    }
+
+    // ESTRATÉGIA 2: Tentar carregar do raw.githubusercontent.com
+    if (records.length === 0) {
+        try {
+            console.log('[Radar X9] 🔄 Tentando carregar do raw GitHub...');
+            const rawResponse = await fetch(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            });
+            if (rawResponse.ok) {
+                const data = await rawResponse.json();
+                records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+                if (records.length > 0) {
+                    fonte = 'GitHub (Raw)';
+                    RADAR_MODO_OFFLINE = false;
+                    console.log('[Radar X9] ✅ Radares carregados do raw GitHub:', records.length);
+                }
+            }
+        } catch (e) {
+            console.warn('[Radar X9] Raw GitHub falhou:', e.message);
+        }
+    }
+
+    // ESTRATÉGIA 3: Tentar carregar do arquivo local
+    if (records.length === 0) {
+        try {
+            console.log('[Radar X9] 🔄 Tentando carregar arquivo local...');
+            var response = await fetch('radares.json?v=' + Date.now());
+            if (response.ok) {
+                var data = await response.json();
+                records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+                if (records.length > 0) {
+                    fonte = 'Local';
+                    RADAR_MODO_OFFLINE = true;
+                    console.log('[Radar X9] ✅ Radares carregados do arquivo local:', records.length);
+                }
+            }
+        } catch (e) {
+            console.warn('[Radar X9] Arquivo local falhou:', e.message);
+        }
+    }
+
+    // ESTRATÉGIA 4: Tentar carregar do localStorage (cache)
+    if (records.length === 0) {
+        try {
+            console.log('[Radar X9] 🔄 Tentando carregar do cache local...');
+            const cached = localStorage.getItem('radarx9_radares_cache');
+            if (cached) {
+                const data = JSON.parse(cached);
+                records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+                if (records.length > 0) {
+                    fonte = 'Cache Local';
+                    RADAR_MODO_OFFLINE = true;
+                    console.log('[Radar X9] ✅ Radares carregados do cache:', records.length);
+                }
+            }
+        } catch (e) {
+            console.warn('[Radar X9] Cache falhou:', e.message);
+        }
+    }
+
+    // Renderizar radares
+    if (records.length > 0) {
+        renderizarRadaresNoMapa(records, fonte);
+        // Salvar no cache local
+        try {
+            localStorage.setItem('radarx9_radares_cache', JSON.stringify({ records: records }));
+        } catch (e) {}
+    } else {
+        $("#loading").hide();
+        showNotification("⚠️ Nenhum radar encontrado. Verifique a conexão ou configure o GitHub.");
+        RADAR_MODO_OFFLINE = true;
     }
 }
 
