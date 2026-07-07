@@ -310,9 +310,30 @@
     .icon-preview { display: flex; align-items: center; background: #0f1115; padding: 12px 16px; border-radius: 12px; border: 1px solid #333; }
     .icon-preview img { width: 40px; height: 40px; object-fit: contain; }
     .icon-preview span { font-size: 0.95rem; color: var(--text-main); }
-    .current-position { background: #0f1115; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between; margin-bottom: 4px; }
+   
+     /* BOTÃO CAPTURAR POSIÇÃO */
+    .btn-capture-location {
+        width: 100%; padding: 14px 16px; border-radius: 12px;
+        border: 2px dashed rgba(0, 255, 136, 0.4);
+        background: rgba(0, 255, 136, 0.05);
+        color: var(--accent-color); font-size: 1rem; font-weight: 700;
+        cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif;
+        margin-bottom: 4px; text-align: center;
+    }
+    .btn-capture-location:hover { background: rgba(0, 255, 136, 0.15); border-style: solid; }
+    .btn-capture-location:active { transform: scale(0.98); }
+    .btn-capture-location.captured {
+        border-style: solid; border-color: var(--accent-color);
+        background: rgba(0, 255, 136, 0.12); color: var(--text-main);
+    }
+    .current-position { background: #0f1115; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; color: var(--text-muted); display: none; justify-content: space-between; margin-bottom: 4px; }
     .current-position span { font-family: 'Courier New', monospace; color: var(--accent-color); }
-    .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-style: italic; }
+    .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-style: italic; text-align: center; }
+
+
+ 
+     /* BOTÃO INSERIR RADAR */
+
     .btn-submit-radar {
         width: 100%; padding: 14px; border: none; border-radius: 14px;
         background: linear-gradient(135deg, #00cc66, #00994d); color: white; font-size: 1.1rem;
@@ -323,6 +344,10 @@
     .btn-submit-radar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .status-loading { color: var(--accent-color); font-size: 0.85rem; animation: pulseText 1.5s ease-in-out infinite; }
     .menu-dropdown { animation: menuSlideIn 0.2s ease-out; }
+   
+   
+   
+   
     @keyframes menuSlideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     .menu-item:hover { background: rgba(0, 255, 136, 0.1); }
     .config-github-form { display: flex; flex-direction: column; gap: 12px; }
@@ -366,7 +391,7 @@
     <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
           </div>
       </div>
-      
+
     <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
       <div class="menu-hamburger">
         <span></span>
@@ -525,15 +550,21 @@
             <input type="text" id="radar-address" class="form-input" placeholder="Buscando endereço automaticamente...">
           </div>
 
-          <!-- Posição atual -->
+          <!-- BOTÃO DE CAPTURA DE POSIÇÃO -->
           <div class="form-group">
-            <label>📍 Posição Atual</label>
+            <label>Localização do Radar</label>
+            <button type="button" class="btn-capture-location" id="btn-capture-location">
+              📍 Capturar Posição Atual
+            </button>
             <div class="current-position" id="current-position">
-              <span id="pos-lat">🔄 Buscando GPS...</span>
+              <span id="pos-lat"></span>
               <span id="pos-lng"></span>
             </div>
-            <div class="current-position-status" id="pos-status">Aguardando coordenadas...</div>
+            <div class="current-position-status" id="pos-status">Clique acima para inserir as coordenadas.</div>
           </div>
+
+
+         
 
           <!-- Botão de Inclusão - AÇÃO DIRETA, SEM CONFIRMAÇÃO ADICIONAL -->
           <button class="btn-submit-radar" id="btn-submit-radar">
@@ -2183,7 +2214,7 @@ function criarRadarNoMapa(radarData) {
     
 
 // ===================================================================
-// INICIALIZAÇÃO DO MAPA
+// INICIALIZAÇÃO DO MAPA E CONTROLES
 // ===================================================================
 async function initMap() {
     console.log('[Radar X9] 🚀 Inicializando aplicação...');
@@ -2294,6 +2325,59 @@ async function initMap() {
     
     console.log('[Radar X9] ✅ Aplicação inicializada com sucesso!');
 }
+
+// ===================================================================
+// MODAL ADICIONAR RADAR E CAPTURA DE POSIÇÃO
+// ===================================================================
+function openAddRadarModal() {
+    document.getElementById('modal-add-radar').classList.add('active');
+    selectedSpeed=''; selectedType=''; radarLat=null; radarLng=null; // Reseta coordenadas
+    document.getElementById('radar-type').value='';
+    document.getElementById('radar-address').value='';
+    document.getElementById('icon-preview-group').style.display='none';
+    document.querySelectorAll('.speed-btn').forEach(b=>b.className='speed-btn');
+    
+    // Reseta o visual do botão de captura
+    const btnCap = document.getElementById('btn-capture-location');
+    btnCap.textContent = '📍 Capturar Posição Atual';
+    btnCap.classList.remove('captured');
+    document.getElementById('current-position').style.display = 'none';
+    document.getElementById('pos-status').textContent = 'Clique acima para inserir as coordenadas.';
+}
+function capturarPosicaoRadar() {
+    if (!gpsInitialized) { showToast('Aguardando sinal GPS...'); return; }
+        // Captura a posição exata do momento do clique
+    radarLat = userLat;
+    radarLng = userLng;
+    // Atualiza a UI
+    const btnCap = document.getElementById('btn-capture-location');
+    btnCap.textContent = '✅ Posição Capturada!';
+    btnCap.classList.add('captured');
+    const posDiv = document.getElementById('current-position');
+    posDiv.style.display = 'flex';
+    document.getElementById('pos-lat').textContent = radarLat.toFixed(6);
+    document.getElementById('pos-lng').textContent = radarLng.toFixed(6);
+    document.getElementById('pos-status').textContent = 'Precisão: ' + Math.round(gpsAccuracyAtual || 0) + 'm';
+
+    // Busca endereço automaticamente ao capturar
+    document.getElementById('radar-address').value = 'Buscando endereço...';
+    obterEndereco(radarLat, radarLng).then(end => {
+        document.getElementById('radar-address').value = end || 'Endereço não encontrado';
+    });
+}
+
+function closeAddRadarModal() { document.getElementById('modal-add-radar').classList.remove('active'); }
+
+function submitRadar() {
+    if(!selectedType) { showToast('Selecione o tipo de radar'); return; }
+    if(radarLat === null || radarLng === null) { showToast('Captura a posição do radar primeiro!'); return; }
+    
+    const dados = { tipo:selectedType, velocidade:selectedSpeed||'0', endereco:document.getElementById('radar-address').value||'', lat:radarLat, lng:radarLng, sentido:'Não informado', sentidoFiscalizado:'Não informado' };
+    const btn=document.getElementById('btn-submit-radar'); btn.disabled=true; btn.textContent='⏳ Enviando...';
+    enviarRadarParaGitHub(dados).then(ok=>{ btn.disabled=false; btn.textContent='✅ Incluir Radar'; if(ok!==false) closeAddRadarModal(); }).catch(()=>{ btn.disabled=false; btn.textContent='✅ Incluir Radar'; });
+}
+
+
 
 // ===================================================================
 // MENU TOGGLE
@@ -3270,6 +3354,48 @@ setInterval(pollAppInventor, 500);
 // INICIALIZAÇÃO
 // ===================================================================
 window.onload = initMap;
+
+document.addEventListener('DOMContentLoaded', async function() {
+    await carregarConfigGitHub(); carregarPendentesLocal(); initMap(); iniciarBussolaHardware();
+    setTimeout(()=>{ const l=document.getElementById('loading-fullscreen'); if(l){l.classList.add('fade-out');setTimeout(()=>{if(l)l.style.display='none';},600);} }, 1500);
+
+    // Event Listeners
+    document.getElementById('btn-menu-toggle').addEventListener('click', toggleSidebar);
+    document.getElementById('btn-rotate-map').addEventListener('click', toggleMapRotation);
+    document.getElementById('btn-alert-toggle').addEventListener('click', function() {
+        alertaHabilitado=!alertaHabilitado; const b=document.getElementById('btn-alert-toggle'), i=document.getElementById('alert-toggle-icon');
+        if(alertaHabilitado){b.classList.remove('alert-off');i.src='/imagens_app/ic_sound_on.png';showToast('Alertas ON');}else{b.classList.add('alert-off');i.src='/imagens_app/ic_sound_off.png';hideAlert();showToast('Alertas OFF');}
+    });
+    document.getElementById('btn-search-bar').addEventListener('click', toggleSearchBar);
+    document.getElementById('btn-route-bar').addEventListener('click', toggleRouteBar);
+    document.getElementById('btn-center').addEventListener('click', function() { isFollowing=true; if(gpsInitialized) centralizarMapa(userLat,userLng); });
+    document.getElementById('btn-refresh').addEventListener('click', function() { carregarTodosRadares(); resetMap(); });
+    document.getElementById('btn-zoom-in').addEventListener('click', ()=>map.zoomIn());
+    document.getElementById('btn-zoom-out').addEventListener('click', ()=>map.zoomOut());
+    document.getElementById('btn-search-radar').addEventListener('click', ()=>buscarRadares(document.getElementById('query').value));
+    document.getElementById('query').addEventListener('keypress', function(e) { if(e.key==='Enter') buscarRadares(this.value); });
+    document.getElementById('btn-calc-route').addEventListener('click', ()=>calcularRota(document.getElementById('route-query').value));
+    document.getElementById('route-query').addEventListener('keypress', function(e) { if(e.key==='Enter') calcularRota(this.value); });
+    
+    document.getElementById('btn-add-radar').addEventListener('click', openAddRadarModal);
+    document.getElementById('modal-close').addEventListener('click', closeAddRadarModal);
+    document.getElementById('btn-submit-radar').addEventListener('click', submitRadar);
+    
+    // OUVINTE DO BOTÃO DE CAPTURA DE POSIÇÃO
+    document.getElementById('btn-capture-location').addEventListener('click', capturarPosicaoRadar);
+    document.getElementById('radar-type').addEventListener('change', function() {
+        selectedType=this.value; document.getElementById('icon-preview-img').src=getIconForRadar(selectedType);
+        document.getElementById('icon-preview-name').textContent=ajustarNome(selectedType); document.getElementById('icon-preview-group').style.display='flex';
+    });
+    document.querySelectorAll('.speed-btn').forEach(btn=>btn.addEventListener('click', function() {
+        document.querySelectorAll('.speed-btn').forEach(b=>b.className='speed-btn');
+        selectedSpeed=this.getAttribute('data-speed'); this.classList.add('selected','selected-'+selectedSpeed);
+    }));
+    document.getElementById('modal-config-close').addEventListener('click', ()=>document.getElementById('modal-config-github').classList.remove('active'));
+    document.getElementById('btn-save-github-config').addEventListener('click', saveConfigFromModal);
+    document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click', function(e) { if(e.target===this) this.classList.remove('active'); }));
+    map.on('dragstart', ()=>isFollowing=false);
+});
 
 
 </script>
