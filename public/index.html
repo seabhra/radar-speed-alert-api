@@ -2362,14 +2362,14 @@ async function initMap() {
 // MODAL ADICIONAR RADAR E CAPTURA DE POSIÇÃO
 // ===================================================================
 function openAddRadarModal() {
-        document.getElementById('modal-add-radar').classList.add('active');
+    document.getElementById('modal-add-radar').classList.add('active');
     selectedSpeed=''; selectedType=''; radarLat=null; radarLng=null; 
     document.getElementById('radar-type').value='';
     document.getElementById('radar-address').value='';
     document.getElementById('icon-preview-group').style.display='none';
     document.querySelectorAll('.speed-btn').forEach(b=>b.className='speed-btn');
     
-    // Reset do botão e lacunas de captura
+     // Reset do botão e lacunas de captura
     const btnCap = document.getElementById('btn-capture-location');
     btnCap.textContent = '📍 Capturar Posição Atual';
     btnCap.classList.remove('captured');
@@ -2381,24 +2381,31 @@ function openAddRadarModal() {
 }
 
 function capturarPosicaoRadar() {
-    if (!gpsInitialized) { showToast('Aguardando sinal GPS...'); return; }
+    if (!gpsInitialized) { 
+        showToast('Aguardando sinal GPS...'); 
+        return; 
+    }
     
     // Captura a posição exata do momento do clique
     radarLat = userLat;
     radarLng = userLng;
 
-    // Atualiza a UI - Mostra o container e preenche os inputs
+    // 1. Mostra o container das lacunas (muda de none para flex)
     document.getElementById('coords-inputs-container').style.display = 'flex';
+    
+    // 2. Preenche os valores dentro dos inputs (usa .value e não .textContent)
     document.getElementById('pos-lat').value = radarLat.toFixed(6);
     document.getElementById('pos-lng').value = radarLng.toFixed(6);
+    
+    // 3. Atualiza o status de precisão
     document.getElementById('pos-status').textContent = 'Precisão: ' + Math.round(gpsAccuracyAtual || 0) + 'm';
 
-    // Muda o visual do botão para "Capturado"
+    // 4. Muda o visual do botão para "Capturado"
     const btnCap = document.getElementById('btn-capture-location');
     btnCap.textContent = '✅ Posição Capturada!';
     btnCap.classList.add('captured');
 
-    // Busca endereço automaticamente ao capturar
+    // 5. Busca endereço automaticamente
     document.getElementById('radar-address').value = 'Buscando endereço...';
     obterEndereco(radarLat, radarLng).then(end => {
         document.getElementById('radar-address').value = end || 'Endereço não encontrado';
