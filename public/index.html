@@ -328,22 +328,7 @@
 
   <!-- MENU DROPDOWN -->
   <div class="menu-dropdown" id="menu-dropdown" style="display:none;position:absolute;top:70px;right:15px;background:#1a1d24;border:1px solid #333;border-radius:12px;z-index:2000;padding:10px;min-width:200px;box-shadow:0 10px 40px rgba(0,0,0,0.8);">
-    <div style="font-size:0.9rem;font-weight:700;color:var(--accent-color);padding:8px 12px;border-bottom:1px solid #333;margin-bottom:8px;">
-      ⚙️ Configurações
-    </div>
-    <button class="menu-item" id="menu-config-github" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:#fff;cursor:pointer;border-radius:8px;transition:all 0.2s;">
-      <span style="font-size:1.2rem;">🔑</span> Configurar GitHub
-    </button>
-    <button class="menu-item" id="menu-sync-pendentes" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:#fff;cursor:pointer;border-radius:8px;transition:all 0.2s;">
-      <span style="font-size:1.2rem;">🔄</span> Sincronizar Pendentes
-    </button>
-    <button class="menu-item" id="menu-status-github" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:#fff;cursor:pointer;border-radius:8px;transition:all 0.2s;">
-      <span style="font-size:1.2rem;">📡</span> Status: <span id="status-github-text">Verificando...</span>
-    </button>
-    <div style="border-top:1px solid #333;margin:8px 0;padding-top:8px;font-size:0.75rem;color:#888;padding:8px 12px;">
-      Radar X9 v2.0
-    </div>
-  </div>
+      </div>
 
   <div class="map-wrapper">
 
@@ -801,6 +786,7 @@ const iconMap = {
     'Radar Inteligente de Velocidade Média':'/imagens_app/ic_cam_video_v2.png',
     'Passagem Sob Túnel Viário (TUV)':'/imagens_app/ic_tunel_v2.png',
     'Passagem Sob Túnel Viário':'/imagens_app/ic_tunel_v2.png',
+    'Alerta de Poluição Elevada (APE)':'/imagens_app/ic_radar_poluido_v2.png',
     'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
@@ -831,6 +817,7 @@ const TIPOS_ALERTA_RISCO = [
     'Alerta de Alto Índice de Acidente',
     'Zona de Risco de Inundações Recorrentes (ZIR)',
     'Área de Escape Caminhões (ARE)',
+    'Alerta de Poluição Elevada (APE)',
     'Zona de Estudo Nuclear (ZEN)'
 ];
 
@@ -892,7 +879,8 @@ const ajusteNomes = {
     'Passagem Sob Túnel Viário (TUV)':'Passagem Sob Túnel Viário (TUV)',
     'Radar Inteligente de Velocidade Média (RIV)': 'Radar Inteligente de Velocidade Média (RIV)',
     'Radar Inteligente de Velocidade Média': 'Radar Inteligente de Velocidade Média (RIV)',
-    'Leitor de Reconhecimento Facial (OCR-F)': 'Reconhecimento Facial (OCR-F)'
+    'Leitor de Reconhecimento Facial (OCR-F)': 'Reconhecimento Facial (OCR-F)',
+    'Alerta de Poluição Elevada (APE)': 'Área com Poluição Elevada (APE)'
 };
 
 // ===================================================================
@@ -948,6 +936,7 @@ function getIconUrl(tipo, velocidade) {
 
     var substrings = [
         { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
+          { keys: ['Poluição', 'APE'],               icon: iconMap['Alerta de Poluição Elevada (APE)'] },
         { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
         { keys: ['OCR-P', 'Placas'],                 icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
         { keys: ['Celular', 'DUC'],                  icon: iconMap['Detector de Uso de Celular'] },
@@ -1725,7 +1714,7 @@ function dispararAlerta(radar, distancia) {
         $("#alert-title").text("🚨 ALERTA DE RISCO!");
         $(".alert-bar").addClass("alert-bar-risco");
     } else if (tipoAlerta === 'mobilidade') { 
-        $("#alert-title").text("📢 AVISO DE MOBILIDADE!");
+        $("#alert-title").text("📢 ALERTA DE MOBILIDADE!");
         $(".alert-bar").addClass("alert-bar-mobilidade");
     } else {
         $("#alert-title").text("⚠️ ALERTA DE RADAR!");
