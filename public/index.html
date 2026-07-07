@@ -2381,46 +2381,41 @@ function openAddRadarModal() {
 }
 
 function capturarPosicaoRadar() {
+    // 1. Mostra as lacunas IMEDIATAMENTE ao clicar
+    document.getElementById('coords-inputs-container').style.display = 'flex';
+    
+    const btnCap = document.getElementById('btn-capture-location');
+    btnCap.classList.add('captured');
+
+    // 2. Se o GPS ainda não pegou a posição, avisa e para aqui
     if (!gpsInitialized) { 
         showToast('Aguardando sinal GPS...'); 
+        document.getElementById('pos-lat').value = '';
+        document.getElementById('pos-lng').value = '';
+        document.getElementById('pos-status').textContent = 'Aguardando sinal GPS...';
+        btnCap.textContent = '⏳ Aguardando GPS...';
         return; 
     }
     
-    // Captura a posição exata do momento do clique
+    // 3. Captura a posição exata do momento do clique
     radarLat = userLat;
     radarLng = userLng;
 
-    // 1. Mostra o container das lacunas (muda de none para flex)
-    document.getElementById('coords-inputs-container').style.display = 'flex';
-    
-    // 2. Preenche os valores dentro dos inputs (usa .value e não .textContent)
+    // 4. Preenche os valores dentro dos inputs
     document.getElementById('pos-lat').value = radarLat.toFixed(6);
     document.getElementById('pos-lng').value = radarLng.toFixed(6);
     
-    // 3. Atualiza o status de precisão
+    // 5. Atualiza o status de precisão
     document.getElementById('pos-status').textContent = 'Precisão: ' + Math.round(gpsAccuracyAtual || 0) + 'm';
 
-    // 4. Muda o visual do botão para "Capturado"
-    const btnCap = document.getElementById('btn-capture-location');
+    // 6. Muda o visual do botão para "Capturado"
     btnCap.textContent = '✅ Posição Capturada!';
-    btnCap.classList.add('captured');
 
-    // 5. Busca endereço automaticamente
+    // 7. Busca endereço automaticamente
     document.getElementById('radar-address').value = 'Buscando endereço...';
     obterEndereco(radarLat, radarLng).then(end => {
         document.getElementById('radar-address').value = end || 'Endereço não encontrado';
     });
-}
-
-function closeAddRadarModal() { document.getElementById('modal-add-radar').classList.remove('active'); }
-
-function submitRadar() {
-    if(!selectedType) { showToast('Selecione o tipo de radar'); return; }
-    if(radarLat === null || radarLng === null) { showToast('Captura a posição do radar primeiro!'); return; }
-    
-    const dados = { tipo:selectedType, velocidade:selectedSpeed||'0', endereco:document.getElementById('radar-address').value||'', lat:radarLat, lng:radarLng, sentido:'Não informado', sentidoFiscalizado:'Não informado' };
-    const btn=document.getElementById('btn-submit-radar'); btn.disabled=true; btn.textContent='⏳ Enviando...';
-    enviarRadarParaGitHub(dados).then(ok=>{ btn.disabled=false; btn.textContent='✅ Incluir Radar'; if(ok!==false) closeAddRadarModal(); }).catch(()=>{ btn.disabled=false; btn.textContent='✅ Incluir Radar'; });
 }
 
 
@@ -3428,7 +3423,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('btn-submit-radar').addEventListener('click', submitRadar);
     
     // OUVINTE DO BOTÃO DE CAPTURA DE POSIÇÃO
-    document.getElementById('btn-capture-location').addEventListener('click', capturarPosicaoRadar);
+       
+   document.getElementById('btn-capture-location').addEventListener('click', capturarPosicaoRadar);
+   
     document.getElementById('radar-type').addEventListener('change', function() {
         selectedType=this.value; document.getElementById('icon-preview-img').src=getIconForRadar(selectedType);
         document.getElementById('icon-preview-name').textContent=ajustarNome(selectedType); document.getElementById('icon-preview-group').style.display='flex';
