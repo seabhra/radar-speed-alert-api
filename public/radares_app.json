@@ -1,0 +1,27 @@
+
+{
+  "fields": [
+    { "id": "_id", "type": "int" },
+    { "id": "ID_FISCALIZACAO_ELETRONICA", "type": "text" },
+    { "id": "DESC_LOC_CONTROLADOR_TRANSITO", "type": "text" },
+    { "id": "DESC_TIPO_CONTROLADOR_TRANSITO", "type": "text" },
+    { "id": "VELOCIDADE_REGULAMENTAR", "type": "text" },
+    { "id": "SENTIDO", "type": "text" },
+    { "id": "SENTIDO_FISCALIZADO", "type": "text" },
+    { "id": "STATUS_REVISAO", "type": "text" },
+    { "id": "GEOMETRIA", "type": "text" }
+  ],
+  "records": [
+    [
+      1,
+      "0001",
+      "Rua Das Mações, 93",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "40",
+      "UPA de Nações Unidas/Bairro",
+      "Único",
+      "pendente",
+      "-19.878804, -43.868404"
+    ]
+  ]
+}
