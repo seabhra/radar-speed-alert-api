@@ -330,7 +330,30 @@
     .current-position span { font-family: 'Courier New', monospace; color: var(--accent-color); }
     .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-style: italic; text-align: center; }
 
-
+    /* LACUNAS DAS COORDENADAS */
+    .coords-inputs-container {
+        display: none; /* Escondido até capturar */
+        flex-direction: row;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .coord-field {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .coord-label {
+        font-size: 0.7rem; font-weight: 600; color: var(--text-muted); 
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .coord-input {
+        width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #333;
+        background: #0a0c10; color: var(--accent-color); font-family: 'Courier New', monospace;
+        font-size: 0.9rem; font-weight: 700; outline: none;
+    }
+    .coord-input::placeholder { color: #333; }
+    .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; font-style: italic; text-align: center; }
  
      /* BOTÃO INSERIR RADAR */
 
@@ -550,16 +573,25 @@
             <input type="text" id="radar-address" class="form-input" placeholder="Buscando endereço automaticamente...">
           </div>
 
-          <!-- BOTÃO DE CAPTURA DE POSIÇÃO -->
+               <!-- BOTÃO DE CAPTURA DE POSIÇÃO -->
           <div class="form-group">
             <label>Localização do Radar</label>
             <button type="button" class="btn-capture-location" id="btn-capture-location">
               📍 Capturar Posição Atual
             </button>
-            <div class="current-position" id="current-position">
-              <span id="pos-lat"></span>
-              <span id="pos-lng"></span>
+            
+            <!-- Lacunas de Latitude e Longitude -->
+            <div class="coords-inputs-container" id="coords-inputs-container">
+              <div class="coord-field">
+                <label class="coord-label">Latitude</label>
+                <input type="text" id="pos-lat" class="coord-input" readonly placeholder="-00.000000">
+              </div>
+              <div class="coord-field">
+                <label class="coord-label">Longitude</label>
+                <input type="text" id="pos-lng" class="coord-input" readonly placeholder="-00.000000">
+              </div>
             </div>
+            
             <div class="current-position-status" id="pos-status">Clique acima para inserir as coordenadas.</div>
           </div>
 
@@ -2330,34 +2362,41 @@ async function initMap() {
 // MODAL ADICIONAR RADAR E CAPTURA DE POSIÇÃO
 // ===================================================================
 function openAddRadarModal() {
-    document.getElementById('modal-add-radar').classList.add('active');
-    selectedSpeed=''; selectedType=''; radarLat=null; radarLng=null; // Reseta coordenadas
+        document.getElementById('modal-add-radar').classList.add('active');
+    selectedSpeed=''; selectedType=''; radarLat=null; radarLng=null; 
     document.getElementById('radar-type').value='';
     document.getElementById('radar-address').value='';
     document.getElementById('icon-preview-group').style.display='none';
     document.querySelectorAll('.speed-btn').forEach(b=>b.className='speed-btn');
     
-    // Reseta o visual do botão de captura
+    // Reset do botão e lacunas de captura
     const btnCap = document.getElementById('btn-capture-location');
     btnCap.textContent = '📍 Capturar Posição Atual';
     btnCap.classList.remove('captured');
-    document.getElementById('current-position').style.display = 'none';
+    
+    document.getElementById('coords-inputs-container').style.display = 'none';
+    document.getElementById('pos-lat').value = '';
+    document.getElementById('pos-lng').value = '';
     document.getElementById('pos-status').textContent = 'Clique acima para inserir as coordenadas.';
 }
+
 function capturarPosicaoRadar() {
     if (!gpsInitialized) { showToast('Aguardando sinal GPS...'); return; }
-        // Captura a posição exata do momento do clique
+    
+    // Captura a posição exata do momento do clique
     radarLat = userLat;
     radarLng = userLng;
-    // Atualiza a UI
+
+    // Atualiza a UI - Mostra o container e preenche os inputs
+    document.getElementById('coords-inputs-container').style.display = 'flex';
+    document.getElementById('pos-lat').value = radarLat.toFixed(6);
+    document.getElementById('pos-lng').value = radarLng.toFixed(6);
+    document.getElementById('pos-status').textContent = 'Precisão: ' + Math.round(gpsAccuracyAtual || 0) + 'm';
+
+    // Muda o visual do botão para "Capturado"
     const btnCap = document.getElementById('btn-capture-location');
     btnCap.textContent = '✅ Posição Capturada!';
     btnCap.classList.add('captured');
-    const posDiv = document.getElementById('current-position');
-    posDiv.style.display = 'flex';
-    document.getElementById('pos-lat').textContent = radarLat.toFixed(6);
-    document.getElementById('pos-lng').textContent = radarLng.toFixed(6);
-    document.getElementById('pos-status').textContent = 'Precisão: ' + Math.round(gpsAccuracyAtual || 0) + 'm';
 
     // Busca endereço automaticamente ao capturar
     document.getElementById('radar-address').value = 'Buscando endereço...';
