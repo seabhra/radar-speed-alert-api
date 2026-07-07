@@ -556,9 +556,10 @@
       [538, "1826","Rua Vinte e Oito, Próx. Rodovia BR-040","Controlador Eletrônico de Velocidade (CEV)", "30","Jardim Laguna/BR-040","1001042","KBH53010142","-19.92001, -44.03689"],
       [539, "1827", "Av. Cristiano Machado, Prox. Rua Nair Pentagna Guimarães", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Venda Nova/Centro","1001043", "KBH53010143", "-19.840692, -43.935953"],
       [540, "1828","Anel Rodoviário Celso Mello Azevedo, Próx Rua Taperi","Radar de Caminhão na Faixa Esquerda (CFE)","70","Av. Amazonas/Via Expressa","1001044","KBH5301044"," -19.936274, -44.007521"],
-      [541, "1829","Av. Padre Eustáquio, Próx Av. Nossa Senhora de Fátima","Alerta de Poluição Elevada (APE)","70","Centro/Via Expressa","1001045","KBH5301045","-19.915011, -43.953922"],
-      [542, "1830","Av. Padre Eustáquio, Próx Rua Espinosa","Alerta de Poluição Elevada (APE)","70","Centro/Padre Eustáquio","1001046","KBH5301046","-19.912292, -43.960449"],
-      [543, "1831","Rua Pará de Minas, Próx. Rua Curupaiti","Alerta de Poluição Elevada (APE)","70","Centro/Glória","1001047","KBH5301047","-19.914592, -43.985741"]
+      [541, "1829","Av. Padre Eustáquio, Próx Av. Nossa Senhora de Fátima","Alerta de Poluição Elevada (APE)","60","Centro/Via Expressa","1001045","KBH5301045","-19.915011, -43.953922"],
+      [542, "1830","Av. Padre Eustáquio, Próx Rua Espinosa","Alerta de Poluição Elevada (APE)","60","Centro/Padre Eustáquio","1001046","KBH5301046","-19.912292, -43.960449"],
+      [543, "1831","Rua Pará de Minas, Próx. Rua Curupaiti","Alerta de Poluição Elevada (APE)","60","Centro/Glória","1001047","KBH5301047","-19.914592, -43.985741"],
+      [544, "1832","Av. Padre Eustáquio, Próx. Rua Graça","Alerta de Poluição Elevada (APE)","60","Centro/Glória","1001048","KBH5301048","-19.915269, -43.971608"]
 
     ]
   }
