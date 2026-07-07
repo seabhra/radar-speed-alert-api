@@ -354,13 +354,19 @@
     <div class="spinner-ring"></div>
     <div class="loading-text">Iniciando <span>Radar X9</span></div>
     <div class="loading-sub">Sincronizando satélites...</div>
+   
   </div>
 
   <header>
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
       <h1>RADAR <span>X9</span> BH</h1>
-    </div>
+       <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
+    <div class="gps-status-dot err" id="gps-status-dot"></div>
+    <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
+          </div>
+      </div>
+      
     <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
       <div class="menu-hamburger">
         <span></span>
@@ -448,35 +454,6 @@
       <span class="plus-icon">+</span>
   </button>
 
-
-
-    <!-- MODAL DE CONFIGURAÇÃO GITHUB -->
-    <div class="modal-overlay" id="modal-config-github">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>🔑 Configurar GitHub</h2>
-          <button class="modal-close" id="modal-config-close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="config-status" id="config-status-msg">
-            Configure seu token do GitHub para sincronização em nuvem.
-          </div>
-          <div class="config-github-form" style="margin-top:16px;">
-            <label>Token de Acesso Pessoal (PAT)</label>
-            <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-            <label>Usuário/Organização</label>
-            <input type="text" id="github-owner" placeholder="seabhra" value="seabhra">
-            <label>Repositório</label>
-            <input type="text" id="github-repo" placeholder="radar-speed-alert-api" value="radar-speed-alert-api">
-            <label>Caminho do arquivo</label>
-            <input type="text" id="github-path" placeholder="radares.json" value="radares.json">
-            <label>URL do Proxy CORS (opcional)</label>
-            <input type="text" id="github-proxy" placeholder="https://seu-proxy.vercel.app/api">
-            <button class="btn-save-config" id="btn-save-github-config">💾 Salvar Configuração</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- MODAL DE INCLUSÃO DE RADAR -->
     <div class="modal-overlay" id="modal-add-radar">
