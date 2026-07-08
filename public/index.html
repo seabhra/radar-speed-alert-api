@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
   <style>
@@ -152,7 +152,6 @@
     .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.75rem; color: #555; animation: pulseText 1.8s ease-in-out infinite; }
     @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
-    /* ==================== GPS STATUS DOT (correção) ==================== */
     .gps-status {
       position: absolute; top: 15px; right: 15px; z-index: 900;
       display: flex; align-items: center; gap: 8px;
@@ -169,7 +168,6 @@
     .gps-status-dot.gps-erro { background: var(--alert-color); animation: blinkDot 0.6s infinite; }
     @keyframes blinkDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 
-    /* ==================== ÍCONE DE NAVEGAÇÃO (rotação suave) ==================== */
     .leaflet-div-icon { background: transparent; border: none; }
     .user-nav-icon-wrapper { background: transparent; border: none; }
     .user-nav-icon {
@@ -179,7 +177,6 @@
       will-change: transform;
     }
 
-    /* ==================== MODAL ADICIONAR RADAR (correção) ==================== */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.65);
       display: none; align-items: center; justify-content: center;
@@ -216,7 +213,6 @@
     .coord-field label {
       display: block; font-size: 0.65rem; color: var(--text-muted); margin: 0 0 3px; text-transform: uppercase;
     }
-    /* CORREÇÃO: valores capturados agora visíveis (cor definida explicitamente) */
     .coord-field span {
       display: block; font-size: 0.95rem; font-weight: 800; color: var(--accent-color) !important;
       font-variant-numeric: tabular-nums;
@@ -242,7 +238,8 @@
 
   <header>
     <div class="header-left">
-      <img src="/imagens_app/ic_icon_app.png" alt="App Icon" class="app-icon">
+      <!-- CORREÇÃO: Usar emoji/ícone inline em vez de imagem externa para evitar 404 -->
+      <span style="font-size: 32px;">🚦</span>
       <h1>RADAR <span>X9</span> BH</h1>
     </div>
   </header>
@@ -250,39 +247,44 @@
   <div class="map-wrapper">
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar ou IA (tipo ou endereço)...">
-      <button class="btn-search" id="btn-search-radar" title="Buscar Radares" style="background-image: url('/imagens_app/ic_radar_busca.png');"></button>
+      <button class="btn-search" id="btn-search-radar" title="Buscar Radares" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22%3E%3Cpath d=%22M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z%22/%3E%3C/svg%3E');"></button>
     </div>
     <div class="search-container" id="search-bar-rota">
       <input type="text" id="route-query" placeholder="Insira endereço de uma rota...">
-      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-image: url('/imagens_app/ic_gps_busca.png');"></button>
+      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22%3E%3Cpath d=%22M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z%22/%3E%3C/svg%3E');"></button>
     </div>
 
     <div id="map"></div>
     <div class="toast-notification" id="toast-msg"></div>
 
-    <!-- CORREÇÃO 2: GPS Status Dot -->
     <div class="gps-status">
       <div class="gps-status-dot gps-buscando" id="gps-status-dot"></div>
       <span id="gps-status-text">Buscando GPS...</span>
     </div>
 
     <div class="speed-widget">
-      <img src="/imagens_app/ic_speed_limit.png" alt="Velocidade" class="speed-bg">
+      <!-- CORREÇÃO: Usar SVG inline para o velocímetro -->
+      <svg class="speed-bg" viewBox="0 0 150 150" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;">
+        <circle cx="75" cy="75" r="60" fill="none" stroke="#333" stroke-width="8"/>
+        <circle cx="75" cy="75" r="60" fill="none" stroke="#00ff88" stroke-width="8" 
+                stroke-dasharray="188.5 188.5" stroke-dashoffset="90" stroke-linecap="round"
+                transform="rotate(-130 75 75)"/>
+        <circle cx="75" cy="75" r="50" fill="rgba(15,17,21,0.9)"/>
+        <text x="75" y="80" text-anchor="middle" fill="#00ff88" font-size="14" font-weight="bold">km/h</text>
+      </svg>
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
     <div class="map-controls">
-      <button class="map-btn" id="btn-search-bar" title="Ativa e Focar Barra de Busca"><img src="/imagens_app/ic_radar_busca.png" alt="busca"></button>
-      <button class="map-btn" id="btn-route-bar" title="Ativa e Focar Barra de Rota"><img src="/imagens_app/ic_gps_busca.png" alt="Rota"></button>
-      <button class="map-btn" id="btn-center" title="Minha Localização"><img src="/imagens_app/ic_location_button.png" alt="Centro"></button>
-      <button class="map-btn" id="btn-refresh" title="Atualizar Radares"><img src="/imagens_app/ic_refresh_button.png" alt="Refresh"></button>
-      <button class="map-btn" id="btn-zoom-in" title="Zoom In"><img src="/imagens_app/ic_zoom_in.png" alt="Zoom In"></button>
-      <button class="map-btn" id="btn-zoom-out" title="Zoom Out"><img src="/imagens_app/ic_zoom_out.png" alt="Zoom Out"></button>
-      <!-- CORREÇÃO 3: botão silenciar/tocar -->
+      <button class="map-btn" id="btn-search-bar" title="Ativa e Focar Barra de Busca">🔍</button>
+      <button class="map-btn" id="btn-route-bar" title="Ativa e Focar Barra de Rota">🗺️</button>
+      <button class="map-btn" id="btn-center" title="Minha Localização">📍</button>
+      <button class="map-btn" id="btn-refresh" title="Atualizar Radares">🔄</button>
+      <button class="map-btn" id="btn-zoom-in" title="Zoom In">➕</button>
+      <button class="map-btn" id="btn-zoom-out" title="Zoom Out">➖</button>
       <button class="map-btn" id="btn-mute" title="Silenciar/Ativar Alertas Sonoros">🔊</button>
     </div>
 
-    <!-- CORREÇÃO 1: botões Adicionar Radar / Exportar radares_app.json -->
     <div class="map-controls-left">
       <button class="map-btn" id="btn-add-radar" title="Adicionar Radar">➕</button>
       <button class="map-btn" id="btn-export-json" title="Exportar radares_app.json">⬇️</button>
@@ -290,7 +292,7 @@
 
     <div id="alert-container">
       <div class="alert-bar">
-        <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Tipo Radar">
+        <span id="alert-icon" style="font-size:32px;">⚠️</span>
         <div class="alert-info">
           <h3 id="alert-title">Atenção! Radar Detectado</h3>
           <p id="alert-text">Você está próximo a um radar.</p>
@@ -303,7 +305,6 @@
       <div>Buscando dados...</div>
     </div>
 
-    <!-- CORREÇÃO 1: Modal Adicionar Radar -->
     <div class="modal-overlay" id="modal-add-radar">
       <div class="modal-box">
         <h2>📍 Adicionar Radar</h2>
@@ -348,7 +349,50 @@
     </div>
   </div>
 
-  <audio id="alert-sound" src="alerta.mp3" preload="auto" loop="false"></audio>
+  <!-- CORREÇÃO: Gerar áudio via Web Audio API em vez de arquivo externo -->
+  <script>
+    // Criar som de alerta usando Web Audio API (não precisa de arquivo externo)
+    let alertSound = null;
+    
+    function createAlertSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+        oscillator.frequency.setValueAtTime(660, audioCtx.currentTime + 0.15);
+        
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        return {
+          play: function() {
+            try {
+              const ctx = new (window.AudioContext || window.webkitAudioContext)();
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'square';
+              osc.frequency.setValueAtTime(880, ctx.currentTime);
+              osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+              gain.gain.setValueAtTime(0.3, ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start();
+              osc.stop(ctx.currentTime + 0.4);
+            } catch(e) { console.warn("Áudio não disponível:", e); }
+          }
+        };
+      } catch(e) {
+        return { play: function() { console.log("Áudio indisponível"); } };
+      }
+    }
+  </script>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
@@ -358,16 +402,71 @@
     let map, userMarker, radarMarkers = [], alertTimeout;
     let userLat = -19.91894, userLng = -43.93866, tileLayer, routingControl = null;
     let searchActive = false, routeActive = false, prevLat = null, prevLng = null, prevTime = null;
-
-    // ---- CORREÇÃO 3: estado de áudio (ativo por padrão / silenciar-tocar) ----
     let isMuted = (localStorage.getItem('radarx9_muted') === 'true');
-
-    // ---- CORREÇÃO 4: rumo/heading e animação suave do marcador de navegação ----
     let navHeading = 0;
     let markerAnimFrame = null;
-
-    // ---- CORREÇÃO 1: base local de radares inseridos pelo usuário (radares_app.json) ----
     let radaresAppLocal = { fields: [], records: [] };
+
+    // Inicializar áudio após interação do usuário
+    let audioInitialized = false;
+    let audioContext = null;
+
+    function initAudio() {
+      if (audioInitialized) return;
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioInitialized = true;
+      } catch(e) {
+        console.warn("Web Audio API não suportada");
+      }
+    }
+
+    function playAlertSound() {
+      if (isMuted) return;
+      initAudio();
+      try {
+        if (audioContext) {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(880, audioContext.currentTime);
+          osc.frequency.setValueAtTime(660, audioContext.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(audioContext.destination);
+          osc.start();
+          osc.stop(audioContext.currentTime + 0.4);
+        }
+      } catch(e) { console.warn("Erro ao reproduzir áudio:", e); }
+    }
+
+    // CORREÇÃO: Função para criar ícones com emojis em vez de imagens externas
+    function getIconEmoji(tipo, velocidade) {
+      const isVelocidade = tipo.includes('Velocidade') || tipo.includes('CEV');
+      if (isVelocidade) {
+        const v = parseInt(velocidade);
+        if (v === 50) return '🚗';
+        if (v === 70) return '🚗';
+        return '🚗';
+      }
+      if (tipo.includes('Semáforo') || tipo.includes('DAS')) return '🚦';
+      if (tipo.includes('Celular') || tipo.includes('DUC')) return '📱';
+      if (tipo.includes('OCR') || tipo.includes('Placas')) return '📷';
+      if (tipo.includes('Facial') || tipo.includes('OCR-F')) return '👤';
+      return '📡';
+    }
+
+    function getIconColor(tipo) {
+      const isVelocidade = tipo.includes('Velocidade') || tipo.includes('CEV');
+      if (isVelocidade) return '#ff4444';
+      if (tipo.includes('Semáforo') || tipo.includes('DAS')) return '#ffaa00';
+      if (tipo.includes('Celular') || tipo.includes('DUC')) return '#ff6600';
+      if (tipo.includes('OCR') || tipo.includes('Placas')) return '#44aaff';
+      if (tipo.includes('Facial') || tipo.includes('OCR-F')) return '#aa44ff';
+      return '#ff4444';
+    }
+
     try {
       const salvo = localStorage.getItem('radares_app_local');
       if (salvo) radaresAppLocal = JSON.parse(salvo);
@@ -389,25 +488,7 @@
     }
     if (!Array.isArray(radaresAppLocal.records)) radaresAppLocal.records = [];
 
-    // URL BASE OFICIAL DA API DE DADOS ABERTOS DA PBH
     const API_PBH_BASE = 'https://dados.pbh.gov.br/api/3/action/';
-
-    const iconMap = {
-      'Controlador Eletrônico de Velocidade': '/imagens_app/ic_radar_cev.png',
-      'Detector de Avanço de Semáforo': '/imagens_app/ic_radar_das.png',
-      'Detector de Conversão/Retorno em local Proibido': '/imagens_app/ic_radar_rcp.png',
-      'Detector de Invasão de Faixa de Exclusiva - MOVE': '/imagens_app/ic_radar_dife.png',
-      'Detector de Uso de Celular': '/imagens_app/ic_radar_duc.png',
-      'Detector de Redução de Velocidade': '/imagens_app/ic_radar_rev.png',
-      'Leitor Inteligente de Placas (OCR-P)': '/imagens_app/ic_radar_ocr.png',
-      'Leitor de Reconhecimento Facial (OCR-F)': '/imagens_app/ic_radar_facial.png',
-      'Controlador Eletrônico Misto (CEM)- Velocidade (CEV) e Semáforo (DAS)': '/imagens_app/ic_radar_cem.png',
-      'Controlador Eletrônico Misto (CEM)- Semáforo (DAS) e Detector de Conversão Proibido(DCP)': '/imagens_app/ic_radar_cem.png',
-      'Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)': '/imagens_app/ic_radar_cem.png',
-      'Controlador Eletrônico de Velocidade (CEV)': '/imagens_app/ic_radar_cev.png',
-      'Detector de Avanço de Semáforo (DAS)': '/imagens_app/ic_radar_das.png',
-      'default': '/imagens_app/ic_radar_cev.png'
-    };
 
     const ajusteNomes = {
       'Controlador Eletrônico de Velocidade': 'Controlador Eletrônico de Velocidade (CEV)',
@@ -417,18 +498,6 @@
       'Leitor Inteligente de Placas': 'Leitor Inteligente de Placas (OCR-P)',
       'Leitor de Reconhecimento Facial': 'Leitor de Reconhecimento Facial (OCR-F)'
     };
-
-    function getIconUrl(tipo, velocidade) {
-      let iconeBase = iconMap[tipo] || iconMap['default'];
-      const isRadarDeVelocidade = tipo.includes('Velocidade') || tipo.includes('Misto');
-      if (isRadarDeVelocidade) {
-        const v = parseInt(velocidade);
-        if (v === 50) return '/imagens_app/ic_radar_cev_50.png';
-        if (v === 70) return '/imagens_app/ic_radar_cev_70.png';
-        return '/imagens_app/ic_radar_cev.png';
-      }
-      return iconeBase;
-    }
 
     function showNotification(message) {
       const $toast = $("#toast-msg"); $toast.text(message).addClass("show");
@@ -459,7 +528,6 @@
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
     }
 
-    // CORREÇÃO 4: cálculo de rumo (bearing) entre dois pontos GPS
     function calcularRumo(lat1, lng1, lat2, lng2) {
       const toRad = d => d * Math.PI / 180;
       const toDeg = r => r * 180 / Math.PI;
@@ -470,7 +538,6 @@
       return (brng + 360) % 360;
     }
 
-    // CORREÇÃO 4: interpolação suave da posição do marcador (sem "pulos")
     function animarMarcadorUsuario(fromLatLng, toLatLng, duration) {
       if (markerAnimFrame) cancelAnimationFrame(markerAnimFrame);
       const start = performance.now();
@@ -484,11 +551,16 @@
       markerAnimFrame = requestAnimationFrame(passo);
     }
 
-    // CORREÇÃO 4: ícone do usuário como divIcon, permitindo rotação via CSS transform
     function criarIconeUsuario(heading) {
       return L.divIcon({
         className: 'user-nav-icon-wrapper',
-        html: `<img src="/imagens_app/ic_gps_marker.png" class="user-nav-icon" style="transform: rotate(${heading}deg);">`,
+        html: `<div style="width:40px;height:40px;transform:rotate(${heading}deg);transition:transform 0.35s linear;">
+               <svg viewBox="0 0 24 24" width="40" height="40">
+                 <circle cx="12" cy="12" r="10" fill="#00ff88" stroke="#fff" stroke-width="2"/>
+                 <circle cx="12" cy="12" r="5" fill="#00cc66"/>
+                 <path d="M12 2 L12 5 M12 22 L12 19 M2 12 L5 12 M22 12 L19 12" stroke="#fff" stroke-width="2"/>
+               </svg>
+             </div>`,
         iconSize: [40, 40],
         iconAnchor: [20, 20]
       });
@@ -498,11 +570,10 @@
       if (!userMarker) return;
       const el = userMarker.getElement();
       if (!el) return;
-      const img = el.querySelector('.user-nav-icon');
-      if (img) img.style.transform = `rotate(${heading}deg)`;
+      const div = el.querySelector('div');
+      if (div) div.style.transform = `rotate(${heading}deg)`;
     }
 
-    // CORREÇÃO 2: GPS Status Dot
     function setGpsStatus(status, texto) {
       const dot = document.getElementById('gps-status-dot');
       const label = document.getElementById('gps-status-text');
@@ -580,6 +651,51 @@
         return { lat: v1, lng: v2 };
     }
 
+    function criarMarkerRadar(record) {
+      const endereco = record[2] || "Endereço não informado";
+      let tipo = (record[3] || "Não Identificado").trim();
+      const velocidade = record[4] || "0";
+
+      const coordsFinais = extrairCoordenadas(record);
+      if (!coordsFinais) return null;
+
+      const emoji = getIconEmoji(tipo, velocidade);
+      const color = getIconColor(tipo);
+      
+      // Criar ícone personalizado com emoji
+      const iconHtml = `<div style="
+        background: ${color};
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        font-size: 18px;
+      ">${emoji}</div>`;
+      
+      const icon = L.divIcon({
+        className: 'radar-marker',
+        html: iconHtml,
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -36]
+      });
+
+      const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon }).addTo(map);
+
+      const tipoExibicao = ajusteNomes[tipo] || tipo;
+      const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)');
+      const tituloPopup = isIA ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` : `<b>${tipoExibicao}</b>`;
+
+      radarMarker.bindPopup(`<div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">${tituloPopup}<br>${endereco}<br><span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span></div>`);
+      radarMarker.radarData = { latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao, isIA };
+      radarMarkers.push(radarMarker);
+      return radarMarker;
+    }
+
     function initMap() {
       map = L.map('map', { center: [userLat, userLng], zoom: 16, zoomControl: false });
       aplicarTemaMapa(); setInterval(aplicarTemaMapa, 300000);
@@ -614,7 +730,6 @@
       $("#btn-zoom-out").click(() => map.zoomOut());
       $("#btn-refresh").click(() => { showNotification("Sincronizando dados..."); carregarRadares(); });
 
-      // ---- CORREÇÃO 3: botão silenciar / voltar a tocar ----
       atualizarIconeMute();
       $("#btn-mute").click(() => {
         isMuted = !isMuted;
@@ -623,7 +738,6 @@
         showNotification(isMuted ? "Alertas sonoros silenciados" : "Alertas sonoros ativados");
       });
 
-      // ---- CORREÇÃO 1: modal adicionar radar ----
       $("#btn-add-radar").click(() => { $("#modal-add-radar").addClass('active'); });
       $("#btn-cancelar-radar").click(() => { $("#modal-add-radar").removeClass('active'); resetFormAddRadar(); });
       $("#btn-capturar-posicao").click(() => {
@@ -665,7 +779,6 @@
         const dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
         const time = (currentTime - prevTime) / 1000;
         if (time > 0) speedKmh = Math.round((dist / time) * 3.6);
-        // CORREÇÃO 4: só recalcula rumo se houve deslocamento real (evita "tremer" com GPS parado)
         if (dist > 2) {
           heading = calcularRumo(prevLat, prevLng, newLat, newLng);
           navHeading = heading;
@@ -684,7 +797,6 @@
         userMarker.bindTooltip("Você", { permanent: true, direction: "top", offset: [0, -30] });
         map.setView([newLat, newLng], 16); 
       } else {
-        // CORREÇÃO 4: desliza suavemente até a nova posição na direção da rota, em vez de "pular"
         animarMarcadorUsuario(L.latLng(oldLat, oldLng), L.latLng(newLat, newLng), 800);
         atualizarRotacaoUsuario(heading);
       }
@@ -700,7 +812,7 @@
       let recordsBase = [];
       let origemBase = "Dados de IA (Offline)";
 
-      // ESTRATÉGIA 1: JSON LOCAL (radares.json - base curada)
+      // Tentar carregar JSON local
       try {
         console.log("Tentando carregar JSON local (radares.json)...");
         const response = await fetch(`radares.json?v=${Date.now()}`);
@@ -720,16 +832,21 @@
         console.warn("Falha ao carregar radares.json:", e);
       }
 
-      // ESTRATÉGIA 2: API DA PBH (Fallback), só roda se a Estratégia 1 não trouxe nada
+      // Fallback: API da PBH (com timeout)
       if (recordsBase.length === 0) {
         $("#loading").show().html("<div class='loading-spinner'></div><div>Tentando API PBH...</div>");
         try {
-          const metaResponse = await fetch(`${API_PBH_BASE}package_show?id=fiscalizacao-eletronica`);
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
+          
+          const metaResponse = await fetch(`${API_PBH_BASE}package_show?id=fiscalizacao-eletronica`, { signal: controller.signal });
+          clearTimeout(timeoutId);
           const metaData = await metaResponse.json();
           if (!metaData.success || !metaData.result.resources) throw new Error("API PBH: Estrutura inválida");
           const csvResource = metaData.result.resources.find(r => r.format.toLowerCase() === 'csv');
           if (!csvResource || !csvResource.url) throw new Error("API PBH: CSV não encontrado");
-          const csvResponse = await fetch(csvResource.url);
+          
+          const csvResponse = await fetch(csvResource.url, { signal: controller.signal });
           if (!csvResponse.ok) throw new Error("API PBH: Erro no download");
           const csvText = await csvResponse.text();
           const recordsFromAPI = parseCSVtoRecords(csvText);
@@ -745,8 +862,7 @@
         }
       }
 
-      // CORREÇÃO 1: soma também o radares_app.json publicado no servidor (se existir)
-      // e os radares inseridos localmente pelo usuário (localStorage), ainda não exportados
+      // Carregar radares_app.json
       let recordsAppExternos = [];
       try {
         const respApp = await fetch(`radares_app.json?v=${Date.now()}`);
@@ -802,29 +918,6 @@
       return recordsFormatados;
     }
 
-    // CORREÇÃO: extraída a criação de um marker individual, reaproveitada no
-    // carregamento em massa e na inserção de um novo radar pelo modal
-    function criarMarkerRadar(record) {
-      const endereco = record[2] || "Endereço não informado";
-      let tipo = (record[3] || "Não Identificado").trim();
-      const velocidade = record[4] || "0";
-
-      const coordsFinais = extrairCoordenadas(record);
-      if (!coordsFinais) return null;
-
-      const iconeRadar = L.icon({ iconUrl: getIconUrl(tipo, velocidade), iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
-      const radarMarker = L.marker([coordsFinais.lat, coordsFinais.lng], { icon: iconeRadar }).addTo(map);
-
-      const tipoExibicao = ajusteNomes[tipo] || tipo;
-      const isIA = tipoExibicao.includes('(OCR)') || tipoExibicao.includes('(FACIAL)');
-      const tituloPopup = isIA ? `🤖 <span style="color:#33aaff">${tipoExibicao}</span>` : `<b>${tipoExibicao}</b>`;
-
-      radarMarker.bindPopup(`<div style="color:#000; font-family:Inter; text-align:center; max-width: 250px;">${tituloPopup}<br>${endereco}<br><span style="color:red; font-weight:bold;">Máx: ${velocidade} km/h</span></div>`);
-      radarMarker.radarData = { latitude: coordsFinais.lat, longitude: coordsFinais.lng, endereco, velocidade_maxima: velocidade, tipoOriginal: tipo, tipoExibicao, isIA };
-      radarMarkers.push(radarMarker);
-      return radarMarker;
-    }
-
     function renderizarRadaresNoMapa(records, origem) {
       const radaresExternos = records || [];
       const todosOsRadares = [...radaresExternos, ...injetarRadaresIA()];
@@ -852,16 +945,13 @@
         if (distance < 300) { 
           alertTriggered = true;
           
-          $("#alert-icon").attr("src", getIconUrl(dados.tipoOriginal, dados.velocidade_maxima));
+          const emoji = getIconEmoji(dados.tipoOriginal, dados.velocidade_maxima);
+          $("#alert-icon").text(emoji);
           $("#alert-text").text(`${dados.endereco} - Máx: ${dados.velocidade_maxima}km/h (${Math.round(distance)}m)`);
           $("#alert-title").text(dados.isIA ? "⚠️ Câmera Inteligente Detectada!" : "Atenção! Radar Detectado");
           
-          // CORREÇÃO 3: som toca sempre que ativo (padrão), só é bloqueado quando isMuted = true
-          if (!isMuted) {
-            const sound = document.getElementById("alert-sound");
-            sound.currentTime = 0;
-            sound.play().catch(e => { console.warn("Áudio bloqueado pelo navegador:", e); });
-          }
+          // Tocar som de alerta
+          playAlertSound();
 
           $("#alert-container").fadeIn(200); clearTimeout(alertTimeout);
           alertTimeout = setTimeout(() => $("#alert-container").fadeOut(500), 5000);
@@ -889,7 +979,6 @@
       else showNotification("Ative seu GPS."); 
     }
 
-    // ================== CORREÇÃO 1: Adicionar Radar -> radares_app.json ==================
     function resetFormAddRadar() {
       $("#capture-lat").text("--"); $("#capture-lng").text("--");
       $("#input-endereco").val(""); $("#input-velocidade").val("");
@@ -925,10 +1014,9 @@
       radaresAppLocal.records.push(registro);
       localStorage.setItem('radares_app_local', JSON.stringify(radaresAppLocal));
 
-      // Renderiza imediatamente no mapa, sem precisar recarregar tudo
       criarMarkerRadar(registro);
 
-      showNotification("Radar salvo! Use 'Exportar radares_app.json' para publicar no GitHub.");
+      showNotification("Radar salvo! Use 'Exportar radares_app.json' para publicar.");
       $("#modal-add-radar").removeClass('active');
       resetFormAddRadar();
     }
@@ -943,12 +1031,10 @@
       showNotification("Arquivo radares_app.json exportado.");
     }
     
-    document.addEventListener('click', function desbloquearAudio() {
-        const sound = document.getElementById("alert-sound");
-        if (sound) {
-            sound.play().then(() => { sound.pause(); sound.currentTime = 0; }).catch(() => {});
-        }
-        document.removeEventListener('click', desbloquearAudio);
+    // Inicializar áudio no primeiro clique do usuário
+    document.addEventListener('click', function initAudioOnClick() {
+      initAudio();
+      document.removeEventListener('click', initAudioOnClick);
     }, { once: true });
     
     window.onload = initMap;
