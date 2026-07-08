@@ -18,7 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
 
   <style>
-    /* ===== CORREÇÃO: Estilos completos mantidos ===== */
+    /* ===== ESTILOS (mantidos os mesmos por brevidade) ===== */
     :root {
       --bg-color: #0f1115;
       --panel-color: #1a1d24;
@@ -58,7 +58,6 @@
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
     h1 span { color: var(--accent-color); }
 
-    /* GPS STATUS DOT */
     .gps-status-wrapper {
       display: flex; align-items: center; gap: 6px; margin-left: 8px;
       padding: 4px 10px; border-radius: 20px; background: rgba(0,0,0,0.35);
@@ -177,7 +176,7 @@
 
     #btn-rotate-map { transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; }
     #btn-rotate-map.rotated { border-color: var(--accent-color); box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1); background-color: rgba(0, 255, 136, 0.08); }
-    #btn-rotate-map.rotated img { filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5)); transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease; }
+    #btn-rotate-map.rotated img { filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5)); }
 
     .user-gps-marker, .user-navigator-marker { background: transparent !important; border: none !important; }
     .user-gps-marker img, .user-navigator-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); transition: none !important; will-change: transform; }
@@ -202,12 +201,12 @@
 
     #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-    @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
     .alert-bar { color: white; padding: 18px; display: flex; align-items: center; gap: 15px; transition: all 0.2s ease; }
     .alert-bar-radar { background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); }
     .alert-bar-risco { background: linear-gradient(90deg, #e6a800, #b38600); border-top: 2px solid #ffcc00; box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); }
     .alert-bar-mobilidade { background: linear-gradient(90deg, #00b359, #008040); border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
+    @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
     .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
     .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
     .alert-info p { font-size: 0.95rem; opacity: 0.95; }
@@ -292,14 +291,6 @@
     }
     .speed-btn:hover { border-color: var(--accent-color); color: var(--text-main); background: rgba(0, 255, 136, 0.05); }
     .speed-btn.selected { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.15); color: var(--accent-color); box-shadow: 0 0 20px rgba(0, 255, 136, 0.15); }
-    .speed-btn.selected-30 { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
-    .speed-btn.selected-40 { border-color: #ffa94d; color: #ffa94d; background: rgba(255, 169, 77, 0.1); }
-    .speed-btn.selected-50 { border-color: #ffd93d; color: #ffd93d; background: rgba(255, 217, 61, 0.1); }
-    .speed-btn.selected-60 { border-color: #6bcb77; color: #6bcb77; background: rgba(107, 203, 119, 0.1); }
-    .speed-btn.selected-70 { border-color: #4d96ff; color: #4d96ff; background: rgba(77, 150, 255, 0.1); }
-    .speed-btn.selected-80 { border-color: #9b59b6; color: #9b59b6; background: rgba(155, 89, 182, 0.1); }
-    .speed-btn.selected-100 { border-color: #ff6b9d; color: #ff6b9d; background: rgba(255, 107, 157, 0.1); }
-    .speed-btn.selected-110 { border-color: #ff4757; color: #ff4757; background: rgba(255, 71, 87, 0.1); }
 
     .icon-preview { display: flex; align-items: center; background: #0f1115; padding: 12px 16px; border-radius: 12px; border: 1px solid #333; }
     .icon-preview img { width: 40px; height: 40px; object-fit: contain; }
@@ -343,7 +334,6 @@
     .btn-submit-radar:active { transform: scale(0.97); }
     .btn-submit-radar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    /* Menu Dropdown */
     .menu-dropdown {
       position: absolute; top: 70px; right: 15px; background: var(--panel-color);
       border: 1px solid #333; border-radius: 12px; padding: 8px; min-width: 220px;
@@ -357,6 +347,11 @@
     .menu-item:hover { background: rgba(0, 255, 136, 0.1); }
     .menu-item .menu-icon { font-size: 1.1rem; }
     .menu-divider { height: 1px; background: #333; margin: 6px 0; }
+
+    .config-status { padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; text-align: center; }
+    .config-status.ok { background: rgba(0, 204, 102, 0.15); color: #00cc66; }
+    .config-status.erro { background: rgba(255, 68, 68, 0.15); color: #ff4444; }
+    .config-status.aviso { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
 
     @media (max-width: 600px) {
       .btn-add-radar { bottom: 20px; right: 92px; width: 56px; height: 56px; }
@@ -398,7 +393,6 @@
     </button>
   </header>
 
-  <!-- Menu Dropdown -->
   <div class="menu-dropdown" id="menu-dropdown">
     <div class="menu-item" id="menu-config-github">
       <span class="menu-icon">🔑</span> Configurar GitHub
@@ -443,7 +437,6 @@
       <div class="speed-value" id="speed-display">0</div>
     </div>
 
-    <!-- Sidebar de controles -->
     <div class="sidebar-controls" id="sidebar-controls">
       <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
         <img id="rotate-btn-icon" src="/imagens_app/ic_girado_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3089/3089803.png'" alt="Rotacionar">
@@ -486,12 +479,10 @@
       <div style="margin-top:10px; color:#fff;">Processando...</div>
     </div>
 
-    <!-- BOTÃO + PARA ADICIONAR RADAR -->
     <button class="btn-add-radar" id="btn-add-radar">
       <span class="plus-icon">+</span>
     </button>
 
-    <!-- MODAL DE INCLUSÃO DE RADAR -->
     <div class="modal-overlay" id="modal-add-radar">
       <div class="modal-content">
         <div class="modal-header">
@@ -584,7 +575,6 @@
       </div>
     </div>
 
-    <!-- Modal Config GitHub -->
     <div class="modal-overlay" id="modal-config-github">
       <div class="modal-content">
         <div class="modal-header">
@@ -605,8 +595,8 @@
             <input type="text" id="github-repo" class="form-input" value="radar-speed-alert-api">
           </div>
           <div class="form-group">
-            <label>Caminho do Arquivo</label>
-            <input type="text" id="github-path" class="form-input" value="radares.json">
+            <label>Caminho do Arquivo (radares_app.json)</label>
+            <input type="text" id="github-path" class="form-input" value="radares_app.json">
           </div>
           <div class="form-group">
             <label>Proxy URL (opcional)</label>
@@ -619,7 +609,6 @@
     </div>
   </div>
 
-  <!-- ÁUDIOS DE ALERTA -->
   <audio id="alert-sound-radar" preload="auto">
     <source src="audio_app/alerta_sound_radar.mp3" type="audio/mpeg">
   </audio>
@@ -632,7 +621,7 @@
 
   <script>
   // ===================================================================
-  // CÓDIGO JAVASCRIPT COMPLETO CORRIGIDO
+  // JAVASCRIPT COMPLETO CORRIGIDO
   // ===================================================================
   
   // ===================================================================
@@ -641,6 +630,7 @@
   let map;
   let tileLayer;
   let radarMarkers = [];
+  let radaresAppMarkers = []; // Marcadores específicos do radares_app.json
   let alertTimeout;
   let userLat = -19.919055;
   let userLng = -43.938641;
@@ -702,12 +692,12 @@
   let tipoAlertaAtivo = null;
 
   // ===================================================================
-  // CONFIGURAÇÃO DO GITHUB
+  // CONFIGURAÇÃO DO GITHUB - APONTA PARA radares_app.json
   // ===================================================================
   let GITHUB_CONFIG = {
     owner: 'seabhra',
     repo: 'radar-speed-alert-api',
-    path: 'radares.json',
+    path: 'radares_app.json',  // <-- CORRIGIDO: agora aponta para radares_app.json
     token: '',
     proxyUrl: '',
     _branchCache: null,
@@ -721,6 +711,24 @@
 
   let RADAR_MODO_OFFLINE = false;
   let RADAR_PENDENTES_SINCRONIZAR = [];
+
+  // ===================================================================
+  // DADOS DO radares_app.json (estrutura fixa)
+  // ===================================================================
+  const RADARES_APP_STRUCTURE = {
+    fields: [
+      { id: "_id", type: "int" },
+      { id: "ID_FISCALIZACAO_ELETRONICA", type: "text" },
+      { id: "DESC_LOC_CONTROLADOR_TRANSITO", type: "text" },
+      { id: "DESC_TIPO_CONTROLADOR_TRANSITO", type: "text" },
+      { id: "VELOCIDADE_REGULAMENTAR", type: "text" },
+      { id: "SENTIDO", type: "text" },
+      { id: "SENTIDO_FISCALIZADO", type: "text" },
+      { id: "STATUS_REVISAO", type: "text" },
+      { id: "GEOMETRIA", type: "text" }
+    ],
+    records: []
+  };
 
   // ===================================================================
   // ALERT CONFIG
@@ -739,7 +747,7 @@
   };
 
   // ===================================================================
-  // MAPEAMENTO DE ÍCONES
+  // MAPEAMENTO DE ÍCONES (mesmo do original)
   // ===================================================================
   const iconMap = {
     'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
@@ -902,7 +910,6 @@
 
     if (iconMap[tipoLimpo]) return iconMap[tipoLimpo];
 
-    // Busca por substrings
     const substrings = [
       { keys: ['Olho Vivo', 'COV'], icon: iconMap['Câmera Olho Vivo (COV)'] },
       { keys: ['Poluição', 'APE'], icon: iconMap['Alerta de Poluição Elevada (APE)'] },
@@ -1173,7 +1180,6 @@
     zoomAlvo = 17;
     bearingAlvo = 0;
     bearingAtual = 0;
-    bearingAlvoAnterior = null;
     headingIconeNavegacao = 0;
     headingIconeSuavizado = 0;
     if (typeof map.setBearing === 'function') map.setBearing(0);
@@ -1691,12 +1697,10 @@
   function deveAlertaRadar(tipoOriginal) {
     if (!tipoOriginal) return false;
     const tipoLimpo = tipoOriginal.trim();
-    // Verifica se é um tipo que deve gerar alerta
     const todosTipos = [...TIPOS_ALERTA_RADAR, ...TIPOS_ALERTA_RISCO, ...TIPOS_ALERTA_MOBILIDADE];
     for (let i = 0; i < todosTipos.length; i++) {
       if (tipoLimpo === todosTipos[i] || tipoLimpo.includes(todosTipos[i])) return true;
     }
-    // Por padrão, radares de velocidade sempre alertam
     if (tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('Controlador Eletrônico')) {
       return true;
     }
@@ -2040,7 +2044,6 @@
     const alertIcon = document.getElementById('alert-toggle-icon');
     if (!alertBtn) return;
 
-    // Garantir que alerta começa ativo
     alertaHabilitado = true;
     alertBtn.classList.remove('alert-off');
     if (alertIcon) {
@@ -2122,7 +2125,7 @@
   // ===================================================================
   // CRIAR RADAR NO MAPA
   // ===================================================================
-  function criarRadarNoMapa(radarData) {
+  function criarRadarNoMapa(radarData, isAppRadar) {
     if (!map) {
       console.warn('[Radar X9] ⚠️ Mapa não inicializado ao criar radar');
       return null;
@@ -2134,13 +2137,16 @@
 
     const radarMarker = L.marker([radarData.latitude, radarData.longitude], {
       icon: iconeRadar,
-      zIndexOffset: 1000
+      zIndexOffset: isAppRadar ? 2000 : 1000 // Prioridade maior para radares_app
     }).addTo(map);
 
     const tipoExibicao = ajusteNomes[radarData.tipo] || radarData.tipo;
     const velInfo = radarData.velocidade ? ` | ${radarData.velocidade} km/h` : '';
+    const origemTag = isAppRadar ? '<span style="color:#ffa500;font-size:0.7rem;">📌 Inserido pelo usuário</span><br>' : '';
+    
     const popupContent = `
       <div style="color:#222; font-family:'Inter'; text-align:center; min-width:200px;">
+        ${origemTag}
         <b>${tipoExibicao}</b><br>
         <hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">
         ${radarData.endereco || 'Endereço não informado'}<br>
@@ -2157,7 +2163,8 @@
       velocidade_maxima: radarData.velocidade,
       tipoOriginal: radarData.tipo,
       tipoExibicao: tipoExibicao,
-      isIA: tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL')
+      isIA: tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL'),
+      isAppRadar: isAppRadar || false
     };
 
     return radarMarker;
@@ -2176,7 +2183,7 @@
         Object.assign(GITHUB_CONFIG, {
           owner: config.owner || GITHUB_CONFIG.owner,
           repo: config.repo || GITHUB_CONFIG.repo,
-          path: config.path || GITHUB_CONFIG.path,
+          path: config.path || GITHUB_CONFIG.path || 'radares_app.json',
           token: config.token || '',
           proxyUrl: config.proxyUrl || ''
         });
@@ -2227,10 +2234,10 @@
   }
 
   // ===================================================================
-  // SALVAR RADAR NO GITHUB
+  // SALVAR RADAR NO radares_app.json (GitHub)
   // ===================================================================
   async function salvarRadarNoGitHub(novoRadar, proximoId) {
-    console.log('[Radar X9] 📤 Salvando radar no GitHub...', novoRadar);
+    console.log('[Radar X9] 📤 Salvando radar no radares_app.json...', novoRadar);
 
     if (!GITHUB_CONFIG.token) {
       throw new Error('Token do GitHub não configurado. Configure no menu (🔑 Configurar GitHub).');
@@ -2263,7 +2270,7 @@
 
     if (!getResponse.ok) {
       const detalheErro = await getResponse.text().catch(function () { return ''; });
-      throw new Error(`Erro ao buscar arquivo (${getResponse.status}): ${detalheErro.slice(0, 300)}`);
+      throw new Error(`Erro ao buscar radares_app.json (${getResponse.status}): ${detalheErro.slice(0, 300)}`);
     }
 
     const data = await getResponse.json();
@@ -2273,24 +2280,25 @@
       const content = atob(data.content.replace(/\s/g, ''));
       jsonData = JSON.parse(content);
     } catch (e) {
-      throw new Error('Erro ao parsear o conteúdo do arquivo radares.json: ' + e.message);
+      // Se o arquivo não existir ou estiver corrompido, criar estrutura nova
+      jsonData = JSON.parse(JSON.stringify(RADARES_APP_STRUCTURE));
     }
 
     if (!jsonData.records) {
       jsonData.records = [];
     }
 
-    const idFiscalizacao = String(proximoId);
+    // Criar registro no formato do radares_app.json
+    const idFiscalizacao = String(proximoId).padStart(4, '0');
     const novoRegistro = [
       proximoId,
       idFiscalizacao,
       novoRadar.endereco,
       novoRadar.tipo,
       String(novoRadar.velocidade),
-      "Único",
-      "Único",
-      `M${String(proximoId).padStart(6, '0')}`,
-      `KBH${String(proximoId).padStart(6, '0')}`,
+      novoRadar.sentido || "Único",
+      novoRadar.sentidoFiscalizado || "Único",
+      "pendente",
       `${novoRadar.latitude.toFixed(6)}, ${novoRadar.longitude.toFixed(6)}`
     ];
 
@@ -2331,16 +2339,16 @@
 
     if (!updateResponse.ok) {
       const erro = await updateResponse.text().catch(function () { return ''; });
-      throw new Error(`Erro ao salvar (${updateResponse.status}): ${erro.slice(0, 300)}`);
+      throw new Error(`Erro ao salvar no radares_app.json (${updateResponse.status}): ${erro.slice(0, 300)}`);
     }
 
-    console.log('[Radar X9] ✅ Radar salvo no GitHub! ID:', proximoId, '| branch:', branch);
+    console.log('[Radar X9] ✅ Radar salvo no radares_app.json! ID:', proximoId, '| branch:', branch);
     RADAR_MODO_OFFLINE = false;
     return { success: true, id: proximoId, persistido: true };
   }
 
   // ===================================================================
-  // INCLUIR RADAR
+  // INCLUIR RADAR (salva no radares_app.json)
   // ===================================================================
   async function incluirRadar(currentPosition, fecharModal) {
     const tipo = document.getElementById('radar-type').value;
@@ -2382,26 +2390,43 @@
         endereco: endereco,
         velocidade: velocidade,
         latitude: currentPosition.lat,
-        longitude: currentPosition.lng
+        longitude: currentPosition.lng,
+        sentido: "Único",
+        sentidoFiscalizado: "Único"
       };
 
-      let proximoId = 541;
-      if (radarMarkers.length > 0) {
-        const idsExistentes = radarMarkers.map(m => m.radarData.id);
+      // Determinar próximo ID
+      let proximoId = 1;
+      // Buscar IDs existentes nos radares_app já carregados
+      const idsExistentes = radarMarkers
+        .filter(m => m.radarData && m.radarData.isAppRadar)
+        .map(m => m.radarData.id);
+      if (idsExistentes.length > 0) {
         proximoId = Math.max(...idsExistentes) + 1;
+      } else {
+        // Verificar se há registros no radares_app.json local
+        const appData = localStorage.getItem('radarx9_radares_app_data');
+        if (appData) {
+          try {
+            const parsed = JSON.parse(appData);
+            if (parsed.records && parsed.records.length > 0) {
+              const ids = parsed.records.map(r => r[0]);
+              proximoId = Math.max(...ids) + 1;
+            }
+          } catch(e) {}
+        }
       }
 
-      let resultado = null;
       let salvouNoGitHub = false;
 
-      // TENTATIVA 1: Salvar no GitHub (se configurado)
+      // TENTATIVA: Salvar no GitHub (radares_app.json)
       if (GITHUB_CONFIG.token) {
         try {
-          resultado = await salvarRadarNoGitHub(novoRadar, proximoId);
+          await salvarRadarNoGitHub(novoRadar, proximoId);
           salvouNoGitHub = true;
-          console.log('[Radar X9] ✅ Salvo no GitHub');
+          console.log('[Radar X9] ✅ Salvo no radares_app.json');
         } catch (githubError) {
-          console.error('[Radar X9] ❌ Falha ao salvar no GitHub:', githubError.message);
+          console.error('[Radar X9] ❌ Falha ao salvar no radares_app.json:', githubError.message);
           showNotification('⚠️ GitHub falhou: ' + githubError.message + ' (salvo localmente)');
         }
       } else {
@@ -2410,6 +2435,31 @@
 
       // Se não salvou no GitHub, salva localmente (pendente)
       if (!salvouNoGitHub) {
+        // Salvar no localStorage como pendente
+        const appData = localStorage.getItem('radarx9_radares_app_data');
+        let appJson = JSON.parse(JSON.stringify(RADARES_APP_STRUCTURE));
+        if (appData) {
+          try {
+            const parsed = JSON.parse(appData);
+            if (parsed.records) appJson.records = parsed.records;
+          } catch(e) {}
+        }
+        
+        const novoRegistro = [
+          proximoId,
+          String(proximoId).padStart(4, '0'),
+          endereco,
+          tipo,
+          String(velocidade),
+          "Único",
+          "Único",
+          "pendente",
+          `${currentPosition.lat.toFixed(6)}, ${currentPosition.lng.toFixed(6)}`
+        ];
+        appJson.records.push(novoRegistro);
+        localStorage.setItem('radarx9_radares_app_data', JSON.stringify(appJson));
+        
+        // Adicionar aos pendentes para sincronização futura
         RADAR_PENDENTES_SINCRONIZAR.push({
           radar: novoRadar,
           id: proximoId,
@@ -2418,19 +2468,22 @@
         try {
           localStorage.setItem('radarx9_pendentes', JSON.stringify(RADAR_PENDENTES_SINCRONIZAR));
         } catch (e) {}
+        
         showNotification('📌 Radar salvo localmente (pendente de sincronização)');
       }
 
       animarBotaoRadar(salvouNoGitHub ? 'adicionado' : 'erro');
 
-      // Criar marcador no mapa
+      // Criar marcador no mapa (marcar como AppRadar)
       const novoMarker = criarRadarNoMapa({
         ...novoRadar,
         id: proximoId,
         tipoOriginal: tipo
-      });
+      }, true); // isAppRadar = true
+      
       if (novoMarker) {
         radarMarkers.push(novoMarker);
+        radaresAppMarkers.push(novoMarker);
         novoMarker.openPopup();
       }
 
@@ -2443,9 +2496,12 @@
           'selected-70', 'selected-80', 'selected-100', 'selected-110');
       });
       document.getElementById('icon-preview-group').style.display = 'none';
+      document.getElementById('coords-inputs-container').style.display = 'none';
+      document.getElementById('btn-capture-location').textContent = '📍 Capturar Posição Atual';
+      document.getElementById('btn-capture-location').classList.remove('captured');
 
       if (salvouNoGitHub) {
-        showNotification(`✅ Radar #${proximoId} salvo no GitHub!`);
+        showNotification(`✅ Radar #${proximoId} salvo no radares_app.json!`);
         setTimeout(() => { carregarRadares(); }, 3000);
       }
 
@@ -2518,115 +2574,95 @@
   }
 
   // ===================================================================
-  // CARREGAR RADARES
+  // CARREGAR RADARES (radares.json + radares_app.json)
   // ===================================================================
   async function carregarRadares() {
     if (!map) return;
     if (radarMarkers.length > 0) { 
       radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); 
       radarMarkers = []; 
+      radaresAppMarkers = [];
     }
     $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas...</div>");
 
-    let records = [];
+    let recordsBase = [];
+    let recordsApp = [];
     let fonte = '';
 
-    // ESTRATÉGIA 1: Tentar carregar do GitHub via CDN
+    // ===== CARREGAR radares.json (base fixa) =====
     try {
-      console.log('[Radar X9] 🔄 Tentando carregar do GitHub via CDN...');
+      console.log('[Radar X9] 🔄 Carregando radares.json...');
+      const response = await fetch('radares.json?v=' + Date.now());
+      if (response.ok) {
+        const data = await response.json();
+        recordsBase = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+        if (recordsBase.length > 0) {
+          fonte = 'radares.json';
+          console.log('[Radar X9] ✅ radares.json carregado:', recordsBase.length);
+        }
+      }
+    } catch (e) {
+      console.warn('[Radar X9] radares.json não encontrado:', e.message);
+    }
+
+    // ===== CARREGAR radares_app.json (usuários) =====
+    // 1. Tentar do GitHub via CDN
+    try {
+      console.log('[Radar X9] 🔄 Carregando radares_app.json do GitHub...');
       const cdnResponse = await fetch(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       });
       if (cdnResponse.ok) {
         const data = await cdnResponse.json();
-        records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-        if (records.length > 0) {
-          fonte = 'GitHub (CDN)';
+        if (data && data.records && Array.isArray(data.records)) {
+          recordsApp = data.records;
+          fonte += ' + radares_app.json (GitHub)';
           RADAR_MODO_OFFLINE = false;
-          console.log('[Radar X9] ✅ Radares carregados do GitHub via CDN:', records.length);
+          console.log('[Radar X9] ✅ radares_app.json carregado do GitHub:', recordsApp.length);
         }
       }
     } catch (e) {
-      console.warn('[Radar X9] CDN falhou:', e.message);
+      console.warn('[Radar X9] radares_app.json do GitHub falhou:', e.message);
     }
 
-    // ESTRATÉGIA 2: Tentar carregar do raw.githubusercontent.com
-    if (records.length === 0) {
+    // 2. Fallback: localStorage
+    if (recordsApp.length === 0) {
       try {
-        console.log('[Radar X9] 🔄 Tentando carregar do raw GitHub...');
-        const rawResponse = await fetch(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), {
-          method: 'GET',
-          headers: { 'Accept': 'application/json' }
-        });
-        if (rawResponse.ok) {
-          const data = await rawResponse.json();
-          records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-          if (records.length > 0) {
-            fonte = 'GitHub (Raw)';
-            RADAR_MODO_OFFLINE = false;
-            console.log('[Radar X9] ✅ Radares carregados do raw GitHub:', records.length);
+        const localAppData = localStorage.getItem('radarx9_radares_app_data');
+        if (localAppData) {
+          const data = JSON.parse(localAppData);
+          if (data && data.records && Array.isArray(data.records)) {
+            recordsApp = data.records;
+            fonte += ' + radares_app.json (local)';
+            console.log('[Radar X9] ✅ radares_app.json carregado do localStorage:', recordsApp.length);
           }
         }
       } catch (e) {
-        console.warn('[Radar X9] Raw GitHub falhou:', e.message);
+        console.warn('[Radar X9] radares_app.json local falhou:', e.message);
       }
     }
 
-    // ESTRATÉGIA 3: Tentar carregar do arquivo local
-    if (records.length === 0) {
+    // Combinar os dois datasets
+    const todosOsRegistros = [...recordsBase, ...recordsApp];
+    
+    if (todosOsRegistros.length > 0) {
+      renderizarRadaresNoMapa(todosOsRegistros, recordsApp.length, fonte);
+      // Salvar cache
       try {
-        console.log('[Radar X9] 🔄 Tentando carregar arquivo local...');
-        const response = await fetch('radares.json?v=' + Date.now());
-        if (response.ok) {
-          const data = await response.json();
-          records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-          if (records.length > 0) {
-            fonte = 'Local';
-            RADAR_MODO_OFFLINE = true;
-            console.log('[Radar X9] ✅ Radares carregados do arquivo local:', records.length);
-          }
-        }
-      } catch (e) {
-        console.warn('[Radar X9] Arquivo local falhou:', e.message);
-      }
-    }
-
-    // ESTRATÉGIA 4: Tentar carregar do localStorage (cache)
-    if (records.length === 0) {
-      try {
-        console.log('[Radar X9] 🔄 Tentando carregar do cache local...');
-        const cached = localStorage.getItem('radarx9_radares_cache');
-        if (cached) {
-          const data = JSON.parse(cached);
-          records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-          if (records.length > 0) {
-            fonte = 'Cache Local';
-            RADAR_MODO_OFFLINE = true;
-            console.log('[Radar X9] ✅ Radares carregados do cache:', records.length);
-          }
-        }
-      } catch (e) {
-        console.warn('[Radar X9] Cache falhou:', e.message);
-      }
-    }
-
-    // Renderizar radares
-    if (records.length > 0) {
-      renderizarRadaresNoMapa(records, fonte);
-      try {
-        localStorage.setItem('radarx9_radares_cache', JSON.stringify({ records: records }));
+        localStorage.setItem('radarx9_radares_cache', JSON.stringify({ records: todosOsRegistros }));
       } catch (e) {}
     } else {
       $("#loading").hide();
-      showNotification("⚠️ Nenhum radar encontrado. Verifique a conexão ou configure o GitHub.");
+      showNotification("⚠️ Nenhum radar encontrado. Verifique a conexão.");
       RADAR_MODO_OFFLINE = true;
     }
   }
 
-  function renderizarRadaresNoMapa(records, origem) {
+  function renderizarRadaresNoMapa(records, qtdApp, origem) {
     if (!map) return;
     let contador = 0;
+    let appCounter = 0;
 
     for (let i = 0; i < records.length; i++) {
       const record = records[i];
@@ -2645,28 +2681,46 @@
 
       const radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
 
+      // Verificar se é um radar do radares_app (pelo ID ou pela origem)
+      const isAppRadar = (i >= (records.length - qtdApp) && qtdApp > 0) || 
+                         (record[7] === 'pendente' || record[7] === 'aprovado');
+
       const tipoExibicao = ajusteNomes[tipo] || tipo;
       const isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
+      const origemTag = isAppRadar ? '<span style="color:#ffa500;font-size:0.7rem;">📌 Inserido pelo usuário</span><br>' : '';
       const tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
 
       radarMarker.bindPopup(
         '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' +
+        origemTag +
         tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
         endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div></div>'
       );
 
       radarMarker.radarData = {
-        id: i, latitude: finalLat, longitude: finalLng,
-        endereco: endereco, velocidade_maxima: velocidade,
-        tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA
+        id: i, 
+        latitude: finalLat, 
+        longitude: finalLng,
+        endereco: endereco, 
+        velocidade_maxima: velocidade,
+        tipoOriginal: tipo, 
+        tipoExibicao: tipoExibicao, 
+        isIA: isIA,
+        isAppRadar: isAppRadar
       };
+      
       radarMarkers.push(radarMarker);
+      if (isAppRadar) radaresAppMarkers.push(radarMarker);
       contador++;
+      if (isAppRadar) appCounter++;
     }
 
     $("#loading").hide();
-    if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
-    else showNotification("Nenhum radar encontrado.");
+    if (contador > 0) {
+      showNotification(`Base carregada: ${origem} (${contador} radares, ${appCounter} do usuário)`);
+    } else {
+      showNotification("Nenhum radar encontrado.");
+    }
   }
 
   function buscarRadares(query) {
@@ -2749,7 +2803,9 @@
       return; 
     }
     
-    map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
+    map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false });
+    // CORREÇÃO: Remover rotate: true pois o plugin não está carregando
+    // Usar método alternativo para rotação com CSS
     aplicarTemaMapa();
     setInterval(aplicarTemaMapa, 300000);
     inicializarBussolaHardware();
@@ -2844,7 +2900,7 @@
   }
 
   // ===================================================================
-  // INICIALIZAR BOTÃO ROTAÇÃO
+  // INICIALIZAR BOTÃO ROTAÇÃO (CORRIGIDO - sem leaflet-rotate)
   // ===================================================================
   function inicializarBotaoRotacaoMapa() {
     const rotateBtn = document.getElementById('btn-rotate-map');
@@ -2856,37 +2912,54 @@
       rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
     }
     
-    if (typeof map !== 'undefined' && map && typeof map.setBearing !== 'function') {
-      console.error('[Radar X9] ERRO: leaflet-rotate NÃO carregou!');
-      rotateBtn.style.opacity = '0.3'; rotateBtn.style.pointerEvents = 'none';
-      rotateBtn.title = 'Rotação indisponível'; 
-      showNotification('Plugin de rotação não carregou.'); 
-      return;
-    }
-    
-    rotateBtn.addEventListener('click', async function () {
-      if (!map || typeof map.setBearing !== 'function') return;
-      if (!bussolaHardwareDisponivel) { await solicitarPermissaoBussolaIOS(); }
+    rotateBtn.addEventListener('click', function () {
+      // Alternar entre modo normal e modo com bússola
+      mapaRotacionado = !mapaRotacionado;
       
-      if (!mapaRotacionado) {
-        mapaRotacionado = true;
-        const anguloRotacao = (currentHeading > 0 && currentHeading < 360) ? currentHeading : 0;
-        bearingAlvo = anguloRotacao; bearingAtual = anguloRotacao;
-        map.setBearing(anguloRotacao); rotateBtn.classList.add('rotated');
-        
-        if (rotateBtnIcon) {
-          rotateBtnIcon.src = "/imagens_app/ic_girar_map.png";
-          rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
-          rotateBtnIcon.style.transform = 'rotate(' + anguloRotacao + 'deg)';
+      if (mapaRotacionado) {
+        // Tentar usar bússola se disponível
+        if (bussolaHardwareDisponivel && currentHeading > 0) {
+          // Aplicar rotação via CSS no container do mapa
+          const mapContainer = document.getElementById('map');
+          if (mapContainer) {
+            mapContainer.style.transform = 'rotate(' + (-currentHeading) + 'deg)';
+            mapContainer.style.transition = 'transform 0.5s ease';
+          }
+          rotateBtn.classList.add('rotated');
+          if (rotateBtnIcon) {
+            rotateBtnIcon.src = "/imagens_app/ic_girar_map.png";
+            rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
+            rotateBtnIcon.style.transform = 'rotate(' + currentHeading + 'deg)';
+          }
+          showNotification('Mapa rotacionado com bússola');
+        } else {
+          // Usar heading do GPS como fallback
+          if (currentHeading > 0) {
+            const mapContainer = document.getElementById('map');
+            if (mapContainer) {
+              mapContainer.style.transform = 'rotate(' + (-currentHeading) + 'deg)';
+              mapContainer.style.transition = 'transform 0.5s ease';
+            }
+            rotateBtn.classList.add('rotated');
+            if (rotateBtnIcon) {
+              rotateBtnIcon.src = "/imagens_app/ic_girar_map.png";
+              rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
+              rotateBtnIcon.style.transform = 'rotate(' + currentHeading + 'deg)';
+            }
+            showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)');
+          } else {
+            showNotification('Aguardando direção...');
+            mapaRotacionado = false;
+          }
         }
-        
-        if (bussolaHardwareDisponivel) showNotification('Mapa rotacionado — bússola ativa');
-        else if (currentHeading > 0) showNotification('Mapa rotacionado ' + Math.round(currentHeading) + '° (GPS)');
-        else showNotification('Mapa rotacionado — aguardando direção...');
       } else {
-        mapaRotacionado = false; bearingAlvo = 0; bearingAtual = 0;
-        map.setBearing(0); rotateBtn.classList.remove('rotated');
-        
+        // Resetar rotação
+        const mapContainer = document.getElementById('map');
+        if (mapContainer) {
+          mapContainer.style.transform = 'rotate(0deg)';
+          mapContainer.style.transition = 'transform 0.5s ease';
+        }
+        rotateBtn.classList.remove('rotated');
         if (rotateBtnIcon) {
           rotateBtnIcon.src = "/imagens_app/ic_girado_map.png";
           rotateBtnIcon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3089/3089803.png'; };
@@ -2980,7 +3053,7 @@
     document.getElementById('github-token').value = GITHUB_CONFIG.token || '';
     document.getElementById('github-owner').value = GITHUB_CONFIG.owner || 'seabhra';
     document.getElementById('github-repo').value = GITHUB_CONFIG.repo || 'radar-speed-alert-api';
-    document.getElementById('github-path').value = GITHUB_CONFIG.path || 'radares.json';
+    document.getElementById('github-path').value = GITHUB_CONFIG.path || 'radares_app.json';
     document.getElementById('github-proxy').value = GITHUB_CONFIG.proxyUrl || '';
 
     modal.classList.add('active');
@@ -2994,7 +3067,7 @@
         token: document.getElementById('github-token').value.trim(),
         owner: document.getElementById('github-owner').value.trim() || 'seabhra',
         repo: document.getElementById('github-repo').value.trim() || 'radar-speed-alert-api',
-        path: document.getElementById('github-path').value.trim() || 'radares.json',
+        path: document.getElementById('github-path').value.trim() || 'radares_app.json',
         proxyUrl: document.getElementById('github-proxy').value.trim()
       };
 
@@ -3263,16 +3336,6 @@
   }
 
   // ===================================================================
-  // FUNÇÃO CAPTURAR POSIÇÃO (chamada pelo botão no modal)
-  // ===================================================================
-  function capturarPosicaoRadar() {
-    // Esta função é chamada pelo onclick no botão
-    // A implementação está dentro de inicializarBotaoAddRadar
-    // Mantida para compatibilidade
-    console.log('[Radar X9] Capturar posição chamado');
-  }
-
-  // ===================================================================
   // INICIALIZAÇÃO
   // ===================================================================
   window.onload = function() {
@@ -3282,7 +3345,6 @@
       initMap();
       iniciarBussolaHardware();
       
-      // Esconder loading após 2s se ainda estiver visível
       setTimeout(() => {
         const l = document.getElementById('loading-fullscreen');
         if (l) {
