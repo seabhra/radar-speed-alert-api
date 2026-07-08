@@ -17,6 +17,9 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
 
+  script src="https://unpkg.com/leaflet.rotate@0.0.5/leaflet.rotate.js"></script>
+  
+
   <style>
     /* ===== CORREÇÃO: Estilos completos mantidos ===== */
     :root {
@@ -738,6 +741,51 @@
     DISPAROS_SOM_ANTES_DE_SILENCIAR: 2
   };
 
+    
+  // ===================================================================
+  // VARIAVEL DE CONTROLE DE ROTAÇÃO DO MAPA
+  // ===================================================================
+
+let isMapRotated = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btnRotateMap = document.getElementById('btn-rotate-map');
+    const mapElement = document.getElementById('map');
+
+    // Verifica se o botão e o mapa existem
+    if (btnRotateMap && window.map) {
+        btnRotateMap.addEventListener('click', function() {
+            isMapRotated = !isMapRotated; // Alterna o estado
+
+            if (isMapRotated) {
+                // Gira o mapa 90 graus
+                window.map.setBearing(90);
+                btnRotateMap.classList.add('rotated'); // Adiciona o efeito visual
+                showToast('Mapa rotacionado: Leste para cima');
+            } else {
+                // Volta o mapa ao normal (Norte para cima)
+                window.map.setBearing(0);
+                btnRotateMap.classList.remove('rotated'); // Remove o efeito visual
+                showToast('Mapa resetado: Norte para cima');
+            }
+        });
+    } else {
+        console.error('Botão de girar ou mapa não encontrados.');
+    }
+});
+
+// Função auxiliar de notificação (caso você já não a tenha no seu código)
+function showToast(message) {
+    const toast = document.getElementById('toast-msg');
+    if (toast) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+}
+    
   // ===================================================================
   // MAPEAMENTO DE ÍCONES
   // ===================================================================
