@@ -3342,6 +3342,49 @@
     map.on('dragstart', ()=>isFollowing=false);
 });
 
+//=========================================
+// Variável de controle do estado de rotação
+//==========================================
+
+let isMapRotated = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const btnRotateMap = document.getElementById('btn-rotate-map');
+    const mapElement = document.getElementById('map');
+
+    // Verifica se o botão e o mapa existem
+    if (btnRotateMap && window.map) {
+        btnRotateMap.addEventListener('click', function() {
+            isMapRotated = !isMapRotated; // Alterna o estado
+
+            if (isMapRotated) {
+                // Gira o mapa 90 graus
+                window.map.setBearing(90);
+                btnRotateMap.classList.add('rotated'); // Adiciona o efeito visual
+                showToast('Mapa rotacionado: Leste para cima');
+            } else {
+                // Volta o mapa ao normal (Norte para cima)
+                window.map.setBearing(0);
+                btnRotateMap.classList.remove('rotated'); // Remove o efeito visual
+                showToast('Mapa resetado: Norte para cima');
+            }
+        });
+    } else {
+        console.error('Botão de girar ou mapa não encontrados.');
+    }
+});
+
+// Função auxiliar de notificação (caso você já não a tenha no seu código)
+function showToast(message) {
+    const toast = document.getElementById('toast-msg');
+    if (toast) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+}
   </script>
 </body>
 </html>
