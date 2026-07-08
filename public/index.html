@@ -3297,6 +3297,51 @@
   };
 
   console.log('[Radar X9] ✅ Código carregado com sucesso!');
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    await carregarConfigGitHub(); carregarPendentesLocal(); initMap(); iniciarBussolaHardware();
+    setTimeout(()=>{ const l=document.getElementById('loading-fullscreen'); if(l){l.classList.add('fade-out');setTimeout(()=>{if(l)l.style.display='none';},600);} }, 1500);
+
+    // Event Listeners
+    document.getElementById('btn-menu-toggle').addEventListener('click', toggleSidebar);
+    document.getElementById('btn-rotate-map').addEventListener('click', toggleMapRotation);
+    document.getElementById('btn-alert-toggle').addEventListener('click', function() {
+        alertaHabilitado=!alertaHabilitado; const b=document.getElementById('btn-alert-toggle'), i=document.getElementById('alert-toggle-icon');
+        if(alertaHabilitado){b.classList.remove('alert-off');i.src='/imagens_app/ic_sound_on.png';showToast('Alertas ON');}else{b.classList.add('alert-off');i.src='/imagens_app/ic_sound_off.png';hideAlert();showToast('Alertas OFF');}
+    });
+    document.getElementById('btn-search-bar').addEventListener('click', toggleSearchBar);
+    document.getElementById('btn-route-bar').addEventListener('click', toggleRouteBar);
+    document.getElementById('btn-center').addEventListener('click', function() { isFollowing=true; if(gpsInitialized) centralizarMapa(userLat,userLng); });
+    document.getElementById('btn-refresh').addEventListener('click', function() { carregarTodosRadares(); resetMap(); });
+    document.getElementById('btn-zoom-in').addEventListener('click', ()=>map.zoomIn());
+    document.getElementById('btn-zoom-out').addEventListener('click', ()=>map.zoomOut());
+    document.getElementById('btn-search-radar').addEventListener('click', ()=>buscarRadares(document.getElementById('query').value));
+    document.getElementById('query').addEventListener('keypress', function(e) { if(e.key==='Enter') buscarRadares(this.value); });
+    document.getElementById('btn-calc-route').addEventListener('click', ()=>calcularRota(document.getElementById('route-query').value));
+    document.getElementById('route-query').addEventListener('keypress', function(e) { if(e.key==='Enter') calcularRota(this.value); });
+    
+    document.getElementById('btn-add-radar').addEventListener('click', openAddRadarModal);
+    document.getElementById('modal-close').addEventListener('click', closeAddRadarModal);
+    document.getElementById('btn-submit-radar').addEventListener('click', submitRadar);
+    
+    // OUVINTE DO BOTÃO DE CAPTURA DE POSIÇÃO
+       
+   document.getElementById('btn-capture-location').addEventListener('click', capturarPosicaoRadar);
+   
+    document.getElementById('radar-type').addEventListener('change', function() {
+        selectedType=this.value; document.getElementById('icon-preview-img').src=getIconForRadar(selectedType);
+        document.getElementById('icon-preview-name').textContent=ajustarNome(selectedType); document.getElementById('icon-preview-group').style.display='flex';
+    });
+    document.querySelectorAll('.speed-btn').forEach(btn=>btn.addEventListener('click', function() {
+        document.querySelectorAll('.speed-btn').forEach(b=>b.className='speed-btn');
+        selectedSpeed=this.getAttribute('data-speed'); this.classList.add('selected','selected-'+selectedSpeed);
+    }));
+    document.getElementById('modal-config-close').addEventListener('click', ()=>document.getElementById('modal-config-github').classList.remove('active'));
+    document.getElementById('btn-save-github-config').addEventListener('click', saveConfigFromModal);
+    document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click', function(e) { if(e.target===this) this.classList.remove('active'); }));
+    map.on('dragstart', ()=>isFollowing=false);
+});
+
   </script>
 </body>
 </html>
