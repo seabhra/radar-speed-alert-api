@@ -686,11 +686,11 @@ let gpsLastUpdateTime = 0;
 let GITHUB_CONFIG = {
     owner: 'seabhra',
     repo: 'radar-speed-alert-api',
-    path: 'radares.json',
+    path: 'radares.json',      // Arquivo curado/manual (somente leitura)
     token: '',
     proxyUrl: '',
     _branchCache: null,
-    // CORREÇÃO: Separar radares_app.json do radares.json (curado/manual)
+    // CORREÇÃO: radares_app.json para radares inseridos pelos usuários
     appPath: 'radares_app.json',
     get cdnUrl() {
         return `https://cdn.jsdelivr.net/gh/${this.owner}/${this.repo}@main/${this.path}`;
