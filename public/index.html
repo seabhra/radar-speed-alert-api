@@ -37,141 +37,66 @@
         --gps-ok: #00ff88;
         --gps-instavel: #ffcc00;
         --gps-sem: #ff3333;
-        --destaque-color: #1fc7c7; /* AZUL TURQUESA - Lugares em Destaque */
+        --destaque-color: #1fc7c7;
     }
-    * {
-        box-sizing: border-box; margin: 0; padding: 0;
-        -webkit-tap-highlight-color: transparent;
-    }
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-main);
-        height: 100vh; display: flex; flex-direction: column; overflow: hidden;
-    }
-    header {
-        background-color: var(--panel-color); padding: 15px;
-        display: flex; align-items: center; justify-content: space-between;
-        border-bottom: 2px solid var(--accent-color);
-        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
-        z-index: 1000; flex-shrink: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    header { background-color: var(--panel-color); padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid var(--accent-color); box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1); z-index: 1000; flex-shrink: 0; }
     .header-left { display: flex; align-items: center; gap: 10px; }
     .app-icon { width: 50px; height: 40px; border-radius: 8px; object-fit: contain; }
     h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
     h1 span { color: var(--accent-color); }
 
-    .gps-status-wrapper {
-        display: flex; align-items: center; gap: 6px; margin-left: 8px;
-        padding: 4px 10px; border-radius: 20px; background: rgba(0,0,0,0.35);
-        border: 1px solid rgba(255,255,255,0.06); cursor: default; user-select: none;
-        transition: border-color 0.4s ease;
-    }
-    .gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
+    .gps-status-wrapper { display: flex; align-items: center; gap: 6px; margin-left: 8px; padding: 4px 10px; border-radius: 20px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.06); cursor: default; user-select: none; transition: border-color 0.4s ease; }
+    .gps-status-wrapper.gps-ok { border-color: rgba(0,255,136,0.25); }
     .gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
-    .gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
-    .gps-status-dot {
-        width: 10px; height: 10px; border-radius: 50%; background-color: var(--gps-sem);
-        position: relative; flex-shrink: 0; transition: background-color 0.4s ease;
-    }
-    .gps-status-dot::after {
-        content: ''; position: absolute; inset: -3px; border-radius: 50%;
-        background-color: inherit; opacity: 0.5;
-        animation: gpsPulse 2s ease-in-out infinite;
-    }
-    .gps-status-dot.ok   { background-color: var(--gps-ok); }
+    .gps-status-wrapper.gps-err { border-color: rgba(255,51,51,0.3); }
+    .gps-status-dot { width: 10px; height: 10px; border-radius: 50%; background-color: var(--gps-sem); position: relative; flex-shrink: 0; transition: background-color 0.4s ease; }
+    .gps-status-dot::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; background-color: inherit; opacity: 0.5; animation: gpsPulse 2s ease-in-out infinite; }
+    .gps-status-dot.ok { background-color: var(--gps-ok); }
     .gps-status-dot.warn { background-color: var(--gps-instavel); }
-    .gps-status-dot.err  { background-color: var(--gps-sem); }
+    .gps-status-dot.err { background-color: var(--gps-sem); }
     @keyframes gpsPulse { 0%,100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(2.2); opacity: 0; } }
-    .gps-status-label {
-        font-size: 0.6rem; font-weight: 700; letter-spacing: 0.8px;
-        text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
-        transition: color 0.4s ease;
-    }
-    .gps-status-wrapper.gps-ok   .gps-status-label { color: var(--gps-ok); }
+    .gps-status-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); white-space: nowrap; transition: color 0.4s ease; }
+    .gps-status-wrapper.gps-ok .gps-status-label { color: var(--gps-ok); }
     .gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
-    .gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
+    .gps-status-wrapper.gps-err .gps-status-label { color: var(--gps-sem); }
 
-    .btn-menu-toggle {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 2px; background: none; border: 1.5px solid rgba(0, 255, 136, 0.3);
-        border-radius: 10px; padding: 8px 14px 6px; cursor: pointer;
-        transition: all 0.25s ease; user-select: none; -webkit-user-select: none;
-        position: relative; z-index: 1001;
-    }
+    .btn-menu-toggle { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: 1.5px solid rgba(0, 255, 136, 0.3); border-radius: 10px; padding: 8px 14px 6px; cursor: pointer; transition: all 0.25s ease; user-select: none; position: relative; z-index: 1001; }
     .btn-menu-toggle:hover { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.06); }
     .btn-menu-toggle:active { transform: scale(0.93); }
     .menu-hamburger { display: flex; flex-direction: column; gap: 4px; width: 22px; }
-    .menu-hamburger span {
-        display: block; height: 2.5px; width: 100%;
-        background-color: var(--accent-color); border-radius: 2px;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center;
-    }
+    .menu-hamburger span { display: block; height: 2.5px; width: 100%; background-color: var(--accent-color); border-radius: 2px; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center; }
     .btn-menu-toggle.active .menu-hamburger span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
     .btn-menu-toggle.active .menu-hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
     .btn-menu-toggle.active .menu-hamburger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-    .menu-label {
-        font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px;
-        color: var(--accent-color); text-transform: uppercase; line-height: 1; margin-top: 2px;
-    }
+    .menu-label { font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px; color: var(--accent-color); text-transform: uppercase; line-height: 1; margin-top: 2px; }
 
-    .sidebar-controls {
-        position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width);
-        z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 10px; padding: 20px 0; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateX(0); pointer-events: auto;
-    }
+    .sidebar-controls { position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width); z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px 0; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); pointer-events: auto; }
     .sidebar-controls.retracted { transform: translateX(calc(var(--sidebar-width) + 15px)); pointer-events: none; }
     .sidebar-controls .map-btn { width: var(--btn-size); height: var(--btn-size); opacity: 1; transition: opacity 0.3s ease 0s, transform 0.2s ease, border-color 0.2s ease; }
     .sidebar-controls.retracted .map-btn { opacity: 0; pointer-events: none; transition: opacity 0.2s ease 0s, transform 0.2s ease, border-color 0.2s ease; }
 
-    .search-container {
-        position: absolute; top: 0; left: 0; width: 100%; background-color: rgba(26, 29, 36, 0.98);
-        backdrop-filter: blur(8px); display: flex; gap: 12px; z-index: 1000; max-height: 0;
-        overflow: hidden; opacity: 0; padding: 0 15px; border-bottom: 1px solid transparent;
-        transition: all 0.3s ease; align-items: center;
-    }
+    .search-container { position: absolute; top: 0; left: 0; width: 100%; background-color: rgba(26, 29, 36, 0.98); backdrop-filter: blur(8px); display: flex; gap: 12px; z-index: 1000; max-height: 0; overflow: hidden; opacity: 0; padding: 0 15px; border-bottom: 1px solid transparent; transition: all 0.3s ease; align-items: center; }
     .search-container.active { max-height: 90px; opacity: 1; padding: 15px; border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
-    .search-container input {
-        flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444;
-        background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
-    }
+    .search-container input { flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444; background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif; }
     .search-container input:focus { border-color: var(--accent-color); }
-    .btn-search {
-        position: relative; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%;
-        border: none; cursor: pointer; background: rgba(46, 102, 158, 0.95);
-        box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); transition: all 0.2s ease; overflow: hidden;
-    }
+    .btn-search { position: relative; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%; border: none; cursor: pointer; background: rgba(46, 102, 158, 0.95); box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); transition: all 0.2s ease; overflow: hidden; }
     .btn-search:active { transform: scale(0.9); }
     .btn-search img { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; object-fit: contain; display: block; transform: translate(-50%, -50%); }
 
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; position: relative; }
 
-    .compass-widget {
-        position: absolute; top: 10px; left: 5px; width: 65px; height: 65px;
-        z-index: 999999 !important; transform: translateZ(0); will-change: transform;
-        display: flex; align-items: center; justify-content: center; pointer-events: none;
-        transition: opacity 0.3s ease, top 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1;
-    }
+    .compass-widget { position: absolute; top: 10px; left: 5px; width: 65px; height: 65px; z-index: 999999 !important; transform: translateZ(0); will-change: transform; display: flex; align-items: center; justify-content: center; pointer-events: none; transition: opacity 0.3s ease, top 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1; }
     .compass-widget.hidden { opacity: 0; pointer-events: none; }
     .compass-widget.busca-ativo { top: 75px; }
-    .compass-base {
-        position: absolute; width: 100%; height: 100%; z-index: 1;
-        background-image: url('/imagens_app/ic_compass.png'); background-size: contain;
-        background-repeat: no-repeat; background-position: center; opacity: 0.9;
-    }
+    .compass-base { position: absolute; width: 100%; height: 100%; z-index: 1; background-image: url('/imagens_app/ic_compass.png'); background-size: contain; background-repeat: no-repeat; background-position: center; opacity: 0.9; }
     .compass-needle { position: absolute; width: 55%; height: 55%; z-index: 2; object-fit: contain; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
 
-    .leaflet-pane, .leaflet-map-pane, .leaflet-tile-pane, .leaflet-overlay-pane, .leaflet-shadow-pane,
-    .leaflet-marker-pane, .leaflet-popup-pane, .leaflet-control-pane, .leaflet-tooltip-pane { z-index: 1 !important; }
+    .leaflet-pane, .leaflet-map-pane, .leaflet-tile-pane, .leaflet-overlay-pane, .leaflet-shadow-pane, .leaflet-marker-pane, .leaflet-popup-pane, .leaflet-control-pane, .leaflet-tooltip-pane { z-index: 1 !important; }
 
-    .map-btn {
-        width: var(--btn-size); height: var(--btn-size); display: flex; align-items: center;
-        justify-content: center; border-radius: 50%; cursor: pointer; background: rgba(20, 20, 20, 0.92);
-        border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-        transition: all 0.2s ease; flex-shrink: 0;
-    }
+    .map-btn { width: var(--btn-size); height: var(--btn-size); display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; background: rgba(20, 20, 20, 0.92); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6); transition: all 0.2s ease; flex-shrink: 0; }
     .map-btn:hover { transform: scale(1.08); border-color: var(--accent-color); }
     .map-btn:active { transform: scale(0.92); }
     .map-btn img { width: 30px; height: 30px; object-fit: contain; pointer-events: none; }
@@ -198,64 +123,33 @@
     .speed-widget { position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500; display: flex; align-items: center; justify-content: center; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
     .speed-widget.alerta-ativo { bottom: 75px !important; }
     .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
-    .speed-value {
-        position: absolute; top: 50%; left: 50%; transform: translate(-64%, -60%);
-        font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-        color: #000; line-height: 1; z-index: 2; white-space: nowrap; text-align: center;
-        font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch;
-    }
+    .speed-value { position: absolute; top: 50%; left: 50%; transform: translate(-64%, -60%); font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif; color: #000; line-height: 1; z-index: 2; white-space: nowrap; text-align: center; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch; }
 
     #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
 
     .alert-bar { color: white; padding: 18px; display: flex; align-items: center; gap: 15px; transition: all 0.2s ease; }
-    .alert-bar-radar, .alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]):not([class*="-destaque"]) { background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); }
+    .alert-bar-radar { background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); }
     .alert-bar-risco { background: linear-gradient(90deg, #e6a800, #b38600); border-top: 2px solid #ffcc00; box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); }
     .alert-bar-mobilidade { background: linear-gradient(90deg, #00b359, #008040); border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
-
-    /* ===== ALERTA DE LUGARES EM DESTAQUE (AZUL TURQUESA) ===== */
- .alert-bar-destaque {
-        background: linear-gradient(90deg, #1fc7c7, #109090);
-        border-top: 2px solid #5fecec;
-        box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5);
-    }
-    .alert-bar-destaque .alert-info h3 { color: #ffffff; text-shadow: 0 0 8px rgba(31, 199, 199, 0.8); }
-    .alert-bar-destaque img { filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9)); }
- 
-    
+    .alert-bar-destaque { background: linear-gradient(90deg, #1fc7c7, #109090); border-top: 2px solid #5fecec; box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5); }
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
     .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
     .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
     .alert-info p { font-size: 0.95rem; opacity: 0.95; }
 
-    .toast-notification {
-        position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
-        background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px;
-        border-radius: 50px; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-        z-index: 2000; opacity: 0; font-size: 0.95rem; font-weight: 600; text-align: center;
-        pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; white-space: nowrap;
-    }
+    .toast-notification { position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px; border-radius: 50px; border: 1px solid #444; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8); z-index: 2000; opacity: 0; font-size: 0.95rem; font-weight: 600; text-align: center; pointer-events: none; transition: opacity 0.3s ease, transform 0.3s ease; white-space: nowrap; }
     .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    .loading-overlay {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        background: rgba(20, 20, 20, 0.9); padding: 20px 30px; border-radius: 12px;
-        border: 1px solid var(--accent-color); text-align: center; z-index: 1001; backdrop-filter: blur(5px);
-    }
+    .loading-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 20, 20, 0.9); padding: 20px 30px; border-radius: 12px; border: 1px solid var(--accent-color); text-align: center; z-index: 1001; backdrop-filter: blur(5px); }
     .loading-spinner { border: 3px solid #333; border-top: 3px solid var(--accent-color); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
     @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    .loading-fullscreen {
-        position: fixed; inset: 0; background-color: var(--bg-color); display: flex;
-        flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
-        transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
+    .loading-fullscreen { position: fixed; inset: 0; background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease, visibility 0.5s ease; }
     .loading-fullscreen.fade-out { opacity: 0; visibility: hidden; }
     .loading-fullscreen .spinner-ring { width: 60px; height: 60px; border-radius: 50%; position: relative; margin-bottom: 24px; }
-    .loading-fullscreen .spinner-ring::before, .loading-fullscreen .spinner-ring::after {
-        content: ''; position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent;
-    }
+    .loading-fullscreen .spinner-ring::before, .loading-fullscreen .spinner-ring::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 4px solid transparent; }
     .loading-fullscreen .spinner-ring::before { border-top-color: var(--accent-color); border-right-color: var(--accent-color); animation: spinRing 1s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite; }
     .loading-fullscreen .spinner-ring::after { inset: 10px; border-bottom-color: #ff3333; border-left-color: #ff3333; animation: spinRing 1.4s cubic-bezier(0.68, -0.15, 0.27, 1.15) infinite reverse; }
     @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -266,23 +160,13 @@
 
     .leaflet-control-zoom, .leaflet-control-attribution, .leaflet-routing-container { display: none !important; }
 
-    .btn-add-radar {
-        position: absolute; bottom: 10px; right: 10px !important; width: 60px; height: 60px;
-        border-radius: 50%; background: linear-gradient(135deg, #00cc66, #00994d);
-        border: 2px solid rgba(0, 255, 136, 0.4); box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
-        cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); animation: pulsePlus 2s ease-in-out infinite;
-    }
+    .btn-add-radar { position: absolute; bottom: 10px; right: 10px !important; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #00cc66, #00994d); border: 2px solid rgba(0, 255, 136, 0.4); box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5); cursor: pointer; z-index: 1000; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); animation: pulsePlus 2s ease-in-out infinite; }
     @keyframes pulsePlus { 0%, 100% { box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5); } 50% { box-shadow: 0 4px 35px rgba(0, 204, 102, 0.8); } }
     .btn-add-radar:hover { transform: scale(1.12); box-shadow: 0 4px 30px rgba(0, 204, 102, 0.7); }
     .btn-add-radar:active { transform: scale(0.92); }
     .btn-add-radar .plus-icon { font-size: 40px; font-weight: 300; color: white; line-height: 1; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); margin-top: -2px; }
 
-    .modal-overlay {
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center;
-        padding: 20px; animation: modalFadeIn 0.3s ease-out;
-    }
+    .modal-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; animation: modalFadeIn 0.3s ease-out; }
     .modal-overlay.active { display: flex; }
     @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
@@ -295,25 +179,16 @@
 
     .form-group { margin-bottom: 18px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-select, .form-input {
-        width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #333;
-        background: #0f1115; color: #fff; font-size: 1rem; font-family: 'Inter', sans-serif;
-        transition: border-color 0.3s ease; outline: none;
-    }
+    .form-select, .form-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #333; background: #0f1115; color: #fff; font-size: 1rem; font-family: 'Inter', sans-serif; transition: border-color 0.3s ease; outline: none; }
     .form-select:focus, .form-input:focus { border-color: var(--accent-color); }
     .form-select option { background: #1a1d24; color: #fff; padding: 8px; }
 
-    /* Select de lugares em destaque - cor turquesa quando ALE selecionado */
     #destaque-lugar-group { display: none; }
     #destaque-lugar-group.ativo { display: block; animation: modalFadeIn 0.25s ease-out; }
     #destaque-lugar-group label { color: var(--destaque-color); }
 
     .speed-buttons-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 4px; }
-    .speed-btn {
-        padding: 10px 0; border: 2px solid #333; border-radius: 10px; background: #0f1115;
-        color: var(--text-muted); font-size: 0.95rem; font-weight: 700; cursor: pointer;
-        transition: all 0.25s ease; font-family: 'Inter', sans-serif;
-    }
+    .speed-btn { padding: 10px 0; border: 2px solid #333; border-radius: 10px; background: #0f1115; color: var(--text-muted); font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.25s ease; font-family: 'Inter', sans-serif; }
     .speed-btn:hover { border-color: var(--accent-color); color: var(--text-main); background: rgba(0, 255, 136, 0.05); }
     .speed-btn.selected { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.15); color: var(--accent-color); box-shadow: 0 0 20px rgba(0, 255, 136, 0.15); }
     .speed-btn.selected-30 { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
@@ -329,20 +204,10 @@
     .icon-preview img { width: 40px; height: 40px; object-fit: contain; }
     .icon-preview span { font-size: 0.95rem; color: var(--text-main); }
 
-    .btn-capture-location {
-        width: 100%; padding: 14px 16px; border-radius: 12px;
-        border: 2px dashed rgba(0, 255, 136, 0.4); background: rgba(0, 255, 136, 0.05);
-        color: var(--accent-color); font-size: 1rem; font-weight: 700;
-        cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif;
-        margin-bottom: 4px; text-align: center;
-    }
+    .btn-capture-location { width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px dashed rgba(0, 255, 136, 0.4); background: rgba(0, 255, 136, 0.05); color: var(--accent-color); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-family: 'Inter', sans-serif; margin-bottom: 4px; text-align: center; }
     .btn-capture-location:hover { background: rgba(0, 255, 136, 0.15); border-style: solid; }
     .btn-capture-location:active { transform: scale(0.98); }
     .btn-capture-location.captured { border-style: solid; border-color: var(--accent-color); background: rgba(0, 255, 136, 0.12); color: var(--text-main); }
-
-    .current-position { background: #0f1115; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; color: var(--text-muted); display: none; justify-content: space-between; margin-bottom: 4px; }
-    .current-position span { font-family: 'Courier New', monospace; color: var(--accent-color); }
-    .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; font-style: italic; text-align: center; }
 
     .coords-inputs-container { display: none; flex-direction: row; gap: 10px; margin-top: 8px; }
     .coord-field { flex: 1; display: flex; flex-direction: column; gap: 4px; }
@@ -351,16 +216,11 @@
     .coord-input::placeholder { color: #333; }
     .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; font-style: italic; text-align: center; }
 
-    .btn-submit-radar {
-        width: 100%; padding: 14px; border: none; border-radius: 14px;
-        background: linear-gradient(135deg, #00cc66, #00994d); color: white; font-size: 1.1rem;
-        font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 204, 102, 0.3); margin-top: 10px;
-    }
+    .btn-submit-radar { width: 100%; padding: 14px; border: none; border-radius: 14px; background: linear-gradient(135deg, #00cc66, #00994d); color: white; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 204, 102, 0.3); margin-top: 10px; }
     .btn-submit-radar:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(0, 204, 102, 0.5); }
     .btn-submit-radar:active { transform: scale(0.97); }
     .btn-submit-radar:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-    .status-loading { color: var(--accent-color); font-size: 0.85rem; animation: pulseText 1.5s ease-in-out infinite; }
     .menu-dropdown { animation: menuSlideIn 0.2s ease-out; }
     @keyframes menuSlideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     .menu-item:hover { background: rgba(0, 255, 136, 0.1); }
@@ -499,12 +359,10 @@
               <option value="Radar de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
               <option value="Zona de Estudo Nuclear (ZEN)">☢️ Zona de Estudo Nuclear (ZEN)</option>
               <option value="Controle de Redução de Velocidade (CRV)">⬇️ Redução de Velocidade (CRV)</option>
-              <!-- ===== NOVA OPÇÃO: LUGARES EM DESTAQUE ===== -->
               <option value="Alerta de Lugares em Destaque (ALE)">📍 Lugares em Destaque (ALE)</option>
             </select>
           </div>
 
-          <!-- Sub-seletor dinâmico para LUGARES EM DESTAQUE -->
           <div class="form-group" id="destaque-lugar-group">
             <label for="destaque-lugar">Selecione o Lugar em Destaque</label>
             <select id="destaque-lugar" class="form-select">
@@ -658,60 +516,40 @@ let GITHUB_CONFIG = {
 let RADAR_MODO_OFFLINE = false;
 let RADAR_PENDENTES_SINCRONIZAR = [];
 
-async function carregarConfigGitHub() {
-    try {
-        const response = await fetch('/api/config');
-        if (response.ok) {
-            const config = await response.json();
-            Object.assign(GITHUB_CONFIG, {
-                owner: config.githubOwner || GITHUB_CONFIG.owner,
-                repo: config.githubRepo || GITHUB_CONFIG.repo,
-                path: config.githubPath || GITHUB_CONFIG.path,
-                token: config.githubToken || '',
-                proxyUrl: config.proxyUrl || '',
-                appPath: config.githubAppPath || 'radares_app.json'
-            });
-            return true;
-        }
-    } catch (err) { console.warn('[Radar X9] Backend não disponível.'); }
-    try {
-        const savedConfig = localStorage.getItem('radarx9_github_config');
-        if (savedConfig) {
-            const config = JSON.parse(savedConfig);
-            Object.assign(GITHUB_CONFIG, config);
-            return true;
-        }
-    } catch (err) { console.warn('[Radar X9] localStorage não disponível.'); }
-    return false;
+// ===================================================================
+// FUNÇÕES AUXILIARES
+// ===================================================================
+function showToast(msg, duracao) {
+    const toast = document.getElementById('toast-msg');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(function() {
+        toast.classList.remove('show');
+    }, duracao || 2500);
 }
 
-// ===================================================================
-// CONFIGURAÇÃO DE ALERTAS
-// ===================================================================
-const ALERT_CONFIG = {
-    DISTANCIA_MAXIMA: 180,
-    DISTANCIA_CRITICA: 100,
-    TEMPO_ALERTA: 15000,
-    DISTANCIA_PASSAR_RADAR: 30,
-    ANGULO_APROXIMACAO: 100,
-    ANGULO_AFASTANDO: 140,
-    HISTORICO_TAMANHO: 5,
-    SUAVIZACAO_FATOR: 0.6,
-    DISTANCIA_MINIMA_MOVIMENTO: 2,
-    DISPAROS_SOM_ANTES_DE_SILENCIAR: 2
-};
+function hideFullscreenLoading() {
+    const el = document.getElementById('loading-fullscreen');
+    if (el) { el.classList.add('fade-out'); setTimeout(function() { el.remove(); }, 600); }
+}
 
-let currentHeading = 0;
-let mapaRotacionado = false;
-let bussolaHardwareDisponivel = false;
-let ultimaAtualizacaoRotacao = 0;
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+    var R = 6371e3;
+    var p1 = lat1 * Math.PI / 180;
+    var p2 = lat2 * Math.PI / 180;
+    var dp = (lat2 - lat1) * Math.PI / 180;
+    var dl = (lon2 - lon1) * Math.PI / 180;
+    var a = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
 
-var posicaoSuavizada = { lat: null, lng: null };
-var historicoPosicoes = [];
-var historicoDistanciasRadar = {};
-var ultimaPosicaoMarcador = { lat: null, lng: null };
-var animacaoMarcadorAtiva = false;
-var tipoAlertaAtivo = null;
+function suavizarBearing(alvo, atual, fator) {
+    var diff = alvo - atual;
+    while (diff > 180) diff -= 360;
+    while (diff < -180) diff += 360;
+    return (atual + diff * fator + 360) % 360;
+}
 
 // ===================================================================
 // GPS STATUS INDICATOR
@@ -759,7 +597,6 @@ setInterval(function() {
 // MAPEAMENTO DE ÍCONES - INCLUINDO LUGARES EM DESTAQUE (ALE)
 // ===================================================================
 const iconMap = {
-    // === Radares padrão ===
     'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
     'Controlador Eletrônico de Velocidade (CEV)':'/imagens_app/ic_radar_cev_v2.png',
     'Controlador Eletrônico Misto (CEM)':'/imagens_app/ic_radar_cev_v2.png',
@@ -799,9 +636,6 @@ const iconMap = {
     'Radar de Caminhão na Faixa Esquerda (CFE)':'/imagens_app/ic_caminhao_faixa.png',
     'Zona de Estudo Nuclear (ZEN)':'/imagens_app/ic_zona_nuclear.png',
     'Zona de Perigo e Violência (ZPV)':'/imagens_app/ic_zona_perigo.png',
-
-    // === ALERTA DE LUGARES EM DESTAQUE (ALE) ===
-    // Variações com hífen "-" (formato do radares.json)
     'Alerta de Lugares em Destaque (ALE) - Mercado Central - Gastronomia': '/imagens_app/ic_mercado_central.png',
     'Alerta de Lugares em Destaque (ALE) - Mirante do Mangabeiras - Mirante': '/imagens_app/ic_mirante_mangabeiras.png',
     'Alerta de Lugares em Destaque (ALE) - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
@@ -821,70 +655,37 @@ const iconMap = {
     'Alerta de Lugares em Destaque (ALE) - Praça da Savassi - Gastronomia': '/imagens_app/ic_praca_savassi.png',
     'Alerta de Lugares em Destaque (ALE) - Museu de Artes e Ofícios - História': '/imagens_app/ic_museu_artes_oficios.png',
     'Alerta de Lugares em Destaque (ALE) - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
-    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato - Nações Unidas - Artesanato': '/imagens_app/ic_polo_artesanato.png',
-    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas': '/imagens_app/ic_polo_artesanato.png'
+    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato - Nações Unidas - Artesanato': '/imagens_app/ic_polo_artesanato.png'
+};
 
- };
-
-// Ícone fallback genérico para ALE
 const ICON_DESTAQUE_FALLBACK = '/imagens_app/ic_destaque_generico.png';
-
-// ===================================================================
-// NORMALIZAR TEXTO (para buscar ícone ignorando hífens/travessões)
-// ===================================================================
-function normalizarTexto(str) {
-    if (!str) return '';
-    return String(str)
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
-        .replace(/[–—]/g, '-') // unifica travessões para hífen
-        .replace(/\s*-\s*/g, ' - ') // espaça hífens
-        .replace(/\s+/g, ' ')
-        .trim();
-}
 
 function obterIconeRadar(tipoRadar) {
     if (!tipoRadar) return '/imagens_app/ic_radar_das.png';
-    // Busca direta
     if (iconMap[tipoRadar]) return iconMap[tipoRadar];
-    // Busca normalizada (cobre variações de hífen/travessão)
-    const tipoNorm = normalizarTexto(tipoRadar);
-    for (const chave in iconMap) {
-        if (normalizarTexto(chave) === tipoNorm) return iconMap[chave];
-    }
-    // Fallback para ALE
     if (tipoRadar.indexOf('ALE') !== -1 || tipoRadar.indexOf('Lugares em Destaque') !== -1) {
         return ICON_DESTAQUE_FALLBACK;
     }
     return '/imagens_app/ic_radar_das.png';
 }
 
-// ===================================================================
-// DETECTAR TIPO DE ALERTA
-// ===================================================================
 function detectarTipoAlerta(tipoRadar) {
-    if (!tipoRadar) return { classe: '', somId: 'alert-sound-radar' };
+    if (!tipoRadar) return { classe: 'alert-bar-radar', somId: 'alert-sound-radar' };
     const t = String(tipoRadar).toLowerCase();
-    // LUGARES EM DESTAQUE (turquesa)
     if (t.indexOf('lugares em destaque') !== -1 || t.indexOf('(ale)') !== -1) {
         return { classe: 'alert-bar-destaque', somId: 'alert-sound-destaque' };
     }
-    // RISCO (amarelo) - inundações, perigo, violência
     if (t.indexOf('inunda') !== -1 || t.indexOf('risco') !== -1 ||
         t.indexOf('perigo') !== -1 || t.indexOf('violência') !== -1 ||
         t.indexOf('acidente') !== -1) {
         return { classe: 'alert-bar-risco', somId: 'alert-sound-risco' };
     }
-    // MOBILIDADE (verde) - zonas verdes, trânsito local
     if (t.indexOf('zona verde') !== -1 || t.indexOf('trânsito local') !== -1) {
         return { classe: 'alert-bar-mobilidade', somId: 'alert-sound-aviso' };
     }
-    // PADRÃO (vermelho) - radares de velocidade/semáforo
     return { classe: 'alert-bar-radar', somId: 'alert-sound-radar' };
 }
 
-// ===================================================================
-// EXIBIR ALERTA NA TELA
-// ===================================================================
 function exibirAlerta(radar, distancia, critico) {
     const container = document.getElementById('alert-container');
     const alertBar = container.querySelector('.alert-bar');
@@ -892,25 +693,11 @@ function exibirAlerta(radar, distancia, critico) {
     const titleEl = document.getElementById('alert-title');
     const textEl = document.getElementById('alert-text');
 
-    // Limpa classes anteriores (mantém apenas .alert-bar)
-  alertBar.className = 'alert-bar';
-
-if (radar.tipo.includes('ALE') || radar.tipo.includes('Lugares em Destaque')) {
-    alertBar.classList.add('alert-bar-destaque');
-    document.getElementById('alert-sound-destaque').play();
-} else if (radar.tipo.includes('ZIR') || radar.tipo.includes('ZPV')) {
-    alertBar.classList.add('alert-bar-risco');
-    document.getElementById('alert-sound-risco').play();
-} else {
-    alertBar.classList.add('alert-bar-radar');
-    document.getElementById('alert-sound-radar').play();
-}
-
+    alertBar.className = 'alert-bar';
     const tipoInfo = detectarTipoAlerta(radar.tipo);
     alertBar.classList.add(tipoInfo.classe);
     if (critico) alertBar.classList.add(tipoInfo.classe + '-critico');
 
-    // Ícone
     const iconSrc = obterIconeRadar(radar.tipo);
     iconEl.src = iconSrc;
     iconEl.onerror = function() {
@@ -922,9 +709,7 @@ if (radar.tipo.includes('ALE') || radar.tipo.includes('Lugares em Destaque')) {
         }
     };
 
-    // Título e texto
     if (radar.tipo && radar.tipo.indexOf('ALE') !== -1) {
-        // Lugares em Destaque: extrair nome do lugar
         const match = radar.tipo.match(/-\s*(.+?)(?:\s*-\s*(.+))?$/);
         const lugar = match ? match[1] : 'Lugar em Destaque';
         const categoria = match && match[2] ? match[2] : '';
@@ -941,7 +726,6 @@ if (radar.tipo.includes('ALE') || radar.tipo.includes('Lugares em Destaque')) {
     container.style.display = 'block';
     document.querySelector('.speed-widget').classList.add('alerta-ativo');
 
-    // Som específico
     if (alertaHabilitado) {
         const audio = document.getElementById(tipoInfo.somId);
         if (audio) {
@@ -957,11 +741,10 @@ if (radar.tipo.includes('ALE') || radar.tipo.includes('Lugares em Destaque')) {
         }
     }
 
-    // Auto-ocultar
     if (alertTimeout) clearTimeout(alertTimeout);
     alertTimeout = setTimeout(function() {
         ocultarAlerta();
-    }, ALERT_CONFIG.TEMPO_ALERTA);
+    }, ALERT_CONFIG.TEMPO_ALERTA || 15000);
 }
 
 function ocultarAlerta() {
@@ -972,20 +755,451 @@ function ocultarAlerta() {
 }
 
 // ===================================================================
-// TOAST
+// INICIALIZAÇÃO DO MAPA
 // ===================================================================
-function showToast(msg, duracao) {
-    const toast = document.getElementById('toast-msg');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    clearTimeout(toast._timer);
-    toast._timer = setTimeout(function() {
-        toast.classList.remove('show');
-    }, duracao || 2500);
+async function initMap() {
+    console.log('[Radar X9] 🚀 Inicializando aplicação...');
+    
+    try {
+        // Carregar configuração do GitHub
+        await carregarConfigGitHub();
+        console.log("CONFIG:", GITHUB_CONFIG);
+    } catch(e) {
+        console.warn('[Radar X9] Erro ao carregar config:', e);
+    }
+    
+    if (typeof L === 'undefined') { 
+        hideFullscreenLoading(); 
+        showToast("Erro de conexão. Os mapas não puderam carregar."); 
+        return; 
+    }
+    
+    map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
+    if (typeof map.setBearing !== 'function') console.warn('[Radar X9] AVISO: leaflet-rotate pode não ter carregado.');
+    
+    tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { 
+        attribution: '', 
+        subdomains: 'abcd', 
+        maxZoom: 19 
+    }).addTo(map);
+    
+    // Botões de zoom
+    document.getElementById('btn-zoom-in').addEventListener('click', function() { if (map) map.zoomIn(); });
+    document.getElementById('btn-zoom-out').addEventListener('click', function() { if (map) map.zoomOut(); });
+    
+    // Botão centralizar
+    document.getElementById('btn-center').addEventListener('click', function() {
+        isFollowing = true;
+        if (userMarker) {
+            map.flyTo([userLat, userLng], 17, { duration: 0.5 });
+            showToast("Centralizando na sua posição");
+        } else {
+            showToast("Aguardando sinal GPS...");
+        }
+    });
+    
+    // Botão refresh
+    document.getElementById('btn-refresh').addEventListener('click', function() {
+        if (map) {
+            map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom);
+            showToast("Mapa resetado");
+        }
+    });
+    
+    // Botão de busca
+    document.getElementById('btn-search-radar').addEventListener('click', function() {
+        const query = document.getElementById('query').value.trim();
+        if (query.length < 2) { showToast("Digite pelo menos 2 caracteres"); return; }
+        buscarRadares(query);
+    });
+    
+    document.getElementById('query').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') document.getElementById('btn-search-radar').click();
+    });
+    
+    // Rota
+    document.getElementById('btn-calc-route').addEventListener('click', function() {
+        const endereco = document.getElementById('route-query').value.trim();
+        if (endereco.length < 5) { showToast("Digite um endereço válido"); return; }
+        buscarCoordenadas(endereco);
+    });
+    
+    document.getElementById('route-query').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') document.getElementById('btn-calc-route').click();
+    });
+    
+    // Toggle das barras de busca
+    function fecharTodasBarras() {
+        searchActive = false;
+        routeActive = false;
+        document.getElementById('search-bar-radares').classList.remove('active');
+        document.getElementById('search-bar-rota').classList.remove('active');
+    }
+    
+    document.getElementById('btn-search-bar').addEventListener('click', function() {
+        if (searchActive) { fecharTodasBarras(); return; }
+        fecharTodasBarras();
+        searchActive = true;
+        document.getElementById('search-bar-radares').classList.add('active');
+        setTimeout(function() { document.getElementById('query').focus(); }, 300);
+    });
+    
+    document.getElementById('btn-route-bar').addEventListener('click', function() {
+        if (routeActive) { fecharTodasBarras(); return; }
+        fecharTodasBarras();
+        routeActive = true;
+        document.getElementById('search-bar-rota').classList.add('active');
+        setTimeout(function() { document.getElementById('route-query').focus(); }, 300);
+    });
+    
+    // Menu toggle
+    document.getElementById('btn-menu-toggle').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar-controls');
+        sidebarAberta = !sidebarAberta;
+        if (sidebarAberta) {
+            sidebar.classList.remove('retracted');
+        } else {
+            sidebar.classList.add('retracted');
+            fecharTodasBarras();
+        }
+    });
+    
+    // Adicionar Radar
+    document.getElementById('btn-add-radar').addEventListener('click', function() {
+        document.getElementById('modal-add-radar').classList.add('active');
+        document.getElementById('pos-lat').value = userLat.toFixed(6);
+        document.getElementById('pos-lng').value = userLng.toFixed(6);
+        document.getElementById('pos-status').textContent = 'Posição GPS atual capturada!';
+        document.getElementById('coords-inputs-container').style.display = 'flex';
+        document.getElementById('btn-capture-location').classList.add('captured');
+        document.getElementById('btn-capture-location').textContent = '✅ Posição Capturada!';
+    });
+    
+    // Fechar modal
+    document.getElementById('modal-close').addEventListener('click', function() {
+        document.getElementById('modal-add-radar').classList.remove('active');
+    });
+    
+    document.getElementById('modal-add-radar').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+    
+    // Capturar posição
+    document.getElementById('btn-capture-location').addEventListener('click', function() {
+        document.getElementById('coords-inputs-container').style.display = 'flex';
+        this.classList.add('captured');
+        this.textContent = '✅ Posição Capturada!';
+        document.getElementById('pos-lat').value = userLat.toFixed(6);
+        document.getElementById('pos-lng').value = userLng.toFixed(6);
+        document.getElementById('pos-status').textContent = 'Precisão: ' + Math.round(gpsAccuracyAtual || 0) + 'm';
+    });
+    
+    // ALE - mostrar sub-seletor
+    document.getElementById('radar-type').addEventListener('change', function() {
+        const destaqueGroup = document.getElementById('destaque-lugar-group');
+        if (this.value === 'Alerta de Lugares em Destaque (ALE)') {
+            destaqueGroup.classList.add('ativo');
+        } else {
+            destaqueGroup.classList.remove('ativo');
+        }
+        // Preview do ícone
+        const iconPreviewGroup = document.getElementById('icon-preview-group');
+        const iconPreviewImg = document.getElementById('icon-preview-img');
+        const iconPreviewName = document.getElementById('icon-preview-name');
+        if (this.value) {
+            iconPreviewGroup.style.display = 'block';
+            iconPreviewImg.src = obterIconeRadar(this.value);
+            iconPreviewName.textContent = this.value;
+        } else {
+            iconPreviewGroup.style.display = 'none';
+        }
+    });
+    
+    // Botões de velocidade
+    document.querySelectorAll('.speed-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.speed-btn').forEach(function(b) {
+                b.classList.remove('selected', 'selected-30', 'selected-40', 'selected-50', 
+                                   'selected-60', 'selected-70', 'selected-80', 'selected-100', 'selected-110');
+            });
+            this.classList.add('selected', 'selected-' + this.dataset.speed);
+        });
+    });
+    
+    // Submit radar
+    document.getElementById('btn-submit-radar').addEventListener('click', function() {
+        const tipoSelect = document.getElementById('radar-type');
+        let tipo = tipoSelect.value;
+        if (!tipo) { showToast('⚠️ Selecione o tipo de radar!'); return; }
+        
+        if (tipo === 'Alerta de Lugares em Destaque (ALE)') {
+            const lugar = document.getElementById('destaque-lugar').value;
+            if (!lugar) { showToast('⚠️ Selecione o lugar em destaque!'); return; }
+            tipo = 'Alerta de Lugares em Destaque (ALE) - ' + lugar;
+        }
+        
+        const velocidade = document.querySelector('.speed-btn.selected');
+        if (!velocidade) { showToast('⚠️ Selecione a velocidade máxima!'); return; }
+        
+        const endereco = document.getElementById('radar-address').value.trim();
+        if (!endereco) { showToast('⚠️ Informe o endereço!'); return; }
+        
+        const lat = parseFloat(document.getElementById('pos-lat').value);
+        const lng = parseFloat(document.getElementById('pos-lng').value);
+        if (isNaN(lat) || isNaN(lng)) { showToast('⚠️ Aguardando posição GPS!'); return; }
+        
+        const novoRadar = {
+            tipo: tipo,
+            velocidade: velocidade.dataset.speed,
+            endereco: endereco,
+            latitude: lat,
+            longitude: lng
+        };
+        
+        // Adicionar ao mapa
+        const marker = criarRadarNoMapa(novoRadar);
+        if (marker) {
+            radarMarkers.push(marker);
+            showToast('✅ Radar adicionado!');
+            document.getElementById('modal-add-radar').classList.remove('active');
+        }
+    });
+    
+    // Iniciar GPS
+    startGPSTracking();
+    
+    // Carregar radares
+    carregarRadares();
+    
+    hideFullscreenLoading();
+    console.log('[Radar X9] ✅ Aplicação inicializada com sucesso!');
 }
 
 // ===================================================================
-// MODAL ADD RADAR - LÓGICA DO SUB-SELETOR ALE
+// CRIAR RADAR NO MAPA
+// ===================================================================
+function criarRadarNoMapa(radarData) {
+    if (!map) return null;
+    
+    const iconeUrl = obterIconeRadar(radarData.tipo);
+    const icone = L.icon({
+        iconUrl: iconeUrl,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -20],
+        className: 'radar-marker-icon'
+    });
+    
+    const marker = L.marker([radarData.latitude, radarData.longitude], { icon: icone }).addTo(map);
+    
+    const tipoExibicao = radarData.tipo || 'Radar';
+    const velInfo = radarData.velocidade ? ' | ' + radarData.velocidade + ' km/h' : '';
+    marker.bindPopup(
+        '<div style="color:#222; text-align:center; min-width:180px;">' +
+        '<b>' + tipoExibicao + '</b><br>' +
+        (radarData.endereco || 'Endereço não informado') + '<br>' +
+        '<span style="color:#d00; font-weight:bold;">Máx: ' + (radarData.velocidade || 'N/A') + ' km/h</span>' +
+        '</div>'
+    );
+    
+    marker.radarData = radarData;
+    return marker;
+}
+
+// ===================================================================
+// BUSCAR RADARES
+// ===================================================================
+function buscarRadares(query) {
+    if (!query || query.length < 2) return;
+    var encontrou = false;
+    var boundsGroup = L.featureGroup();
+    var q = query.toLowerCase();
+    radarMarkers.forEach(function(marker) {
+        var d = marker.radarData;
+        if (d && (d.tipo || '').toLowerCase().includes(q) || (d.endereco || '').toLowerCase().includes(q)) {
+            encontrou = true;
+            boundsGroup.addLayer(marker);
+            marker.openPopup();
+        }
+    });
+    if (encontrou && map) {
+        map.fitBounds(boundsGroup.getBounds().pad(0.2));
+        isFollowing = false;
+    } else {
+        showToast("Nenhum radar encontrado para: " + query);
+    }
+}
+
+// ===================================================================
+// BUSCAR COORDENADAS PARA ROTA
+// ===================================================================
+async function buscarCoordenadas(endereco) {
+    try {
+        document.getElementById('loading').style.display = 'block';
+        const response = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + 
+            encodeURIComponent(endereco + ', Belo Horizonte, Minas Gerais, Brasil'));
+        const data = await response.json();
+        document.getElementById('loading').style.display = 'none';
+        if (data && data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            showToast('🗺️ Rota calculada!');
+            // Animação simples - centralizar no destino
+            if (map) {
+                map.flyTo([lat, lng], 15, { duration: 1.5 });
+                // Adicionar marcador de destino
+                const destIcon = L.divIcon({
+                    html: '<img src="/imagens_app/ic_icon_chegada.png" style="width:40px;height:40px;">',
+                    className: 'route-end-marker',
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40]
+                });
+                L.marker([lat, lng], { icon: destIcon }).addTo(map).bindPopup('📍 ' + endereco);
+            }
+        } else {
+            showToast('❌ Endereço não encontrado');
+        }
+    } catch(e) {
+        document.getElementById('loading').style.display = 'none';
+        showToast('❌ Erro ao buscar endereço');
+        console.error(e);
+    }
+}
+
+// ===================================================================
+// CARREGAR RADARES DO GITHUB
+// ===================================================================
+async function carregarRadares() {
+    if (!map) return;
+    if (radarMarkers.length > 0) {
+        radarMarkers.forEach(function(marker) { map.removeLayer(marker); });
+        radarMarkers = [];
+    }
+    
+    document.getElementById('loading').style.display = 'block';
+    
+    let records = [];
+    let fonte = '';
+    
+    try {
+        // Tentar carregar do GitHub
+        const response = await fetch(GITHUB_CONFIG.rawUrl + '?v=' + Date.now());
+        if (response.ok) {
+            const data = await response.json();
+            records = data.records || [];
+            fonte = 'GitHub';
+        }
+    } catch(e) {
+        console.warn('[Radar X9] GitHub falhou:', e);
+    }
+    
+    // Fallback: arquivo local
+    if (records.length === 0) {
+        try {
+            const response = await fetch('radares.json?v=' + Date.now());
+            if (response.ok) {
+                const data = await response.json();
+                records = data.records || [];
+                fonte = 'Local';
+            }
+        } catch(e) {
+            console.warn('[Radar X9] Local falhou:', e);
+        }
+    }
+    
+    document.getElementById('loading').style.display = 'none';
+    
+    if (records.length > 0) {
+        records.forEach(function(record) {
+            if (record.length >= 10) {
+                const coords = record[9] ? record[9].split(',').map(function(s) { return parseFloat(s.trim()); }) : null;
+                if (coords && coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                    const radar = {
+                        tipo: record[3] || 'Não Identificado',
+                        velocidade: record[4] || '0',
+                        endereco: record[2] || 'Endereço não informado',
+                        latitude: coords[0],
+                        longitude: coords[1]
+                    };
+                    const marker = criarRadarNoMapa(radar);
+                    if (marker) radarMarkers.push(marker);
+                }
+            }
+        });
+        showToast('📡 ' + radarMarkers.length + ' radares carregados (' + fonte + ')');
+    } else {
+        showToast('⚠️ Nenhum radar encontrado');
+    }
+}
+
+// ===================================================================
+// GPS TRACKING
+// ===================================================================
+function startGPSTracking() {
+    if (!navigator.geolocation) {
+        hideFullscreenLoading();
+        showToast("GPS não suportado.");
+        return;
+    }
+    
+    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+    
+    watchId = navigator.geolocation.watchPosition(
+        function(position) {
+            gpsSource = 'browser';
+            userLat = position.coords.latitude;
+            userLng = position.coords.longitude;
+            
+            gpsInitialized = true;
+            atualizarStatusGPS(position);
+            
+            // Atualizar velocidade
+            if (position.coords.speed !== null && position.coords.speed >= 0) {
+                velocidadeAtual = Math.round(position.coords.speed * 3.6);
+                document.getElementById('speed-display').textContent = velocidadeAtual;
+            }
+            
+            // Atualizar marcador do usuário
+            if (!userMarker) {
+                const userIcon = L.divIcon({
+                    html: '<img src="/imagens_app/ic_gps_marker.png" style="width:40px;height:40px;">',
+                    className: 'user-gps-marker',
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 40]
+                });
+                userMarker = L.marker([userLat, userLng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
+                userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -20] });
+            } else {
+                userMarker.setLatLng([userLat, userLng]);
+            }
+            
+            if (isFollowing && map) {
+                map.setView([userLat, userLng], map.getZoom(), { animate: true });
+            }
+            
+            hideFullscreenLoading();
+        },
+        function(error) {
+            console.warn('[Radar X9] GPS error:', error);
+            if (error.code === 1) showToast("Permissão de GPS negada.");
+            else if (error.code === 2) showToast("Sinal GPS indisponível.");
+            else showToast("Erro ao obter localização.");
+            hideFullscreenLoading();
+        },
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+    );
+    
+    // Timeout para loading
+    setTimeout(function() {
+        if (!gpsInitialized) {
+            hideFullscreenLoading();
+            showToast("Aguardando GPS...");
+        }
+    }, 8000);
+}
+
+// ===================================================================
+// EVENTOS DO MODAL - ALE
 // ===================================================================
 document.addEventListener('DOMContentLoaded', function() {
     const radarTypeSelect = document.getElementById('radar-type');
@@ -1002,33 +1216,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    // Botão submit - monta tipo final quando ALE
-    const btnSubmit = document.getElementById('btn-submit-radar');
-    if (btnSubmit) {
-        btnSubmit.addEventListener('click', function() {
-            const tipoSelecionado = radarTypeSelect.value;
-            if (!tipoSelecionado) {
-                showToast('⚠️ Selecione o tipo de radar!');
-                return;
-            }
-            let tipoFinal = tipoSelecionado;
-            if (tipoSelecionado === 'Alerta de Lugares em Destaque (ALE)') {
-                const lugar = destaqueLugarSelect.value;
-                if (!lugar) {
-                    showToast('⚠️ Selecione o lugar em destaque!');
-                    return;
-                }
-                // Monta no formato do radares.json: "Alerta de Lugares em Destaque (ALE) - <Lugar> - <Categoria>"
-                tipoFinal = 'Alerta de Lugares em Destaque (ALE) - ' + lugar;
-            }
-            // ... (continua fluxo de envio: chamar função de cadastro passando tipoFinal)
-            window._tipoRadarFinal = tipoFinal;
-            // Dispara evento para função original de submit continuar
-            console.log('[Radar X9] Tipo final para cadastro:', tipoFinal);
-        });
-    }
 });
+
+// ===================================================================
+// INICIALIZAÇÃO
+// ===================================================================
+window.onload = initMap;
 </script>
 </body>
 </html>
