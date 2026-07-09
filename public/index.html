@@ -215,14 +215,15 @@
     .alert-bar-mobilidade { background: linear-gradient(90deg, #00b359, #008040); border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
 
     /* ===== ALERTA DE LUGARES EM DESTAQUE (AZUL TURQUESA) ===== */
-    .alert-bar-destaque {
+ .alert-bar-destaque {
         background: linear-gradient(90deg, #1fc7c7, #109090);
         border-top: 2px solid #5fecec;
         box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5);
     }
     .alert-bar-destaque .alert-info h3 { color: #ffffff; text-shadow: 0 0 8px rgba(31, 199, 199, 0.8); }
     .alert-bar-destaque img { filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9)); }
-
+ 
+    
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
     .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
     .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
@@ -822,7 +823,8 @@ const iconMap = {
     'Alerta de Lugares em Destaque (ALE) - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
     'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato - Nações Unidas - Artesanato': '/imagens_app/ic_polo_artesanato.png',
     'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas': '/imagens_app/ic_polo_artesanato.png'
-};
+
+ };
 
 // Ícone fallback genérico para ALE
 const ICON_DESTAQUE_FALLBACK = '/imagens_app/ic_destaque_generico.png';
@@ -842,11 +844,14 @@ function normalizarTexto(str) {
 
 function obterIconeRadar(tipoRadar) {
     if (!tipoRadar) return '/imagens_app/ic_radar_das.png';
+    // Busca direta
     if (iconMap[tipoRadar]) return iconMap[tipoRadar];
+    // Busca normalizada (cobre variações de hífen/travessão)
     const tipoNorm = normalizarTexto(tipoRadar);
     for (const chave in iconMap) {
         if (normalizarTexto(chave) === tipoNorm) return iconMap[chave];
     }
+    // Fallback para ALE
     if (tipoRadar.indexOf('ALE') !== -1 || tipoRadar.indexOf('Lugares em Destaque') !== -1) {
         return ICON_DESTAQUE_FALLBACK;
     }
@@ -859,17 +864,21 @@ function obterIconeRadar(tipoRadar) {
 function detectarTipoAlerta(tipoRadar) {
     if (!tipoRadar) return { classe: '', somId: 'alert-sound-radar' };
     const t = String(tipoRadar).toLowerCase();
+    // LUGARES EM DESTAQUE (turquesa)
     if (t.indexOf('lugares em destaque') !== -1 || t.indexOf('(ale)') !== -1) {
         return { classe: 'alert-bar-destaque', somId: 'alert-sound-destaque' };
     }
+    // RISCO (amarelo) - inundações, perigo, violência
     if (t.indexOf('inunda') !== -1 || t.indexOf('risco') !== -1 ||
         t.indexOf('perigo') !== -1 || t.indexOf('violência') !== -1 ||
         t.indexOf('acidente') !== -1) {
         return { classe: 'alert-bar-risco', somId: 'alert-sound-risco' };
     }
+    // MOBILIDADE (verde) - zonas verdes, trânsito local
     if (t.indexOf('zona verde') !== -1 || t.indexOf('trânsito local') !== -1) {
         return { classe: 'alert-bar-mobilidade', somId: 'alert-sound-aviso' };
     }
+    // PADRÃO (vermelho) - radares de velocidade/semáforo
     return { classe: 'alert-bar-radar', somId: 'alert-sound-radar' };
 }
 
@@ -883,11 +892,25 @@ function exibirAlerta(radar, distancia, critico) {
     const titleEl = document.getElementById('alert-title');
     const textEl = document.getElementById('alert-text');
 
-    alertBar.className = 'alert-bar';
+    // Limpa classes anteriores (mantém apenas .alert-bar)
+  alertBar.className = 'alert-bar';
+
+if (radar.tipo.includes('ALE') || radar.tipo.includes('Lugares em Destaque')) {
+    alertBar.classList.add('alert-bar-destaque');
+    document.getElementById('alert-sound-destaque').play();
+} else if (radar.tipo.includes('ZIR') || radar.tipo.includes('ZPV')) {
+    alertBar.classList.add('alert-bar-risco');
+    document.getElementById('alert-sound-risco').play();
+} else {
+    alertBar.classList.add('alert-bar-radar');
+    document.getElementById('alert-sound-radar').play();
+}
+
     const tipoInfo = detectarTipoAlerta(radar.tipo);
     alertBar.classList.add(tipoInfo.classe);
     if (critico) alertBar.classList.add(tipoInfo.classe + '-critico');
 
+    // Ícone
     const iconSrc = obterIconeRadar(radar.tipo);
     iconEl.src = iconSrc;
     iconEl.onerror = function() {
@@ -899,7 +922,9 @@ function exibirAlerta(radar, distancia, critico) {
         }
     };
 
+    // Título e texto
     if (radar.tipo && radar.tipo.indexOf('ALE') !== -1) {
+        // Lugares em Destaque: extrair nome do lugar
         const match = radar.tipo.match(/-\s*(.+?)(?:\s*-\s*(.+))?$/);
         const lugar = match ? match[1] : 'Lugar em Destaque';
         const categoria = match && match[2] ? match[2] : '';
@@ -916,6 +941,7 @@ function exibirAlerta(radar, distancia, critico) {
     container.style.display = 'block';
     document.querySelector('.speed-widget').classList.add('alerta-ativo');
 
+    // Som específico
     if (alertaHabilitado) {
         const audio = document.getElementById(tipoInfo.somId);
         if (audio) {
@@ -931,6 +957,7 @@ function exibirAlerta(radar, distancia, critico) {
         }
     }
 
+    // Auto-ocultar
     if (alertTimeout) clearTimeout(alertTimeout);
     alertTimeout = setTimeout(function() {
         ocultarAlerta();
@@ -961,22 +988,6 @@ function showToast(msg, duracao) {
 // MODAL ADD RADAR - LÓGICA DO SUB-SELETOR ALE
 // ===================================================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Esconder loading
-    setTimeout(function() {
-        const loading = document.getElementById('loading-fullscreen');
-        if (loading) loading.classList.add('fade-out');
-    }, 1500);
-
-    // Inicializar mapa básico (para evitar tela cinza se a API não carregar)
-    try {
-        map = L.map('map', { zoomControl: false, attributionControl: false }).setView([userLat, userLng], 17);
-        tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19
-        }).addTo(map);
-    } catch (e) {
-        console.error('Erro ao init mapa', e);
-    }
-
     const radarTypeSelect = document.getElementById('radar-type');
     const destaqueGroup = document.getElementById('destaque-lugar-group');
     const destaqueLugarSelect = document.getElementById('destaque-lugar');
@@ -992,6 +1003,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Botão submit - monta tipo final quando ALE
     const btnSubmit = document.getElementById('btn-submit-radar');
     if (btnSubmit) {
         btnSubmit.addEventListener('click', function() {
@@ -1007,22 +1019,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     showToast('⚠️ Selecione o lugar em destaque!');
                     return;
                 }
+                // Monta no formato do radares.json: "Alerta de Lugares em Destaque (ALE) - <Lugar> - <Categoria>"
                 tipoFinal = 'Alerta de Lugares em Destaque (ALE) - ' + lugar;
             }
+            // ... (continua fluxo de envio: chamar função de cadastro passando tipoFinal)
             window._tipoRadarFinal = tipoFinal;
+            // Dispara evento para função original de submit continuar
             console.log('[Radar X9] Tipo final para cadastro:', tipoFinal);
-            showToast('✅ Radar preparado para envio!');
         });
     }
-    
-    // Modal abrir/fechar
-    const btnAdd = document.getElementById('btn-add-radar');
-    const modal = document.getElementById('modal-add-radar');
-    const btnClose = document.getElementById('modal-close');
-    
-    if(btnAdd) btnAdd.onclick = () => modal.classList.add('active');
-    if(btnClose) btnClose.onclick = () => modal.classList.remove('active');
-
 });
 </script>
 </body>
