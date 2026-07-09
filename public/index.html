@@ -225,6 +225,23 @@
     .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
     .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
     .alert-info p { font-size: 0.95rem; opacity: 0.95; }
+    
+    /* CORREÇÃO DO BUG DE CSS (ESPAÇO EXTRA REMOVIDO) */
+    .alert-bar-destaque {
+        background: linear-gradient(90deg, #1fc7c7, #109090);
+        border-top: 2px solid #5fecec;
+        box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5);
+    }
+    .alert-bar-destaque .alert-info h3 { color: #ffffff; text-shadow: 0 0 8px rgba(31, 199, 199, 0.8); }
+    .alert-bar-destaque img { filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9)); }
+ 
+    
+    .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
+    .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
+    .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
+    .alert-info p { font-size: 0.95rem; opacity: 0.95; }
+              
+    
     .toast-notification {
         position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
         background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px;
@@ -540,8 +557,39 @@
               <option value="Radar de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
               <option value="Zona de Estudo Nuclear (ZEN)">☢️ Zona de Estudo Nuclear (ZEN)</option>
               <option value="Controle de Redução de Velocidade (CRV)">⬇️ Redução de Velocidade (CRV)</option>
+               <option value="Alerta de Lugares em Destaque (ALE)">🏛️ Lugares em Destaque (ALE)</option>
             </select>
           </div>
+
+            <!-- Seletor de Tipo de Destaque -->
+
+          <div class="form-group" id="destaque-lugar-group">
+            <label for="destaque-lugar">Selecione o Lugar em Destaque</label>
+            <select id="destaque-lugar" class="form-select">
+              <option value="">Selecione o lugar...</option>
+              <option value="Mercado Central - Gastronomia">Mercado Central (Gastronomia)</option>
+              <option value="Mirante do Mangabeiras - Mirante">Mirante do Mangabeiras (Mirante)</option>
+              <option value="Parque Mangabeiras - Natureza">Parque Mangabeiras (Natureza)</option>
+              <option value="Mercado Novo - Gastronomia">Mercado Novo (Gastronomia)</option>
+              <option value="Santa Tereza - Gastronomia">Santa Tereza (Gastronomia)</option>
+              <option value="Rua Sapucaí - Gastronomia">Rua Sapucaí (Gastronomia)</option>
+              <option value="Praça da Liberdade - Cultura">Praça da Liberdade (Cultura)</option>
+              <option value="Edifício Maletta - Gastronomia">Edifício Maletta (Gastronomia)</option>
+              <option value="Praça do Papa - Mirante">Praça do Papa (Mirante)</option>
+              <option value="Museu do Futebol - Cultura">Museu do Futebol (Cultura)</option>
+              <option value="Igreja da Pampulha - Cultura">Igreja da Pampulha (Cultura)</option>
+              <option value="Parque Ecológico da Pampulha - Ecoturismo">Parque Ecológico da Pampulha (Ecoturismo)</option>
+              <option value="Parque da Serra do Curral - Ecoturismo">Parque da Serra do Curral (Ecoturismo)</option>
+              <option value="Feirinha da Afonso Pena - Compras">Feirinha da Afonso Pena (Compras)</option>
+              <option value="Palácio das Artes - Cultura">Palácio das Artes (Cultura)</option>
+              <option value="Parque Municipal - Parque">Parque Municipal (Parque)</option>
+              <option value="Praça da Savassi - Gastronomia">Praça da Savassi (Gastronomia)</option>
+              <option value="Museu de Artes e Ofícios - História">Museu de Artes e Ofícios (História)</option>
+              <option value="Museu Abílio Barreto - História">Museu Abílio Barreto (História)</option>
+              <option value="Polo de Artesanato - Nações Unidas - Artesanato">Polo de Artesanato - Nações Unidas (Artesanato)</option>
+            </select>
+          </div>
+
 
        <!-- Velocidade Máxima -->
 <div class="form-group" id="speed-group">
@@ -921,26 +969,30 @@ const iconMap = {
     'Passagem Sob Túnel Viário':'/imagens_app/ic_tunel_v2.png',
     'Alerta de Poluição Elevada (APE)':'/imagens_app/ic_radar_poluido_v2.png',
 
-'Alerta de Lugares em Destaque (ALE) – Mercado Central (Gastronomia)': '/imagens_app/ic_mercado_central.png',
-'Alerta de Lugares em Destaque (ALE) – Mirante do Mangabeiras (Mirante)': '/imagens_app/ic_mirante_mangabeiras.png',
-'Alerta de Lugares em Destaque (ALE) – Parque Mangabeiras (Natureza)': '/imagens_app/ic_parque_mangabeiras.png',
-'Alerta de Lugares em Destaque (ALE) – Mercado Novo (Gastronomia)': '/imagens_app/ic_mercado_novo.png',
-'Alerta de Lugares em Destaque (ALE) – Santa Tereza (Gastronomia)': '/imagens_app/ic_santa_tereza.png',
-'Alerta de Lugares em Destaque (ALE) – Rua Sapucaí (Gastronomia)': '/imagens_app/ic_rua_sapucai.png',
-'Alerta de Lugares em Destaque (ALE) – Praça da Liberdade (Cultura)': '/imagens_app/ic_praca_liberdade.png',
-'Alerta de Lugares em Destaque (ALE) – Edifício Maletta (Gastronomia)': '/imagens_app/ic_edificio_maletta.png',
-'Alerta de Lugares em Destaque (ALE) – Praça do Papa (Mirante)': '/imagens_app/ic_praca_papa.png',
-'Alerta de Lugares em Destaque (ALE) – Museu do Futebol (Cultura)': '/imagens_app/ic_museu_futebol.png',
-'Alerta de Lugares em Destaque (ALE) – Igreja da Pampulha (Cultura)': '/imagens_app/ic_igreja_pampulha.png',
-'Alerta de Lugares em Destaque (ALE) – Parque Ecológico da Pampulha (Ecoturismo)': '/imagens_app/ic_parque_ecologico_pampulha.png',
-'Alerta de Lugares em Destaque (ALE) – Parque da Serra do Curral (Ecoturismo)': '/imagens_app/ic_parque_serra_curral.png',
-'Alerta de Lugares em Destaque (ALE) – Feirinha da Afonso Pena (Compras)': '/imagens_app/ic_feira_afonso_pena.png',
-'Alerta de Lugares em Destaque (ALE) – Palácio das Artes (Cultura)': '/imagens_app/ic_palacio_artes.png',
-'Alerta de Lugares em Destaque (ALE) – Parque Municipal (Parque)': '/imagens_app/ic_praca_municipal.png',
-'Alerta de Lugares em Destaque (ALE) – Praça da Savassi (Gastronomia)': '/imagens_app/ic_praca_savassi.png',
-'Alerta de Lugares em Destaque (ALE) – Museu de Artes e Ofícios (História)': '/imagens_app/ic_museu_artes_oficios.png',
-'Alerta de Lugares em Destaque (ALE) – Museu Abílio Barreto (História)': '/imagens_app/ic_museu_abilio_barreto.png',
-'Alerta de Lugares em Destaque (ALE) – Polo de Artesanato - Nações Unidas (Artesanato)': '/imagens_app/ic_polo_artesanato.png',
+
+     //=== ALERTA DE LUGARES EM DESTAQUE (ALE) ===
+    // Variações com hífen "-" (formato do radares.json)
+    'Alerta de Lugares em Destaque (ALE) - Mercado Central - Gastronomia': '/imagens_app/ic_mercado_central.png',
+    'Alerta de Lugares em Destaque (ALE) - Mirante do Mangabeiras - Mirante': '/imagens_app/ic_mirante_mangabeiras.png',
+    'Alerta de Lugares em Destaque (ALE) - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
+    'Alerta de Lugares em Destaque (ALE) - Mercado Novo - Gastronomia': '/imagens_app/ic_mercado_novo.png',
+    'Alerta de Lugares em Destaque (ALE) - Santa Tereza - Gastronomia': '/imagens_app/ic_santa_tereza.png',
+    'Alerta de Lugares em Destaque (ALE) - Rua Sapucaí - Gastronomia': '/imagens_app/ic_rua_sapucai.png',
+    'Alerta de Lugares em Destaque (ALE) - Praça da Liberdade - Cultura': '/imagens_app/ic_praca_liberdade.png',
+    'Alerta de Lugares em Destaque (ALE) - Edifício Maletta - Gastronomia': '/imagens_app/ic_edificio_maletta.png',
+    'Alerta de Lugares em Destaque (ALE) - Praça do Papa - Mirante': '/imagens_app/ic_praca_papa.png',
+    'Alerta de Lugares em Destaque (ALE) - Museu do Futebol - Cultura': '/imagens_app/ic_museu_futebol.png',
+    'Alerta de Lugares em Destaque (ALE) - Igreja da Pampulha - Cultura': '/imagens_app/ic_igreja_pampulha.png',
+    'Alerta de Lugares em Destaque (ALE) - Parque Ecológico da Pampulha - Ecoturismo': '/imagens_app/ic_parque_ecologico_pampulha.png',
+    'Alerta de Lugares em Destaque (ALE) - Parque da Serra do Curral - Ecoturismo': '/imagens_app/ic_parque_serra_curral.png',
+    'Alerta de Lugares em Destaque (ALE) - Feirinha da Afonso Pena - Compras': '/imagens_app/ic_feira_afonso_pena.png',
+    'Alerta de Lugares em Destaque (ALE) - Palácio das Artes - Cultura': '/imagens_app/ic_palacio_artes.png',
+    'Alerta de Lugares em Destaque (ALE) - Parque Municipal - Parque': '/imagens_app/ic_praca_municipal.png',
+    'Alerta de Lugares em Destaque (ALE) - Praça da Savassi - Gastronomia': '/imagens_app/ic_praca_savassi.png',
+    'Alerta de Lugares em Destaque (ALE) - Museu de Artes e Ofícios - História': '/imagens_app/ic_museu_artes_oficios.png',
+    'Alerta de Lugares em Destaque (ALE) - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
+    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato - Nações Unidas - Artesanato': '/imagens_app/ic_polo_artesanato.png',
+    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas': '/imagens_app/ic_polo_artesanato.png',
 
     'default': '/imagens_app/ic_radar_cev_v2.png'
 };
@@ -1059,30 +1111,6 @@ const ajusteNomes = {
     'Radar Inteligente de Velocidade Média (RIV)': 'Radar Inteligente de Velocidade Média (RIV)',
     'Radar Inteligente de Velocidade Média': 'Radar Inteligente de Velocidade Média (RIV)',
     'Leitor de Reconhecimento Facial (OCR-F)': 'Reconhecimento Facial (OCR-F)',
-
-     //=== ALERTA DE LUGARES EM DESTAQUE (ALE) ===
-    // Variações com hífen "-" (formato do radares.json)
-    'Alerta de Lugares em Destaque (ALE) - Mercado Central - Gastronomia': '/imagens_app/ic_mercado_central.png',
-    'Alerta de Lugares em Destaque (ALE) - Mirante do Mangabeiras - Mirante': '/imagens_app/ic_mirante_mangabeiras.png',
-    'Alerta de Lugares em Destaque (ALE) - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
-    'Alerta de Lugares em Destaque (ALE) - Mercado Novo - Gastronomia': '/imagens_app/ic_mercado_novo.png',
-    'Alerta de Lugares em Destaque (ALE) - Santa Tereza - Gastronomia': '/imagens_app/ic_santa_tereza.png',
-    'Alerta de Lugares em Destaque (ALE) - Rua Sapucaí - Gastronomia': '/imagens_app/ic_rua_sapucai.png',
-    'Alerta de Lugares em Destaque (ALE) - Praça da Liberdade - Cultura': '/imagens_app/ic_praca_liberdade.png',
-    'Alerta de Lugares em Destaque (ALE) - Edifício Maletta - Gastronomia': '/imagens_app/ic_edificio_maletta.png',
-    'Alerta de Lugares em Destaque (ALE) - Praça do Papa - Mirante': '/imagens_app/ic_praca_papa.png',
-    'Alerta de Lugares em Destaque (ALE) - Museu do Futebol - Cultura': '/imagens_app/ic_museu_futebol.png',
-    'Alerta de Lugares em Destaque (ALE) - Igreja da Pampulha - Cultura': '/imagens_app/ic_igreja_pampulha.png',
-    'Alerta de Lugares em Destaque (ALE) - Parque Ecológico da Pampulha - Ecoturismo': '/imagens_app/ic_parque_ecologico_pampulha.png',
-    'Alerta de Lugares em Destaque (ALE) - Parque da Serra do Curral - Ecoturismo': '/imagens_app/ic_parque_serra_curral.png',
-    'Alerta de Lugares em Destaque (ALE) - Feirinha da Afonso Pena - Compras': '/imagens_app/ic_feira_afonso_pena.png',
-    'Alerta de Lugares em Destaque (ALE) - Palácio das Artes - Cultura': '/imagens_app/ic_palacio_artes.png',
-    'Alerta de Lugares em Destaque (ALE) - Parque Municipal - Parque': '/imagens_app/ic_praca_municipal.png',
-    'Alerta de Lugares em Destaque (ALE) - Praça da Savassi - Gastronomia': '/imagens_app/ic_praca_savassi.png',
-    'Alerta de Lugares em Destaque (ALE) - Museu de Artes e Ofícios - História': '/imagens_app/ic_museu_artes_oficios.png',
-    'Alerta de Lugares em Destaque (ALE) - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
-    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato - Nações Unidas - Artesanato': '/imagens_app/ic_polo_artesanato.png',
-    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas': '/imagens_app/ic_polo_artesanato.png',
 
 
     'Alerta de Poluição Elevada (APE)': 'Área com Poluição Elevada (APE)'
@@ -1871,7 +1899,7 @@ function deveAlertaRadar(tipoOriginal) {
 }
 
 function dispararAlertaMobilidadeIA(mensagem) {
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico");
+    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
     $(".alert-bar").css("background", "");
     $("#alert-title").text("✅ ALERTA DE MOBILIDADE!");
     $("#alert-text").text(mensagem);
@@ -1901,7 +1929,9 @@ function classificarAlerta(tipoOriginal) {
     for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
         if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobilidade';
     }
-    
+    for (var j = 0; j < TIPOS_ALERTA_DESTAQUE.length; j++) {
+        if (tipoLimpo === TIPOS_ALERTA_DESTAQUE[j] || tipoLimpo.includes(TIPOS_ALERTA_DESTAQUE[j])) return 'destaque';
+    }
     return 'radar';
 }
 
@@ -1912,26 +1942,56 @@ function dispararAlerta(radar, distancia) {
         return;
     }
 
-    const tipoAlerta = classificarAlerta(radar.tipoOriginal);
-    const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
-    const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
+const tipoAlerta = classificarAlerta(radar.tipoOriginal);
+const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
+const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
 
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-radar");
-    $(".alert-bar").css("background", "");
+$(".alert-bar").removeClass(
+    "alert-bar-critico alert-bar-risco alert-bar-risco-critico" +
+    "alert-bar-mobilidade alert-bar-mobilidade-critico " +
+    "alert-bar-radar alert-bar-radar-critico" +
+    "alert-bar-destaque alert-bar-destaque-critico" 
+);
+$(".alert-bar").css("background", "");
 
-    if (tipoAlerta === 'risco') {
-        $("#alert-title").text("🚨 ALERTA DE RISCO!");
-        $(".alert-bar").addClass("alert-bar-risco");
-    } else if (tipoAlerta === 'mobilidade') { 
-        $("#alert-title").text("📢 ALERTA DE MOBILIDADE!");
-        $(".alert-bar").addClass("alert-bar-mobilidade");
+if (tipoAlerta === "risco") {
+    $("#alert-title").text("🚨 ALERTA DE RISCO!");
+    $(".alert-bar").addClass("alert-bar-risco");
+
+} else if (tipoAlerta === "mobilidade") {
+    $("#alert-title").text("📢 ALERTA DE MOBILIDADE!");
+    $(".alert-bar").addClass("alert-bar-mobilidade");
+
+} else if (tipoAlerta === "destaque") {
+    $("#alert-title").text("🏛️ ALERTA DE DESTAQUE!");
+    $(".alert-bar").addClass("alert-bar-destaque");
+
+} else {
+    $("#alert-title").text("⚠️ ALERTA DE RADAR!");
+    $(".alert-bar").addClass("alert-bar-radar");
+}
+
+$("#alert-text").text(
+    tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros"
+);
+
+$("#alert-icon").attr(
+    "src",
+    getIconUrl(radar.tipoOriginal, radar.velocidade_maxima)
+);
+
+  alertBar.className = 'alert-bar';
+    if (radar.tipo.includes('ALE') || radar.tipo.includes('Lugares em Destaque')) {
+        alertBar.classList.add('alert-bar-destaque');
+        document.getElementById('alert-sound-destaque').play().catch(e => console.log("Audio play blocked"));
+    } else if (radar.tipo.includes('ZIR') || radar.tipo.includes('ZPV')) {
+        alertBar.classList.add('alert-bar-risco');
+        document.getElementById('alert-sound-risco').play().catch(e => console.log("Audio play blocked"));
     } else {
-        $("#alert-title").text("⚠️ ALERTA DE RADAR!");
-        $(".alert-bar").addClass("alert-bar-radar");
+        alertBar.classList.add('alert-bar-radar');
+        document.getElementById('alert-sound-radar').play().catch(e => console.log("Audio play blocked"));
     }
 
-    $("#alert-text").text(tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros");
-    $("#alert-icon").attr("src", getIconUrl(radar.tipoOriginal, radar.velocidade_maxima));
 
     const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
 
@@ -1958,9 +2018,14 @@ function dispararAlerta(radar, distancia) {
     if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
         if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
         else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
+        else if (tipoAlerta === 'destaque') $(".alert-bar").addClass("alert-bar-destque-critico");
         else $(".alert-bar").addClass("alert-bar-critico");
     }
 
+
+
+
+    
     ultimoRadarAlertado = radar.id;
     clearTimeout(alertTimeout);
     alertTimeout = setTimeout(function() { 
@@ -1983,7 +2048,7 @@ function fecharAlertaImediatamente() {
 
 function esconderAlertaVisualSemBeep() {
     $("#alert-container").fadeOut(150);
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
+    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
     $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
     contagemTocarSom = 0;
     clearTimeout(alertTimeout);
@@ -1995,7 +2060,7 @@ function esconderAlertaVisualSemBeep() {
 function esconderAlertaVisual() {
     silenciarAlertaComBeep(tipoAlertaAtivo);
     $("#alert-container").fadeOut(150);
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-cao alert-bar-mobilidade-critico");
+    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
     $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
     contagemTocarSom = 0;
     fecharAlertaImediatamente();
