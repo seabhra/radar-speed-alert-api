@@ -707,22 +707,33 @@ let gpsLastUpdateTime = 0;
 // ===================================================================
 // CONFIGURAÇÃO DO GITHUB
 // ===================================================================
+
 let GITHUB_CONFIG = {
     owner: 'seabhra',
     repo: 'radar-speed-alert-api',
-    path: 'radares.json',      // Arquivo curado/manual (somente leitura)
+    path: 'radares.json',  // Arquivo curado/manual (somente leitura)
     token: '',
     proxyUrl: '',
     _branchCache: null,
-    // CORREÇÃO: radares_app.json para radares inseridos pelos usuários
     appPath: 'radares_app.json',
     get cdnUrl() {
         return `https://cdn.jsdelivr.net/gh/${this.owner}/${this.repo}@main/${this.path}`;
     },
     get rawUrl() {
         return `https://raw.githubusercontent.com/${this.owner}/${this.repo}/main/${this.path}`;
+    },
+
+     //==================================================================== 
+    // [ADICIONADO] URLs equivalentes para o arquivo de radares dos usuários
+    //======================================================================
+    get cdnUrlApp() {
+        return `https://cdn.jsdelivr.net/gh/${this.owner}/${this.repo}@main/${this.appPath}`;
+    },
+    get rawUrlApp() {
+        return `https://raw.githubusercontent.com/${this.owner}/${this.repo}/main/${this.appPath}`;
     }
 };
+
 
 // Flag para controle de modo offline
 let RADAR_MODO_OFFLINE = false;
@@ -3321,102 +3332,91 @@ function carregarRadaresPendentes() {
     }
 }
 
-// ===================================================================
-// CARREGAR RADARES - CORRIGIDO
-// ===================================================================
+// ===============================
+// CARREGAR RADARES GITHUB VIA CDN
+// ===============================
 async function carregarRadares() {
     if (!map) return;
     if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
     $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas...</div>");
 
-    let records = [];
+    let recordsCurados = [];
+    let recordsUsuarios = [];
     let fonte = '';
 
-    // ESTRATÉGIA 1: Tentar carregar do GitHub via CDN
+    // ---- 1. Radares curados (radares.json) ----
     try {
-        console.log('[Radar X9] 🔄 Tentando carregar do GitHub via CDN...');
-        const cdnResponse = await fetch(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), {
-            method: 'GET',
-            headers: { 'Accept': 'application/json' }
-        });
+        const cdnResponse = await fetch(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
         if (cdnResponse.ok) {
             const data = await cdnResponse.json();
-            records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-            if (records.length > 0) {
-                fonte = 'GitHub (CDN)';
-                RADAR_MODO_OFFLINE = false;
-                console.log('[Radar X9] ✅ Radares carregados do GitHub via CDN:', records.length);
-            }
+            recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+            if (recordsCurados.length > 0) { fonte = 'GitHub (CDN)'; RADAR_MODO_OFFLINE = false; }
         }
-    } catch (e) {
-        console.warn('[Radar X9] CDN falhou:', e.message);
-    }
+    } catch (e) { console.warn('[Radar X9] CDN curado falhou:', e.message); }
 
-    // ESTRATÉGIA 2: Tentar carregar do raw.githubusercontent.com
-    if (records.length === 0) {
+    if (recordsCurados.length === 0) {
         try {
-            console.log('[Radar X9] 🔄 Tentando carregar do raw GitHub...');
-            const rawResponse = await fetch(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), {
-                method: 'GET',
-                headers: { 'Accept': 'application/json' }
-            });
+            const rawResponse = await fetch(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
             if (rawResponse.ok) {
                 const data = await rawResponse.json();
-                records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-                if (records.length > 0) {
-                    fonte = 'GitHub (Raw)';
-                    RADAR_MODO_OFFLINE = false;
-                    console.log('[Radar X9] ✅ Radares carregados do raw GitHub:', records.length);
-                }
+                recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+                if (recordsCurados.length > 0) { fonte = 'GitHub (Raw)'; RADAR_MODO_OFFLINE = false; }
             }
-        } catch (e) {
-            console.warn('[Radar X9] Raw GitHub falhou:', e.message);
-        }
+        } catch (e) { console.warn('[Radar X9] Raw curado falhou:', e.message); }
     }
 
-    // ESTRATÉGIA 3: Tentar carregar do arquivo local
-    if (records.length === 0) {
+    if (recordsCurados.length === 0) {
         try {
-            console.log('[Radar X9] 🔄 Tentando carregar arquivo local...');
             var response = await fetch('radares.json?v=' + Date.now());
             if (response.ok) {
                 var data = await response.json();
-                records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-                if (records.length > 0) {
-                    fonte = 'Local';
-                    RADAR_MODO_OFFLINE = true;
-                    console.log('[Radar X9] ✅ Radares carregados do arquivo local:', records.length);
-                }
+                recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+                if (recordsCurados.length > 0) { fonte = 'Local'; RADAR_MODO_OFFLINE = true; }
             }
-        } catch (e) {
-            console.warn('[Radar X9] Arquivo local falhou:', e.message);
-        }
+        } catch (e) { console.warn('[Radar X9] Arquivo local curado falhou:', e.message); }
     }
 
-    // ESTRATÉGIA 4: Tentar carregar do localStorage (cache)
-    if (records.length === 0) {
+    // ---- 2. [ADICIONADO] Radares enviados por usuários (radares_app.json) ----
+    try {
+        const cdnResponseApp = await fetch(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
+        if (cdnResponseApp.ok) {
+            const dataApp = await cdnResponseApp.json();
+            recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
+        }
+    } catch (e) { console.warn('[Radar X9] CDN usuários falhou:', e.message); }
+
+    if (recordsUsuarios.length === 0) {
         try {
-            console.log('[Radar X9] 🔄 Tentando carregar do cache local...');
+            const rawResponseApp = await fetch(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
+            if (rawResponseApp.ok) {
+                const dataApp = await rawResponseApp.json();
+                recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
+            }
+        } catch (e) { console.warn('[Radar X9] Raw usuários falhou:', e.message); }
+    }
+
+    // ---- 3. Fallback: cache local (mescla ambos, se existirem) ----
+    if (recordsCurados.length === 0 && recordsUsuarios.length === 0) {
+        try {
             const cached = localStorage.getItem('radarx9_radares_cache');
             if (cached) {
                 const data = JSON.parse(cached);
-                records = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-                if (records.length > 0) {
-                    fonte = 'Cache Local';
-                    RADAR_MODO_OFFLINE = true;
-                    console.log('[Radar X9] ✅ Radares carregados do cache:', records.length);
-                }
+                recordsCurados = data.recordsCurados || [];
+                recordsUsuarios = data.recordsUsuarios || [];
+                fonte = 'Cache Local';
+                RADAR_MODO_OFFLINE = true;
             }
-        } catch (e) {
-            console.warn('[Radar X9] Cache falhou:', e.message);
-        }
+        } catch (e) { console.warn('[Radar X9] Cache falhou:', e.message); }
     }
 
-    // Renderizar radares
-    if (records.length > 0) {
-        renderizarRadaresNoMapa(records, fonte);
+    // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
+    if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
+        renderizarRadaresNoMapa(recordsCurados, fonte, false);
+        if (recordsUsuarios.length > 0) {
+            renderizarRadaresNoMapa(recordsUsuarios, 'Comunidade', true);
+        }
         try {
-            localStorage.setItem('radarx9_radares_cache', JSON.stringify({ records: records }));
+            localStorage.setItem('radarx9_radares_cache', JSON.stringify({ recordsCurados: recordsCurados, recordsUsuarios: recordsUsuarios }));
         } catch (e) {}
     } else {
         $("#loading").hide();
@@ -3425,10 +3425,16 @@ async function carregarRadares() {
     }
 }
 
-function renderizarRadaresNoMapa(records, origem) {
+// ===========================
+// RENDERIZAR RADARES NO MAPA
+// ===========================
+
+function renderizarRadaresNoMapa(records, origem, isUsuario) {
     if (!map) return;
     var radaresExternos = records || [];
     var contador = 0;
+    // [ADICIONADO] offset de ID para não colidir com os IDs dos radares curados
+    var idOffset = isUsuario ? 100000 : 0;
 
     for (var i = 0; i < radaresExternos.length; i++) {
         var record = radaresExternos[i];
@@ -3455,18 +3461,26 @@ function renderizarRadaresNoMapa(records, origem) {
 
         var tipoExibicao = ajusteNomes[tipo] || tipo;
         var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
+
+        //===============================================================
+        // [ADICIONADO] selo visual para radares enviados pela comunidade
+        //===============================================================
+        
+        var seloUsuario = isUsuario ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">📍 Enviado pela comunidade</div>' : '';
         var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
 
         radarMarker.bindPopup(
             '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' +
             tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
-            endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div></div>'
+            endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div>' +
+            seloUsuario + '</div>'
         );
 
         radarMarker.radarData = {
-            id: i, latitude: finalLat, longitude: finalLng,
+            id: idOffset + i, latitude: finalLat, longitude: finalLng,
             endereco: endereco, velocidade_maxima: velocidade,
-            tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA
+            tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA,
+            isUsuario: !!isUsuario // [ADICIONADO]
         };
         radarMarkers.push(radarMarker);
         contador++;
@@ -3474,8 +3488,11 @@ function renderizarRadaresNoMapa(records, origem) {
 
     $("#loading").hide();
     if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
-    else showNotification("Nenhum radar encontrado.");
 }
+
+// =======================
+// FUNÇÃO BUSCAR RADARES
+// =======================
 
 function buscarRadares(query) {
     if (!query || query.length < 2) return;
@@ -3531,9 +3548,9 @@ async function solicitarPermissaoBussolaIOS() {
     return false;
 }
 
-// ===================================================================
+// =======================
 // INTEGRAÇÃO APP INVENTOR
-// ===================================================================
+// =======================
 function enviarParaAppInventor(acao, dados) {
     if (typeof AppInventor !== 'undefined') {
         try {
