@@ -12,16 +12,7 @@
     { "id": "GEOMETRIA", "type": "text" }
   ],
   "records": [
-    [
-      1,
-      "0001",
-      "Rua Das Mações, 93",
-      "Controlador Eletrônico de Velocidade (CEV)",
-      "40",
-      "UPA de Nações Unidas/Bairro",
-      "Único",
-      "pendente",
-      "-19.878804, -43.868404"
-    ]
+    [ 1,"0001","Rua Das Nações, 93","Controlador Eletrônico de Velocidade (CEV)","30","UPA Nações Unidas/Bairro","Único","pendente","-19.878804, -43.868404"]
   ]
 }
+
