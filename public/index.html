@@ -557,39 +557,11 @@
               <option value="Radar de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
               <option value="Zona de Estudo Nuclear (ZEN)">☢️ Zona de Estudo Nuclear (ZEN)</option>
               <option value="Controle de Redução de Velocidade (CRV)">⬇️ Redução de Velocidade (CRV)</option>
-               <option value="Alerta de Lugares em Destaque (ALE)">🏛️ Lugares em Destaque (ALE)</option>
+         
             </select>
           </div>
 
-            <!-- Seletor de Tipo de Destaque -->
-
-          <div class="form-group" id="destaque-lugar-group">
-            <label for="destaque-lugar">Selecione o Lugar em Destaque</label>
-            <select id="destaque-lugar" class="form-select">
-              <option value="">Selecione o lugar...</option>
-              <option value="Mercado Central - Gastronomia">Mercado Central (Gastronomia)</option>
-              <option value="Mirante do Mangabeiras - Mirante">Mirante do Mangabeiras (Mirante)</option>
-              <option value="Parque Mangabeiras - Natureza">Parque Mangabeiras (Natureza)</option>
-              <option value="Mercado Novo - Gastronomia">Mercado Novo (Gastronomia)</option>
-              <option value="Santa Tereza - Gastronomia">Santa Tereza (Gastronomia)</option>
-              <option value="Rua Sapucaí - Gastronomia">Rua Sapucaí (Gastronomia)</option>
-              <option value="Praça da Liberdade - Cultura">Praça da Liberdade (Cultura)</option>
-              <option value="Edifício Maletta - Gastronomia">Edifício Maletta (Gastronomia)</option>
-              <option value="Praça do Papa - Mirante">Praça do Papa (Mirante)</option>
-              <option value="Museu do Futebol - Cultura">Museu do Futebol (Cultura)</option>
-              <option value="Igreja da Pampulha - Cultura">Igreja da Pampulha (Cultura)</option>
-              <option value="Parque Ecológico da Pampulha - Ecoturismo">Parque Ecológico da Pampulha (Ecoturismo)</option>
-              <option value="Parque da Serra do Curral - Ecoturismo">Parque da Serra do Curral (Ecoturismo)</option>
-              <option value="Feirinha da Afonso Pena - Compras">Feirinha da Afonso Pena (Compras)</option>
-              <option value="Palácio das Artes - Cultura">Palácio das Artes (Cultura)</option>
-              <option value="Parque Municipal - Parque">Parque Municipal (Parque)</option>
-              <option value="Praça da Savassi - Gastronomia">Praça da Savassi (Gastronomia)</option>
-              <option value="Museu de Artes e Ofícios - História">Museu de Artes e Ofícios (História)</option>
-              <option value="Museu Abílio Barreto - História">Museu Abílio Barreto (História)</option>
-              <option value="Polo de Artesanato - Nações Unidas - Artesanato">Polo de Artesanato - Nações Unidas (Artesanato)</option>
-            </select>
-          </div>
-
+            
 
        <!-- Velocidade Máxima -->
 <div class="form-group" id="speed-group">
@@ -1857,13 +1829,14 @@ function startGPSTracking() {
             if (gpsSource !== 'appinventor') gpsSource = 'browser';
             var speedKmh = 0;
             if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
-            processarNovaPosicao(position.coords.latitude, position.coords.longitude, speedKmh, position.coords.heading);
+            processarNovaPosicao(position.coords.latitude, position.coords.longitude, speedKmh, position.coords.heading, position.coords.accuracy);
         }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
     );
     browserGpsTimeout = setTimeout(function() {
         if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); }
     }, 8000);
 }
+
 
 function verificarProximidadeRadares() {
     if (!alertaHabilitado || radarMarkers.length === 0) return;
