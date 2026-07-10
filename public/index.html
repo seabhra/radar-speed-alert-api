@@ -1719,7 +1719,10 @@ function _iniciarAnimacaoNavegacao(toLat, toLng, novoHeading) {
     _navAnim.rafId = requestAnimationFrame(_animarIconeNavegacao);
 }
 
-function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
+//================================
+// FUNÇÃO PROCESSAR NOVA POSIÇÃO
+//================================
+function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accuracy) {
     if (!map) return;
 
     var currentTime = Date.now();
@@ -1771,8 +1774,9 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
     userLat = newLat;
     userLng = newLng;
 
-    // [CORREÇÃO] Atualizar o status GPS com a posição real
-    atualizarStatusGPS({ coords: { latitude: newLat, longitude: newLng, accuracy: gpsAccuracyAtual } });
+    // [CORREÇÃO] Usa a precisão real recebida (fallback 999 se ausente)
+    var accReal = (accuracy !== undefined && accuracy !== null && !isNaN(accuracy)) ? accuracy : 999;
+    atualizarStatusGPS({ coords: { latitude: newLat, longitude: newLng, accuracy: accReal } });
 
     if (estaEmNavegacao && startRouteMarker) {
         _iniciarAnimacaoNavegacao(smoothLat, smoothLng, novoHeading);
@@ -1820,6 +1824,10 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading) {
 
     if (destinoAtual) verificarChegadaDestino();
 }
+
+//================================
+// função iniciar Navegação de GPS
+//================================
 
 function startGPSTracking() {
     if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
@@ -3536,6 +3544,8 @@ function enviarParaAppInventor(acao, dados) {
     }
     return false;
 }
+
+
 
 function receberDadosAppInventor(dadosStr) {
     if (!dadosStr || typeof dadosStr !== 'string') return;
