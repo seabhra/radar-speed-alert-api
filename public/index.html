@@ -3545,7 +3545,9 @@ function enviarParaAppInventor(acao, dados) {
     return false;
 }
 
-
+// ===================================================================
+// INTEGRAÇÃO APP INVENTOR - RECEBER DADOS DO APP INVENTOR
+// ===================================================================
 
 function receberDadosAppInventor(dadosStr) {
     if (!dadosStr || typeof dadosStr !== 'string') return;
@@ -3557,12 +3559,16 @@ function receberDadosAppInventor(dadosStr) {
         var speed = partes[3] ? parseFloat(partes[3]) : 0;
         var heading = partes[4] ? parseFloat(partes[4]) : null;
         if (heading === -1 || isNaN(heading)) heading = null;
+        // [CORREÇÃO] Precisão vinda do App Inventor (posição 5); fallback fixo de 50m se ausente
+        var accuracy = (partes[5] !== undefined && partes[5] !== '') ? parseFloat(partes[5]) : 50;
+        if (isNaN(accuracy)) accuracy = 50;
         if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
             gpsSource = 'appinventor';
-            processarNovaPosicao(lat, lng, speed, heading);
+            processarNovaPosicao(lat, lng, speed, heading, accuracy);
         }
     }
 }
+
 
 var ultimoWebViewString = '';
 function pollAppInventor() {
