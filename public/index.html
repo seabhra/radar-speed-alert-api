@@ -1845,6 +1845,9 @@ function startGPSTracking() {
     }, 8000);
 }
 
+//=====================================
+// FUNÇÃO VERIFICAR PROXIMIDADE RADARES
+//=====================================
 
 function verificarProximidadeRadares() {
     if (!alertaHabilitado || radarMarkers.length === 0) return;
@@ -1870,6 +1873,10 @@ function verificarProximidadeRadares() {
     }
 }
 
+//================================
+// FUNÇÃO ALERTA RADAR
+//================================
+
 function deveAlertaRadar(tipoOriginal) {
     if (!tipoOriginal) return false;
     var tipoLimpo = tipoOriginal.trim();
@@ -1887,7 +1894,7 @@ function dispararAlertaMobilidadeIA(mensagem) {
     $(".alert-bar").addClass("alert-bar-mobilidade");
     $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
     
-    tocarSomAlerta('aviso');
+    tocarSomAlerta('mobilidade');
 
     if (!$("#alert-container").is(":visible")) { 
         $("#alert-container").fadeIn(200); 
@@ -1916,6 +1923,11 @@ function classificarAlerta(tipoOriginal) {
     return 'radar';
 }
 
+
+//================================
+// FUNÇÃO DISPARAR ALERTAS
+//================================
+
 function dispararAlerta(radar, distancia) {
     const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
     if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
@@ -1923,56 +1935,47 @@ function dispararAlerta(radar, distancia) {
         return;
     }
 
-const tipoAlerta = classificarAlerta(radar.tipoOriginal);
-const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
-const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
+    const tipoAlerta = classificarAlerta(radar.tipoOriginal);
+    const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
+    const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
 
-$(".alert-bar").removeClass(
-    "alert-bar-critico alert-bar-risco alert-bar-risco-critico" +
-    "alert-bar-mobilidade alert-bar-mobilidade-critico " +
-    "alert-bar-radar alert-bar-radar-critico" +
-    "alert-bar-destaque alert-bar-destaque-critico" 
-);
-$(".alert-bar").css("background", "");
+    $(".alert-bar").removeClass(
+        "alert-bar-critico alert-bar-risco alert-bar-risco-critico " +
+        "alert-bar-mobilidade alert-bar-mobilidade-critico " +
+        "alert-bar-radar alert-bar-radar-critico " +
+        "alert-bar-destaque alert-bar-destaque-critico"
+    );
 
-if (tipoAlerta === "risco") {
-    $("#alert-title").text("🚨 ALERTA DE RISCO!");
-    $(".alert-bar").addClass("alert-bar-risco");
+    $(".alert-bar").css("background", "");
 
-} else if (tipoAlerta === "mobilidade") {
-    $("#alert-title").text("📢 ALERTA DE MOBILIDADE!");
-    $(".alert-bar").addClass("alert-bar-mobilidade");
+    if (tipoAlerta === "risco") {
+        $("#alert-title").text("🚨 ALERTA DE RISCO!");
+        $(".alert-bar").addClass("alert-bar-risco");
 
-} else if (tipoAlerta === "destaque") {
-    $("#alert-title").text("🏛️ ALERTA DE DESTAQUE!");
-    $(".alert-bar").addClass("alert-bar-destaque");
+    } else if (tipoAlerta === "mobilidade") {
+        $("#alert-title").text("📢 ALERTA DE MOBILIDADE!");
+        $(".alert-bar").addClass("alert-bar-mobilidade");
 
-} else {
-    $("#alert-title").text("⚠️ ALERTA DE RADAR!");
-    $(".alert-bar").addClass("alert-bar-radar");
-}
+    } else if (tipoAlerta === "destaque") {
+        $("#alert-title").text("🏛️ ALERTA DE DESTAQUE!");
+        $(".alert-bar").addClass("alert-bar-destaque");
 
-$("#alert-text").text(
-    tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros"
-);
-
-$("#alert-icon").attr(
-    "src",
-    getIconUrl(radar.tipoOriginal, radar.velocidade_maxima)
-);
-
-  alertBar.className = 'alert-bar';
-    if (radar.tipo.includes('ALE') || radar.tipo.includes('Lugares em Destaque')) {
-        alertBar.classList.add('alert-bar-destaque');
-        document.getElementById('alert-sound-destaque').play().catch(e => console.log("Audio play blocked"));
-    } else if (radar.tipo.includes('ZIR') || radar.tipo.includes('ZPV')) {
-        alertBar.classList.add('alert-bar-risco');
-        document.getElementById('alert-sound-risco').play().catch(e => console.log("Audio play blocked"));
     } else {
-        alertBar.classList.add('alert-bar-radar');
-        document.getElementById('alert-sound-radar').play().catch(e => console.log("Audio play blocked"));
+        $("#alert-title").text("⚠️ ALERTA DE RADAR!");
+        $(".alert-bar").addClass("alert-bar-radar");
     }
 
+    $("#alert-text").text(
+        tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros"
+    );
+
+    $("#alert-icon").attr(
+        "src",
+        getIconUrl(radar.tipoOriginal, radar.velocidade_maxima)
+    );
+
+    // [REMOVIDO] bloco quebrado que usava "alertBar" e "radar.tipo" (não existiam)
+    // O som já é disparado corretamente mais abaixo, via tocarSomAlerta(tipoAlerta)
 
     const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
 
@@ -1981,6 +1984,8 @@ $("#alert-icon").attr(
         contagemTocarSom = 0; 
         ajustarPosicaoSpeedWidget(true);
     }
+
+    tipoAlertaAtivo = tipoAlerta; // [ADICIONADO] necessário para o beep de silenciar tocar o som certo
 
     if (alertaHabilitado) {
         var deveTocar = false;
@@ -1999,14 +2004,10 @@ $("#alert-icon").attr(
     if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
         if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
         else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
-        else if (tipoAlerta === 'destaque') $(".alert-bar").addClass("alert-bar-destque-critico");
+        else if (tipoAlerta === 'destaque') $(".alert-bar").addClass("alert-bar-destaque-critico");
         else $(".alert-bar").addClass("alert-bar-critico");
     }
 
-
-
-
-    
     ultimoRadarAlertado = radar.id;
     clearTimeout(alertTimeout);
     alertTimeout = setTimeout(function() { 
@@ -3559,6 +3560,7 @@ function receberDadosAppInventor(dadosStr) {
         var speed = partes[3] ? parseFloat(partes[3]) : 0;
         var heading = partes[4] ? parseFloat(partes[4]) : null;
         if (heading === -1 || isNaN(heading)) heading = null;
+       
         // [CORREÇÃO] Precisão vinda do App Inventor (posição 5); fallback fixo de 50m se ausente
         var accuracy = (partes[5] !== undefined && partes[5] !== '') ? parseFloat(partes[5]) : 50;
         if (isNaN(accuracy)) accuracy = 50;
