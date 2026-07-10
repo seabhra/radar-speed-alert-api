@@ -3344,7 +3344,10 @@ async function carregarRadares() {
     let recordsUsuarios = [];
     let fonte = '';
 
+     //==========================================
     // ---- 1. Radares curados (radares.json) ----
+    //===========================================
+
     try {
         const cdnResponse = await fetch(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
         if (cdnResponse.ok) {
@@ -3375,8 +3378,10 @@ async function carregarRadares() {
             }
         } catch (e) { console.warn('[Radar X9] Arquivo local curado falhou:', e.message); }
     }
-
+    //===========================================================================
     // ---- 2. [ADICIONADO] Radares enviados por usuários (radares_app.json) ----
+    //===========================================================================
+
     try {
         const cdnResponseApp = await fetch(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
         if (cdnResponseApp.ok) {
@@ -3465,7 +3470,7 @@ function renderizarRadaresNoMapa(records, origem, isUsuario) {
         //===============================================================
         // [ADICIONADO] selo visual para radares enviados pela comunidade
         //===============================================================
-        
+
         var seloUsuario = isUsuario ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">📍 Enviado pela comunidade</div>' : '';
         var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
 
@@ -3604,18 +3609,18 @@ function pollAppInventor() {
 }
 setInterval(pollAppInventor, 500);
 
+
 // ===================================================================
 // INICIALIZAÇÃO
 // ===================================================================
-window.onload = initMap;
-
 document.addEventListener('DOMContentLoaded', async function() {
     await carregarConfigGitHub(); 
     carregarRadaresPendentes(); 
     initMap(); 
-    iniciarBussolaHardware();
+    inicializarBussolaHardware(); // nome corrigido, ver bug 2 abaixo
     setTimeout(()=>{ const l=document.getElementById('loading-fullscreen'); if(l){l.classList.add('fade-out');setTimeout(()=>{if(l)l.style.display='none';},600);} }, 1500);
 });
+
 </script>
 </body>
 </html>
