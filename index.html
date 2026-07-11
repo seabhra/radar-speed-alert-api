@@ -2662,22 +2662,7 @@ function inicializarMenuToggle() {
     });
 
     // Configurar GitHub
-    var btnConfigGithub = document.getElementById('menu-config-github');
-    if (btnConfigGithub) {
-        btnConfigGithub.addEventListener('click', function() {
-            abrirModalConfigGithub();
-            menuDropdown.style.display = 'none';
-        });
-    }
-
-    // Sincronizar pendentes
-    var btnSyncPendentes = document.getElementById('menu-sync-pendentes');
-    if (btnSyncPendentes) {
-        btnSyncPendentes.addEventListener('click', function() {
-            sincronizarRadaresPendentes();
-            menuDropdown.style.display = 'none';
-        });
-    }
+    
 }
 
 function atualizarStatusGitHub() {
