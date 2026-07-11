@@ -443,50 +443,6 @@
     </button>
   </header>
 
-<!-- MENU DROPDOWN (estava faltando) -->
-  <div class="menu-dropdown" id="menu-dropdown" style="display:none; position:absolute; top:70px; right:15px; background:#1a1d24; border:1px solid #333; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.6); z-index:1500; min-width:220px; overflow:hidden;">
-    <div class="menu-item" id="menu-config-github" style="padding:14px 18px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #2a2d34;">
-      <span>🔑 Configurar GitHub</span>
-      <span id="status-github-text" style="font-size:0.75rem; color:#888;">...</span>
-    </div>
-    <div class="menu-item" id="menu-sync-pendentes" style="padding:14px 18px; cursor:pointer;">
-      <span>🔄 Sincronizar Pendentes</span>
-    </div>
-  </div>
-
-  <!-- MODAL DE CONFIGURAÇÃO DO GITHUB (estava faltando) -->
-  <div class="modal-overlay" id="modal-config-github">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>🔑 Configurar GitHub</h2>
-        <button class="modal-close" id="modal-config-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="config-github-form">
-          <label for="github-token">Token (Personal Access Token, escopo "repo")</label>
-          <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-
-          <label for="github-owner">Owner (usuário/organização)</label>
-          <input type="text" id="github-owner" placeholder="seabhra">
-
-          <label for="github-repo">Repositório</label>
-          <input type="text" id="github-repo" placeholder="radar-speed-alert-api">
-
-          <label for="github-path">Path do arquivo curado</label>
-          <input type="text" id="github-path" placeholder="radares.json">
-
-          <label for="github-app-path">Path do arquivo de usuários</label>
-          <input type="text" id="github-app-path" placeholder="radares_app.json">
-
-          <label for="github-proxy">Proxy URL (opcional)</label>
-          <input type="text" id="github-proxy" placeholder="deixe em branco se não usar proxy">
-
-          <button class="btn-save-config" id="btn-save-github-config">Salvar e Validar</button>
-          <div class="config-status" id="config-status-msg" style="display:none;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- MENU DROPDOWN -->
  
