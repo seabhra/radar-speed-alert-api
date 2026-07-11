@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -454,40 +453,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE CONFIGURAÇÃO DO GITHUB (estava faltando) -->
-  <div class="modal-overlay" id="modal-config-github">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>🔑 Configurar GitHub</h2>
-        <button class="modal-close" id="modal-config-close">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="config-github-form">
-          <label for="github-token">Token (Personal Access Token, escopo "repo")</label>
-          <input type="password" id="github-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-
-          <label for="github-owner">Owner (usuário/organização)</label>
-          <input type="text" id="github-owner" placeholder="seabhra">
-
-          <label for="github-repo">Repositório</label>
-          <input type="text" id="github-repo" placeholder="radar-speed-alert-api">
-
-          <label for="github-path">Path do arquivo curado</label>
-          <input type="text" id="github-path" placeholder="radares.json">
-
-          <label for="github-app-path">Path do arquivo de usuários</label>
-          <input type="text" id="github-app-path" placeholder="radares_app.json">
-
-          <label for="github-proxy">Proxy URL (opcional)</label>
-          <input type="text" id="github-proxy" placeholder="deixe em branco se não usar proxy">
-
-          <button class="btn-save-config" id="btn-save-github-config">Salvar e Validar</button>
-          <div class="config-status" id="config-status-msg" style="display:none;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+  
   <!-- MENU DROPDOWN -->
  
   <div class="map-wrapper">
@@ -2705,22 +2671,6 @@ function inicializarMenuToggle() {
         }
     });
 
-    // Configurar GitHub
-    var btnConfigGithub = document.getElementById('menu-config-github');
-    if (btnConfigGithub) {
-        btnConfigGithub.addEventListener('click', function() {
-            abrirModalConfigGithub();
-            menuDropdown.style.display = 'none';
-        });
-    }
-
-    // Sincronizar pendentes
-    var btnSyncPendentes = document.getElementById('menu-sync-pendentes');
-    if (btnSyncPendentes) {
-        btnSyncPendentes.addEventListener('click', function() {
-            sincronizarRadaresPendentes();
-            menuDropdown.style.display = 'none';
-        });
     }
 }
 
