@@ -442,16 +442,6 @@
     </button>
   </header>
 
-<!-- MENU DROPDOWN (estava faltando) -->
-  <div class="menu-dropdown" id="menu-dropdown" style="display:none; position:absolute; top:70px; right:15px; background:#1a1d24; border:1px solid #333; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.6); z-index:1500; min-width:220px; overflow:hidden;">
-    <div class="menu-item" id="menu-config-github" style="padding:14px 18px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #2a2d34;">
-      <span>🔑 Configurar GitHub</span>
-      <span id="status-github-text" style="font-size:0.75rem; color:#888;">...</span>
-    </div>
-    <div class="menu-item" id="menu-sync-pendentes" style="padding:14px 18px; cursor:pointer;">
-      <span>🔄 Sincronizar Pendentes</span>
-    </div>
-  </div>
 
   
   <!-- MENU DROPDOWN -->
@@ -513,7 +503,7 @@
 
     <div id="alert-container">
       <div class="alert-bar">
-        <img id="alert-icon" src="/imagens_app/ic_radar_das.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
+        <img id="alert-icon" src="/imagens_app/ic_radar_das_v2.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
         <div class="alert-info">
           <h3 id="alert-title">ATENÇÃO!</h3>
           <p id="alert-text">Radar Próximo</p>
@@ -2671,9 +2661,10 @@ function inicializarMenuToggle() {
         }
     });
 
-    }
+    // Configurar GitHub
+    
 }
-
+/*
 function atualizarStatusGitHub() {
     var statusText = document.getElementById('status-github-text');
     if (!statusText) return;
@@ -2689,6 +2680,7 @@ function atualizarStatusGitHub() {
         statusText.style.color = '#ffc107';
     }
 }
+*/
 
 function abrirModalConfigGithub() {
     var modal = document.getElementById('modal-config-github');
@@ -3201,23 +3193,30 @@ async function incluirRadar(currentPosition, fecharModal) {
             const idsExistentes = radarMarkers.map(m => m.radarData.id);
             proximoId = Math.max(...idsExistentes) + 1;
         }
+//// SALVAR RADAR INSERIDO SEM PASSAR NAVEGADOR
+let resultado = null;
+let salvouNoGitHub = false;
 
-        let resultado = null;
-        let salvouNoGitHub = false;
-
-        // TENTATIVA: Salvar no GitHub (usando radares_app.json)
-        if (GITHUB_CONFIG.token) {
-            try {
-                resultado = await salvarRadarNoGitHub(novoRadar, proximoId, GITHUB_CONFIG.appPath || 'radares_app.json');
-                salvouNoGitHub = true;
-                console.log('[Radar X9] ✅ Salvo no GitHub (radares_app.json)');
-            } catch (githubError) {
-                console.error('[Radar X9] ❌ Falha real ao salvar no GitHub:', githubError.message);
-                showNotification('❌ GitHub falhou: ' + githubError.message);
-            }
-        } else {
-            showNotification('⚠️ Nenhum token GitHub configurado — configure no menu (🔑).');
-        }
+// Salvar via backend seguro (token nunca passa pelo navegador)
+try {
+    const resp = await fetch('/api/save-radar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novoRadar)
+    });
+    const data = await resp.json();
+    if (resp.ok && data.success) {
+        resultado = data;
+        proximoId = data.id;
+        salvouNoGitHub = true;
+        console.log('[Radar X9] ✅ Salvo no GitHub via backend, ID:', data.id);
+    } else {
+        throw new Error(data.error || 'Erro desconhecido do backend');
+    }
+} catch (backendError) {
+    console.error('[Radar X9] ❌ Falha ao salvar via backend:', backendError.message);
+    showNotification('❌ Falha ao salvar: ' + backendError.message);
+}
 
         // Fallback apenas de sessão (não persiste)
         if (!salvouNoGitHub) {
@@ -3475,7 +3474,7 @@ function renderizarRadaresNoMapa(records, origem, isUsuario) {
         // [ADICIONADO] selo visual para radares enviados pela comunidade
         //===============================================================
 
-        var seloUsuario = isUsuario ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">📍 Enviado pela comunidade</div>' : '';
+        var seloUsuario = isUsuario ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">🧩 Compartilhado por usuário</div>' : '';
         var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
 
         radarMarker.bindPopup(
