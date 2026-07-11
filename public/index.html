@@ -3474,7 +3474,7 @@ function renderizarRadaresNoMapa(records, origem, isUsuario) {
         // [ADICIONADO] selo visual para radares enviados pela comunidade
         //===============================================================
 
-        var seloUsuario = isUsuario ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">🧩 Compartilhado por usuários</div>' : '';
+        var seloUsuario = isUsuario ? '<div style="color:#66A775;font-size:0.85rem;margin-top:4px;font-weight:bold;">🧩 Compartilhado por usuários</div>' : '';
         var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
 
         radarMarker.bindPopup(
