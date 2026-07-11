@@ -2382,12 +2382,19 @@ function criarRadarNoMapa(radarData) {
 
     const tipoExibicao = ajusteNomes[radarData.tipo] || radarData.tipo;
     const velInfo = radarData.velocidade ? ` | ${radarData.velocidade} km/h` : '';
+
+    // >>> ADICIONADO: selo de origem, igual ao que renderizarRadaresNoMapa já faz
+    const seloUsuario = radarData.isUsuario
+        ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">🧩 Compartilhado pelo usuário</div>'
+        : '';
+
     const popupContent = `
         <div style="color:#222; font-family:'Inter'; text-align:center; min-width:200px;">
             <b>${tipoExibicao}</b><br>
             <hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">
             ${radarData.endereco || 'Endereço não informado'}<br>
             <div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ${radarData.velocidade || 'N/A'} km/h</div>
+            ${seloUsuario}
         </div>
     `;
     radarMarker.bindPopup(popupContent);
@@ -2400,7 +2407,8 @@ function criarRadarNoMapa(radarData) {
         velocidade_maxima: radarData.velocidade,
         tipoOriginal: radarData.tipo,
         tipoExibicao: tipoExibicao,
-        isIA: tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL')
+        isIA: tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL'),
+        isUsuario: !!radarData.isUsuario   // >>> ADICIONADO
     };
 
     console.log('[Radar X9] ✅ Radar criado no mapa com sucesso!');
