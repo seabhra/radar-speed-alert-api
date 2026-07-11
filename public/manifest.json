@@ -3,14 +3,11 @@
   "short_name": "Radar X9",
   "description": "Alerta em tempo real de radares e câmeras em Belo Horizonte",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1a1a2e",
   "theme_color": "#cc0000",
-  "permissions": [
-    "notifications"
-  ],
-  "gcm_sender_id": "103953800507",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
