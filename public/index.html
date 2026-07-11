@@ -2387,7 +2387,7 @@ function criarRadarNoMapa(radarData) {
 
     // >>> ADICIONADO: selo de origem, igual ao que renderizarRadaresNoMapa já faz
     const seloUsuario = radarData.isUsuario
-        ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">🧩 Compartilhado pelo usuário</div>'
+        ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">🧩 Compartilhado por usuários</div>'
         : '';
 
     const popupContent = `
@@ -3421,7 +3421,7 @@ async function carregarRadares() {
     if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
         renderizarRadaresNoMapa(recordsCurados, fonte, false);
         if (recordsUsuarios.length > 0) {
-            renderizarRadaresNoMapa(recordsUsuarios, 'Compartilhados pelos usuários', true);
+            renderizarRadaresNoMapa(recordsUsuarios, 'Compartilhados por usuários', true);
         }
         try {
             localStorage.setItem('radarx9_radares_cache', JSON.stringify({ recordsCurados: recordsCurados, recordsUsuarios: recordsUsuarios }));
@@ -3474,7 +3474,7 @@ function renderizarRadaresNoMapa(records, origem, isUsuario) {
         // [ADICIONADO] selo visual para radares enviados pela comunidade
         //===============================================================
 
-        var seloUsuario = isUsuario ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">🧩 Compartilhado por usuário</div>' : '';
+        var seloUsuario = isUsuario ? '<div style="color:#00cc66;font-size:0.75rem;margin-top:4px;">🧩 Compartilhado por usuários</div>' : '';
         var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
 
         radarMarker.bindPopup(
