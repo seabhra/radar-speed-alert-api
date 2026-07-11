@@ -7,7 +7,7 @@ export default function handler(req, res) {
   res.status(200).json({
     githubOwner: process.env.GITHUB_OWNER || 'seabhra',
     githubRepo: process.env.GITHUB_REPO || 'radar-speed-alert-api',
-    githubPath: process.env.GITHUB_PATH || 'radares.json',
+    githubPath: process.env.GITHUB_PATH || 'radares_app.json',
     githubAppPath: process.env.GITHUB_APP_PATH || 'radares_app.json'
   });
 }
