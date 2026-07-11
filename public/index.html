@@ -3421,7 +3421,7 @@ async function carregarRadares() {
     if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
         renderizarRadaresNoMapa(recordsCurados, fonte, false);
         if (recordsUsuarios.length > 0) {
-            renderizarRadaresNoMapa(recordsUsuarios, 'Comunidade', true);
+            renderizarRadaresNoMapa(recordsUsuarios, 'Compartilhados pelos usuários', true);
         }
         try {
             localStorage.setItem('radarx9_radares_cache', JSON.stringify({ recordsCurados: recordsCurados, recordsUsuarios: recordsUsuarios }));
