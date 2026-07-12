@@ -3335,6 +3335,20 @@ function carregarRadaresPendentes() {
     }
 }
 
+
+// =====================================================================
+// FETCH COM TIMEOUT (evita travamento silencioso em WebViews restritos)
+// =====================================================================
+function fetchComTimeout(url, opcoes, timeoutMs) {
+    timeoutMs = timeoutMs || 8000;
+    return Promise.race([
+        fetch(url, opcoes),
+        new Promise(function(_, reject) {
+            setTimeout(function() { reject(new Error('Timeout: ' + url)); }, timeoutMs);
+        })
+    ]);
+}
+
 // ===============================
 // CARREGAR RADARES GITHUB VIA CDN
 // ===============================
@@ -3347,12 +3361,12 @@ async function carregarRadares() {
     let recordsUsuarios = [];
     let fonte = '';
 
-     //==========================================
+    //==========================================
     // ---- 1. Radares curados (radares.json) ----
     //===========================================
 
     try {
-        const cdnResponse = await fetch(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
+        const cdnResponse = await fetchComTimeout(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
         if (cdnResponse.ok) {
             const data = await cdnResponse.json();
             recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
@@ -3362,7 +3376,7 @@ async function carregarRadares() {
 
     if (recordsCurados.length === 0) {
         try {
-            const rawResponse = await fetch(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
+            const rawResponse = await fetchComTimeout(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
             if (rawResponse.ok) {
                 const data = await rawResponse.json();
                 recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
@@ -3373,7 +3387,7 @@ async function carregarRadares() {
 
     if (recordsCurados.length === 0) {
         try {
-            var response = await fetch('radares.json?v=' + Date.now());
+            var response = await fetchComTimeout('radares.json?v=' + Date.now(), {}, 8000);
             if (response.ok) {
                 var data = await response.json();
                 recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
@@ -3381,12 +3395,13 @@ async function carregarRadares() {
             }
         } catch (e) { console.warn('[Radar X9] Arquivo local curado falhou:', e.message); }
     }
+
     //===========================================================================
-    // ---- 2. [ADICIONADO] Radares enviados por usuários (radares_app.json) ----
+    // ---- 2. Radares enviados por usuários (radares_app.json) ----
     //===========================================================================
 
     try {
-        const cdnResponseApp = await fetch(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
+        const cdnResponseApp = await fetchComTimeout(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
         if (cdnResponseApp.ok) {
             const dataApp = await cdnResponseApp.json();
             recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
@@ -3395,7 +3410,7 @@ async function carregarRadares() {
 
     if (recordsUsuarios.length === 0) {
         try {
-            const rawResponseApp = await fetch(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } });
+            const rawResponseApp = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
             if (rawResponseApp.ok) {
                 const dataApp = await rawResponseApp.json();
                 recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
@@ -3432,7 +3447,6 @@ async function carregarRadares() {
         RADAR_MODO_OFFLINE = true;
     }
 }
-
 // ===========================
 // RENDERIZAR RADARES NO MAPA
 // ===========================
