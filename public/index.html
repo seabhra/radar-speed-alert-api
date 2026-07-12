@@ -2521,6 +2521,10 @@ async function initMap() {
     $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
     $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
     
+    
+// ===================================================================
+// INICIALIÇÃO GERAL E CARREGAMENTOS DE FUNÇÕES
+// ===================================================================
     inicializarBotaoRotacaoMapa();
     inicializarBotaoAlertaToggle();
     inicializarBotaoAddRadar();
@@ -2659,12 +2663,8 @@ function inicializarMenuToggle() {
             menuDropdown.style.display = 'none';
             btnMenu.classList.remove('active');
         }
-    });
+    });}
 
-    // Configurar GitHub
-    
-}
-/*
 function atualizarStatusGitHub() {
     var statusText = document.getElementById('status-github-text');
     if (!statusText) return;
@@ -2680,7 +2680,7 @@ function atualizarStatusGitHub() {
         statusText.style.color = '#ffc107';
     }
 }
-*/
+
 
 function abrirModalConfigGithub() {
     var modal = document.getElementById('modal-config-github');
