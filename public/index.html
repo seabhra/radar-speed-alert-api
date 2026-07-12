@@ -3433,19 +3433,26 @@ async function carregarRadares() {
     }
 
     // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
-    if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
+    if (recordsCurados.length > 0) {
         renderizarRadaresNoMapa(recordsCurados, fonte, false);
-        if (recordsUsuarios.length > 0) {
-            renderizarRadaresNoMapa(recordsUsuarios, 'Compartilhados por usuários', true);
-        }
+    } else {
+        showNotification('⚠️ Base curada (radares.json) não carregou — CDN, raw e local falharam ou expiraram.');
+        console.warn('[Radar X9] Base curada vazia após todas as tentativas.');
+    }
+
+    if (recordsUsuarios.length > 0) {
+        renderizarRadaresNoMapa(recordsUsuarios, 'Compartilhados por usuários', true);
+    }
+
+    if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
         try {
             localStorage.setItem('radarx9_radares_cache', JSON.stringify({ recordsCurados: recordsCurados, recordsUsuarios: recordsUsuarios }));
         } catch (e) {}
     } else {
-        $("#loading").hide();
-        showNotification("⚠️ Nenhum radar encontrado. Verifique a conexão ou configure o GitHub.");
         RADAR_MODO_OFFLINE = true;
     }
+
+    $("#loading").hide();
 }
 // ===========================
 // RENDERIZAR RADARES NO MAPA
