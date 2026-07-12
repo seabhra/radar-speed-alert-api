@@ -2909,9 +2909,6 @@ function inicializarBotaoAddRadar() {
         }
     }
 
-//======================
-//ATUALIZAR PSOIÇÃO ATUAL
-//=======================
     async function atualizarPosicaoAtual() {
         let lat = userLat;
         let lng = userLng;
@@ -2960,10 +2957,6 @@ function inicializarBotaoAddRadar() {
             return false;
         }
     }
-
-//======================
-//BOTÃO ADICIONAR RADAR
-//=======================
 
     btnAddRadar.addEventListener('click', async () => {
         modalAddRadar.classList.add('active');
@@ -3439,6 +3432,7 @@ async function carregarRadares() {
         } catch (e) { console.warn('[Radar X9] Cache falhou:', e.message); }
     }
 
+    // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
     // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
     if (recordsCurados.length > 0) {
         renderizarRadaresNoMapa(recordsCurados, fonte, false);
