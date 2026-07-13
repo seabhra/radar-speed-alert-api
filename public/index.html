@@ -2909,54 +2909,73 @@ function inicializarBotaoAddRadar() {
         }
     }
 
-    async function atualizarPosicaoAtual() {
-        let lat = userLat;
-        let lng = userLng;
+//======================
+//ATUALIZAR POSIÇÃO ATUAL
+//=======================
+async function atualizarPosicaoAtual() {
+    let lat = userLat;
+    let lng = userLng;
 
-        if (!lat || !lng || (lat === -19.919055 && lng === -43.938641)) {
-            posStatus.textContent = '🔄 Aguardando sinal GPS...';
-            try {
-                const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: true,
-                        timeout: 15000
-                    });
-                });
-                lat = pos.coords.latitude;
-                lng = pos.coords.longitude;
-                posStatus.textContent = '✅ GPS obtido com sucesso!';
-            } catch (e) {
-                posStatus.textContent = '⚠️ GPS indisponível. Use o GPS do app.';
-                return false;
-            }
-        }
+    // Se ainda não recebemos nenhuma posição real do App Inventor, aguarda
+    if (!gpsInitialized || !lat || !lng || (lat === -19.919055 && lng === -43.938641)) {
+        posStatus.textContent = '🔄 Aguardando GPS do app...';
 
-        if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
-            currentPosition.lat = lat;
-            currentPosition.lng = lng;
-            posLat.value = lat.toFixed(6);
-            posLng.value = lng.toFixed(6);
-            gpsObtido = true;
-            posStatus.textContent = '🔄 Buscando endereço...';
+        const posicaoRecebida = await new Promise((resolve) => {
+            const inicioEspera = Date.now();
+            const TIMEOUT_ESPERA = 15000;
 
-            try {
-                const endereco = await buscarEnderecoPorCoordenadas(lat, lng);
-                if (endereco) {
-                    radarAddress.value = endereco;
-                    posStatus.textContent = '✅ Endereço encontrado!';
-                } else {
-                    posStatus.textContent = '⚠️ Endereço não encontrado. Preencha manualmente.';
+            const intervalo = setInterval(() => {
+                if (gpsInitialized && userLat && userLng &&
+                    !(userLat === -19.919055 && userLng === -43.938641)) {
+                    clearInterval(intervalo);
+                    resolve({ lat: userLat, lng: userLng });
+                } else if (Date.now() - inicioEspera > TIMEOUT_ESPERA) {
+                    clearInterval(intervalo);
+                    resolve(null);
                 }
-            } catch (e) {
-                posStatus.textContent = '⚠️ Erro ao buscar endereço. Preencha manualmente.';
-                console.warn('[Radar X9] Erro ao buscar endereço:', e);
-            }
-            return true;
-        } else {
-            posStatus.textContent = '❌ Coordenadas inválidas';
+            }, 300);
+        });
+
+        if (!posicaoRecebida) {
+            posStatus.textContent = '⚠️ GPS do app não respondeu. Verifique se o LocationSensor está ativo.';
             return false;
         }
+
+        lat = posicaoRecebida.lat;
+        lng = posicaoRecebida.lng;
+        posStatus.textContent = '✅ GPS obtido via App Inventor!';
     }
+
+    if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+        currentPosition.lat = lat;
+        currentPosition.lng = lng;
+        posLat.value = lat.toFixed(6);
+        posLng.value = lng.toFixed(6);
+        gpsObtido = true;
+        posStatus.textContent = '🔄 Buscando endereço...';
+
+        try {
+            const endereco = await buscarEnderecoPorCoordenadas(lat, lng);
+            if (endereco) {
+                radarAddress.value = endereco;
+                posStatus.textContent = '✅ Endereço encontrado!';
+            } else {
+                posStatus.textContent = '⚠️ Endereço não encontrado. Preencha manualmente.';
+            }
+        } catch (e) {
+            posStatus.textContent = '⚠️ Erro ao buscar endereço. Preencha manualmente.';
+            console.warn('[Radar X9] Erro ao buscar endereço:', e);
+        }
+        return true;
+    } else {
+        posStatus.textContent = '❌ Coordenadas inválidas';
+        return false;
+    }
+}
+
+//=====================    
+//BOTÃO ADICIONAR RADAR
+//=====================
 
     btnAddRadar.addEventListener('click', async () => {
         modalAddRadar.classList.add('active');
