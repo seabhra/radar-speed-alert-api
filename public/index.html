@@ -740,6 +740,9 @@ let GITHUB_CONFIG = {
 // Flag para controle de modo offline
 let RADAR_MODO_OFFLINE = false;
 let RADAR_PENDENTES_SINCRONIZAR = [];
+// Radares inseridos nesta sessão que precisam ser preservados no mapa
+// até o CDN da jsdelivr/raw.githubusercontent propagar o commit novo
+let radaresAdicionadosNestaSessao = [];
 
 async function carregarConfigGitHub() {
     console.log('[Radar X9] 🔄 Carregando configuração...');
@@ -1610,6 +1613,7 @@ function resetarMapa() {
     removerRota();
     esconderAlertaVisual();
     showNotification("Mapa resetado");
+    historicoDistanciasRadar = {};
 }
 
 function extrairCoordenadas(record, index) {
@@ -1919,23 +1923,42 @@ function dispararAlertaMobilidadeIA(mensagem) {
     }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
+//================================
+// FUNÇÃO NORMALIZAR TEXTO
+//================================
+
+function normalizarTexto(txt) {
+    return (txt || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // remove acentos
+        .replace(/[–—]/g, '-')                               // unifica travessão/en-dash em hífen
+        .replace(/\s+/g, ' ')                                // colapsa espaços múltiplos
+        .trim()
+        .toLowerCase();
+}
+
+//================================
+// FUNÇÃO CLASSIFICAÇÃO ALERTAS
+//================================
+
 function classificarAlerta(tipoOriginal) {
     if (!tipoOriginal) return 'radar';
-    var tipoLimpo = tipoOriginal.trim();
-    
+    var tipoLimpo = normalizarTexto(tipoOriginal);
+
     for (var i = 0; i < TIPOS_ALERTA_RISCO.length; i++) {
-        if (tipoLimpo === TIPOS_ALERTA_RISCO[i] || tipoLimpo.includes(TIPOS_ALERTA_RISCO[i])) return 'risco';
+        if (tipoLimpo.includes(normalizarTexto(TIPOS_ALERTA_RISCO[i]))) return 'risco';
     }
-    
     for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
-        if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobilidade';
+        if (tipoLimpo.includes(normalizarTexto(TIPOS_ALERTA_MOBILIDADE[j]))) return 'mobilidade';
     }
-    for (var j = 0; j < TIPOS_ALERTA_DESTAQUE.length; j++) {
-        if (tipoLimpo === TIPOS_ALERTA_DESTAQUE[j] || tipoLimpo.includes(TIPOS_ALERTA_DESTAQUE[j])) return 'destaque';
+    // Atalho mais confiável: qualquer tipo com o prefixo "ALE" já é destaque,
+    // sem depender de bater o nome do lugar exatamente
+    if (tipoLimpo.includes('ale)') || tipoLimpo.includes('lugares em destaque')) return 'destaque';
+
+    for (var k = 0; k < TIPOS_ALERTA_DESTAQUE.length; k++) {
+        if (tipoLimpo.includes(normalizarTexto(TIPOS_ALERTA_DESTAQUE[k]))) return 'destaque';
     }
     return 'radar';
 }
-
 
 //================================
 // FUNÇÃO DISPARAR ALERTAS
@@ -2052,12 +2075,18 @@ function esconderAlertaVisualSemBeep() {
     ajustarPosicaoSpeedWidget(false);
 }
 
+//================================
+// FUNÇÃO ZERA ALERTAS NO REFRESH 
+//================================
+
 function esconderAlertaVisual() {
     silenciarAlertaComBeep(tipoAlertaAtivo);
     $("#alert-container").fadeOut(150);
     $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
     $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
     contagemTocarSom = 0;
+    ultimoRadarAlertado = null;      // ← adicionar
+    tipoAlertaAtivo = null;          // ← adicionar
     fecharAlertaImediatamente();
     ajustarPosicaoSpeedWidget(false);
 }
@@ -2104,7 +2133,7 @@ var contagemTocarSom = 0;
 function cancelarSequenciaSom() {
     _sequenciaSomId++;
     _alertaPrincipalEstaTocando = false;
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el && _soundListeners[id]) {
             el.removeEventListener('ended', _soundListeners[id]);
@@ -2117,7 +2146,7 @@ function cancelarSequenciaSom() {
 
 function pararTodosSons() {
     cancelarSequenciaSom();
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el) {
             el.pause();
@@ -3249,24 +3278,36 @@ try {
                 localStorage.setItem('radarx9_pendentes', JSON.stringify(RADAR_PENDENTES_SINCRONIZAR));
             } catch (e) {}
         }
-
-        animarBotaoRadar(salvouNoGitHub ? 'adicionado' : 'erro');
+         //========================
+         // Criar marcador no mapa
+         //=======================
+               
+     animarBotaoRadar(salvouNoGitHub ? 'adicionado' : 'erro');
 
         // Criar marcador no mapa
         const novoMarker = criarRadarNoMapa({
             ...novoRadar,
             id: proximoId,
-            tipoOriginal: tipo
+            tipoOriginal: tipo,
+            isUsuario: true
         });
         if (novoMarker) {
             radarMarkers.push(novoMarker);
             if (salvouNoGitHub) {
                 showNotification(`✅ Radar #${proximoId} salvo no GitHub!`);
+
+                // [ADICIONADO] Registra na lista de sessão para sobreviver
+                // a um possível carregarRadares() antes do CDN propagar o commit
+                radaresAdicionadosNestaSessao.push({
+                    radar: { ...novoRadar },
+                    id: proximoId
+                });
             }
             novoMarker.openPopup();
         }
-
+         //================================
         // Fechar modal e limpar formulário
+        //=================================
         if (typeof fecharModal === 'function') fecharModal();
         document.getElementById('radar-type').value = '';
         document.getElementById('radar-address').value = '';
@@ -3276,12 +3317,12 @@ try {
         });
         document.getElementById('icon-preview-group').style.display = 'none';
 
-        // Recarregar radares do GitHub após alguns segundos
-        if (salvouNoGitHub) {
-            setTimeout(() => {
-                carregarRadares();
-            }, 3000);
-        }
+       // Recarregar radares do GitHub após alguns segundos
+       // if (salvouNoGitHub) {
+       //     setTimeout(() => {
+       //       carregarRadares();
+       //  }, 3000);
+       // }
 
     } catch (error) {
         animarBotaoRadar('erro');
@@ -3379,7 +3420,7 @@ async function carregarRadares() {
     let recordsCurados = [];
     let recordsUsuarios = [];
     let fonte = '';
-
+   
     //==========================================
     // ---- 1. Radares curados (radares.json) ----
     //===========================================
@@ -3463,8 +3504,9 @@ async function carregarRadares() {
     if (recordsUsuarios.length > 0) {
         renderizarRadaresNoMapa(recordsUsuarios, 'Compartilhados por usuários', true);
     }
+    
 
-    if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
+  if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
         try {
             localStorage.setItem('radarx9_radares_cache', JSON.stringify({ recordsCurados: recordsCurados, recordsUsuarios: recordsUsuarios }));
         } catch (e) {}
@@ -3472,8 +3514,49 @@ async function carregarRadares() {
         RADAR_MODO_OFFLINE = true;
     }
 
+    // [ADICIONADO] Reinsere radares desta sessão que ainda não voltaram
+    // na resposta do CDN (cache da jsdelivr/raw.githubusercontent costuma
+    // levar mais tempo que o esperado para refletir um commit novo)
+
+    if (radaresAdicionadosNestaSessao.length > 0) {
+        radaresAdicionadosNestaSessao.forEach(function(item) {
+            var jaExiste = radarMarkers.some(function(m) {
+                return m.radarData &&
+                       Math.abs(m.radarData.latitude - item.radar.latitude) < 0.00001 &&
+                       Math.abs(m.radarData.longitude - item.radar.longitude) < 0.00001;
+            });
+            if (!jaExiste) {
+                var markerRecriado = criarRadarNoMapa({
+                    ...item.radar,
+                    id: item.id,
+                    tipoOriginal: item.radar.tipo,
+                    isUsuario: true
+                });
+                if (markerRecriado) {
+                    radarMarkers.push(markerRecriado);
+                    console.log('[Radar X9] 🧩 Radar #' + item.id + ' reinserido (ainda não propagado no CDN)');
+                }
+            } else {
+                console.log('[Radar X9] ✅ Radar #' + item.id + ' já veio do CDN, removendo da lista de sessão');
+            }
+        });
+
+        // Limpa da lista de sessão os que já vieram confirmados pelo CDN
+        radaresAdicionadosNestaSessao = radaresAdicionadosNestaSessao.filter(function(item) {
+            return !radarMarkers.some(function(m) {
+                return m.radarData && m.radarData.id === item.id && m.radarData.isUsuario;
+            }) || !recordsUsuarios.some(function(r) {
+                var coords = String(r[9] || '').split(',').map(function(s){return parseFloat(s.trim());});
+                return coords.length === 2 &&
+                       Math.abs(coords[0] - item.radar.latitude) < 0.00001 &&
+                       Math.abs(coords[1] - item.radar.longitude) < 0.00001;
+            });
+        });
+    }
+
     $("#loading").hide();
 }
+
 // ===========================
 // RENDERIZAR RADARES NO MAPA
 // ===========================
