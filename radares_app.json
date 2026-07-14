@@ -239,6 +239,18 @@
       "M100020",
       "KBH100020",
       "-19.922893, -44.059786"
+    ],
+    [
+      100021,
+      "100021",
+      "Via Expressa Francisco Cleuton Lopes, Conjunto Perobas, Eldorado",
+      "Detector de Faixa Preferencial de Ônibus (BUS)",
+      "60",
+      "Único",
+      "Único",
+      "M100021",
+      "KBH100021",
+      "-19.918980, -44.057777"
     ]
   ]
 }
