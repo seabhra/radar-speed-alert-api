@@ -347,6 +347,18 @@
       "M100029",
       "KBH100029",
       "-19.912593, -43.973192"
+    ],
+    [
+      100030,
+      "100030",
+      "Avenida Dom Pedro II, Carlos Prates, Regional Noroeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100030",
+      "KBH100030",
+      "-19.908646, -43.962978"
     ]
   ]
 }
