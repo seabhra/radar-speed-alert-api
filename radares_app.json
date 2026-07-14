@@ -287,6 +287,18 @@
       "M100024",
       "KBH100024",
       "-19.901198, -44.047679"
+    ],
+    [
+      100025,
+      "100025",
+      "Avenida Severino Ballesteros Rodrigues, Centrais de Abastecimento de Minas Gerais, Ressaca",
+      "Detector de Faixa Preferencial de Ônibus (BUS)",
+      "60",
+      "Único",
+      "Único",
+      "M100025",
+      "KBH100025",
+      "-19.901460, -44.045960"
     ]
   ]
 }
