@@ -719,6 +719,18 @@
       "M100060",
       "KBH100060",
       "-19.912663, -43.972205"
+    ],
+    [
+      100061,
+      "100061",
+      "Posto Alice, 4414, Avenida Dom Pedro II",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "60",
+      "Único",
+      "Único",
+      "M100061",
+      "KBH100061",
+      "-19.911109, -43.981641"
     ]
   ]
 }
