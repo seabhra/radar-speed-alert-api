@@ -515,6 +515,18 @@
       "M100043",
       "KBH100043",
       "-19.878642, -43.918187"
+    ],
+    [
+      100044,
+      "100044",
+      "Avenida Pastor Anselmo Silvestre, Dom Joaquim, Regional Nordeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100044",
+      "KBH100044",
+      "-19.879890, -43.917260"
     ]
   ]
 }
