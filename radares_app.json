@@ -575,6 +575,18 @@
       "M100048",
       "KBH100048",
       "-19.910854, -43.909235"
+    ],
+    [
+      100049,
+      "100049",
+      "Avenida dos Andradas, Pompeia, Regional Leste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100049",
+      "KBH100049",
+      "-19.915458, -43.908618"
     ]
   ]
 }
