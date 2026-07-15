@@ -899,6 +899,18 @@
       "M100075",
       "KBH100075",
       "-19.887152, -44.015695"
+    ],
+    [
+      100076,
+      "100076",
+      "Avenida do Contorno, Prado, Regional Oeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100076",
+      "KBH100076",
+      "-19.919175, -43.956840"
     ]
   ]
 }
