@@ -3472,7 +3472,7 @@ if (recordsCurados.length === 0) {
     } catch (e) {
         console.warn('[Radar X9] Backend falhou:', e.message);
     }
-    
+
     // Fallback para CDN se RAW falhar
     if (recordsUsuarios.length === 0) {
         console.log('[Radar X9] 🔄 Tentando CDN como fallback...');
@@ -3488,10 +3488,10 @@ if (recordsCurados.length === 0) {
 
 
     // ---- 3. Fallback: cache local - DESATIVADO COMPLETAMENTE ----
-    // O cache local está DESATIVADO para forçar o carregamento do GitHub
+  
     console.log('[Radar X9] ⚠️ Cache local DESATIVADO - forçando GitHub');
-    // TODO: Remover este bloco completamente
-    /*
+
+    
     if (recordsCurados.length === 0 && recordsUsuarios.length === 0) {
         try {
             const cached = localStorage.getItem('radarx9_radares_cache');
@@ -3504,7 +3504,7 @@ if (recordsCurados.length === 0) {
             }
         } catch (e) { console.warn('[Radar X9] Cache falhou:', e.message); }
     }
-    */
+    
 
     // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
     // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
