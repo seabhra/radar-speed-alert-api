@@ -815,6 +815,18 @@
       "M100068",
       "KBH100068",
       "-19.879012, -44.022081"
+    ],
+    [
+      100069,
+      "100069",
+      "Avenida Princesa Isabel, Arvoredo, São Joaquim",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100069",
+      "KBH100069",
+      "-19.874592, -44.026042"
     ]
   ]
 }
