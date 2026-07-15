@@ -61,7 +61,7 @@ export default async function handler(req, res) {
       
       // Verifica se o arquivo está vazio
       if (!content.trim()) {
-        records = [];
+        records = {"records": [ ]};
       } else {
         // Remove colchetes externos se existirem e quebra por linhas
         let linhas = content.trim();
