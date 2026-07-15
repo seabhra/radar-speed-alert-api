@@ -707,6 +707,18 @@
       "M100059",
       "KBH100059",
       "-19.911535, -43.969562"
+    ],
+    [
+      100060,
+      "100060",
+      "3363, Avenida Dom Pedro II, Padre Eustáquio",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100060",
+      "KBH100060",
+      "-19.912663, -43.972205"
     ]
   ]
 }
