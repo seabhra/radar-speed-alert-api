@@ -1019,6 +1019,18 @@
       "M100085",
       "KBH100085",
       "-19.919009, -43.944409"
+    ],
+    [
+      100086,
+      "100086",
+      "Estação Hospital Belo Horizonte - MOVE BH, Avenida Presidente Antônio Carlos, Aparecida",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100086",
+      "KBH100086",
+      "-19.897958, -43.947993"
     ]
   ]
 }
