@@ -1235,6 +1235,18 @@
       "M100103",
       "KBH100103",
       "-19.879469, -43.929765"
+    ],
+    [
+      100104,
+      "100104",
+      "Epa Plus, Rua Júlio Pereira da Silva, Cidade Nova",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100104",
+      "KBH100104",
+      "-19.888207, -43.928667"
     ]
   ]
 }
