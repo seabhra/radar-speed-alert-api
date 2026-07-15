@@ -3232,7 +3232,7 @@ async function incluirRadar(currentPosition, fecharModal) {
 
     const btnSubmitRadar = document.getElementById('btn-submit-radar');
     btnSubmitRadar.disabled = true;
-    btnSubmitRadar.textContent = '⏳ Salvando...';
+    btnSubmitRadar.textContent = '⏳ Salvando Radar...';
 
     try {
         const novoRadar = {
@@ -3457,19 +3457,22 @@ if (recordsCurados.length === 0) {
     // ---- 2. Radares enviados por usuários (radares_app.json) ----
     //===========================================================================
 
-    // ---- 2. Radares enviados por usuários (radares_app.json) - FORÇADO ----
-    console.log('[Radar X9] 🔄 Forçando carregamento do GitHub (RAW)...');
+  
+    // ---- 2. Radares enviados por usuários (via backend) ----
+    console.log('[Radar X9] 🔄 Carregando radares via backend...');
     try {
-        const rawResponseApp = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now() + '&t=' + Math.random(), { headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' } }, 10000);
-        if (rawResponseApp.ok) {
-            const dataApp = await rawResponseApp.json();
-            recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
-            console.log('[Radar X9] ✅ RAW retornou:', recordsUsuarios.length, 'registros');
-        } else {
-            console.warn('[Radar X9] RAW falhou com status:', rawResponseApp.status);
+        const response = await fetch('/api/radares-app', {
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            recordsUsuarios = data.records || [];
+            console.log('[Radar X9] ✅ Backend retornou:', recordsUsuarios.length, 'registros');
         }
-    } catch (e) { console.warn('[Radar X9] RAW usuários falhou:', e.message); }
-
+    } catch (e) {
+        console.warn('[Radar X9] Backend falhou:', e.message);
+    }
+    
     // Fallback para CDN se RAW falhar
     if (recordsUsuarios.length === 0) {
         console.log('[Radar X9] 🔄 Tentando CDN como fallback...');
