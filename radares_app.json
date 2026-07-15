@@ -1199,6 +1199,18 @@
       "M100100",
       "KBH100100",
       "-19.864917, -43.927216"
+    ],
+    [
+      100101,
+      "100101",
+      "Rua Manoel Sabino Nogueira, Maria Virgínia, Regional Nordeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100101",
+      "KBH100101",
+      "-19.869374, -43.928469"
     ]
   ]
 }
