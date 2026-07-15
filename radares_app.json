@@ -1259,6 +1259,18 @@
       "M100105",
       "KBH100105",
       "-19.889824, -43.929368"
+    ],
+    [
+      100106,
+      "100106",
+      "Avenida Cristiano Machado, Silveira, Regional Nordeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100106",
+      "KBH100106",
+      "-19.892174, -43.928462"
     ]
   ]
 }
