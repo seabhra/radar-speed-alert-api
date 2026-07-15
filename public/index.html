@@ -2165,6 +2165,8 @@ function tocarSomAlerta(tipoAlerta) {
     var soundId = 'alert-sound-radar';
     if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
     else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
+    else if (tipoAlerta === 'destaque') soundId = 'alert-sound-destaque';  // <-- ADICIONE ESTA LINHA
+
 
     var sound = document.getElementById(soundId)
              || document.getElementById('alert-sound-radar');
