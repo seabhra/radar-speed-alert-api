@@ -1211,6 +1211,18 @@
       "M100101",
       "KBH100101",
       "-19.869374, -43.928469"
+    ],
+    [
+      100102,
+      "100102",
+      "4001, Avenida Cristiano Machado, Ipiranga",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100102",
+      "KBH100102",
+      "-19.876300, -43.928936"
     ]
   ]
 }
