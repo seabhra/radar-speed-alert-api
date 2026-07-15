@@ -1055,6 +1055,18 @@
       "M100088",
       "KBH100088",
       "-19.883657, -43.950934"
+    ],
+    [
+      100089,
+      "100089",
+      "Avenida Manoel Gomes, Nova Cachoeirinha, Regional Noroeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100089",
+      "KBH100089",
+      "-19.881576, -43.951625"
     ]
   ]
 }
