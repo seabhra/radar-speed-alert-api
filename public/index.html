@@ -3455,24 +3455,39 @@ async function carregarRadares() {
     //===========================================================================
     // ---- 2. Radares enviados por usuários (radares_app.json) ----
     //===========================================================================
-
-    try {
-        const cdnResponseApp = await fetchComTimeout(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-        if (cdnResponseApp.ok) {
-            const dataApp = await cdnResponseApp.json();
-            recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
-        }
-    } catch (e) { console.warn('[Radar X9] CDN usuários falhou:', e.message); }
-
-    if (recordsUsuarios.length === 0) {
-        try {
-            const rawResponseApp = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-            if (rawResponseApp.ok) {
-                const dataApp = await rawResponseApp.json();
-                recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
-            }
-        } catch (e) { console.warn('[Radar X9] Raw usuários falhou:', e.message); }
+    // 2. BUSCAR METADADOS DO ARQUIVO (Para pegar o SHA do arquivo)
+    // Usamos /contents/ apenas para pegar o SHA, pois isso funciona mesmo para arquivos > 1MB
+    const urlContents = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${APP_PATH}?ref=${encodeURIComponent(branch)}`;
+    const metaResp = await fetch(urlContents, {
+      headers: {
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (!metaResp.ok) {
+      const detalhe = await metaResp.text().catch(() => '');
+      return res.status(metaResp.status).json({ error: `Erro ao buscar metadados do arquivo (${metaResp.status}): ${detalhe.slice(0, 300)}` });
     }
+    const fileMetaData = await metaResp.json();
+    const fileSha = fileMetaData.sha; // SHA necessário para salvar (PUT) depois
+
+    // 3. LER O CONTEÚDO REAL VIA BLOB (Ignora o limite de 1 MB do /contents/)
+    const urlBlob = `https://api.github.com/repos/${OWNER}/${REPO}/git/blobs/${fileSha}`;
+    const blobResp = await fetch(urlBlob, {
+      headers: {
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (!blobResp.ok) {
+      const detalhe = await blobResp.text().catch(() => '');
+      return res.status(blobResp.status).json({ error: `Erro ao buscar blob do arquivo (${blobResp.status}): ${detalhe.slice(0, 300)}` });
+    }
+    const blobData = await blobResp.json();
+    
+    // O blob retorna o conteúdo em Base64 de forma garantida e completa (até 100MB)
+    const content = Buffer.from(blobData.content, 'base64').toString('utf-8');
+  
 
     // ---- 3. Fallback: cache local (mescla ambos, se existirem) ----
     if (recordsCurados.length === 0 && recordsUsuarios.length === 0) {
@@ -3488,7 +3503,6 @@ async function carregarRadares() {
         } catch (e) { console.warn('[Radar X9] Cache falhou:', e.message); }
     }
 
-    // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
     // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
     if (recordsCurados.length > 0) {
         renderizarRadaresNoMapa(recordsCurados, fonte, false);
