@@ -3457,21 +3457,18 @@ if (recordsCurados.length === 0) {
     // ---- 2. Radares enviados por usuários (radares_app.json) ----
     //===========================================================================
 
-  
-    // ---- 2. Radares enviados por usuários (via backend) ----
-    console.log('[Radar X9] 🔄 Carregando radares via backend...');
+    // ---- 2. Radares enviados por usuários (radares_app.json) - FORÇADO ----
+    console.log('[Radar X9] 🔄 Forçando carregamento do GitHub (RAW)...');
     try {
-        const response = await fetch('/api/radares-app', {
-            headers: { 'Cache-Control': 'no-cache' }
-        });
-        if (response.ok) {
-            const data = await response.json();
-            recordsUsuarios = data.records || [];
-            console.log('[Radar X9] ✅ Backend retornou:', recordsUsuarios.length, 'registros');
+        const rawResponseApp = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now() + '&t=' + Math.random(), { headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' } }, 10000);
+        if (rawResponseApp.ok) {
+            const dataApp = await rawResponseApp.json();
+            recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
+            console.log('[Radar X9] ✅ RAW retornou:', recordsUsuarios.length, 'registros');
+        } else {
+            console.warn('[Radar X9] RAW falhou com status:', rawResponseApp.status);
         }
-    } catch (e) {
-        console.warn('[Radar X9] Backend falhou:', e.message);
-    }
+    } catch (e) { console.warn('[Radar X9] RAW usuários falhou:', e.message); }
 
     // Fallback para CDN se RAW falhar
     if (recordsUsuarios.length === 0) {
@@ -3488,10 +3485,9 @@ if (recordsCurados.length === 0) {
 
 
     // ---- 3. Fallback: cache local - DESATIVADO COMPLETAMENTE ----
-  
+    // O cache local está DESATIVADO para forçar o carregamento do GitHub
     console.log('[Radar X9] ⚠️ Cache local DESATIVADO - forçando GitHub');
-
-    
+   
     if (recordsCurados.length === 0 && recordsUsuarios.length === 0) {
         try {
             const cached = localStorage.getItem('radarx9_radares_cache');
