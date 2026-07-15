@@ -611,6 +611,18 @@
       "M100051",
       "KBH100051",
       "-19.913324, -43.929798"
+    ],
+    [
+      100052,
+      "100052",
+      "Avenida do Contorno, Centro, Regional Centro-Sul",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100052",
+      "KBH100052",
+      "-19.914849, -43.933752"
     ]
   ]
 }
