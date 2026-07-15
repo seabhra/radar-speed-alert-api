@@ -3168,8 +3168,8 @@ async function salvarRadarNoGitHub(novoRadar, proximoId, arquivoPath) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
-                content: updatedContent,
+                message: `Adicionado radar #${proximoId}: ${tipo} em ${endereco}`,
+                content: updatedContent, // O base64 do novo conteúdo
                 sha: data.sha,
                 branch: branch
             })
