@@ -1610,69 +1610,58 @@ function resetarMapa() {
     historicoDistanciasRadar = {};
 }
 
-// ======================================
-// EXTRAIR COORDENADAS DO RADAR USUÁRIO
-// =======================================
 function extrairCoordenadas(record, index) {
     if (!record || record.length < 9) return null;
-    
-    // O campo de coordenadas está no índice 9 (décimo elemento)
-    var geomIndex = (record.length >= 10) ? 9 : 8;
-    var s = String(record[geomIndex]).trim();
-    
+    let geomIndex = (record.length >= 10) ? 9 : 8;
+    let s = String(record[geomIndex]).trim();
     if (!s || s === '' || s === 'null' || s === 'undefined') {
-        return null;
+        geomIndex = (geomIndex === 9) ? 8 : 7;
+        s = String(record[geomIndex]).trim();
     }
+    if (!s || s === '') return null;
+    let lat = null, lng = null;
     
-    var lat = null, lng = null;
-    
-    // Tenta parsear no formato "-19.931680, -43.924099"
-    var parts = s.split(',').map(function(p) { return p.trim(); });
-    if (parts.length >= 2) {
-        lat = parseFloat(parts[0]);
-        lng = parseFloat(parts[parts.length - 1]);
+    if (lat === null && s.includes('.')) {
+        let parts = s.split(',').map(function(p) { return p.trim(); });
+        if (parts.length >= 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[parts.length - 1]); }
     }
-    
-    // Se falhar, tenta extrair com regex
+    if ((lat === null || isNaN(lat)) && s.includes(';')) {
+        let parts = s.split(';').map(function(p) { return p.trim().replace(',', '.'); });
+        if (parts.length >= 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
+    }
+    if ((lat === null || isNaN(lat)) && (s.match(/,/g) || []).length >= 3) {
+        let match = s.match(/(-?\d+,\d+),\s*(-?\d+,\d+)/);
+        if (match) { lat = parseFloat(match[1].replace(',', '.')); lng = parseFloat(match[2].replace(',', '.')); }
+    }
     if ((lat === null || isNaN(lat))) {
-        var match = s.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
-        if (match) {
-            lat = parseFloat(match[1]);
-            lng = parseFloat(match[2]);
+        let parts = s.split(',').map(function(p) { return p.trim().replace(',', '.'); });
+        if (parts.length === 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
+    }
+    if (lat === null || isNaN(lat) || lng === null || isNaN(lng)) {
+        for (var f = Math.max(0, geomIndex - 2); f < Math.min(record.length, geomIndex + 3); f++) {
+            if (f === geomIndex) continue;
+            var campo = String(record[f]).trim();
+            if (campo.includes('.') && campo.includes(',')) {
+                let parts = campo.split(',').map(function(p) { return p.trim(); });
+                if (parts.length === 2) {
+                    var tLat = parseFloat(parts[0]); var tLng = parseFloat(parts[1]);
+                    if (!isNaN(tLat) && !isNaN(tLng) && tLat >= -90 && tLat <= 90) { lat = tLat; lng = tLng; break; }
+                }
+            }
         }
     }
-    
-    // Se ainda falhar, tenta extrair números com vírgula como separador decimal
-    if ((lat === null || isNaN(lat))) {
-        var numbers = s.match(/(-?\d+,\d+)/g);
-        if (numbers && numbers.length >= 2) {
-            lat = parseFloat(numbers[0].replace(',', '.'));
-            lng = parseFloat(numbers[1].replace(',', '.'));
-        }
-    }
-    
-    // Verifica se as coordenadas são válidas
-    if (isNaN(lat) || isNaN(lng) || lat === null || lng === null) {
-        return null;
-    }
-    
-    // Valida se está dentro dos limites
-    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-        return null;
-    }
-    
+    if (isNaN(lat) || isNaN(lng) || lat === null || lng === null || lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
     return { lat: lat, lng: lng };
 }
-
 
 function atualizarBussola(headingDegrees) {
     var needle = document.getElementById('compass-needle-img');
     if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
 }
 
-// =====================================
+// ===================================================================
 // GPS / ÍCONE DE ROTA FLUIDO - CORRIGIDO
-// ======================================
+// ===================================================================
 var _navAnim = {
     rafId: null,
     fromLat: null,
@@ -3232,7 +3221,7 @@ async function incluirRadar(currentPosition, fecharModal) {
 
     const btnSubmitRadar = document.getElementById('btn-submit-radar');
     btnSubmitRadar.disabled = true;
-    btnSubmitRadar.textContent = '⏳ Salvando Radar...';
+    btnSubmitRadar.textContent = '⏳ Salvando...';
 
     try {
         const novoRadar = {
@@ -3432,17 +3421,6 @@ async function carregarRadares() {
     // ---- 1. Radares curados (radares.json) ----
     //===========================================
 
-    // PRIORIZA RAW (atualiza instantaneamente)
-try {
-    const rawResponse = await fetchComTimeout(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-    if (rawResponse.ok) {
-        const data = await rawResponse.json();
-        recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-        if (recordsCurados.length > 0) { fonte = 'GitHub (Raw)'; RADAR_MODO_OFFLINE = false; }
-    }
-} catch (e) { console.warn('[Radar X9] Raw curado falhou:', e.message); }
-
-if (recordsCurados.length === 0) {
     try {
         const cdnResponse = await fetchComTimeout(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
         if (cdnResponse.ok) {
@@ -3451,43 +3429,52 @@ if (recordsCurados.length === 0) {
             if (recordsCurados.length > 0) { fonte = 'GitHub (CDN)'; RADAR_MODO_OFFLINE = false; }
         }
     } catch (e) { console.warn('[Radar X9] CDN curado falhou:', e.message); }
-}
+
+    if (recordsCurados.length === 0) {
+        try {
+            const rawResponse = await fetchComTimeout(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
+            if (rawResponse.ok) {
+                const data = await rawResponse.json();
+                recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+                if (recordsCurados.length > 0) { fonte = 'GitHub (Raw)'; RADAR_MODO_OFFLINE = false; }
+            }
+        } catch (e) { console.warn('[Radar X9] Raw curado falhou:', e.message); }
+    }
+
+    if (recordsCurados.length === 0) {
+        try {
+            var response = await fetchComTimeout('radares.json?v=' + Date.now(), {}, 8000);
+            if (response.ok) {
+                var data = await response.json();
+                recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+                if (recordsCurados.length > 0) { fonte = 'Local'; RADAR_MODO_OFFLINE = true; }
+            }
+        } catch (e) { console.warn('[Radar X9] Arquivo local curado falhou:', e.message); }
+    }
 
     //===========================================================================
     // ---- 2. Radares enviados por usuários (radares_app.json) ----
     //===========================================================================
 
-    // ---- 2. Radares enviados por usuários (radares_app.json) - FORÇADO ----
-    console.log('[Radar X9] 🔄 Forçando carregamento do GitHub (RAW)...');
     try {
-        const rawResponseApp = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now() + '&t=' + Math.random(), { headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' } }, 10000);
-        if (rawResponseApp.ok) {
-            const dataApp = await rawResponseApp.json();
+        const cdnResponseApp = await fetchComTimeout(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
+        if (cdnResponseApp.ok) {
+            const dataApp = await cdnResponseApp.json();
             recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
-            console.log('[Radar X9] ✅ RAW retornou:', recordsUsuarios.length, 'registros');
-        } else {
-            console.warn('[Radar X9] RAW falhou com status:', rawResponseApp.status);
         }
-    } catch (e) { console.warn('[Radar X9] RAW usuários falhou:', e.message); }
+    } catch (e) { console.warn('[Radar X9] CDN usuários falhou:', e.message); }
 
-    // Fallback para CDN se RAW falhar
     if (recordsUsuarios.length === 0) {
-        console.log('[Radar X9] 🔄 Tentando CDN como fallback...');
         try {
-            const cdnResponseApp = await fetchComTimeout(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now() + '&t=' + Math.random(), { headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' } }, 8000);
-            if (cdnResponseApp.ok) {
-                const dataApp = await cdnResponseApp.json();
+            const rawResponseApp = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
+            if (rawResponseApp.ok) {
+                const dataApp = await rawResponseApp.json();
                 recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
-                console.log('[Radar X9] ✅ CDN retornou:', recordsUsuarios.length, 'registros');
             }
-        } catch (e) { console.warn('[Radar X9] CDN usuários falhou:', e.message); }
+        } catch (e) { console.warn('[Radar X9] Raw usuários falhou:', e.message); }
     }
 
-
-    // ---- 3. Fallback: cache local - DESATIVADO COMPLETAMENTE ----
-    // O cache local está DESATIVADO para forçar o carregamento do GitHub
-    console.log('[Radar X9] ⚠️ Cache local DESATIVADO - forçando GitHub');
-   
+    // ---- 3. Fallback: cache local (mescla ambos, se existirem) ----
     if (recordsCurados.length === 0 && recordsUsuarios.length === 0) {
         try {
             const cached = localStorage.getItem('radarx9_radares_cache');
@@ -3500,7 +3487,6 @@ if (recordsCurados.length === 0) {
             }
         } catch (e) { console.warn('[Radar X9] Cache falhou:', e.message); }
     }
-    
 
     // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
     // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
@@ -3577,15 +3563,21 @@ function renderizarRadaresNoMapa(records, origem, isUsuario) {
     var contador = 0;
     var idOffset = isUsuario ? 100000 : 0;
     
-    console.log('[Radar X9] 📊 Carregando ' + radaresExternos.length + ' radares de: ' + origem);
+    console.log('[Radar X9] 📊 Renderizando ' + radaresExternos.length + ' radares de: ' + origem);
 
     for (var i = 0; i < radaresExternos.length; i++) {
         var record = radaresExternos[i];
         
+        // Log para depuração
+        console.log('[Radar X9] Registro ' + i + ':', record);
+        
         var coords = extrairCoordenadas(record, i);
         if (!coords) {
+            console.warn('[Radar X9] ⚠️ Coordenadas não encontradas para registro ' + i + ':', record);
             continue;
         }
+
+        console.log('[Radar X9] ✅ Coordenadas extraídas:', coords);
         
         var finalLat = coords.lat;
         var finalLng = coords.lng;
@@ -3598,24 +3590,20 @@ function renderizarRadaresNoMapa(records, origem, isUsuario) {
         var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
 
         var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
-        
-        // Fallback para ícone - versão corrigida
-        (function(mk, fb) {
-            setTimeout(function() {
-                try {
-                    var el = mk.getElement();
-                    if (el) { 
-                        var imgEl = el.querySelector('img'); 
-                        if (imgEl) imgEl.setAttribute('data-fallback', fb); 
-                    }
-                } catch(e) {
-                    // Ignora erro no fallback
-                }
-            }, 100);
-        })(radarMarker, fallbackUrl);
+
+        setTimeout(function(mk, fb) {
+            return function() {
+                var el = mk.getElement();
+                if (el) { var imgEl = el.querySelector('img'); if (imgEl) imgEl.setAttribute('data-fallback', fb); }
+            };
+        }(radarMarker, fallbackUrl), 100);
 
         var tipoExibicao = ajusteNomes[tipo] || tipo;
         var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
+
+        //===============================================================
+        // [ADICIONADO] selo visual para radares enviados pela comunidade
+        //===============================================================
 
         var seloUsuario = isUsuario ? '<div style="color:#66A775;font-size:0.85rem;margin-top:4px;font-weight:bold;">🧩 Compartilhado por usuários</div>' : '';
         var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
@@ -3628,21 +3616,15 @@ function renderizarRadaresNoMapa(records, origem, isUsuario) {
         );
 
         radarMarker.radarData = {
-            id: (isUsuario ? 100000 : 0) + i, 
-            latitude: finalLat, 
-            longitude: finalLng,
-            endereco: endereco, 
-            velocidade_maxima: velocidade,
-            tipoOriginal: tipo, 
-            tipoExibicao: tipoExibicao, 
-            isIA: isIA,
-            isUsuario: !!isUsuario
+            id: idOffset + i, latitude: finalLat, longitude: finalLng,
+            endereco: endereco, velocidade_maxima: velocidade,
+            tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA,
+            isUsuario: !!isUsuario // [ADICIONADO]
         };
         radarMarkers.push(radarMarker);
         contador++;
     }
 
-    console.log('[Radar X9] ✅ Total de radares renderizados: ' + contador);
     $("#loading").hide();
     if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
 }
