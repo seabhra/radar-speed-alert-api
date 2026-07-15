@@ -1223,6 +1223,18 @@
       "M100102",
       "KBH100102",
       "-19.876300, -43.928936"
+    ],
+    [
+      100103,
+      "100103",
+      "Avenida Cristiano Machado, Ipiranga, Regional Nordeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100103",
+      "KBH100103",
+      "-19.879469, -43.929765"
     ]
   ]
 }
