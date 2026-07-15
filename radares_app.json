@@ -1031,6 +1031,18 @@
       "M100086",
       "KBH100086",
       "-19.897958, -43.947993"
+    ],
+    [
+      100087,
+      "100087",
+      "Avenida Presidente Antônio Carlos, Cachoeirinha, Regional Nordeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Único",
+      "Único",
+      "M100087",
+      "KBH100087",
+      "-19.889222, -43.949616"
     ]
   ]
 }
