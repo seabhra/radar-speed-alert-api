@@ -1565,6 +1565,19 @@
       "KBH000129",
       "-19.839681, -43.910141",
       "16/07/2026, 10:40:39"
+    ],
+    [
+      130,
+      "000130",
+      "Unidade de Pronto Atendimento - UPA Leste, 7260, Avenida dos Andradas",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "7260",
+      "Único",
+      "M000130",
+      "KBH000130",
+      "-19.905370, -43.896518",
+      "16/07/2026, 14:12:48"
     ]
   ]
 }
