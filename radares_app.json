@@ -1357,6 +1357,19 @@
       "KBH000113",
       "-19.878276, -43.929552",
       "16/07/2026, 09:34:09"
+    ],
+    [
+      114,
+      "000114",
+      "Estação Ouro Minas - MOVE BH, Avenida Cristiano Machado, Ipiranga",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "60",
+      "Avenida Cristiano Machado",
+      "Único",
+      "M000114",
+      "KBH000114",
+      "-19.876620, -43.928674",
+      "16/07/2026, 09:35:01"
     ]
   ]
 }
