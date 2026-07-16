@@ -405,17 +405,14 @@
         .gps-status-label { display: none; }
     }
 
-.cidade-label {
-    font-size: 12px;
-    font-weight: bold;
-    margin-top: -4px;
-    margin-left: 2px;
-    transition: color 0.6s ease, transform 0.3s ease;
-    color: #00e5ff;
-}
-
-.cidade-label.mudou {
-    transform: scale(1.15);
+.cidade-label{
+    font-size:14px;
+    font-weight:600;
+    margin-top:2px;
+    white-space:nowrap;      /* impede quebra de linha */
+    overflow:hidden;
+    text-overflow:ellipsis;  /* coloca "..." se o nome for grande */
+    line-height:1.2;
 }
 
 
@@ -435,10 +432,12 @@
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
       <h1>RADAR <span>X9</span></h1>
+    
       <!-- NOVA LABEL DA CIDADE -->
-        <div id="cidade-atual" class="cidade-label">
-            📍 Localizando cidade...
-        </div>
+    <div id="cidade-atual" class="cidade-label">
+    📍 Localizando cidade...
+     </div>
+
        <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
     <div class="gps-status-dot err" id="gps-status-dot"></div>
     <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
