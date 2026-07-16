@@ -404,6 +404,21 @@
         .speed-btn { padding: 8px 0; font-size: 0.85rem; }
         .gps-status-label { display: none; }
     }
+
+.cidade-label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: -4px;
+    margin-left: 2px;
+    transition: color 0.6s ease, transform 0.3s ease;
+    color: #00e5ff;
+}
+
+.cidade-label.mudou {
+    transform: scale(1.15);
+}
+
+
 </style>
 <base target="_blank">
 </head>
@@ -419,7 +434,11 @@
   <header>
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
-      <h1>RADAR <span>X9</span> BH</h1>
+      <h1>RADAR <span>X9</span></h1>
+      <!-- NOVA LABEL DA CIDADE -->
+        <div id="cidade-atual" class="cidade-label">
+            📍 Localizando cidade...
+        </div>
        <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
     <div class="gps-status-dot err" id="gps-status-dot"></div>
     <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
@@ -1850,10 +1869,71 @@ function startGPSTracking() {
             if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
             processarNovaPosicao(position.coords.latitude, position.coords.longitude, speedKmh, position.coords.heading, position.coords.accuracy);
         }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
+
+        
     );
     browserGpsTimeout = setTimeout(function() {
         if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); }
     }, 8000);
+}
+const cidadeLabel = document.getElementById("cidade-atual");
+
+atualizarCidade(
+    position.coords.latitude,
+    position.coords.longitude
+);
+
+let ultimaCidade = "";
+
+async function atualizarCidade(lat, lng){
+
+    try {
+
+        const resposta = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+        );
+
+        const dados = await resposta.json();
+
+        const cidade =
+            dados.address.city ||
+            dados.address.town ||
+            dados.address.municipality ||
+            dados.address.village;
+
+
+        if(cidade && cidade !== ultimaCidade){
+
+            ultimaCidade = cidade;
+
+            cidadeLabel.innerHTML =
+                "📍 " + cidade;
+
+            cidadeLabel.style.color =
+                corCidade(cidade);
+
+            cidadeLabel.classList.add("mudou");
+
+            setTimeout(()=>{
+                cidadeLabel.classList.remove("mudou");
+            },400);
+
+        }
+
+    } catch(e){
+        console.log("Erro cidade:",e);
+    }
+}
+function corCidade(nome){
+
+    let hash = 0;
+
+    for(let i=0;i<nome.length;i++){
+        hash = nome.charCodeAt(i) + ((hash << 5)-hash);
+    }
+
+    return `hsl(${Math.abs(hash)%360},90%,55%)`;
+
 }
 
 //=====================================
