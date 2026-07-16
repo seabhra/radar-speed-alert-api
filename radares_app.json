@@ -1344,6 +1344,19 @@
       "KBH000112",
       "-19.883111, -43.934430",
       "16/07/2026, 09:32:36"
+    ],
+    [
+      113,
+      "000113",
+      "Avenida Cristiano Machado, Ipiranga, Regional Nordeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Ipiranga",
+      "Único",
+      "M000113",
+      "KBH000113",
+      "-19.878276, -43.929552",
+      "16/07/2026, 09:34:09"
     ]
   ]
 }
