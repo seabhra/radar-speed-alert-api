@@ -19,6 +19,7 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js" crossorigin="anonymous"></script>
 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
   <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
@@ -418,8 +419,10 @@
 
 .cidade-label{
     margin-top:3px;
-    font-size:12px;
-    font-weight:600;
+    font-family: "Inter", Arial, sans-serif;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:0.3px;
     line-height:1;
 }
 
@@ -1986,7 +1989,7 @@ async function atualizarCidade(lat, lng){
             ultimaCidade = cidade;
 
             cidadeLabel.innerHTML =
-                "📍 " + cidade;
+                "🧭" + cidade;
 
             cidadeLabel.style.color =
                 corCidade(cidade);
