@@ -1876,15 +1876,86 @@ function startGPSTracking() {
         if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); }
     }, 8000);
 }
-const cidadeLabel = document.getElementById("cidade-atual");
 
-atualizarCidade(
-    position.coords.latitude,
-    position.coords.longitude
-);
+//================================
+// função iniciar Navegação de GPS
+//================================
+
+const cidadeLabel = document.getElementById("cidade-atual");
 
 let ultimaCidade = "";
 
+function startGPSTracking() {
+
+    if (!navigator.geolocation) { 
+        hideFullscreenLoading(); 
+        showNotification("GPS não suportado."); 
+        return; 
+    }
+
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+    }
+
+    watchId = navigator.geolocation.watchPosition(
+
+        function(position) {
+
+            if (gpsSource !== 'appinventor') {
+                gpsSource = 'browser';
+            }
+
+            var speedKmh = 0;
+
+            if (position.coords.speed !== null && position.coords.speed >= 0) {
+                speedKmh = Math.round(position.coords.speed * 3.6);
+            }
+
+
+            // ATUALIZA CIDADE AQUI
+            atualizarCidade(
+                position.coords.latitude,
+                position.coords.longitude
+            );
+
+
+            processarNovaPosicao(
+                position.coords.latitude,
+                position.coords.longitude,
+                speedKmh,
+                position.coords.heading,
+                position.coords.accuracy
+            );
+
+
+        }, 
+
+        showError, 
+
+        { 
+            enableHighAccuracy: true, 
+            maximumAge: 2000, 
+            timeout: 15000 
+        }
+
+    );
+
+
+    browserGpsTimeout = setTimeout(function() {
+
+        if (!gpsInitialized && gpsSource === 'none') { 
+            showNotification("Aguardando GPS do app..."); 
+            hideFullscreenLoading(); 
+        }
+
+    }, 8000);
+
+}
+
+
+//=====================================
+// FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
+//=====================================
 async function atualizarCidade(lat, lng){
 
     try {
