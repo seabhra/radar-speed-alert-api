@@ -666,7 +666,7 @@
             <span id="temperaturaAtual" class="temp-value">20.8°C</span>
              <span class="label">Sensação:</span>
             <span id="sensacaoAtual">19.2°C</span>
-            
+
         </div>
       </div>
 
@@ -3054,8 +3054,9 @@ const speedIcon = document.getElementById("speedIcon");
 
 function desativarCentralizacao(){
 
-
     console.log("ARRASTOU O MAPA");
+    speedIcon.src="/imagens_app/ic_recentralizar.png";
+    console.log(speedIcon.src);
 
     if(!mapaCentralizado) return;
 
@@ -3117,8 +3118,11 @@ speedWidget.addEventListener("click", () => {
             }
         }, TEMPO_RETORNO_GPS);
     });
-    
+
+    //=============================
     // Configurar eventos dos botões
+    //==============================
+
     $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
