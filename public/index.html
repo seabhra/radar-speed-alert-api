@@ -58,7 +58,7 @@
         flex-direction: column;
         overflow: hidden;
     }
-
+    
     /* CSS HEADER DO APP */
  
     header {
@@ -77,135 +77,137 @@
 }
 
 
-/* Área esquerda: ícone + título + cidade */
+/* ======================== */
+/* HEADER LEFT (ÍCONE + TÍTULO) */
+/* ======================== */
+
+/* 1. Alinha o ícone e o título lado a lado */
 .header-left {
-
-    display:flex;
-    flex-direction:column;
-
-    gap:3px;
+    display: flex;
+    align-items: center; /* Alinha verticalmente ao centro */
+    gap: 10px; /* Espaço entre o ícone e o texto */
 }
 
-
-/* Linha superior: ícone + RADAR X9 + GPS */
-.header-top {
-
-    display:flex;
-    align-items:center;
-    gap:10px;
-
-}
-
-
-/* Ícone */
+/* Ajuste de tamanho do ícone */
 .app-icon {
-
-    width:50px;
-    height:40px;
-
-    border-radius:8px;
-    object-fit:contain;
-
+    width: 36px;
+    height: 36px;
 }
 
 
-     /* CSS LOCALIZAÇÃO CIDADE/TEMPERATURA */
+/* ======================== */
+/* TÍTULO DO APP */
+/* ======================== */
 
-/* Título */
 .titulo-app {
-
-    display:flex;
-    flex-direction:column;
-
+    display: flex;
+    flex-direction: column;
 }
-
 
 .titulo-linha {
-
-    display:flex;
-    align-items:center;
-    gap:10px;
-
+    display: flex;
+    align-items: center; /* Garante que H1 e GPS fiquem na mesma linha e altura */
+    gap: 12px; /* Espaço entre o "RADAR X9" e o indicador de GPS */
+    white-space: nowrap; /* Impede que o GPS quebre de linha */
 }
-
 
 h1 {
-
-    font-size:1.2rem;
-    font-weight:800;
-
-    letter-spacing:1px;
-    text-transform:uppercase;
-
-    margin:0;
-
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0; /* Remove margem padrão para não desalinhar */
+    display: flex;
+    align-items: center;
 }
-
 
 h1 span {
-
-    color:var(--accent-color);
-
+    color: var(--accent-color);
 }
 
 
+/* ======================== */
+/* CIDADE / TEMPERATURA */
+/* ======================== */
 
-/* Cidade, temperatura e sensação */
 .cidade-label {
-
-    margin-left:0px;
-
-    display:flex;
-    align-items:center;
-
-    gap:5px;
-
-    font-size:12px;
-    font-weight:600;
-
-    line-height:1;
-
-    white-space:nowrap;
-
+    margin-left: 0px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 
-    /* GPS STATUS DOT */
-    .gps-status-wrapper {
-        display: flex; align-items: center; gap: 6px; margin-left: 8px;
-        padding: 4px 10px; border-radius: 20px; background: rgba(0,0,0,0.35);
-        border: 1px solid rgba(255,255,255,0.06); cursor: default; user-select: none;
-        transition: border-color 0.4s ease;
-    }
-    .gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
-    .gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
-    .gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
-    .gps-status-dot {
-        width: 10px; height: 10px; border-radius: 50%; background-color: var(--gps-sem);
-        position: relative; flex-shrink: 0; transition: background-color 0.4s ease;
-    }
-    .gps-status-dot::after {
-        content: ''; position: absolute; inset: -3px; border-radius: 50%;
-        background-color: inherit; opacity: 0.5;
-        animation: gpsPulse 2s ease-in-out infinite;
-    }
-    .gps-status-dot.ok   { background-color: var(--gps-ok); }
-    .gps-status-dot.warn { background-color: var(--gps-instavel); }
-    .gps-status-dot.err  { background-color: var(--gps-sem); }
-    @keyframes gpsPulse {
-        0%, 100% { transform: scale(1);   opacity: 0.5; }
-        50%      { transform: scale(2.2); opacity: 0; }
-    }
-    .gps-status-label {
-        font-size: 0.6rem; font-weight: 700; letter-spacing: 0.8px;
-        text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
-        transition: color 0.4s ease;
-    }
-    .gps-status-wrapper.gps-ok   .gps-status-label { color: var(--gps-ok); }
-    .gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
-    .gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
+/* ======================== */
+/* GPS STATUS */
+/* ======================== */
 
+.gps-status-wrapper {
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    margin-left: 0px; /* Zerado pois o gap do .titulo-linha já dá o espaço */
+    padding: 4px 10px; 
+    border-radius: 20px; 
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.06); 
+    cursor: default; 
+    user-select: none;
+    transition: border-color 0.4s ease;
+}
 
+.gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
+.gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
+.gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
+
+.gps-status-dot {
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background-color: var(--gps-sem);
+    position: relative; 
+    flex-shrink: 0; 
+    transition: background-color 0.4s ease;
+}
+
+.gps-status-dot::after {
+    content: ''; 
+    position: absolute; 
+    inset: -3px; 
+    border-radius: 50%;
+    background-color: inherit; 
+    opacity: 0.5;
+    animation: gpsPulse 2s ease-in-out infinite;
+}
+
+.gps-status-dot.ok   { background-color: var(--gps-ok); }
+.gps-status-dot.warn { background-color: var(--gps-instavel); }
+.gps-status-dot.err  { background-color: var(--gps-sem); }
+
+@keyframes gpsPulse {
+    0%, 100% { transform: scale(1);   opacity: 0.5; }
+    50%      { transform: scale(2.2); opacity: 0; }
+}
+
+.gps-status-label {
+    font-size: 0.6rem; 
+    font-weight: 700; 
+    letter-spacing: 0.8px;
+    text-transform: uppercase; 
+    color: var(--text-muted); 
+    white-space: nowrap;
+    transition: color 0.4s ease;
+}
+
+.gps-status-wrapper.gps-ok   .gps-status-label { color: var(--gps-ok); }
+.gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
+.gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
+
+  /* CSS BOTÃO MENU TOGLE */
 
     .btn-menu-toggle {
         display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -537,32 +539,31 @@ h1 span {
 
         <div class="header-left">
 
-    <img src="/imagens_app/ic_icon_app.png"
-         onerror="this.style.display='none'"
-         alt="App Icon"
-         class="app-icon">
+            <img src="/imagens_app/ic_icon_app.png"
+                 onerror="this.style.display='none'"
+                 alt="App Icon"
+                 class="app-icon">
 
+            <div class="titulo-app">
 
-    <div class="titulo-linha">
+                <div class="titulo-linha">
+                    <h1>RADAR <span>X9</span></h1>
 
-        <h1>RADAR <span>X9</span></h1>
+                    <div class="gps-status-wrapper gps-err" 
+                         id="gps-status-wrapper" 
+                         title="GPS: Aguardando sinal">
 
-        <div class="gps-status-wrapper gps-err" 
-             id="gps-status-wrapper" 
-             title="GPS: Aguardando sinal">
+                        <div class="gps-status-dot err" id="gps-status-dot"></div>
+                        <span class="gps-status-label" id="gps-status-label">
+                            GPS OFF
+                        </span>
 
-            <div class="gps-status-dot err" id="gps-status-dot"></div>
+                    </div>
+                </div>
 
-            <span class="gps-status-label" id="gps-status-label">
-                GPS OFF
-            </span>
+            </div>
 
         </div>
-
-    </div>
-
-</div>
-</div>
 
 
         <!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
