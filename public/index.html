@@ -425,38 +425,30 @@
     
      /* CSS LOCALIZAÇÃO CIDADE */
 
-.titulo-app{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+.titulo-app {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
-.titulo-app h1{
-    margin:0;
-    line-height:1;
+.titulo-linha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.titulo-linha h1 {
+    margin: 0;
 }
 
 .cidade-label {
-    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-size: 12px;
     font-weight: 600;
     line-height: 1;
-    display: flex;
-    align-items: center;
-    gap: 6px;
     white-space: nowrap;
-}
-
-.temp-value {
-    font-weight: 700;
-}
-
-.label {
-    opacity: .8;
-}
-
-.separador {
-    opacity: .5;
 }
 
     
@@ -478,21 +470,26 @@
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
      
-   <h1>RADAR <span>X9</span></h1>
+   
+      <div class="titulo-app">
+      <div class="titulo-linha">
+        <h1>RADAR <span>X9</span></h1>
 
-    <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
-        <div class="gps-status-dot err" id="gps-status-dot"></div>
-        <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
+        <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
+            <div class="gps-status-dot err" id="gps-status-dot"></div>
+            <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
+        </div>
     </div>
- <span
+
     <div id="cidade-atual" class="cidade-label">
-    <span id="nomeCidade">🚩 Localizando...</span>
-    <span class="separador">|</span>
-    <span id="temperaturaAtual" class="temp-value">🌡️ °C</span>
-    <span class="separador">|</span>
-    <span class="label">Sensação:</span>
-    <span id="sensacaoAtual"> °C</span></span>
-</div>
+        <span id="nomeCidade">🚩 Localizando...</span>
+        <span class="separador">|</span>
+        <span id="temperaturaAtual" class="temp-value">🌡️ --°C</span>
+        <span class="separador">|</span>
+        <span class="label">Sensação:</span>
+        <span id="sensacaoAtual">--°C</span>
+    </div>
+
 </div>
 
 
