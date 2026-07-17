@@ -89,11 +89,14 @@
 }
 
 /* Ajuste de tamanho do ícone */
+/* Ajuste de tamanho do ícone */
 .app-icon {
     width: 36px;
     height: 36px;
+    object-fit: cover; /* Impede que a imagem fique oval/esticada */
+    border-radius: 8px; /* Opcional: Arredonda levemente as bordas para ficar mais bonito */
+    flex-shrink: 0; /* Impede que o ícone encolha se o texto ficar muito grande */
 }
-
 
 /* ======================== */
 /* TÍTULO DO APP */
