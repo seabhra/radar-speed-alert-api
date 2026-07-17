@@ -478,8 +478,12 @@
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
      
-   <div class="titulo-app">
-    <h1>RADAR <span>X9</span></h1>
+   <h1>RADAR <span>X9</span></h1>
+
+    <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
+        <div class="gps-status-dot err" id="gps-status-dot"></div>
+        <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
+    </div>
 
     <div id="cidade-atual" class="cidade-label">
     <span id="nomeCidade">🚩 Localizando...</span>
@@ -491,11 +495,6 @@
 </div>
 </div>
 
-       <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
-    <div class="gps-status-dot err" id="gps-status-dot"></div>
-    <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
-          </div>
-      </div>
 
     <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
       <div class="menu-hamburger">
