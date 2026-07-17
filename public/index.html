@@ -407,6 +407,9 @@
         .gps-status-label { display: none; }
     }
 
+    
+     /* CSS LOCALIZAÇÃO CIDADE */
+
 .titulo-app{
     display:flex;
     flex-direction:column;
@@ -428,6 +431,158 @@
      text-transform:uppercase;
 }
 
+     /* CSS BARRA TEMPERATURA */
+.temperatura-bar{
+
+    width:100%;
+    background:#161616;
+
+    padding:10px 14px 14px;
+
+    color:#fff;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+    box-shadow:0 2px 8px rgba(0,0,0,.35);
+
+}
+
+.temp-topo{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    font-size:13px;
+
+    margin-bottom:10px;
+
+}
+
+.temp-valor{
+
+    font-size:32px;
+
+    font-weight:700;
+
+}
+
+.temp-info{
+
+    color:#bdbdbd;
+
+}
+
+.temp-update{
+
+    color:#999;
+
+}
+
+.escala-container{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.icone-frio,
+.icone-calor{
+
+    font-size:26px;
+
+}
+
+.escala{
+
+    position:relative;
+
+    flex:1;
+
+    height:22px;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    background:linear-gradient(
+        to right,
+
+        #0D47A1 0%,
+        #1976D2 15%,
+        #26C6DA 30%,
+        #2ECC71 45%,
+        #FDD835 60%,
+        #FB8C00 75%,
+        #F4511E 88%,
+        #D50000 100%
+
+    );
+
+}
+
+.ponteiro{
+
+    position:absolute;
+
+    top:50%;
+
+    width:18px;
+
+    height:18px;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    border:3px solid #2ECC71;
+
+    transform:translate(-50%,-50%);
+
+    transition:left .6s;
+
+    box-shadow:0 0 8px rgba(0,0,0,.5);
+
+}
+
+.ponteiro::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+
+    top:20px;
+
+    transform:translateX(-50%);
+
+    border-left:6px solid transparent;
+    border-right:6px solid transparent;
+    border-top:8px solid #fff;
+
+}
+
+.legenda-temp{
+
+    margin-top:12px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    text-align:center;
+
+    font-size:11px;
+
+    color:#ddd;
+
+}
 
 </style>
 <base target="_blank">
@@ -448,7 +603,7 @@
      <div class="titulo-app">
         <h1>RADAR <span>X9</span></h1>
         <div id="cidade-atual" class="cidade-label">
-            <span>🧭Localizando cidade...</span>
+            <span>🚩Localizando...</span>
         </div>
       </div>
 
@@ -468,7 +623,48 @@
     </button>
   </header>
 
+ <!-- BARRA DE TEMPERATURA -->
+<div id="temperatura-bar" class="temperatura-bar">
 
+    <div class="temp-topo">
+        <div class="temp-valor">
+            🌡️ <span id="temperaturaAtual">--°C</span>
+        </div>
+
+        <div class="temp-info">
+            Sensação térmica: <span id="sensacaoAtual">--°C</span>
+        </div>
+
+        <div class="temp-update">
+            ⟳ Agora
+        </div>
+    </div>
+
+    <div class="escala-container">
+
+        <div class="icone-frio">❄️</div>
+
+        <div class="escala">
+
+            <div class="ponteiro" id="ponteiroTemp"></div>
+
+        </div>
+
+        <div class="icone-calor">☀️</div>
+
+    </div>
+
+    <div class="legenda-temp">
+
+        <span>FRIO<br>EXTREMO</span>
+        <span>MUITO<br>FRIO</span>
+        <span>AMENO</span>
+        <span>QUENTE</span>
+        <span>MUITO<br>QUENTE</span>
+        <span>CALOR<br>EXTREMO</span>
+
+    </div>
+</div>
   
   <!-- MENU DROPDOWN -->
  
@@ -1869,7 +2065,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 }
 
 //================================
-// função iniciar Navegação de GPS
+// FUNÇÃO INICIAR NAVEGAÇÃO GPS
 //================================
 
 function startGPSTracking() {
@@ -1891,7 +2087,7 @@ function startGPSTracking() {
 }
 
 //================================
-// função iniciar Navegação de GPS
+// FUNÇÃO GPS CIDADE ATUAL 
 //================================
 
 const cidadeLabel = document.getElementById("cidade-atual");
@@ -1946,9 +2142,9 @@ function startGPSTracking() {
         showError, 
 
         { 
-            enableHighAccuracy: true, 
-            maximumAge: 2000, 
-            timeout: 15000 
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+           timeout: 10000
         }
 
     );
@@ -1965,7 +2161,71 @@ function startGPSTracking() {
 
 }
 
+//=====================================
+// FUNÇÃO ACCURACY DISTANCIA METROS
+//=====================================
+function distanciaMetros(lat1, lon1, lat2, lon2){
 
+    const R = 6371000;
+
+    const dLat = (lat2-lat1) * Math.PI/180;
+    const dLon = (lon2-lon1) * Math.PI/180;
+
+    const a =
+        Math.sin(dLat/2)**2 +
+        Math.cos(lat1*Math.PI/180) *
+        Math.cos(lat2*Math.PI/180) *
+        Math.sin(dLon/2)**2;
+
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+}
+//=====================================
+// FUNÇÃO INTEGRAÇÃO ACCURACY GPS
+//=====================================
+
+let melhorPrecisao = Infinity;
+
+const historico = [];
+
+function sucesso(position){
+
+    const acc = position.coords.accuracy;
+
+    // 1. Ignora leituras ruins
+    if(acc > 15){
+        console.log("GPS ignorado:", acc + " m");
+        return;
+    }
+
+    // 2. Guarda a melhor precisão obtida
+    if(acc < melhorPrecisao){
+        melhorPrecisao = acc;
+    }
+
+    // 3. Guarda histórico para suavizar o GPS
+    historico.push({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+    });
+
+    if(historico.length > 5){
+        historico.shift();
+    }
+
+    // 4. Calcula média
+    userLat = historico.reduce((s,p)=>s+p.lat,0)/historico.length;
+    userLng = historico.reduce((s,p)=>s+p.lng,0)/historico.length;
+
+    console.log(
+        "GPS:",
+        userLat,
+        userLng,
+        "Precisão:",
+        melhorPrecisao.toFixed(1)+" m"
+    );
+
+}
 //=====================================
 // FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
 //=====================================
@@ -1991,7 +2251,7 @@ async function atualizarCidade(lat, lng){
             ultimaCidade = cidade;
 
             cidadeLabel.innerHTML =
-                "🧭" + cidade;
+                "🚩" + cidade;
 
             cidadeLabel.style.color =
                 corCidade(cidade);
@@ -2017,6 +2277,74 @@ function corCidade(nome){
     }
 
     return `hsl(${Math.abs(hash)%360},90%,55%)`;
+
+}
+
+navigator.geolocation.getCurrentPosition(async(pos)=>{
+
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+
+    await atualizarCidade();
+
+    await atualizarTemperatura();
+
+});
+
+//=====================================
+// FUNÇÃO ATUALIZAR TEMPERATURA LOCAL
+//=====================================
+
+async function atualizarTemperatura() {
+
+    if (!userLat || !userLng) return;
+
+    try{
+
+        const url =
+`https://api.open-meteo.com/v1/forecast?latitude=${userLat}&longitude=${userLng}&current=temperature_2m,apparent_temperature`;
+
+        const resposta = await fetch(url);
+
+        const dados = await resposta.json();
+
+        const temperatura = dados.current.temperature_2m;
+
+        const sensacao = dados.current.apparent_temperature;
+
+        document.getElementById("temperaturaAtual").textContent =
+            temperatura.toFixed(1)+"°C";
+
+        document.getElementById("sensacaoAtual").textContent =
+            sensacao.toFixed(1)+"°C";
+
+        posicionarTemperatura(temperatura);
+
+    }catch(e){
+
+        console.error(e);
+
+    }
+
+}
+
+//=====================================
+// FUNÇÃO POSIONAR TEMPERATURA LOCAL
+//=====================================
+function posicionarTemperatura(temp){
+
+    const minimo = -20;
+
+    const maximo = 50;
+
+    let porcentagem =
+
+        ((temp-minimo)/(maximo-minimo))*100;
+
+    porcentagem = Math.max(0,Math.min(100,porcentagem));
+
+    document.getElementById("ponteiroTemp").style.left =
+        porcentagem+"%";
 
 }
 
