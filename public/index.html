@@ -482,13 +482,13 @@
     <h1>RADAR <span>X9</span></h1>
 
     <div id="cidade-atual" class="cidade-label">
-        <span id="nomeCidade">🚩 Localizando...</span>
-        <span class="separador">|</span>
-        <span id="temperaturaAtual" class="temp-value">🌡️ --°C</span>
-        <span class="separador">|</span>
-        <span class="label">Sensação:</span>
-        <span id="sensacaoAtual">--°C</span>
-    </div>
+    <span id="nomeCidade">🚩 Localizando...</span>
+    <span class="separador">|</span>
+    <span id="temperaturaAtual" class="temp-value">🌡️ °C</span>
+    <span class="separador">|</span>
+    <span class="label">Sensação:</span>
+    <span id="sensacaoAtual"> °C</span>
+</div>
 </div>
 
        <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
@@ -2101,8 +2101,8 @@ async function atualizarCidade(lat, lng){
 
             ultimaCidade = cidade;
 
-            cidadeLabel.innerHTML =
-                "🚩" + cidade;
+           document.getElementById("nomeCidade").textContent = 
+    "🚩 " + cidade;
 
             cidadeLabel.style.color =
                 corCidade(cidade);
