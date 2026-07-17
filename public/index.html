@@ -651,6 +651,7 @@
     <div class="spinner-ring"></div>
     <div class="loading-text">Iniciando <span>Radar X9</span></div>
     <div class="loading-sub">Sincronizando satélites...</div>
+    
    
   </div>
 
@@ -662,6 +663,10 @@
         <h1>RADAR <span>X9</span></h1>
         <div id="cidade-atual" class="cidade-label">
             <span>🚩Localizando...</span>
+            <span id="temperaturaAtual" class="temp-value">20.8°C</span>
+             <span class="label">Sensação:</span>
+            <span id="sensacaoAtual">19.2°C</span>
+            
         </div>
       </div>
 
@@ -919,9 +924,7 @@
             
             <div class="current-position-status" id="pos-status">Clique acima para inserir as coordenadas.</div>
           </div>
-
-
-         
+        
 
           <!-- Botão de Inclusão - AÇÃO DIRETA, SEM CONFIRMAÇÃO ADICIONAL -->
           <button class="btn-submit-radar" id="btn-submit-radar">
