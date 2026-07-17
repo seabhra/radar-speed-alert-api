@@ -1008,59 +1008,6 @@ let sidebarAberta = true;
 let gpsAccuracyAtual = 999;
 let gpsLastUpdateTime = 0;
 
-// ==========================
-// RECENTRALIZAR MAPA
-// ==========================
-
-let mapaCentralizado = true;
-
-const speedWidget = document.getElementById("speedWidget");
-const speedIcon = document.getElementById("speedIcon");
-
-function desativarCentralizacao(){
-
-    if(!mapaCentralizado) return;
-
-    mapaCentralizado = false;
-
-    speedIcon.src = "/imagens_app/ic_recentralizar.png";
-
-    speedWidget.classList.add("recentralizar");
-
-}
-
-function recentralizarMapa(){
-
-    mapaCentralizado = true;
-
-    map.flyTo(
-        [userLat, userLng],
-        map.getZoom(),
-        {
-            animate:true,
-            duration:0.6
-        }
-    );
-
-    speedIcon.src = "/imagens_app/ic_speed_limit.png";
-
-    speedWidget.classList.remove("recentralizar");
-
-}
-
-// O usuário moveu o mapa
-map.on("dragstart", desativarCentralizacao);
-map.on("zoomstart", desativarCentralizacao);
-map.on("movestart", desativarCentralizacao);
-
-// Clique no botão
-speedWidget.addEventListener("click", () => {
-
-    if(!mapaCentralizado){
-        recentralizarMapa();
-    }
-
-});
 
 // ======================
 // CONFIGURAÇÃO DO GITHUB
@@ -3092,6 +3039,61 @@ async function initMap() {
     aplicarTemaMapa();
     setInterval(aplicarTemaMapa, 300000);
     inicializarBussolaHardware();
+
+    // ==========================
+// RECENTRALIZAR MAPA
+// ==========================
+
+let mapaCentralizado = true;
+
+const speedWidget = document.getElementById("speedWidget");
+const speedIcon = document.getElementById("speedIcon");
+
+function desativarCentralizacao(){
+
+    if(!mapaCentralizado) return;
+
+    mapaCentralizado = false;
+
+    speedIcon.src = "/imagens_app/ic_recentralizar.png";
+
+    speedWidget.classList.add("recentralizar");
+
+}
+
+function recentralizarMapa(){
+
+    mapaCentralizado = true;
+
+    map.flyTo(
+        [userLat, userLng],
+        map.getZoom(),
+        {
+            animate:true,
+            duration:0.6
+        }
+    );
+
+    speedIcon.src = "/imagens_app/ic_speed_limit.png";
+
+    speedWidget.classList.remove("recentralizar");
+
+}
+
+// O usuário moveu o mapa
+map.on("dragstart", desativarCentralizacao);
+map.on("zoomstart", desativarCentralizacao);
+map.on("movestart", desativarCentralizacao);
+
+// Clique no botão
+speedWidget.addEventListener("click", () => {
+
+    if(!mapaCentralizado){
+        recentralizarMapa();
+    }
+
+});
+
     
     map.on('dragstart', function() { 
         isFollowing = false; 
