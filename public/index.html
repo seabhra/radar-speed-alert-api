@@ -234,6 +234,8 @@ h1 span {
         font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px;
         color: var(--accent-color); text-transform: uppercase; line-height: 1; margin-top: 2px;
     }
+
+
     .sidebar-controls {
         position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width);
         z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -3352,6 +3354,8 @@ function inicializarBotaoAddRadar() {
     const iconPreviewName = document.getElementById('icon-preview-name');
     const speedButtons = document.querySelectorAll('.speed-btn');
     const btnCaptureLocation = document.getElementById('btn-capture-location');
+     const btnMenuToggle = document.getElementById('btn-menu-toggle');
+
 
     let currentPosition = { lat: null, lng: null };
     let gpsObtido = false;
@@ -3507,6 +3511,32 @@ async function atualizarPosicaoAtual() {
         return false;
     }
 }
+
+//=====================    
+//BOTÃO MENU TOGLE
+//=====================
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Pega o botão pelo ID
+    const btnMenuToggle = document.getElementById('btn-menu-toggle');
+
+    // Verifica se o botão existe na página para evitar erros
+    if (btnMenuToggle) {
+        
+        // Adiciona o evento de clique
+        btnMenuToggle.addEventListener('click', () => {
+            
+            // Adiciona ou remove a classe 'active' a cada clique
+            btnMenuToggle.classList.toggle('active');
+
+            // OPCIONAL: Se você tiver um menu lateral para abrir/fechar, adicione a lógica aqui
+            // Exemplo:
+            // const menuLateral = document.getElementById('menu-lateral');
+            // menuLateral.classList.toggle('open');
+        });
+    }
+});
+
 
 //=====================    
 //BOTÃO ADICIONAR RADAR
