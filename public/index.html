@@ -207,6 +207,8 @@
     @keyframes pulseEnd { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
     .radar-marker-icon { background: transparent !important; border: none !important; }
     .radar-marker-icon img { width: 40px !important; height: 40px !important; object-fit: contain !important; display: block !important; }
+   
+     /* CSS SPEED WIDGET */
     .speed-widget { position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500; display: flex; align-items: center; justify-content: center; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
     .speed-widget.alerta-ativo { bottom: 75px !important; }
     .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
@@ -214,8 +216,21 @@
         position: absolute; top: 50%; left: 50%; transform: translate(-64%, -60%);
         font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
         color: #000; line-height: 1; z-index: 2; white-space: nowrap; text-align: center;
-        font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch;
-    }
+        font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch;}
+
+/* CSS SPEED RECENTRALIZAR */
+.speed-widget.recentralizar{
+
+    cursor:pointer;
+
+}
+.speed-widget.recentralizar .speed-value{
+
+    display:none;
+
+}    
+
+/* CSS ALERTAS */
     #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
@@ -982,10 +997,63 @@ let sidebarAberta = true;
 let gpsAccuracyAtual = 999;
 let gpsLastUpdateTime = 0;
 
+// ==========================
+// RECENTRALIZAR MAPA
+// ==========================
 
-// ===================================================================
+let mapaCentralizado = true;
+
+const speedWidget = document.getElementById("speedWidget");
+const speedIcon = document.getElementById("speedIcon");
+
+function desativarCentralizacao(){
+
+    if(!mapaCentralizado) return;
+
+    mapaCentralizado = false;
+
+    speedIcon.src = "/imagens_app/ic_recentralizar.png";
+
+    speedWidget.classList.add("recentralizar");
+
+}
+
+function recentralizarMapa(){
+
+    mapaCentralizado = true;
+
+    map.flyTo(
+        [userLat, userLng],
+        map.getZoom(),
+        {
+            animate:true,
+            duration:0.6
+        }
+    );
+
+    speedIcon.src = "/imagens_app/ic_speed_limit.png";
+
+    speedWidget.classList.remove("recentralizar");
+
+}
+
+// O usuário moveu o mapa
+map.on("dragstart", desativarCentralizacao);
+map.on("zoomstart", desativarCentralizacao);
+map.on("movestart", desativarCentralizacao);
+
+// Clique no botão
+speedWidget.addEventListener("click", () => {
+
+    if(!mapaCentralizado){
+        recentralizarMapa();
+    }
+
+});
+
+// ======================
 // CONFIGURAÇÃO DO GITHUB
-// ===================================================================
+// ======================
 
 let GITHUB_CONFIG = {
     owner: 'seabhra',
