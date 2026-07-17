@@ -436,211 +436,30 @@
     line-height:1;
 }
 
-.cidade-label{
-    margin-top:3px;
-     font-family:"Rajdhani", sans-serif;
-    font-size:13px;
-    font-weight:700;
-    letter-spacing:0.8px;
-    line-height:1;
-     text-transform:uppercase;
+.cidade-label {
+    margin-top: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
 }
 
-     /* CSS BARRA TEMPERATURA */
-.weather-bar{
-
-    background:#151515;
-
-    color:#fff;
-
-    padding:8px 12px 6px;
-
-    border-bottom:1px solid rgba(255,255,255,.06);
-
-    user-select:none;
-
+.temp-value {
+    font-weight: 700;
 }
 
-/* ---------- topo ---------- */
-
-.weather-top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:8px;
-
+.label {
+    opacity: .8;
 }
 
-.temp-box{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
+.separador {
+    opacity: .5;
 }
 
-.temp-icon{
-
-    font-size:26px;
-
-    line-height:1;
-
-}
-
-.temp-value{
-
-    font-size:20px;
-
-    font-weight:700;
-
-}
-
-.sensacao-box{
-
-    font-size:12px;
-
-    color:#bdbdbd;
-
-}
-
-.update-box{
-
-    font-size:12px;
-
-    color:#bdbdbd;
-
-}
-
-/* ---------- régua ---------- */
-
-.weather-scale{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-}
-
-.cold-icon,
-.hot-icon{
-
-    width:18px;
-
-    font-size:20px;
-
-    text-align:center;
-
-}
-
-/* ---------- barra ---------- */
-
-.scale{
-
-    position:relative;
-
-    flex:1;
-
-    height:22px;
-
-    border-radius:20px;
-
-    overflow:hidden;
-
-    background:linear-gradient(
-        to right,
-
-        #1747df 0%,
-        #1e88e5 15%,
-        #22c7e8 30%,
-        #35d89a 45%,
-        #d7f000 55%,
-        #ffd028 70%,
-        #ff8c1a 84%,
-        #ff4500 92%,
-        #d40000 100%
-    );
-
-}
-
-/* divisões */
-
-.scale .div{
-
-    position:absolute;
-
-    top:0;
-
-    width:1px;
-
-    height:100%;
-
-    background:rgba(255,255,255,.45);
-
-}
-
-.d1{ left:16.6%; }
-
-.d2{ left:33.3%; }
-
-.d3{ left:50%; }
-
-.d4{ left:66.6%; }
-
-.d5{ left:83.3%; }
-
-/* ponteiro */
-
-.pointer{
-
-    position:absolute;
-
-    top:50%;
-
-    width:14px;
-
-    height:14px;
-
-    border-radius:50%;
-
-    background:#fff;
-
-    border:3px solid #81c784;
-
-    transform:translate(-50%,-50%);
-
-    z-index:5;
-
-    transition:left .4s;
-
-    box-shadow:0 0 6px rgba(0,0,0,.45);
-
-}
-
-/* ---------- legenda ---------- */
-
-.scale-labels{
-
-    margin-top:6px;
-
-    display:grid;
-
-    grid-template-columns:repeat(6,1fr);
-
-    font-size:10px;
-
-    color:#bdbdbd;
-
-    text-align:center;
-
-}
+    
 
 </style>
 <base target="_blank">
@@ -659,16 +478,18 @@
     <div class="header-left">
       <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
      
-     <div class="titulo-app">
-        <h1>RADAR <span>X9</span></h1>
-        <div id="cidade-atual" class="cidade-label">
-            <span>🚩Localizando...</span>
-            <span id="temperaturaAtual" class="temp-value">20.8°C</span>
-             <span class="label">Sensação:</span>
-            <span id="sensacaoAtual">19.2°C</span>
+   <div class="titulo-app">
+    <h1>RADAR <span>X9</span></h1>
 
-        </div>
-      </div>
+    <div id="cidade-atual" class="cidade-label">
+        <span id="nomeCidade">🚩 Localizando...</span>
+        <span class="separador">|</span>
+        <span id="temperaturaAtual" class="temp-value">🌡️ --°C</span>
+        <span class="separador">|</span>
+        <span class="label">Sensação:</span>
+        <span id="sensacaoAtual">--°C</span>
+    </div>
+</div>
 
        <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
     <div class="gps-status-dot err" id="gps-status-dot"></div>
@@ -686,60 +507,6 @@
     </button>
   </header>
 
- <!-- BARRA DE TEMPERATURA -->
-<div class="weather-bar">
-
-    <div class="weather-top">
-
-        <div class="temp-box">
-            <span class="temp-icon">🌡️</span>
-            <span id="temperaturaAtual" class="temp-value">20.8°C</span>
-        </div>
-
-        <div class="sensacao-box">
-            <span class="label">Sensação:</span>
-            <span id="sensacaoAtual">19.2°C</span>
-        </div>
-
-        <div class="update-box">
-            ⟳ Agora
-        </div>
-
-    </div>
-
-    <div class="weather-scale">
-
-        <span class="cold-icon">❄</span>
-
-        <div class="scale">
-
-            <div id="ponteiroTemp" class="pointer"></div>
-
-            <!-- divisões -->
-            <span class="div d1"></span>
-            <span class="div d2"></span>
-            <span class="div d3"></span>
-            <span class="div d4"></span>
-            <span class="div d5"></span>
-
-        </div>
-
-        <span class="hot-icon">☀</span>
-
-    </div>
-
-    <div class="scale-labels">
-
-        <span>FRIO</span>
-        <span>MUITO</span>
-        <span>AMENO</span>
-        <span>QUENTE</span>
-        <span>MUITO</span>
-        <span>CALOR</span>
-
-    </div>
-
-</div>
   
   <!-- MENU DROPDOWN -->
  
