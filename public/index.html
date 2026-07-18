@@ -2300,8 +2300,8 @@ async function atualizarTemperatura() {
         document.getElementById("temperaturaAtual").textContent =
             temperatura.toFixed(1)+"°C";
 
-        document.getElementById("sensacaoAtual").textContent =
-            sensacao.toFixed(1)+"°C";
+      // Troque sensacaoAtual por umidadeAtual, e o dado da API para umidade (geralmente humidity)
+         document.getElementById('umidadeAtual').textContent = umidade + '%'; 
 
         posicionarTemperatura(temperatura);
 
