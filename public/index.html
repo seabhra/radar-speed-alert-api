@@ -144,6 +144,31 @@ h1 span {
     white-space: nowrap;
 }
 
+/* LABEL DE ALERTA DE CLIMA */
+.alerta-clima-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px; /* Espaço abaixo da linha da cidade */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    animation: piscarAlerta 1.5s infinite;
+}
+
+/* Cores dos Alertas */
+.alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
+.alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
+.alerta-seco   { background: rgba(255, 165, 0, 0.15); color: #ffcc00; border: 1px solid rgba(255, 165, 0, 0.3); }
+
+/* Animação para piscar */
+@keyframes piscarAlerta {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
 
 /* ======================== */
 /* GPS STATUS */
@@ -570,27 +595,25 @@ h1 span {
 
         </div>
 
+<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
+<div id="cidade-atual" class="cidade-label">
+    <span id="nomeCidade">📍 Local...</span>
+    <span class="separador">|</span>
 
-        <!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
-        <div id="cidade-atual" class="cidade-label">
-            <span id="nomeCidade">📍 Localizando...</span>
-            <span class="separador">|</span>
+    <span id="temperaturaAtual" class="temp-value">
+        🌡️ °C
+    </span>
 
-            <span id="temperaturaAtual" class="temp-value">
-                🌡️ °C
-            </span>
+    <span class="separador">|</span>
 
-            <span class="separador">|</span>
+    <span class="label">💧 Umidade:</span>
+    <span id="umidadeAtual">%</span>
+</div>
 
-            <span class="label">
-                Sensação:
-            </span>
-
-            <span id="sensacaoAtual">
-                °C
-            </span>
-        </div>
-
+<!-- LABEL DE ALERTA ABAIXO -->
+<div id="alerta-clima" class="alerta-clima-label" style="display: none;">
+    <!-- O texto e ícone do alerta serão injetados via JavaScript -->
+</div>
 
     </div>
 
@@ -823,8 +846,12 @@ h1 span {
     <source src="audio_app/alerta_sound_destaque.mp3" type="audio/mpeg">
   </audio>
 
+   <audio id="alerta-sound-clima" preload="auto">
+    <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
+  </audio>
 
 <script>
+
  // ===================================================================
 // VARIÁVEIS GLOBAIS
 // ===================================================================
@@ -2271,7 +2298,7 @@ async function atualizarTemperatura() {
         const sensacao = dados.current.apparent_temperature;
 
         document.getElementById("temperaturaAtual").textContent =
-            temperatura.toFixed(1)+"🌡️"+"°C";
+            temperatura.toFixed(1)+"°C";
 
         document.getElementById("sensacaoAtual").textContent =
             sensacao.toFixed(1)+"°C";
@@ -2304,6 +2331,61 @@ function posicionarTemperatura(temp){
     document.getElementById("ponteiroTemp").style.left =
         porcentagem+"%";
 
+}
+//====================================
+// FUNÇÃO ALERTA CLIMÁTICO
+//=====================================
+// Configuração do Som (Substitua 'alerta.mp3' pelo caminho do seu arquivo de som)
+const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3');
+somAlerta.volume = 0.5; // Volume de 0.0 a 1.0
+
+// Variável de controle para não ficar tocando o som infinitamente
+let alertaAtivoAtual = '';
+
+function verificarAlertasClima(temperatura, umidade) {
+    const alertaDiv = document.getElementById('alerta-sound-clima');
+    
+    // Converte para número caso venha como string
+    const temp = parseFloat(temperatura);
+    const umid = parseFloat(umidade);
+    
+    let novoAlerta = '';
+
+    // Limpa classes anteriores
+    alertaDiv.className = 'alerta-clima-label';
+
+    // Condição 1: Calor Extremo (Ex: acima de 40°C)
+    if (temp >= 40) {
+        novoAlerta = 'quente';
+        alertaDiv.innerHTML = '🔥 ALERTA: Temperatura Extrema!';
+        alertaDiv.classList.add('alerta-quente');
+    } 
+    // Condição 2: Frio Extremo (Ex: abaixo de 5°C)
+    else if (temp <= 5) {
+        novoAlerta = 'frio';
+        alertaDiv.innerHTML = '❄️ ALERTA: Frio Extremo!';
+        alertaDiv.classList.add('alerta-frio');
+    } 
+    // Condição 3: Umidade Baixa (Ex: abaixo de 20%)
+    else if (umid <= 20) {
+        novoAlerta = 'seco';
+        alertaDiv.innerHTML = '🏜️ ATENÇÃO: Umidade do Ar Baixa!';
+        alertaDiv.classList.add('alerta-seco');
+    }
+
+    // Lógica para mostrar/esconder e tocar o som
+    if (novoAlerta !== '') {
+        alertaDiv.style.display = 'flex';
+        
+        // Toca o som apenas se for um alerta NOVO (para não ficar repetindo a cada atualização da API)
+        if (novoAlerta !== alertaAtivoAtual) {
+            somAlerta.play().catch(e => console.log("Som bloqueado pelo navegador. Aguardando interação do usuário."));
+            alertaAtivoAtual = novoAlerta; // Marca que esse alerta já tocou
+        }
+    } else {
+        alertaDiv.style.display = 'none';
+        alertaAtivoAtual = ''; // Reseta se o clima estiver normal
+    }
 }
 
 //=====================================
