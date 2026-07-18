@@ -600,9 +600,9 @@ h1 span {
     <span id="nomeCidade">🚩 Local...</span>
     <span class="separador">|</span>
 
-    <span id="temperaturaAtual" class="temp-value">
-        🌡️ °C
-    </span>
+    <span class="temp-value">
+    🌡️ <span id="temperaturaAtual">°C</span>
+</span>
 
     <span class="separador">|</span>
 
@@ -615,7 +615,6 @@ h1 span {
 
 <div id="alerta-sound-clima" class="alerta-clima-label" style="display: none;"></div>
 
->
 
     </div>
 
@@ -2308,8 +2307,10 @@ async function atualizarTemperatura() {
         document.getElementById("temperaturaAtual").textContent =
             temperatura.toFixed(1)+"°C";
 
+            
         // 3. ATUALIZANDO O HTML COM A VARIÁVEL CORRETA
         document.getElementById('umidadeAtual').textContent = umidade + '%'; 
+        
 
         posicionarTemperatura(temperatura);
         
