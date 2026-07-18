@@ -611,9 +611,11 @@ h1 span {
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
-<div id="alerta-clima" class="alerta-clima-label" style="display: none;">
-    <!-- O texto e ícone do alerta serão injetados via JavaScript -->
-</div>
+
+
+<div id="alerta-sound-clima" class="alerta-clima-label" style="display: none;"></div>
+
+>
 
     </div>
 
@@ -2276,9 +2278,13 @@ navigator.geolocation.getCurrentPosition(async(pos)=>{
 
 });
 
-//=====================================
-// FUNÇÃO ATUALIZAR TEMPERATURA LOCAL
-//=====================================
+//============================================
+// FUNÇÃO ATUALIZAR TEMPERATURA E UMIDADE LOCAL
+//============================================
+
+//============================================
+// FUNÇÃO ATUALIZAR TEMPERATURA E UMIDADE LOCAL
+//============================================
 
 async function atualizarTemperatura() {
 
@@ -2286,28 +2292,33 @@ async function atualizarTemperatura() {
 
     try{
 
+        // 1. ADICIONADO relative_humidity_2m NA URL DA API
         const url =
-`https://api.open-meteo.com/v1/forecast?latitude=${userLat}&longitude=${userLng}&current=temperature_2m,apparent_temperature`;
+`https://api.open-meteo.com/v1/forecast?latitude=${userLat}&longitude=${userLng}&current=temperature_2m,relative_humidity_2m`;
 
         const resposta = await fetch(url);
 
         const dados = await resposta.json();
 
         const temperatura = dados.current.temperature_2m;
-
-        const sensacao = dados.current.apparent_temperature;
+        
+        // 2. CRIADA A VARIÁVEL UMIDADE EXATA COMO A API DEVOLVE
+        const umidade = dados.current.relative_humidity_2m;
 
         document.getElementById("temperaturaAtual").textContent =
             temperatura.toFixed(1)+"°C";
 
-      // Troque sensacaoAtual por umidadeAtual, e o dado da API para umidade (geralmente humidity)
-         document.getElementById('umidadeAtual').textContent = umidade + '%'; 
+        // 3. ATUALIZANDO O HTML COM A VARIÁVEL CORRETA
+        document.getElementById('umidadeAtual').textContent = umidade + '%'; 
 
         posicionarTemperatura(temperatura);
+        
+        // 4. CHAMA A VERIFICAÇÃO DE ALERTA DEPOIS DE ATUALIZAR OS DADOS
+        verificarAlertasClima();
 
     }catch(e){
 
-        console.error(e);
+        console.error("Erro clima:", e);
 
     }
 
