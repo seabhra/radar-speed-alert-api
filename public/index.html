@@ -597,7 +597,7 @@ h1 span {
 
 <!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
 <div id="cidade-atual" class="cidade-label">
-    <span id="nomeCidade">📍 Local...</span>
+    <span id="nomeCidade">🚩 Local...</span>
     <span class="separador">|</span>
 
     <span id="temperaturaAtual" class="temp-value">
@@ -2332,61 +2332,88 @@ function posicionarTemperatura(temp){
         porcentagem+"%";
 
 }
-//====================================
-// FUNÇÃO ALERTA CLIMÁTICO
-//=====================================
-// Configuração do Som (Substitua 'alerta.mp3' pelo caminho do seu arquivo de som)
-const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3');
-somAlerta.volume = 0.5; // Volume de 0.0 a 1.0
 
-// Variável de controle para não ficar tocando o som infinitamente
-let alertaAtivoAtual = '';
+ // =======================================================
+// SISTEMA DE ALERTA DE CLIMA (Umidade e Temperatura)
+// =======================================================
 
-function verificarAlertasClima(temperatura, umidade) {
+// Configuração do Som (Coloque o caminho do seu arquivo de áudio aqui)
+const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3'); // <-- Troque 'alerta.mp3' pelo som que você quer
+somAlerta.volume = 0.5;
+
+let alertaAtivoAtual = ''; // Evita que o som toque em loop
+
+function verificarAlertasClima() {
+    // Pega os valores que JÁ ESTÃO na tela (colocados pelo seu código de API)
+    const tempTexto = document.getElementById('temperaturaAtual').textContent;
+    const umidTexto = document.getElementById('umidadeAtual').textContent;
+    
+    // Extrai apenas os números (removendo °C, %, emojis, etc)
+    const temp = parseFloat(tempTexto.replace(/[^0-9.-]/g, ''));
+    const umid = parseFloat(umidTexto.replace(/[^0-9.-]/g, ''));
+    
+    // Se não conseguir ler números, sai da função
+    if (isNaN(temp) || isNaN(umid)) return;
+
     const alertaDiv = document.getElementById('alerta-sound-clima');
-    
-    // Converte para número caso venha como string
-    const temp = parseFloat(temperatura);
-    const umid = parseFloat(umidade);
-    
     let novoAlerta = '';
 
     // Limpa classes anteriores
     alertaDiv.className = 'alerta-clima-label';
 
-    // Condição 1: Calor Extremo (Ex: acima de 40°C)
+    // Condição 1: Calor Extremo (Acima de 40°C - ajuste o valor como achar melhor)
     if (temp >= 40) {
         novoAlerta = 'quente';
         alertaDiv.innerHTML = '🔥 ALERTA: Temperatura Extrema!';
         alertaDiv.classList.add('alerta-quente');
     } 
-    // Condição 2: Frio Extremo (Ex: abaixo de 5°C)
+    // Condição 2: Frio Extremo (Abaixo de 5°C - ajuste o valor como achar melhor)
     else if (temp <= 5) {
         novoAlerta = 'frio';
         alertaDiv.innerHTML = '❄️ ALERTA: Frio Extremo!';
         alertaDiv.classList.add('alerta-frio');
     } 
-    // Condição 3: Umidade Baixa (Ex: abaixo de 20%)
+    // Condição 3: Umidade Baixa (Abaixo de 20% - ajuste o valor como achar melhor)
     else if (umid <= 20) {
         novoAlerta = 'seco';
         alertaDiv.innerHTML = '🏜️ ATENÇÃO: Umidade do Ar Baixa!';
         alertaDiv.classList.add('alerta-seco');
     }
 
-    // Lógica para mostrar/esconder e tocar o som
+    // Mostra o alerta e toca o som
     if (novoAlerta !== '') {
         alertaDiv.style.display = 'flex';
         
-        // Toca o som apenas se for um alerta NOVO (para não ficar repetindo a cada atualização da API)
+        // Toca o som apenas UMA VEZ quando o alerta aparece (não fica tocando sem parar)
         if (novoAlerta !== alertaAtivoAtual) {
-            somAlerta.play().catch(e => console.log("Som bloqueado pelo navegador. Aguardando interação do usuário."));
-            alertaAtivoAtual = novoAlerta; // Marca que esse alerta já tocou
+            somAlerta.play().catch(e => console.log("Aguardando interação do usuário para tocar o som."));
+            alertaAtivoAtual = novoAlerta;
         }
     } else {
         alertaDiv.style.display = 'none';
         alertaAtivoAtual = ''; // Reseta se o clima estiver normal
     }
 }
+
+// =======================================================
+// OBSERVADOR AUTOMÁTICO (A MÁGICA ACONTECE AQUI)
+// =======================================================
+// Fica observando o elemento de temperatura. Quando o SEU código de API
+// atualizar a temperatura na tela, ele roda a função de alerta automaticamente.
+
+const observer = new MutationObserver(function() {
+    verificarAlertasClima();
+});
+
+// Configuração do observador
+const configObserver = { childList: true, subtree: true };
+
+// Inicia a observação no elemento de temperatura e umidade
+const elemTemp = document.getElementById('temperaturaAtual');
+const elemUmid = document.getElementById('umidadeAtual');
+
+if (elemTemp) observer.observe(elemTemp, configObserver);
+if (elemUmid) observer.observe(elemUmid, configObserver);
 
 //=====================================
 // FUNÇÃO VERIFICAR PROXIMIDADE RADARES
