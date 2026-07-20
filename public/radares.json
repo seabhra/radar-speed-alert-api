@@ -565,7 +565,24 @@
       [547, "1835","Av. Otacílio Negrão de Lima, Próx. Parque Guanabara","Alerta de Lugares em Destaque (ALE) - Igreja da Pampulha - Cultura","60","Mineirão/Parque Guanabara","1001051","KBH5301051","-19.859347, -43.978317"],
       [548, "1836","Nações Unidas, Sabará - Brasil","Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas","60","UPA/Bairro","1001052","KBH5301052","-19.878808, -43.868218"],
       [549, "1837","Nações Unidas, Sabará - Brasil","Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas","60","General Carneiro/Nações Unidas","1001053","KBH5301053","-19.878478, -43.860774"],
-      [550, "1838","Rua Das Nações, Próx. Rua Chile","Controlador Eletrônico de Velocidade (CEV)","30","Belo Horizonte/Nações Unidas","1001054","KBH5301054","-19.878547, -43.867425"]
+      [550, "1838","Rua Das Nações, Próx. Rua Chile","Controlador Eletrônico de Velocidade (CEV)","30","Belo Horizonte/Nações Unidas","1001054","KBH5301054","-19.878547, -43.867425"],
+      [551, "1839","Rua da Bahia, Próx. Avenida Augusto de Lima","Alerta de Lugares em Destaque (ALE) - Edifício Maletta","60","Praça da Estação/Savassi","1001055","KBH5301055","-19.924969, -43.937483"],
+      [552, "1840","Avenida Afonso Pena, Próx. Rua da Bahia","Alerta de Lugares em Destaque (ALE) - Feira de Artesanato da Afonso Pena (aos domingos)","60","Rodoviária/Mangabeiras","1001056","KBH5301056","-19.923149, -43.936233"],
+      [553, "1841","Avenida Olegário Maciel, Próx. Rua dos Tupis","Alerta de Lugares em Destaque (ALE) - Mercado Novo","60","Rodoviária/Praça Raul Soares","1001057","KBH5301057","-19.920775, -43.944696"],
+      [554, "1842","Rua Dr. Emir Soares, Próx. Rua Pedro José Pardo","Alerta de Lugares em Destaque (ALE) - Mirante do Magabeiras","30","Praça do Papa/Praça do Mirante","1001058","KBH5301058","-19.951789, -43.912660"],
+      [555, "1843","Avenida Prudente de Morais, Próx. Rua Josafá Belo","Alerta de Lugares em Destaque (ALE) - Museu Histórico Abílio Barreto","60","Loudes/São Pedro","1001059","KBH5301059","-19.937253, -43.947231"],
+      [556, "1844","Praça Rui Barbosa, Próx. Estação Ferroviária","Alerta de Lugares em Destaque (ALE) - Museu Artes e Ofícios","60","Parque Municipal/Floresta","1001060","KBH530106-","-19.916875, -43.933620"],
+      [557, "1845","Avenida Otacílio Negrão de Lima, Próx. Igreja da Pampulha","Alerta de Lugares em Destaque (ALE) - Parque de Diversões Guanabara","40","Zoológico/Estádio do Mineirão","1001061","KBH5301061","-19.859512, -43.978423"],
+      [558, "1846","Avenida José do Patrocínio Pontes, Próx. Praça Dimas Perrin","Alerta de Lugares em Destaque (ALE) - Parque Manbeiras","40","Praça do Papa/Parque Mangabeiras","1001062","KBH5301062","-19.955388, -43.907701"],
+      [559, "1847","Avenida Afonso Pena, Próx. Avenida Álvarez Cabral","Alerta de Lugares em Destaque (ALE) - Parque Municipal","60","Rodoviária/Mangabeiras","1001063","KBH5301063","-19.924473, -43.935203"],
+      [560, "1848","Avenida José do Patrocínio Pontes, Próx. Praça do Estado de Israel","Alerta de Lugares em Destaque (ALE) - Parque da Serra do Curral","40","Praça do Paça/Mangabeiras","1001064","KBH5301064","-19.961767, -43.918851"],
+      [561, "1849","Avenida João Pinheiro, Próx. Rua Gonçalves Dias","Alerta de Lugares em Destaque (ALE) - Praça da Liberdade","60","Centro/Savassi","1001065","KBH5301065","-19.931125, -43.937800"],
+      [562, "1850","Praça Israel Pinheiro, Próx. Rua Salomão de Vasconcelos","Alerta de Lugares em Destaque (ALE) - Praça do Papa","40","Rodoviária/Mangabeiras","1001066","KBH5301066","-19.958261, -43.914410"],
+      [563, "1851","Avenida Critovão Colombo, Próx. Rua Getúlio Vargas","Alerta de Lugares em Destaque (ALE) - Praça da Savassi","40","Praça da Liberdade/São Pedro","1001067","KBH5301067","-19.938125, -43.935632"],
+      [564, "1852","Rua Sapucaí, Próx. Avenida Assis Chateuabriand","Alerta de Lugares em Destaque (ALE) - Mirante da Rua Sapucaí","60","Centro/Floresta","1001068","KBH5301068","-19.917513, -43.932651"],
+      [565, "1853","Rua Dores do Indaiá, Próx. Rua Alvinópolis","Alerta de Lugares em Destaque (ALE) - Santa Tereza Circuito Boêmio","60","Floresta/Santa Tereza","1001069","KBH5301069","-19.916055, -43.910846"]
+
+      
 
     ]
   }
