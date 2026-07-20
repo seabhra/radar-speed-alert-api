@@ -2455,207 +2455,162 @@ function verificarProximidadeRadares() {
     }
 }
 
-//================================
-// FUNÇÃO ALERTA RADAR
-//================================
+// ===================================================================
+// BOTÃO SILENCIAR (CORRIGIDO PARA OS 4 TIPOS)
+// ===================================================================
+function inicializarBotaoAlertaToggle() {
+    var alertBtn  = document.getElementById('btn-alert-toggle');
+    var alertIcon = document.getElementById('alert-toggle-icon');
+    if (!alertBtn) return;
 
-function deveAlertaRadar(tipoOriginal) {
-    if (!tipoOriginal) return false;
-    var tipoLimpo = tipoOriginal.trim();
-    for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {  
-        if (tipoLimpo === TIPOS_SEM_ALERTA[i]) return false;
-    }
-    return true;
+    alertBtn.addEventListener('click', function () {
+        alertaHabilitado = !alertaHabilitado;
+
+        if (alertaHabilitado) {
+            alertBtn.classList.remove('alert-off');
+            if (alertIcon) {
+                alertIcon.src = '/imagens_app/ic_sound_on.png';
+                alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
+            }
+            
+            // Se ligou o som e tem um alerta na tela, zera o contador para o som voltar a tocar
+            if ($("#alert-container").is(":visible")) {
+                contagemTocarSom = 0; 
+            }
+            
+            tocarBeepConfirmacao('on');
+            showNotification('Alerta LIGADO');
+        } else {
+            alertBtn.classList.add('alert-off');
+            if (alertIcon) {
+                alertIcon.src = '/imagens_app/ic_sound_off.png';
+                alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
+            }
+            
+            // Se desligou o som e tem um alerta visível, chama a função de 1 clique
+            if ($("#alert-container").is(":visible")) {
+                silenciarAlertaManual(); 
+            } else {
+                pararTodosSons();
+                cancelarSequenciaSom();
+                tocarBeepConfirmacao('off');
+            }
+            
+            showNotification('Alerta DESLIGADO');
+        }
+    });
 }
 
-function dispararAlertaMobilidadeIA(mensagem) {
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
-    $(".alert-bar").css("background", "");
-    $("#alert-title").text("✅ ALERTA DE MOBILIDADE!");
-    $("#alert-text").text(mensagem);
-    $(".alert-bar").addClass("alert-bar-mobilidade");
-    $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
-    
-    tocarSomAlerta('mobilidade');
+// ===================================================================
+// BEEPS DE CONFIRMAÇÃO E SILENCIAR (COM DESTAQUE INCLUSO)
+// ===================================================================
 
-    if (!$("#alert-container").is(":visible")) { 
-        $("#alert-container").fadeIn(200); 
-        ajustarPosicaoSpeedWidget(true);
+function tocarBeepConfirmacao(estado) {
+    try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (estado === 'on') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, ctx.currentTime);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.1);
+        } else {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.2);
+        }
+    } catch(e) {
+        console.warn("Beep de confirmação falhou:", e);
     }
-    clearTimeout(alertTimeout);
-    alertTimeout = setTimeout(function() { 
-        if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
-    }, ALERT_CONFIG.TEMPO_ALERTA);
 }
 
-//================================
-// FUNÇÃO NORMALIZAR TEXTO
-//================================
+function silenciarAlertaComBeep(tipoAlerta) {
+    cancelarSequenciaSom();
 
-function normalizarTexto(txt) {
-    return (txt || '')
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // remove acentos
-        .replace(/[–—]/g, '-')                               // unifica travessão/en-dash em hífen
-        .replace(/\s+/g, ' ')                                // colapsa espaços múltiplos
-        .trim()
-        .toLowerCase();
+    var ctx;
+    try {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        _tocarBeep(ctx, tipoAlerta);
+        setTimeout(function() {
+            if (ctx && ctx.state !== 'closed') {
+                ctx.close().catch(function(){});
+            }
+        }, 600);
+    } catch(e) {
+        console.warn('[Radar X9] Áudio não suportado para o beep:', e);
+        if (ctx) ctx.close().catch(function(){});
+    }
 }
 
-//================================
-// FUNÇÃO CLASSIFICAÇÃO ALERTAS
-//================================
+function _tocarBeep(ctx, tipoAlerta) {
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
 
-function classificarAlerta(tipoOriginal) {
-    if (!tipoOriginal) return 'radar';
-    var tipoLimpo = normalizarTexto(tipoOriginal);
+    if (tipoAlerta === 'risco') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
+        osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.6, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.4);
 
-    for (var i = 0; i < TIPOS_ALERTA_RISCO.length; i++) {
-        if (tipoLimpo.includes(normalizarTexto(TIPOS_ALERTA_RISCO[i]))) return 'risco';
-    }
-    for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
-        if (tipoLimpo.includes(normalizarTexto(TIPOS_ALERTA_MOBILIDADE[j]))) return 'mobilidade';
-    }
-    // Atalho mais confiável: qualquer tipo com o prefixo "ALE" já é destaque,
-    // sem depender de bater o nome do lugar exatamente
-    if (tipoLimpo.includes('ale)') || tipoLimpo.includes('lugares em destaque')) return 'destaque';
+    } else if (tipoAlerta === 'mobilidade') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.12);
+        osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
+        osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.32);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.35);
 
-    for (var k = 0; k < TIPOS_ALERTA_DESTAQUE.length; k++) {
-        if (tipoLimpo.includes(normalizarTexto(TIPOS_ALERTA_DESTAQUE[k]))) return 'destaque';
-    }
-    return 'radar';
-}
-
-//================================
-// FUNÇÃO DISPARAR ALERTAS
-//================================
-
-function dispararAlerta(radar, distancia) {
-    const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
-    if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
-        cancelarSequenciaSom();
-        return;
-    }
-
-    const tipoAlerta = classificarAlerta(radar.tipoOriginal);
-    const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
-    const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
-
-    $(".alert-bar").removeClass(
-        "alert-bar-critico alert-bar-risco alert-bar-risco-critico " +
-        "alert-bar-mobilidade alert-bar-mobilidade-critico " +
-        "alert-bar-radar alert-bar-radar-critico " +
-        "alert-bar-destaque alert-bar-destaque-critico"
-    );
-
-    $(".alert-bar").css("background", "");
-
-    if (tipoAlerta === "risco") {
-        $("#alert-title").text("🚨 ALERTA DE RISCO!");
-        $(".alert-bar").addClass("alert-bar-risco");
-
-    } else if (tipoAlerta === "mobilidade") {
-        $("#alert-title").text("📢 ALERTA DE MOBILIDADE!");
-        $(".alert-bar").addClass("alert-bar-mobilidade");
-
-    } else if (tipoAlerta === "destaque") {
-        $("#alert-title").text("🏛️ ALERTA DE DESTAQUE!");
-        $(".alert-bar").addClass("alert-bar-destaque");
+    } else if (tipoAlerta === 'destaque') {
+        // Som de silêncio específico para DESTAQUE (Mais agudo e contínuo)
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(1000, ctx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
 
     } else {
-        $("#alert-title").text("⚠️ ALERTA DE RADAR!");
-        $(".alert-bar").addClass("alert-bar-radar");
+        // Som de silêncio padrão para RADAR
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1050, ctx.currentTime);
+        gain.gain.setValueAtTime(0.6, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.18);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.18);
+        
+        var osc2 = ctx.createOscillator();
+        var gain2 = ctx.createGain();
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(1050, ctx.currentTime + 0.25);
+        gain2.gain.setValueAtTime(0.6, ctx.currentTime + 0.25);
+        gain2.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.43);
+        osc2.start(ctx.currentTime + 0.25);
+        osc2.stop(ctx.currentTime + 0.43);
     }
-
-    $("#alert-text").text(
-        tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros"
-    );
-
-    $("#alert-icon").attr(
-        "src",
-        getIconUrl(radar.tipoOriginal, radar.velocidade_maxima)
-    );
-
-    // [REMOVIDO] bloco quebrado que usava "alertBar" e "radar.tipo" (não existiam)
-    // O som já é disparado corretamente mais abaixo, via tocarSomAlerta(tipoAlerta)
-
-    const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
-
-    if (isNewAlert) { 
-        $("#alert-container").fadeIn(200);   
-        contagemTocarSom = 0; 
-        ajustarPosicaoSpeedWidget(true);
-    }
-
-    tipoAlertaAtivo = tipoAlerta; // [ADICIONADO] necessário para o beep de silenciar tocar o som certo
-
-    if (alertaHabilitado) {
-        var deveTocar = false;
-        if (tipoAlerta === 'radar') { 
-            if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; 
-        } else { 
-            if (isNewAlert) deveTocar = true; 
-        }
-
-        if (deveTocar) { 
-            tocarSomAlerta(tipoAlerta); 
-            contagemTocarSom++; 
-        }
-    }
-
-    if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
-        if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
-        else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
-        else if (tipoAlerta === 'destaque') $(".alert-bar").addClass("alert-bar-destaque-critico");
-        else $(".alert-bar").addClass("alert-bar-critico");
-    }
-
-    ultimoRadarAlertado = radar.id;
-    clearTimeout(alertTimeout);
-    alertTimeout = setTimeout(function() { 
-        if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
-    }, ALERT_CONFIG.TEMPO_ALERTA);
 }
-
-function atualizarDistanciaAlerta(distancia) {
-    if (!$("#alert-container").is(":visible")) return;
-    var textoAtual = $("#alert-text").text();
-    var partes = textoAtual.split(" - a ");
-    if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
-}
-
-function fecharAlertaImediatamente() {
-    pararTodosSons();
-    clearTimeout(alertTimeout);
-    cancelarSequenciaSom();
-}
-
-function esconderAlertaVisualSemBeep() {
-    $("#alert-container").fadeOut(150);
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
-    $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
-    contagemTocarSom = 0;
-    clearTimeout(alertTimeout);
-    ultimoRadarAlertado = null;
-    tipoAlertaAtivo = null;
-    ajustarPosicaoSpeedWidget(false);
-}
-
-//================================
-// FUNÇÃO ZERA ALERTAS NO REFRESH 
-//================================
-
-function esconderAlertaVisual() {
-    silenciarAlertaComBeep(tipoAlertaAtivo);
-    $("#alert-container").fadeOut(150);
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
-    $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
-    contagemTocarSom = 0;
-    ultimoRadarAlertado = null;      // ← adicionar
-    tipoAlertaAtivo = null;          // ← adicionar
-    fecharAlertaImediatamente();
-    ajustarPosicaoSpeedWidget(false);
-}
-
 // ===================================================================
 // AUDIO ENGINE
 // ===================================================================
