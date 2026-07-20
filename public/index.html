@@ -2277,9 +2277,6 @@ navigator.geolocation.getCurrentPosition(async(pos)=>{
 
 });
 
-//============================================
-// FUNÇÃO ATUALIZAR TEMPERATURA E UMIDADE LOCAL
-//============================================
 
 //============================================
 // FUNÇÃO ATUALIZAR TEMPERATURA E UMIDADE LOCAL
@@ -2308,7 +2305,8 @@ async function atualizarTemperatura() {
         const umidade = dados.main.humidity;
 
         // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
-        document.getElementById("temperaturaAtual").textContent = "🌡️ " + temperatura.toFixed(1) + "°C";
+        document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
+       
         document.getElementById('umidadeAtual').textContent = umidade + '%'; 
         
         posicionarTemperatura(temperatura);
