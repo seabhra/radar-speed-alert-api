@@ -2290,41 +2290,37 @@ async function atualizarTemperatura() {
     if (!userLat || !userLng) return;
 
     try{
-
-        // 1. ADICIONADO relative_humidity_2m NA URL DA API
-        const url =
-`https://api.open-meteo.com/v1/forecast?latitude=${userLat}&longitude=${userLng}&current=temperature_2m,relative_humidity_2m`;
+        // COLOQUE SUA CHAVE DA OPENWEATHERMAP ABAIXO (Substitua o texto)
+        const API_KEY = 'a5c507ef270b147035538e0d6019bce1'; 
+        
+        // units=metric garante que venha em Celsius. lang=pt_br traz as descrições em português.
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
 
         const resposta = await fetch(url);
+        
+        // Se a chave estiver errada ou expirada, vai cair no catch
+        if (!resposta.ok) throw new Error('Erro na API de clima: ' + resposta.status);
 
         const dados = await resposta.json();
 
-        const temperatura = dados.current.temperature_2m;
-        
-        // 2. CRIADA A VARIÁVEL UMIDADE EXATA COMO A API DEVOLVE
-        const umidade = dados.current.relative_humidity_2m;
+        // A OpenWeatherMap organiza temperatura e umidade dentro de "main"
+        const temperatura = dados.main.temp;
+        const umidade = dados.main.humidity;
 
-        document.getElementById("temperaturaAtual").textContent =
-            temperatura.toFixed(1)+"°C";
-
-            
-        // 3. ATUALIZANDO O HTML COM A VARIÁVEL CORRETA
+        // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
+        document.getElementById("temperaturaAtual").textContent = "🌡️ " + temperatura.toFixed(1) + "°C";
         document.getElementById('umidadeAtual').textContent = umidade + '%'; 
         
-
         posicionarTemperatura(temperatura);
         
-        // 4. CHAMA A VERIFICAÇÃO DE ALERTA DEPOIS DE ATUALIZAR OS DADOS
+        // Chama a verificação de alerta de clima
         verificarAlertasClima();
 
     }catch(e){
-
         console.error("Erro clima:", e);
-
     }
 
 }
-
 //=====================================
 // FUNÇÃO POSIONAR TEMPERATURA LOCAL
 //=====================================
