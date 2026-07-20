@@ -3038,7 +3038,7 @@ async function initMap() {
     setInterval(aplicarTemaMapa, 300000);
     inicializarBussolaHardware();
 
-    // ==========================
+   // ==========================
 // RECENTRALIZAR MAPA
 // ==========================
 
@@ -3047,72 +3047,61 @@ let mapaCentralizado = true;
 const speedWidget = document.getElementById("speedWidget");
 const speedIcon = document.getElementById("speedIcon");
 
+// Função chamada APENAS quando o usuário arrasta o mapa com o mouse ou dedo
 function desativarCentralizacao(){
-
-    console.log("ARRASTOU O MAPA");
-    speedIcon.src="/imagens_app/ic_recentralizar.png";
-    console.log(speedIcon.src);
-
+    // Se o mapa já não está centralizado, não faz nada (evita processamento à toa)
     if(!mapaCentralizado) return;
 
+    console.log("ARRASTOU O MAPA - Desativando centralização");
     mapaCentralizado = false;
 
+    // Troca o ícone para o botão de recentralizar
     speedIcon.src = "/imagens_app/ic_recentralizar.png";
-
+    
+    // Adiciona a classe visual (caso tenha animação de pulse no CSS)
     speedWidget.classList.add("recentralizar");
-
 }
 
+// Função chamada quando o usuário clica no botão para voltar para o GPS
 function recentralizarMapa(){
+    if(mapaCentralizado) return; // Já está centralizado, não faz nada
 
+    console.log("RECENTRALIZANDO MAPA");
     mapaCentralizado = true;
 
+    // Voou de volta para a posição do usuário
     map.flyTo(
         [userLat, userLng],
         map.getZoom(),
         {
-            animate:true,
-            duration:0.6
+            animate: true,
+            duration: 0.6
         }
     );
 
+    // Troca o ícone de volta para o padrão
     speedIcon.src = "/imagens_app/ic_speed_limit.png";
-
+    
+    // Remove a classe visual
     speedWidget.classList.remove("recentralizar");
-
 }
 
-// O usuário moveu o mapa
+// ==========================================
+// EVENTOS DO LEAFLT (APENAS ARRASTAR)
+// ==========================================
+
+// O usuário ARRASTOU o mapa com mouse ou toque
 map.on("dragstart", desativarCentralizacao);
-map.on("zoomstart", desativarCentralizacao);
-map.on("movestart", desativarCentralizacao);
 
-// Clique no botão
+// (Removido: zoomstart e movestart para o ícone não ficar mudando sem querer)
+// (Removido: Lógica de retorno automático com setTimeout para respeitar o botão)
+
+// Clique no botão de recentralizar
 speedWidget.addEventListener("click", () => {
-
     if(!mapaCentralizado){
         recentralizarMapa();
     }
-
 });
-
-    
-    map.on('dragstart', function() { 
-        isFollowing = false; 
-        if (returnToGpsTimer) clearTimeout(returnToGpsTimer); 
-    });
-    map.on('dragend', function() {
-        returnToGpsTimer = setTimeout(function() {
-            if (!isFollowing) {
-                var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
-                if (marcadorAtivo) { 
-                    isFollowing = true; 
-                    map.setView(marcadorAtivo.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 }); 
-                    showNotification("Voltando à sua posição atual"); 
-                }
-            }
-        }, TEMPO_RETORNO_GPS);
-    });
 
     //=============================
     // Configurar eventos dos botões
