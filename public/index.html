@@ -3018,12 +3018,12 @@ function recentralizarMapa(){
     console.log("RECENTRALIZANDO MAPA");
     mapaCentralizado = true;
 
-    // Voou de volta para a posição do usuário
+    // Volta para a posição do usuário
     map.flyTo(
         [userLat, userLng],
         map.getZoom(),
         {
-            animate: true,
+            animate: false,
             duration: 0.6
         }
     );
