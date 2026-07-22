@@ -606,8 +606,9 @@ h1 span {
 
     <span class="separador">|</span>
 
-   <span class="label">💧</span>
-<span id="umidadeAtual">Umidade</span>
+    <span class="label">💧 Umidade:</span>
+    <span id="umidadeAtual">%</span>
+</div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
 
@@ -2305,7 +2306,8 @@ async function atualizarTemperatura() {
 
         // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
         document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
-       document.getElementById('umidadeAtual').textContent = umidade + '%'; // <- A linha é exatamente igual, mas certifique-se de que NÃO tem a palavra "Umidade:" escrita antes do 'umidade'
+       
+        document.getElementById('umidadeAtual').textContent = + '%'; 
         
         posicionarTemperatura(temperatura);
         
@@ -2448,7 +2450,7 @@ function verificarProximidadeRadares() {
 }
 
 // ===================================================================
-// BOTÃO SILENCIAR (CORRIGIDO PARA OS 4 TIPOS DE ALERTAS)
+// BOTÃO SILENCIAR (CORRIGIDO PARA OS 4 TIPOS)
 // ===================================================================
 function inicializarBotaoAlertaToggle() {
     var alertBtn  = document.getElementById('btn-alert-toggle');
@@ -2493,7 +2495,7 @@ function inicializarBotaoAlertaToggle() {
     });
 }
 
-// ================================
+// =================================
 // BEEPS DE CONFIRMAÇÃO E SILENCIAR 
 // =================================
 
