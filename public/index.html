@@ -2430,7 +2430,7 @@ if (elemUmid) observer.observe(elemUmid, configObserver);
 
 
 // ===================================================================
-// NORMALIZAÇÃO E CLASSIFICAÇÃO DE ALERTAS
+// NORMALIZAÇÃO E CLASSIFICAÇÃO DE ALERTAS 
 // ===================================================================
 function normalizarTexto(texto) {
     if (!texto) return '';
@@ -2496,7 +2496,7 @@ function dispararAlerta(radarData, distancia) {
     var tipoExibicao = ajusteNomes[radarData.tipoOriginal] || radarData.tipoOriginal;
     $icon.attr('src', getIconUrl(radarData.tipoOriginal, radarData.velocidade_maxima));
 
-    var titulos = { radar: 'ATENÇÃO!', risco: 'ALERTA DE RISCO', mobilidade: 'ALERTA DE MOBILIDADE', destaque: 'ALERTA DE LUGARES' };
+    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO DE MOBILIDADE', destaque: 'PONTOS TURÍSTICOS' };
     $title.text(titulos[tipo] || 'ATENÇÃO!');
     $text.text(tipoExibicao + ' — ' + Math.round(distancia) + 'm');
 
@@ -2742,6 +2742,7 @@ function _tocarBeep(ctx, tipoAlerta) {
         osc2.stop(ctx.currentTime + 0.43);
     }
 }
+
 // ===================================================================
 // AUDIO ENGINE
 // ===================================================================
@@ -2774,6 +2775,34 @@ function desbloquearAudioMobile() {
 
 ['click', 'touchstart', 'touchend', 'keydown'].forEach(function (evt) {
     document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
+});
+
+// ===================================================================
+// DESBLOQUEIO DOS <audio> DE ALERTA (necessário p/ tocar sem gesto depois)
+// ===================================================================
+var _alertSoundsDesbloqueados = false;
+
+function desbloquearAudiosDeAlerta() {
+    if (_alertSoundsDesbloqueados) return;
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.muted = true;
+        el.play().then(function () {
+            el.pause();
+            el.currentTime = 0;
+            el.muted = false;
+        }).catch(function () {
+            el.muted = false;
+            // Alguns WebViews só liberam de fato no 2º/3º toque; sem problema,
+            // o listener continua ativo (once:false) até conseguir.
+        });
+    });
+    _alertSoundsDesbloqueados = true;
+}
+
+['click', 'touchstart', 'touchend', 'keydown'].forEach(function (evt) {
+    document.addEventListener(evt, desbloquearAudiosDeAlerta, { once: false, passive: true });
 });
 
 var _sequenciaSomId = 0;
