@@ -2311,7 +2311,7 @@ async function atualizarTemperatura() {
         console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
 
        if (umidade !== undefined && umidade !== null) {
-    document.getElementById('umidadeAtual').textContent = umidade + '%';
+    document.getElementById('umidadeAtual').textContent = + '%';
        } else {
     document.getElementById('umidadeAtual').textContent = 'N/A';
     console.warn("A API não retornou o valor de umidade.");
