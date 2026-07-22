@@ -2307,8 +2307,15 @@ async function atualizarTemperatura() {
         // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
         document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
        
-        document.getElementById('umidadeAtual').textContent = + "%"; 
-        
+        // Verifica se a umidade veio da API
+        console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
+
+       if (umidade !== undefined && umidade !== null) {
+    document.getElementById('umidadeAtual').textContent = umidade + '%';
+       } else {
+    document.getElementById('umidadeAtual').textContent = 'N/A';
+    console.warn("A API não retornou o valor de umidade.");
+}
         posicionarTemperatura(temperatura);
         
         // Chama a verificação de alerta de clima
