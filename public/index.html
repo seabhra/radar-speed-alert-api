@@ -2873,38 +2873,29 @@ function tocarSomAlerta(tipoAlerta) {
     }
 
     function onEnded() {
-        if (meuId !== _sequenciaSomId) {
-            sound.removeEventListener('ended', onEnded);
-            delete _soundListeners[soundId];
-            _alertaPrincipalEstaTocando = false;
-            return;
-        }
-
-        toques++;
-        if (toques < numToques) {
-            sound.currentTime = 0;
-            sound.play().catch(function(err) {
-                console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
-            });
-        } else {
-            sound.removeEventListener('ended', onEnded);
-            delete _soundListeners[soundId];
-            _alertaPrincipalEstaTocando = false;
-        }
-    }
-
-    _soundListeners[soundId] = onEnded;
-    sound.addEventListener('ended', onEnded);
-
-    sound.currentTime = 0;
-    sound.play().catch(function(err) {
-        console.warn('[Radar X9] Falha ao iniciar mp3 (' + soundId + '):', err);
+    if (meuId !== _sequenciaSomId) {
         sound.removeEventListener('ended', onEnded);
         delete _soundListeners[soundId];
         _alertaPrincipalEstaTocando = false;
-    });
-}
+        return;
+    }
 
+    toques++;
+    if (toques < numToques) {
+        sound.currentTime = 0;
+        sound.play().catch(function(err) {
+            console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
+            sound.removeEventListener('ended', onEnded);
+            delete _soundListeners[soundId];
+            _alertaPrincipalEstaTocando = false;
+        });
+    } else {
+        sound.removeEventListener('ended', onEnded);
+        delete _soundListeners[soundId];
+        _alertaPrincipalEstaTocando = false;
+    }
+}
+}
 
 // ===================================================================
 // FUNÇÃO PARA ANIMAR O BOTÃO ADICIONAR RADAR
