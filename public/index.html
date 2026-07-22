@@ -2307,7 +2307,7 @@ async function atualizarTemperatura() {
         // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
         document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
        
-        document.getElementById('umidadeAtual').textContent = umidade + '%'; 
+        document.getElementById('umidadeAtual').textContent = '%'; 
         
         posicionarTemperatura(temperatura);
         
@@ -2450,7 +2450,7 @@ function verificarProximidadeRadares() {
 }
 
 // ===================================================================
-// BOTÃO SILENCIAR (CORRIGIDO PARA OS 4 TIPOS)
+// BOTÃO SILENCIAR (CORRIGIDO PARA OS 4 TIPOS DE ALERTAS)
 // ===================================================================
 function inicializarBotaoAlertaToggle() {
     var alertBtn  = document.getElementById('btn-alert-toggle');
@@ -2495,9 +2495,9 @@ function inicializarBotaoAlertaToggle() {
     });
 }
 
-// ===================================================================
-// BEEPS DE CONFIRMAÇÃO E SILENCIAR (COM DESTAQUE INCLUSO)
-// ===================================================================
+// ================================
+// BEEPS DE CONFIRMAÇÃO E SILENCIAR 
+// =================================
 
 function tocarBeepConfirmacao(estado) {
     try {
@@ -3023,7 +3023,7 @@ function recentralizarMapa(){
         [userLat, userLng],
         map.getZoom(),
         {
-            animate: false,
+            animate: true,
             duration: 0.6
         }
     );
