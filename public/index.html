@@ -2428,6 +2428,137 @@ const elemUmid = document.getElementById('umidadeAtual');
 if (elemTemp) observer.observe(elemTemp, configObserver);
 if (elemUmid) observer.observe(elemUmid, configObserver);
 
+
+// ===================================================================
+// NORMALIZAÇÃO E CLASSIFICAÇÃO DE ALERTAS
+// ===================================================================
+function normalizarTexto(texto) {
+    if (!texto) return '';
+    return texto
+        .toString()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+        .toLowerCase()
+        .trim();
+}
+
+function classificarAlerta(tipoOriginal) {
+    var tipoNorm = normalizarTexto(tipoOriginal);
+
+    // DESTAQUE (pontos turísticos) — verifica pelo nome do lugar
+    for (var d = 0; d < TIPOS_ALERTA_DESTAQUE.length; d++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_DESTAQUE[d]))) return 'destaque';
+    }
+    if (tipoNorm.includes('alerta de lugares em destaque') || tipoNorm.includes('(ale)')) return 'destaque';
+
+    for (var r = 0; r < TIPOS_ALERTA_RISCO.length; r++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_RISCO[r]))) return 'risco';
+    }
+
+    for (var m = 0; m < TIPOS_ALERTA_MOBILIDADE.length; m++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_MOBILIDADE[m]))) return 'mobilidade';
+    }
+
+    for (var rr = 0; rr < TIPOS_ALERTA_RADAR.length; rr++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_RADAR[rr]))) return 'radar';
+    }
+
+    // Fallback: se não bateu em nenhuma lista, trata como radar padrão
+    return 'radar';
+}
+
+function deveAlertaRadar(tipoOriginal) {
+    var tipoNorm = normalizarTexto(tipoOriginal);
+    for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_SEM_ALERTA[i]))) return false;
+    }
+    return true;
+}
+
+// ===================================================================
+// DISPARAR ALERTA (mostra tarja + som)
+// ===================================================================
+function dispararAlerta(radarData, distancia) {
+    var tipo = classificarAlerta(radarData.tipoOriginal);
+    tipoAlertaAtivo = tipo;
+    ultimoRadarAlertado = radarData.id;
+    contagemTocarSom = 0;
+
+    var $container = $("#alert-container");
+    var $bar = $container.find(".alert-bar");
+    var $icon = $("#alert-icon");
+    var $title = $("#alert-title");
+    var $text = $("#alert-text");
+
+    $bar.removeClass('alert-bar-radar alert-bar-risco alert-bar-mobilidade alert-bar-destaque ' +
+                      'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico');
+    $bar.addClass('alert-bar-' + tipo);
+
+    var tipoExibicao = ajusteNomes[radarData.tipoOriginal] || radarData.tipoOriginal;
+    $icon.attr('src', getIconUrl(radarData.tipoOriginal, radarData.velocidade_maxima));
+
+    var titulos = { radar: 'ATENÇÃO!', risco: 'ALERTA DE RISCO', mobilidade: 'ALERTA DE MOBILIDADE', destaque: 'ALERTA DE LUGARES' };
+    $title.text(titulos[tipo] || 'ATENÇÃO!');
+    $text.text(tipoExibicao + ' — ' + Math.round(distancia) + 'm');
+
+    if (distancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+        $bar.addClass('alert-bar-' + tipo + '-critico');
+    }
+
+    $container.stop(true, true).show();
+    ajustarPosicaoSpeedWidget(true);
+
+    tocarSomAlerta(tipo);
+
+    if (alertTimeout) clearTimeout(alertTimeout);
+    alertTimeout = setTimeout(function () { esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
+}
+
+// ===================================================================
+// ATUALIZAR DISTÂNCIA (mesmo radar, sem re-disparar do zero)
+// ===================================================================
+function atualizarDistanciaAlerta(distancia) {
+    var $text = $("#alert-text");
+    var base = $text.text().split(' — ')[0];
+    $text.text(base + ' — ' + Math.round(distancia) + 'm');
+
+    if (alertTimeout) clearTimeout(alertTimeout);
+    alertTimeout = setTimeout(function () { esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
+}
+
+// ===================================================================
+// FECHAR IMEDIATAMENTE (usuário se afastou / mudou de direção)
+// ===================================================================
+function fecharAlertaImediatamente() {
+    if (alertTimeout) { clearTimeout(alertTimeout); alertTimeout = null; }
+    $("#alert-container").stop(true, true).hide();
+    ajustarPosicaoSpeedWidget(false);
+    pararTodosSons();
+    cancelarSequenciaSom();
+    tipoAlertaAtivo = null;
+}
+
+// ===================================================================
+// ESCONDER COM ANIMAÇÃO (fim do tempo / passou pelo radar)
+// ===================================================================
+function esconderAlertaVisual() {
+    if (alertTimeout) { clearTimeout(alertTimeout); alertTimeout = null; }
+    var tipoAnterior = tipoAlertaAtivo;
+
+    $("#alert-container").fadeOut(200, function () {
+        $(this).find(".alert-bar").removeClass(
+            'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico'
+        );
+    });
+    ajustarPosicaoSpeedWidget(false);
+    pararTodosSons();
+    cancelarSequenciaSom();
+
+    if (tipoAnterior && somAlertaHabilitado) {
+        silenciarAlertaComBeep(tipoAnterior);
+    }
+    tipoAlertaAtivo = null;
+}
+
 //======================================
 // Nova variável — controla APENAS o som
 //======================================
