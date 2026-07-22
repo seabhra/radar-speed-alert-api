@@ -606,8 +606,8 @@ h1 span {
 
     <span class="separador">|</span>
 
-    <span class="label">💧 Umidade:</span>
-    <span id="umidadeAtual">%</span>
+  
+<span id="umidadeAtual">💧 Umidade</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
@@ -2311,7 +2311,7 @@ async function atualizarTemperatura() {
         console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
 
        if (umidade !== undefined && umidade !== null) {
-    document.getElementById('umidadeAtual').textContent = + '%';
+    document.getElementById('umidadeAtual').textContent = umidade + '%';
        } else {
     document.getElementById('umidadeAtual').textContent = 'N/A';
     console.warn("A API não retornou o valor de umidade.");
