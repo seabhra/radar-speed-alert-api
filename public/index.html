@@ -606,9 +606,8 @@ h1 span {
 
     <span class="separador">|</span>
 
-    <span class="label">💧 Umidade:</span>
-    <span id="umidadeAtual">%</span>
-</div>
+   <span class="label">💧</span>
+<span id="umidadeAtual">Umidade</span>
 
 <!-- LABEL DE ALERTA ABAIXO -->
 
@@ -2306,8 +2305,7 @@ async function atualizarTemperatura() {
 
         // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
         document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
-       
-        document.getElementById('umidadeAtual').textContent = '%'; 
+       document.getElementById('umidadeAtual').textContent = umidade + '%'; // <- A linha é exatamente igual, mas certifique-se de que NÃO tem a palavra "Umidade:" escrita antes do 'umidade'
         
         posicionarTemperatura(temperatura);
         
