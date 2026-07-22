@@ -2307,7 +2307,7 @@ async function atualizarTemperatura() {
         // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
         document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
        
-        document.getElementById('umidadeAtual').textContent = + '%'; 
+        document.getElementById('umidadeAtual').textContent = + "%"; 
         
         posicionarTemperatura(temperatura);
         
@@ -2421,12 +2421,16 @@ const elemUmid = document.getElementById('umidadeAtual');
 if (elemTemp) observer.observe(elemTemp, configObserver);
 if (elemUmid) observer.observe(elemUmid, configObserver);
 
-//=====================================
-// FUNÇÃO VERIFICAR PROXIMIDADE RADARES
-//=====================================
+//======================================
+// Nova variável — controla APENAS o som
+//======================================
+var somAlertaHabilitado = true;
 
+//=====================================
+// FUNÇÃO VERIFICAR PROXIMIDADE RADARES (sem depender de alertaHabilitado)
+//=====================================
 function verificarProximidadeRadares() {
-    if (!alertaHabilitado || radarMarkers.length === 0) return;
+    if (radarMarkers.length === 0) return;   // <-- removido "!alertaHabilitado ||"
     let radarMaisProximo = null;
     let menorDistancia = Infinity;
     radarMarkers.forEach(function(marker) {
@@ -2449,49 +2453,44 @@ function verificarProximidadeRadares() {
     }
 }
 
-// ===================================================================
-// BOTÃO SILENCIAR (CORRIGIDO PARA OS 4 TIPOS)
-// ===================================================================
+//============================================
+// BOTÃO SILENCIAR — versão única, consolidada
+//============================================
 function inicializarBotaoAlertaToggle() {
     var alertBtn  = document.getElementById('btn-alert-toggle');
     var alertIcon = document.getElementById('alert-toggle-icon');
     if (!alertBtn) return;
 
     alertBtn.addEventListener('click', function () {
-        alertaHabilitado = !alertaHabilitado;
+        somAlertaHabilitado = !somAlertaHabilitado;
 
-        if (alertaHabilitado) {
+        if (somAlertaHabilitado) {
             alertBtn.classList.remove('alert-off');
             if (alertIcon) {
                 alertIcon.src = '/imagens_app/ic_sound_on.png';
                 alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
             }
-            
-            // Se ligou o som e tem um alerta na tela, zera o contador para o som voltar a tocar
+            // Religou o som: se já tem alerta visível na tela, deixa o som voltar a tocar
+            // no próximo ciclo, sem esconder a tarja
             if ($("#alert-container").is(":visible")) {
-                contagemTocarSom = 0; 
+                contagemTocarSom = 0;
             }
-            
             tocarBeepConfirmacao('on');
-            showNotification('Alerta LIGADO');
+            showNotification('Som LIGADO');
         } else {
             alertBtn.classList.add('alert-off');
             if (alertIcon) {
                 alertIcon.src = '/imagens_app/ic_sound_off.png';
                 alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
             }
-            
-            // Se desligou o som e tem um alerta visível, chama a função de 1 clique
-            if ($("#alert-container").is(":visible")) {
-                silenciarAlertaManual(); 
-            } else {
-                pararTodosSons();
-                cancelarSequenciaSom();
-                tocarBeepConfirmacao('off');
-            }
-            
-            showNotification('Alerta DESLIGADO');
+            // Desligou o som: apenas para o áudio corrente, a tarja continua visível
+            pararTodosSons();
+            cancelarSequenciaSom();
+            tocarBeepConfirmacao('off');
+            showNotification('Som DESLIGADO');
         }
+        // Nota: propositalmente NÃO chama esconderAlertaVisual() nem
+        // esconderAlertaVisualSemBeep() aqui — a tarja não deve ser afetada.
     });
 }
 
@@ -2669,7 +2668,11 @@ function pararTodosSons() {
     });
 }
 
+//=====================================
+// GATE DE ÁUDIO — colocar no topo de tocarSomAlerta()
+//=====================================
 function tocarSomAlerta(tipoAlerta) {
+    if (!somAlertaHabilitado) return;   // <-- só isso bloqueia o som, sem tocar no visual
     if (typeof AppInventor !== 'undefined') {
         enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
     }
@@ -2735,137 +2738,6 @@ function tocarSomAlerta(tipoAlerta) {
     });
 }
 
-// ===================================================================
-// BOTÃO SILENCIAR
-// ===================================================================
-function inicializarBotaoAlertaToggle() {
-    var alertBtn  = document.getElementById('btn-alert-toggle');
-    var alertIcon = document.getElementById('alert-toggle-icon');
-    if (!alertBtn) return;
-
-    alertBtn.addEventListener('click', function () {
-        alertaHabilitado = !alertaHabilitado;
-
-        if (alertaHabilitado) {
-            alertBtn.classList.remove('alert-off');
-            if (alertIcon) {
-                alertIcon.src = '/imagens_app/ic_sound_on.png';
-                alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
-            }
-            cancelarSequenciaSom();
-            contagemTocarSom = 0;
-            tocarBeepConfirmacao('on');
-            showNotification('Alerta LIGADO');
-        } else {
-            alertBtn.classList.add('alert-off');
-            if (alertIcon) {
-                alertIcon.src = '/imagens_app/ic_sound_off.png';
-                alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
-            }
-            cancelarSequenciaSom();
-            pararTodosSons();
-            tocarBeepConfirmacao('off');
-            showNotification('Alerta DESLIGADO');
-        }
-
-        if ($("#alert-container").is(":visible")) {
-            esconderAlertaVisualSemBeep();
-        }
-    });
-}
-
-function tocarBeepConfirmacao(estado) {
-    try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        if (estado === 'on') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(1200, ctx.currentTime);
-            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.1);
-        } else {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, ctx.currentTime);
-            osc.frequency.linearRampToValueAtTime(400, ctx.currentTime + 0.2);
-            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
-            osc.start(ctx.currentTime);
-            osc.stop(ctx.currentTime + 0.2);
-        }
-    } catch(e) {
-        console.warn("Beep de confirmação falhou:", e);
-    }
-}
-
-function silenciarAlertaComBeep(tipoAlerta) {
-    cancelarSequenciaSom();
-
-    var ctx;
-    try {
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
-        _tocarBeep(ctx, tipoAlerta);
-        setTimeout(function() {
-            if (ctx && ctx.state !== 'closed') {
-                ctx.close().catch(function(){});
-            }
-        }, 600);
-    } catch(e) {
-        console.warn('[Radar X9] Áudio não suportado para o beep:', e);
-        if (ctx) ctx.close().catch(function(){});
-    }
-}
-
-function _tocarBeep(ctx, tipoAlerta) {
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    if (tipoAlerta === 'risco') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(600, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.15);
-        osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
-        osc.frequency.linearRampToValueAtTime(300, ctx.currentTime + 0.35);
-        gain.gain.setValueAtTime(0.6, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.4);
-    } else if (tipoAlerta === 'mobilidade') {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(600, ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.12);
-        osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
-        osc.frequency.linearRampToValueAtTime(900, ctx.currentTime + 0.32);
-        gain.gain.setValueAtTime(0.5, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.35);
-    } else {
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(1050, ctx.currentTime);
-        gain.gain.setValueAtTime(0.6, ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.18);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + 0.18);
-        var osc2 = ctx.createOscillator();
-        var gain2 = ctx.createGain();
-        osc2.connect(gain2);
-        gain2.connect(ctx.destination);
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(1050, ctx.currentTime + 0.25);
-        gain2.gain.setValueAtTime(0.6, ctx.currentTime + 0.25);
-        gain2.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.43);
-        osc2.start(ctx.currentTime + 0.25);
-        osc2.stop(ctx.currentTime + 0.43);
-    }
-}
 
 // ===================================================================
 // FUNÇÃO PARA ANIMAR O BOTÃO ADICIONAR RADAR
