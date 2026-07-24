@@ -294,8 +294,25 @@ h1 span {
     }
     .btn-search:active { transform: scale(0.9); }
     .btn-search img { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; object-fit: contain; display: block; transform: translate(-50%, -50%); }
+    
+    /* ===========
+   SET DO MAPA 
+   ============= */
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; position: relative; }
+/* ========================================
+   TEMA MAPA ESTILO MATRIX (VERDE NEON)
+   ======================================== */
+
+.leaflet-tile-pane .leaflet-tile {
+    /* Transforma o mapa escuro em verde neon estilo Matrix */
+    filter: sepia(0.8) saturate(3) hue-rotate(110deg) brightness(0.85) contrast(1.3);
+    transition: filter 0.5s ease; /* Efeito suave se o tema mudar */
+}
+
+
+
+    
     .compass-widget {
         position: absolute; top: 10px; left: 5px; width: 65px; height: 65px;
         z-index: 999999 !important; transform: translateZ(0); will-change: transform;
@@ -1536,16 +1553,24 @@ function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, rad
     };
 }
 
+// ==========================
+// TEMA DO MAPA (MATRIX SEMPRE)
+// ==========================
+
 function aplicarTemaMapa() {
     if (!map) return;
-    var hora = new Date().getHours();
-    var urlAtual = (hora >= 19 || hora < 6)
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    // Usa apenas o tema Dark, que o CSS acima transformará em Verde Matrix
+    var urlMatrix = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
     if (tileLayer) {
-        tileLayer.setUrl(urlAtual);
+        tileLayer.setUrl(urlMatrix);
     } else {
-        tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+        tileLayer = L.tileLayer(urlMatrix, { 
+            attribution: '', 
+            subdomains: 'abcd', 
+            maxZoom: 19 
+        }).addTo(map);
     }
 }
 
@@ -2435,7 +2460,7 @@ if (elemUmid) observer.observe(elemUmid, configObserver);
 
 
 // ===================================================================
-// NORMALIZAÇÃO E CLASSIFICAÇÃO DE ALERTAS 
+// NORMALIZAÇÃO E CLASSIFICAÇÃO DE ALERTAS RADARES 
 // ===================================================================
 function normalizarTexto(texto) {
     if (!texto) return '';
