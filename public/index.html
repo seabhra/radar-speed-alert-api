@@ -300,14 +300,22 @@ h1 span {
    ============= */
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; position: relative; }
+
+
 /* ========================================
-   TEMA MAPA ESTILO MATRIX (VERDE NEON)
+   TEMA MAPA ESTILO MATRIX - DIA E NOITE
    ======================================== */
 
-.leaflet-tile-pane .leaflet-tile {
-    /* Transforma o mapa escuro em verde neon estilo Matrix */
-    filter: sepia(0.8) saturate(3) hue-rotate(110deg) brightness(0.85) contrast(1.3);
-    transition: filter 0.5s ease; /* Efeito suave se o tema mudar */
+/* Matrix Dia: Transforma o mapa claro (Voyager) em um visual Cyberpunk/Matrix daytime */
+.matrix-day .leaflet-tile-pane .leaflet-tile {
+    filter: invert(0.85) hue-rotate(120deg) brightness(0.9) contrast(1.2) saturate(2.5);
+    transition: filter 0.5s ease;
+}
+
+/* Matrix Noite: Transforma o mapa escuro (Dark) no Matrix clássico (Preto e Verde Neon) */
+.matrix-night .leaflet-tile-pane .leaflet-tile {
+    filter: sepia(0.8) saturate(3) hue-rotate(110deg) brightness(0.8) contrast(1.3);
+    transition: filter 0.5s ease;
 }
 
 
@@ -1553,20 +1561,40 @@ function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, rad
     };
 }
 
-// ==========================
-// TEMA DO MAPA (MATRIX SEMPRE)
-// ==========================
+
+
+// =================================
+// TEMA DO MAPA MATRIX (DIA E NOITE)
+// =================================
 
 function aplicarTemaMapa() {
     if (!map) return;
 
-    // Usa apenas o tema Dark, que o CSS acima transformará em Verde Matrix
-    var urlMatrix = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    var hora = new Date().getHours();
+    var mapContainer = map.getContainer(); // Pega a div que segura o mapa
 
-    if (tileLayer) {
-        tileLayer.setUrl(urlMatrix);
+    // Define se é dia (6h às 18h) ou noite (18h às 6h)
+    var isNight = (hora >= 19 || hora < 6);
+
+    // Troca a URL base do mapa: Voyager (Dia) ou Dark (Noite)
+    var urlTema = isNight 
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
+        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+    // Troca a classe CSS que aplica o filtro Matrix
+    if (isNight) {
+        mapContainer.classList.remove('matrix-day');
+        mapContainer.classList.add('matrix-night');
     } else {
-        tileLayer = L.tileLayer(urlMatrix, { 
+        mapContainer.classList.remove('matrix-night');
+        mapContainer.classList.add('matrix-day');
+    }
+
+    // Atualiza o tile do mapa
+    if (tileLayer) {
+        tileLayer.setUrl(urlTema);
+    } else {
+        tileLayer = L.tileLayer(urlTema, { 
             attribution: '', 
             subdomains: 'abcd', 
             maxZoom: 19 
