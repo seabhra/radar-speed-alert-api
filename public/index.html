@@ -2917,17 +2917,15 @@ function pararTodosSons() {
 //=============================
 function tocarSomAlerta(tipoAlerta) {
     if (!somAlertaHabilitado) return;   // <-- só isso bloqueia o som, sem tocar no visual
-    if (typeof AppInventor !== 'undefined') {
-        enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
-    }
+
+    enviarAlertaSonoroParaAppInventor(tipoAlerta);   // <-- corrigido
 
     if (_alertaPrincipalEstaTocando) return;
 
     var soundId = 'alert-sound-radar';
     if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
     else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
-    else if (tipoAlerta === 'destaque') soundId = 'alert-sound-destaque';  // <-- ADICIONE ESTA LINHA
-
+    else if (tipoAlerta === 'destaque') soundId = 'alert-sound-destaque';
 
     var sound = document.getElementById(soundId)
              || document.getElementById('alert-sound-radar');
@@ -2949,10 +2947,29 @@ function tocarSomAlerta(tipoAlerta) {
         delete _soundListeners[soundId];
     }
 
-//=======================
-// FUNÇÃO ON ENDED ÁUDIOS 
-//=======================
     function onEnded() {
+        if (meuId !== _sequenciaSomId) {
+            sound.removeEventListener('ended', onEnded);
+            delete _soundListeners[soundId];
+            _alertaPrincipalEstaTocando = false;
+            return;
+        }
+
+        toques++;
+        if (toques < numToques) {
+            sound.currentTime = 0;
+            sound.play().catch(function(err) {
+                console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
+                sound.removeEventListener('ended', onEnded);
+                delete _soundListeners[soundId];
+                _alertaPrincipalEstaTocando = false;
+            });
+        } else {
+            sound.removeEventListener('ended', onEnded);
+            delete _soundListeners[soundId];
+            _alertaPrincipalEstaTocando = false;
+        }
+    }
 
     _soundListeners[soundId] = onEnded;
     sound.addEventListener('ended', onEnded);
@@ -2964,30 +2981,6 @@ function tocarSomAlerta(tipoAlerta) {
         delete _soundListeners[soundId];
         _alertaPrincipalEstaTocando = false;
     });
-
-
-    if (meuId !== _sequenciaSomId) {
-        sound.removeEventListener('ended', onEnded);
-        delete _soundListeners[soundId];
-        _alertaPrincipalEstaTocando = false;
-        return;
-    }
-
-    toques++;
-    if (toques < numToques) {
-        sound.currentTime = 0;
-        sound.play().catch(function(err) {
-            console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
-            sound.removeEventListener('ended', onEnded);
-            delete _soundListeners[soundId];
-            _alertaPrincipalEstaTocando = false;
-        });
-    } else {
-        sound.removeEventListener('ended', onEnded);
-        delete _soundListeners[soundId];
-        _alertaPrincipalEstaTocando = false;
-    }
-}
 }
 
 // ===================================================================
