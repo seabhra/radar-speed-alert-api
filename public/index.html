@@ -2554,9 +2554,9 @@ if (elemTemp) observer.observe(elemTemp, configObserver);
 if (elemUmid) observer.observe(elemUmid, configObserver);
 
 
-// ===================================================================
-// NORMALIZAÇÃO E CLASSIFICAÇÃO DE ALERTAS RADARES 
-// ===================================================================
+// =======================================
+// NORMALIZAÇÃO E CLASSIFICAÇÃO DE ALERTAS
+// =======================================
 function normalizarTexto(texto) {
     if (!texto) return '';
     return texto
@@ -2907,23 +2907,36 @@ function desbloquearAudioMobile() {
 // ===================================================================
 var _alertSoundsDesbloqueados = false;
 
+
 function desbloquearAudiosDeAlerta() {
-    if (_alertSoundsDesbloqueados) return;
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
+    var ids = ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'];
+    var algumDesbloqueado = false;
+
+    ids.forEach(function(id) {
         var el = document.getElementById(id);
         if (!el) return;
+
+        // Se já está desbloqueado, pula
+        if (el._desbloqueado) return;
+
         el.muted = true;
         el.play().then(function () {
             el.pause();
             el.currentTime = 0;
             el.muted = false;
+            el._desbloqueado = true;
+            console.log('[Radar X9] Áudio desbloqueado:', id);
         }).catch(function () {
             el.muted = false;
-            // Alguns WebViews só liberam de fato no 2º/3º toque; sem problema,
-            // o listener continua ativo (once:false) até conseguir.
+            // Não marcou como desbloqueado → tentará de novo no próximo toque
         });
     });
-    _alertSoundsDesbloqueados = true;
+
+    // Só considera globalmente desbloqueado se todos existentes já foram
+    _alertSoundsDesbloqueados = ids.every(function(id) {
+        var el = document.getElementById(id);
+        return !el || el._desbloqueado;
+    });
 }
 
 ['click', 'touchstart', 'touchend', 'keydown'].forEach(function (evt) {
@@ -2951,6 +2964,7 @@ function cancelarSequenciaSom() {
 
 function pararTodosSons() {
     cancelarSequenciaSom();
+    _alertaPrincipalEstaTocando = false; // ← ADICIONAR ISSO
     ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el) {
@@ -2964,11 +2978,19 @@ function pararTodosSons() {
 // PORTA DE DISPARO DOS ÁUDIOS 
 //=============================
 function tocarSomAlerta(tipoAlerta) {
-    if (!somAlertaHabilitado) return;   // <-- só isso bloqueia o som, sem tocar no visual
+    if (!somAlertaHabilitado) return;
 
-    enviarAlertaSonoroParaAppInventor(tipoAlerta);   // <-- corrigido
+    // App Inventor (não quebra se der erro)
+    try {
+        if (typeof enviarAlertaSonoroParaAppInventor === 'function') {
+            enviarAlertaSonoroParaAppInventor(tipoAlerta);
+        }
+    } catch(e) {}
 
-    if (_alertaPrincipalEstaTocando) return;
+    if (_alertaPrincipalEstaTocando) {
+        console.log('[Radar X9] Som já tocando, ignorando...');
+        return;
+    }
 
     var soundId = 'alert-sound-radar';
     if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
@@ -2979,37 +3001,51 @@ function tocarSomAlerta(tipoAlerta) {
              || document.getElementById('alert-sound-radar');
 
     if (!sound) {
-        console.warn('[Radar X9] Elemento de áudio não encontrado:', soundId);
+        console.error('[Radar X9] ERRO: Elemento <audio> não encontrado:', soundId);
         return;
+    }
+
+    // Se o áudio não carregou, loga mas tenta mesmo assim
+    if (sound.readyState === 0) {
+        console.warn('[Radar X9] Áudio ainda não carregou (readyState=0):', soundId);
     }
 
     _sequenciaSomId++;
     var meuId = _sequenciaSomId;
     _alertaPrincipalEstaTocando = true;
 
+    // SAFETY TIMEOUT: se travar, libera em 8 segundos
+    var safetyTimer = setTimeout(function() {
+        if (meuId === _sequenciaSomId && _alertaPrincipalEstaTocando) {
+            console.warn('[Radar X9] Safety timeout liberou áudio travado');
+            _alertaPrincipalEstaTocando = false;
+            if (_soundListeners[soundId]) {
+                sound.removeEventListener('ended', _soundListeners[soundId]);
+                delete _soundListeners[soundId];
+            }
+        }
+    }, 8000);
+
     var toques = 0;
     var numToques = 3;
 
+    // Limpa listener anterior do mesmo elemento
     if (_soundListeners[soundId]) {
         sound.removeEventListener('ended', _soundListeners[soundId]);
         delete _soundListeners[soundId];
     }
 
     function onEnded() {
+        clearTimeout(safetyTimer);
         if (meuId !== _sequenciaSomId) {
-            sound.removeEventListener('ended', onEnded);
-            delete _soundListeners[soundId];
             _alertaPrincipalEstaTocando = false;
             return;
         }
-
         toques++;
         if (toques < numToques) {
             sound.currentTime = 0;
             sound.play().catch(function(err) {
-                console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
-                sound.removeEventListener('ended', onEnded);
-                delete _soundListeners[soundId];
+                console.error('[Radar X9] Falha no toque', toques+1, ':', err);
                 _alertaPrincipalEstaTocando = false;
             });
         } else {
@@ -3024,7 +3060,8 @@ function tocarSomAlerta(tipoAlerta) {
 
     sound.currentTime = 0;
     sound.play().catch(function(err) {
-        console.warn('[Radar X9] Falha ao iniciar mp3 (' + soundId + '):', err);
+        clearTimeout(safetyTimer);
+        console.error('[Radar X9] Falha ao iniciar áudio:', err);
         sound.removeEventListener('ended', onEnded);
         delete _soundListeners[soundId];
         _alertaPrincipalEstaTocando = false;
