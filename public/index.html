@@ -2314,69 +2314,76 @@ function sucesso(position){
 //=====================================
 // FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
 //=====================================
-//=====================================
-// FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
-//=====================================
 async function atualizarCidade(lat, lng){
 
-    // Verificação extra para não rodar sem coordenadas
-    if (!lat || !lng) return;
-
     try {
+
         const resposta = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
         );
 
         const dados = await resposta.json();
 
-        // Prevenção de erro: se 'address' não existir, usa objeto vazio
-        const endereco = dados.address || {};
-        const cidade = endereco.city || endereco.town || endereco.municipality || endereco.village;
+        const cidade =
+            dados.address.city ||
+            dados.address.town ||
+            dados.address.municipality ||
+            dados.address.village;
+
 
         if(cidade && cidade !== ultimaCidade){
 
+
             ultimaCidade = cidade;
 
-            // Atualiza o texto e garante a cor viva e clara
-            if (cidadeLabel) {
-                cidadeLabel.textContent = "🚩 " + cidade;
-                cidadeLabel.style.color = corCidade(cidade);
-                
-                cidadeLabel.classList.add("mudou");
-                setTimeout(()=>{
-                    cidadeLabel.classList.remove("mudou");
-                }, 400);
-            }
+           document.getElementById("nomeCidade").textContent = 
+    "🚩 " + cidade;
 
-            console.log("Cidade encontrada:", cidade);
+            cidadeLabel.style.color =
+                corCidade(cidade);
+
+            cidadeLabel.classList.add("mudou");
+
+            setTimeout(()=>{
+                cidadeLabel.classList.remove("mudou");
+            },400);
+            
+            // Exemplo de como evitar o erro quebrando a página:
+          
+            if (data && data.address && data.address.city) {
+           console.log("Cidade:", data.address.city);
+         } else {
+           console.log("Não foi possível encontrar a cidade.");
+           }
 
         }
 
     } catch(e){
-        console.log("Erro cidade:", e);
+        console.log("Erro cidade:",e);
     }
 }
-
-// Função para gerar cores VIVAS e CLARAS (HSL com 75% de luminosidade)
 function corCidade(nome){
+
     let hash = 0;
-    for(let i = 0; i < nome.length; i++){
-        hash = nome.charCodeAt(i) + ((hash << 5) - hash);
+
+    for(let i=0;i<nome.length;i++){
+        hash = nome.charCodeAt(i) + ((hash << 5)-hash);
     }
-    // 100% de saturação e 75% de luminosidade = cores pastéis vivas e fáceis de ler
-    return `hsl(${Math.abs(hash) % 360}, 100%, 75%)`;
+
+    return `hsl(${Math.abs(hash)%360},90%,55%)`;
+
 }
 
 navigator.geolocation.getCurrentPosition(async(pos)=>{
+
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
 
-    // CORREÇÃO DO ERRO 400: Agora estamos passando as variáveis userLat e userLng
-    await atualizarCidade(userLat, userLng);
+    await atualizarCidade();
 
     await atualizarTemperatura();
-});
 
+});
 
 
 //============================================
