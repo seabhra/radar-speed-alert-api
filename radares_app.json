@@ -2306,6 +2306,19 @@
       "KBH000186",
       "-19.918955, -43.968620",
       "24/07/2026, 10:00:59"
+    ],
+    [
+      187,
+      "000187",
+      "Avenida do Contorno, Barro Preto, Regional Centro-Sul",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Barro Preto",
+      "Único",
+      "M000187",
+      "KBH000187",
+      "-19.917664, -43.950886",
+      "24/07/2026, 10:04:43"
     ]
   ]
 }
