@@ -164,6 +164,13 @@ h1 span {
     animation: piscarAlerta 1.5s infinite;
 }
 
+.temp-value,
+#temperaturaAtual,
+#umidadeAtual,
+.label,
+.separador{
+    color: #fff;
+} 
 /* Cores dos Alertas */
 .alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
 .alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
@@ -2422,14 +2429,13 @@ async function atualizarTemperatura() {
 
         // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
         document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
-        temp.style.color = "#fff";
+        
        
         // Verifica se a umidade veio da API
         console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
 
        if (umidade !== undefined && umidade !== null) {
     document.getElementById('umidadeAtual').textContent = umidade + '%';
-    umid.style.color = "#fff";
     
        } else {
     document.getElementById('umidadeAtual').textContent = 'N/A';
