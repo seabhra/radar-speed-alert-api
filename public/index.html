@@ -2311,69 +2311,78 @@ function sucesso(position){
     );
 
 }
-
 //=====================================
 // FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
 //=====================================
 async function atualizarCidade(lat, lng){
 
-    // Verificação extra para não rodar sem coordenadas
-    if (!lat || !lng) return;
-
     try {
+
         const resposta = await fetch(
           `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
         );
 
         const dados = await resposta.json();
 
-        // Prevenção de erro: se 'address' não existir, usa objeto vazio
-        const endereco = dados.address || {};
-        const cidade = endereco.city || endereco.town || endereco.municipality || endereco.village;
+        const cidade =
+            dados.address.city ||
+            dados.address.town ||
+            dados.address.municipality ||
+            dados.address.village;
+
 
         if(cidade && cidade !== ultimaCidade){
 
+
             ultimaCidade = cidade;
 
-            // Atualiza o texto e garante a cor viva e clara
-            if (cidadeLabel) {
-                cidadeLabel.textContent = "🚩 " + cidade;
-                cidadeLabel.style.color = corCidade(cidade);
-                
-                cidadeLabel.classList.add("mudou");
-                setTimeout(()=>{
-                    cidadeLabel.classList.remove("mudou");
-                }, 400);
-            }
+           document.getElementById("nomeCidade").textContent = 
+    "🚩 " + cidade;
 
-            console.log("Cidade encontrada:", cidade);
+            cidadeLabel.style.color =
+                corCidade(cidade);
+
+            cidadeLabel.classList.add("mudou");
+
+            setTimeout(()=>{
+                cidadeLabel.classList.remove("mudou");
+            },400);
+            
+            // Exemplo de como evitar o erro quebrando a página:
+          
+            if (data && data.address && data.address.city) {
+           console.log("Cidade:", data.address.city);
+         } else {
+           console.log("Não foi possível encontrar a cidade.");
+           }
 
         }
 
     } catch(e){
-        console.log("Erro cidade:", e);
+        console.log("Erro cidade:",e);
     }
 }
-//=====================================================================
-// Função para gerar cores VIVAS e CLARAS (HSL com 75% de luminosidade)
-//=====================================================================
 function corCidade(nome){
+
     let hash = 0;
-    for(let i = 0; i < nome.length; i++){
-        hash = nome.charCodeAt(i) + ((hash << 5) - hash);
+
+    for(let i=0;i<nome.length;i++){
+        hash = nome.charCodeAt(i) + ((hash << 5)-hash);
     }
-    // 100% de saturação e 75% de luminosidade = cores pastéis vivas e fáceis de ler
-    return `hsl(${Math.abs(hash) % 360}, 100%, 75%)`;
+
+    return `hsl(${Math.abs(hash)%360},90%,55%)`;
+
 }
 
 navigator.geolocation.getCurrentPosition(async(pos)=>{
+
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
 
-    // CORREÇÃO DO ERRO 400: Agora estamos passando as variáveis userLat e userLng
-    await atualizarCidade(userLat, userLng);
+    await atualizarCidade();
 
     await atualizarTemperatura();
+
 });
 
 
@@ -2386,52 +2395,48 @@ async function atualizarTemperatura() {
     if (!userLat || !userLng) return;
 
     try{
-        // COLOQUE SUA CHAVE DA OPENWEATHERMAP ABAIXO
+        // COLOQUE SUA CHAVE DA OPENWEATHERMAP ABAIXO (Substitua o texto)
         const API_KEY = 'a5c507ef270b147035538e0d6019bce1'; 
         
+        // units=metric garante que venha em Celsius. lang=pt_br traz as descrições em português.
         const url = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
 
         const resposta = await fetch(url);
         
+        // Se a chave estiver errada ou expirada, vai cair no catch
         if (!resposta.ok) throw new Error('Erro na API de clima: ' + resposta.status);
 
         const dados = await resposta.json();
 
+        // A OpenWeatherMap organiza temperatura e umidade dentro de "main"
         const temperatura = dados.main.temp;
         const umidade = dados.main.humidity;
 
-        // Pega os elementos do HTML
-        const tempElemento = document.getElementById("temperaturaAtual");
-        const umidadeElemento = document.getElementById('umidadeAtual');
-
-        // Atualiza texto e GARANTE que a cor seja branca
-        if (tempElemento) {
-            tempElemento.textContent = temperatura.toFixed(1) + "°C";
-            tempElemento.style.color = "white"; // <--- TEMPERATURA BRANCA
-        }
+        // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
+        document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
+        tempElemento.style.color = "white";
        
-        console.log("Umidade recebida da API:", umidade);
+        // Verifica se a umidade veio da API
+        console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
 
-        if (umidadeElemento) {
-            if (umidade !== undefined && umidade !== null) {
-                umidadeElemento.textContent = umidade + '%';
-            } else {
-                umidadeElemento.textContent = 'N/A';
-                console.warn("A API não retornou o valor de umidade.");
-            }
-            umidadeElemento.style.color = "white"; // <--- UMIDADE BRANCA
-        }
+       if (umidade !== undefined && umidade !== null) {
+    document.getElementById('umidadeAtual').textContent = umidade + '%';
+    umidadeElemento.style.color = "white";
 
+       } else {
+    document.getElementById('umidadeAtual').textContent = 'N/A';
+    console.warn("A API não retornou o valor de umidade.");
+}
         posicionarTemperatura(temperatura);
+        
+        // Chama a verificação de alerta de clima
         verificarAlertasClima();
 
     }catch(e){
         console.error("Erro clima:", e);
     }
+
 }
-
-
-
 //=====================================
 // FUNÇÃO POSIONAR TEMPERATURA LOCAL
 //=====================================
