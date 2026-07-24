@@ -338,8 +338,30 @@ h1 span {
     transition: filter .4s ease;
 }
 
+.matrix-day .leaflet-tile-pane,
+.matrix-night .leaflet-tile-pane{
+    filter:
+        drop-shadow(0 0 1px rgba(255,255,255,.18));
+}
+.matrix-day .leaflet-map-pane::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:rgba(80,255,150,.12);
+}
 
-    
+.matrix-night .leaflet-map-pane::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:rgba(0,180,70,.18);
+}
+
+    /* ===============
+   CSS DA BÚSSOLA
+   ================ */
     .compass-widget {
         position: absolute; top: 10px; left: 5px; width: 65px; height: 65px;
         z-index: 999999 !important; transform: translateZ(0); will-change: transform;
