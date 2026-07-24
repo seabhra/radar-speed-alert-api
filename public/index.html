@@ -2362,16 +2362,24 @@ async function atualizarCidade(lat, lng){
         console.log("Erro cidade:",e);
     }
 }
+//=========================
+// MUDANÇA DA COR DA CIDADE
+//=========================
 function corCidade(nome){
 
     let hash = 0;
 
-    for(let i=0;i<nome.length;i++){
-        hash = nome.charCodeAt(i) + ((hash << 5)-hash);
+    for(let i = 0; i < nome.length; i++){
+        hash = nome.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    return `hsl(${Math.abs(hash)%360},90%,55%)`;
+    let hue = Math.abs(hash) % 360;
 
+    // Evita faixas pouco agradáveis
+    if (hue >= 20 && hue <= 40) hue = 45;      // remove marrom
+    if (hue >= 250 && hue <= 295) hue = 210;   // troca roxo por azul
+
+    return `hsl(${hue},100%,68%)`;
 }
 
 navigator.geolocation.getCurrentPosition(async(pos)=>{
@@ -2414,12 +2422,14 @@ async function atualizarTemperatura() {
 
         // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
         document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
+        temp.style.color = "#fff";
        
         // Verifica se a umidade veio da API
         console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
 
        if (umidade !== undefined && umidade !== null) {
     document.getElementById('umidadeAtual').textContent = umidade + '%';
+    umid.style.color = "#fff";
     
        } else {
     document.getElementById('umidadeAtual').textContent = 'N/A';
