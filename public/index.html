@@ -303,38 +303,40 @@ h1 span {
 
 
 /* ========================================
-   TEMA MAPA ESTILO MATRIX - DIA E NOITE
+   TEMA MATRIX - DIA
+   Verde translúcido estilo Matrix
    ======================================== */
+
+.matrix-day .leaflet-tile-pane .leaflet-tile{
+    filter:
+        grayscale(0.35)
+        sepia(0.45)
+        hue-rotate(78deg)
+        saturate(2.4)
+        brightness(1.18)
+        contrast(1.08)
+        opacity(.90);
+
+    transition: filter .4s ease;
+}
+
 
 /* ========================================
-   TEMA MATRIX - DIA E NOITE
+   TEMA MATRIX - NOITE
+   Matrix clássico mais escuro
    ======================================== */
 
-/* Matrix Dia */
-.matrix-day .leaflet-tile-pane .leaflet-tile {
+.matrix-night .leaflet-tile-pane .leaflet-tile{
     filter:
-        grayscale(1)
-        invert(0.92)
-        sepia(1)
-        hue-rotate(75deg)
-        saturate(7)
-        brightness(0.82)
-        contrast(1.45);
+        grayscale(0.65)
+        sepia(0.85)
+        hue-rotate(80deg)
+        saturate(3.6)
+        brightness(.72)
+        contrast(1.35);
+
     transition: filter .4s ease;
 }
-
-/* Matrix Noite */
-.matrix-night .leaflet-tile-pane .leaflet-tile {
-    filter:
-        grayscale(1)
-        sepia(1)
-        hue-rotate(75deg)
-        saturate(8)
-        brightness(0.65)
-        contrast(1.7);
-    transition: filter .4s ease;
-}
-
 
 
     
