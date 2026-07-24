@@ -2912,9 +2912,9 @@ function pararTodosSons() {
     });
 }
 
-//=====================================
-// GATE DE ÁUDIO — colocar no topo de tocarSomAlerta()
-//=====================================
+//=============================
+// PORTA DE DISPARO DOS ÁUDIOS 
+//=============================
 function tocarSomAlerta(tipoAlerta) {
     if (!somAlertaHabilitado) return;   // <-- só isso bloqueia o som, sem tocar no visual
     if (typeof AppInventor !== 'undefined') {
@@ -2949,7 +2949,23 @@ function tocarSomAlerta(tipoAlerta) {
         delete _soundListeners[soundId];
     }
 
+//=======================
+// FUNÇÃO ON ENDED ÁUDIOS 
+//=======================
     function onEnded() {
+
+    _soundListeners[soundId] = onEnded;
+    sound.addEventListener('ended', onEnded);
+
+    sound.currentTime = 0;
+    sound.play().catch(function(err) {
+        console.warn('[Radar X9] Falha ao iniciar mp3 (' + soundId + '):', err);
+        sound.removeEventListener('ended', onEnded);
+        delete _soundListeners[soundId];
+        _alertaPrincipalEstaTocando = false;
+    });
+
+
     if (meuId !== _sequenciaSomId) {
         sound.removeEventListener('ended', onEnded);
         delete _soundListeners[soundId];
@@ -4408,14 +4424,39 @@ async function solicitarPermissaoBussolaIOS() {
     return false;
 }
 
-// =======================
-// INTEGRAÇÃO APP INVENTOR
-// =======================
+// =====================================
+// NOVA FORMA DE INTEGRAÇÃO APP INVENTOR
+// =====================================
+
+function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
+    if (typeof AppInventor === 'undefined') return;
+
+    var mapaTextos = {
+        radar: 'ALERTA DE RADAR',
+        risco: 'ALERTA DE RISCO',
+        mobilidade: 'AVISO DE MOBILIDADE',
+        destaque: 'PONTOS TURISTICOS'   // sem acento — igual ao bloco
+    };
+
+    var texto = mapaTextos[tipoAlerta] || 'ALERTA DE RADAR';
+
+    try {
+        AppInventor.setWebViewString(texto);
+        console.log('[Radar X9] → AppInventor (som nativo):', texto);
+    } catch (e) {
+        console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
+    }
+}
+
+// ==========================
+// FUNÇÃO ENVIAR APP INVENTOR
+// ===========================
 function enviarParaAppInventor(acao, dados) {
     if (typeof AppInventor !== 'undefined') {
         try {
             var mensagem = acao + '|' + dados.join('|');
             AppInventor.setWebViewString(mensagem);
+            
             console.log('[Radar X9] → AppInventor:', mensagem);
             return true;
         } catch (e) { console.error('[Radar X9] Erro ao enviar para AppInventor:', e); return false; }
@@ -4423,9 +4464,9 @@ function enviarParaAppInventor(acao, dados) {
     return false;
 }
 
-// ===================================================================
-// INTEGRAÇÃO APP INVENTOR - RECEBER DADOS DO APP INVENTOR
-// ===================================================================
+// ====================================
+// FUNÇÃO RECEBER DADOS DO APP INVENTOR
+// ====================================
 
 function receberDadosAppInventor(dadosStr) {
     if (!dadosStr || typeof dadosStr !== 'string') return;
