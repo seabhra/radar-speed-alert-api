@@ -2319,6 +2319,19 @@
       "KBH000187",
       "-19.917664, -43.950886",
       "24/07/2026, 10:04:43"
+    ],
+    [
+      188,
+      "000188",
+      "Avenida Cristiano Machado, Graça, Regional Nordeste",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Graça",
+      "Único",
+      "M000188",
+      "KBH000188",
+      "-19.903475, -43.932299",
+      "24/07/2026, 10:14:16"
     ]
   ]
 }
