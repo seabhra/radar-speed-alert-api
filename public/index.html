@@ -19,6 +19,8 @@
   <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js" crossorigin="anonymous"></script>
 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 
   <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
@@ -56,67 +58,203 @@
         flex-direction: column;
         overflow: hidden;
     }
+    
+    /* CSS HEADER DO APP */
+ 
     header {
-        background-color: var(--panel-color);
-        padding: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 2px solid var(--accent-color);
-        box-shadow: 0 4px 15px rgba(0, 255, 136, 0.1);
-        z-index: 1000;
-        flex-shrink: 0;
-    }
-    .header-left { display: flex; align-items: center; gap: 10px; }
-    .app-icon { width: 50px; height: 40px; border-radius: 8px; object-fit: contain; }
-    h1 { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
-    h1 span { color: var(--accent-color); }
+    background-color: var(--panel-color);
+    padding: 10px 15px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    border-bottom:2px solid var(--accent-color);
+    box-shadow:0 4px 15px rgba(0,255,136,0.1);
+
+    z-index:1000;
+    flex-shrink:0;
+}
 
 
+/* ======================== */
+/* HEADER LEFT (ÍCONE + TÍTULO) */
+/* ======================== */
 
-    /* GPS STATUS DOT */
-    .gps-status-wrapper {
-        display: flex; align-items: center; gap: 6px; margin-left: 8px;
-        padding: 4px 10px; border-radius: 20px; background: rgba(0,0,0,0.35);
-        border: 1px solid rgba(255,255,255,0.06); cursor: default; user-select: none;
-        transition: border-color 0.4s ease;
-    }
-    .gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
-    .gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
-    .gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
-    .gps-status-dot {
-        width: 10px; height: 10px; border-radius: 50%; background-color: var(--gps-sem);
-        position: relative; flex-shrink: 0; transition: background-color 0.4s ease;
-    }
-    .gps-status-dot::after {
-        content: ''; position: absolute; inset: -3px; border-radius: 50%;
-        background-color: inherit; opacity: 0.5;
-        animation: gpsPulse 2s ease-in-out infinite;
-    }
-    .gps-status-dot.ok   { background-color: var(--gps-ok); }
-    .gps-status-dot.warn { background-color: var(--gps-instavel); }
-    .gps-status-dot.err  { background-color: var(--gps-sem); }
-    @keyframes gpsPulse {
-        0%, 100% { transform: scale(1);   opacity: 0.5; }
-        50%      { transform: scale(2.2); opacity: 0; }
-    }
-    .gps-status-label {
-        font-size: 0.6rem; font-weight: 700; letter-spacing: 0.8px;
-        text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
-        transition: color 0.4s ease;
-    }
-    .gps-status-wrapper.gps-ok   .gps-status-label { color: var(--gps-ok); }
-    .gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
-    .gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
+/* 1. Alinha o ícone e o título lado a lado */
+.header-left {
+    display: flex;
+    align-items: center; /* Alinha verticalmente ao centro */
+    gap: 10px; /* Espaço entre o ícone e o texto */
+}
+
+/* Ajuste de tamanho do ícone */
+/* Ajuste de tamanho do ícone */
+.app-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: cover; /* Impede que a imagem fique oval/esticada */
+    border-radius: 8px; /* Opcional: Arredonda levemente as bordas para ficar mais bonito */
+    flex-shrink: 0; /* Impede que o ícone encolha se o texto ficar muito grande */
+}
+
+/* ======================== */
+/* TÍTULO DO APP */
+/* ======================== */
+
+.titulo-app {
+    display: flex;
+    flex-direction: column;
+}
+
+.titulo-linha {
+    display: flex;
+    align-items: center; /* Garante que H1 e GPS fiquem na mesma linha e altura */
+    gap: 12px; /* Espaço entre o "RADAR X9" e o indicador de GPS */
+    white-space: nowrap; /* Impede que o GPS quebre de linha */
+}
+
+h1 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0; /* Remove margem padrão para não desalinhar */
+    display: flex;
+    align-items: center;
+}
+
+h1 span {
+    color: var(--accent-color);
+}
 
 
+/* ======================== */
+/* CIDADE / TEMPERATURA */
+/* ======================== */
+
+.cidade-label {
+    margin-left: 0px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    font-size: 13px;
+   font-weight: 700;
+   letter-spacing: 0.4px;
+   text-transform: uppercase;
+}
+
+/* LABEL DE ALERTA DE CLIMA */
+.alerta-clima-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px; /* Espaço abaixo da linha da cidade */
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    animation: piscarAlerta 1.5s infinite;
+}
+
+.temp-value,
+#temperaturaAtual,
+#umidadeAtual,
+.label,
+.separador{
+    color: #fff;
+} 
+/* Cores dos Alertas */
+.alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
+.alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
+.alerta-seco   { background: rgba(255, 165, 0, 0.15); color: #ffcc00; border: 1px solid rgba(255, 165, 0, 0.3); }
+
+/* Animação para piscar */
+@keyframes piscarAlerta {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ======================== */
+/* GPS STATUS */
+/* ======================== */
+
+.gps-status-wrapper {
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    margin-left: 0px; /* Zerado pois o gap do .titulo-linha já dá o espaço */
+    padding: 4px 10px; 
+    border-radius: 20px; 
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.06); 
+    cursor: default; 
+    user-select: none;
+    transition: border-color 0.4s ease;
+}
+
+.gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
+.gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
+.gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
+
+.gps-status-dot {
+    width: 10px; 
+    height: 10px; 
+    border-radius: 50%; 
+    background-color: var(--gps-sem);
+    position: relative; 
+    flex-shrink: 0; 
+    transition: background-color 0.4s ease;
+}
+
+.gps-status-dot::after {
+    content: ''; 
+    position: absolute; 
+    inset: -3px; 
+    border-radius: 50%;
+    background-color: inherit; 
+    opacity: 0.5;
+    animation: gpsPulse 2s ease-in-out infinite;
+}
+
+.gps-status-dot.ok   { background-color: var(--gps-ok); }
+.gps-status-dot.warn { background-color: var(--gps-instavel); }
+.gps-status-dot.err  { background-color: var(--gps-sem); }
+
+@keyframes gpsPulse {
+    0%, 100% { transform: scale(1);   opacity: 0.5; }
+    50%      { transform: scale(2.2); opacity: 0; }
+}
+
+.gps-status-label {
+    font-size: 0.6rem; 
+    font-weight: 700; 
+    letter-spacing: 0.8px;
+    text-transform: uppercase; 
+    color: var(--text-muted); 
+    white-space: nowrap;
+    transition: color 0.4s ease;
+}
+
+.gps-status-wrapper.gps-ok   .gps-status-label { color: var(--gps-ok); }
+.gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
+.gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
+
+  /* CSS BOTÃO MENU TOGLE */
 
     .btn-menu-toggle {
         display: flex; flex-direction: column; align-items: center; justify-content: center;
         gap: 2px; background: none; border: 1.5px solid rgba(0, 255, 136, 0.3);
         border-radius: 10px; padding: 8px 14px 6px; cursor: pointer;
         transition: all 0.25s ease; user-select: none; -webkit-user-select: none;
-        position: relative; z-index: 1001;
+        position: relative; z-index: 99999;
     }
     .btn-menu-toggle:hover { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.06); }
     .btn-menu-toggle:active { transform: scale(0.93); }
@@ -133,6 +271,8 @@
         font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px;
         color: var(--accent-color); text-transform: uppercase; line-height: 1; margin-top: 2px;
     }
+
+
     .sidebar-controls {
         position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width);
         z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -161,8 +301,74 @@
     }
     .btn-search:active { transform: scale(0.9); }
     .btn-search img { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; object-fit: contain; display: block; transform: translate(-50%, -50%); }
+    
+    /* ===========
+   SET DO MAPA 
+   ============= */
     .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
     #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; position: relative; }
+
+
+/* ========================================
+   TEMA MATRIX - DIA
+   Verde translúcido estilo Matrix
+   ======================================== */
+
+.matrix-day .leaflet-tile-pane .leaflet-tile{
+    filter:
+        grayscale(0.35)
+        sepia(0.45)
+        hue-rotate(78deg)
+        saturate(2.4)
+        brightness(1.18)
+        contrast(1.08)
+        opacity(.90);
+
+    transition: filter .4s ease;
+}
+
+
+/* ========================================
+   TEMA MATRIX - NOITE
+   Matrix clássico mais escuro
+   ======================================== */
+
+.matrix-night .leaflet-tile-pane .leaflet-tile{
+    filter:
+        grayscale(0.65)
+        sepia(0.85)
+        hue-rotate(80deg)
+        saturate(3.6)
+        brightness(.72)
+        contrast(1.35);
+
+    transition: filter .4s ease;
+}
+
+.matrix-day .leaflet-tile-pane,
+.matrix-night .leaflet-tile-pane{
+    filter:
+        drop-shadow(0 0 1px rgba(255,255,255,.18));
+}
+.matrix-day .leaflet-map-pane::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:rgba(80,255,150,.12);
+}
+
+.matrix-night .leaflet-map-pane::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:rgba(0,180,70,.18);
+}
+
+    /* ===============
+   CSS DA BÚSSOLA
+   ================ */
     .compass-widget {
         position: absolute; top: 10px; left: 5px; width: 65px; height: 65px;
         z-index: 999999 !important; transform: translateZ(0); will-change: transform;
@@ -205,6 +411,8 @@
     @keyframes pulseEnd { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
     .radar-marker-icon { background: transparent !important; border: none !important; }
     .radar-marker-icon img { width: 40px !important; height: 40px !important; object-fit: contain !important; display: block !important; }
+   
+     /* CSS SPEED WIDGET */
     .speed-widget { position: absolute; bottom: -15px; left: -25px; width: 150px; height: 150px; z-index: 500; display: flex; align-items: center; justify-content: center; transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
     .speed-widget.alerta-ativo { bottom: 75px !important; }
     .speed-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
@@ -212,8 +420,21 @@
         position: absolute; top: 50%; left: 50%; transform: translate(-64%, -60%);
         font-size: 28px; font-weight: 700; font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
         color: #000; line-height: 1; z-index: 2; white-space: nowrap; text-align: center;
-        font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch;
-    }
+        font-variant-numeric: tabular-nums; letter-spacing: -0.5px; min-width: 3ch;}
+
+/* CSS SPEED RECENTRALIZAR */
+.speed-widget.recentralizar{
+
+    cursor:pointer;
+
+}
+.speed-widget.recentralizar .speed-value{
+
+    display:none;
+
+}    
+
+/* CSS ALERTAS */
     #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
@@ -226,20 +447,14 @@
     .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
     .alert-info p { font-size: 0.95rem; opacity: 0.95; }
     
-    /* CORREÇÃO DO BUG DE CSS (ESPAÇO EXTRA REMOVIDO) */
-    .alert-bar-destaque {
-        background: linear-gradient(90deg, #1fc7c7, #109090);
-        border-top: 2px solid #5fecec;
-        box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5);
-    }
-    .alert-bar-destaque .alert-info h3 { color: #ffffff; text-shadow: 0 0 8px rgba(31, 199, 199, 0.8); }
-    .alert-bar-destaque img { filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9)); }
- 
-    
-    .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
-    .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
-    .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
-    .alert-info p { font-size: 0.95rem; opacity: 0.95; }
+ /* CORREÇÃO DO BUG DE CSS (ESPAÇO EXTRA REMOVIDO) */
+.alert-bar-destaque {background: linear-gradient(90deg, #1fc7c7, #109090) !important;border-top: 2px solid #5fecec !important;box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5) !important;}
+.alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
+.alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
+.alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
+.alert-bar img {width: 50px;height: 50px;filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));}
+.alert-info h3 {font-size: 1.2rem;margin-bottom: 3px;text-transform: uppercase;font-weight: 800;}
+.alert-info p {font-size: 0.95rem;opacity: 0.95;}
               
     
     .toast-notification {
@@ -410,6 +625,9 @@
         .speed-btn { padding: 8px 0; font-size: 0.85rem; }
         .gps-status-label { display: none; }
     }
+
+        
+
 </style>
 <base target="_blank">
 </head>
@@ -419,29 +637,84 @@
     <div class="spinner-ring"></div>
     <div class="loading-text">Iniciando <span>Radar X9</span></div>
     <div class="loading-sub">Sincronizando satélites...</div>
+    
    
   </div>
+  <!-- CSS HEADER COM MARCA DA APP -->
 
   <header>
-    <div class="header-left">
-      <img src="/imagens_app/ic_icon_app.png" onerror="this.style.display='none'" alt="App Icon" class="app-icon">
-      <h1>RADAR <span>X9</span> BH</h1>
-       <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
-    <div class="gps-status-dot err" id="gps-status-dot"></div>
-    <span class="gps-status-label" id="gps-status-label">GPS OFF</span>
-          </div>
-      </div>
+    <div class="header-content">
 
-    <button class="btn-menu-toggle" id="btn-menu-toggle" aria-label="Abrir menu de controles">
-      <div class="menu-hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-      <div class="menu-label">MENU</div>
-    </button>
-  </header>
+        <div class="header-left">
 
+            <img src="/imagens_app/ic_icon_app.png"
+                 onerror="this.style.display='none'"
+                 alt="App Icon"
+                 class="app-icon">
+
+            <div class="titulo-app">
+
+                <div class="titulo-linha">
+                    <h1>RADAR <span>X9</span></h1>
+
+                    <div class="gps-status-wrapper gps-err" 
+                         id="gps-status-wrapper" 
+                         title="GPS: Aguardando sinal">
+
+                        <div class="gps-status-dot err" id="gps-status-dot"></div>
+                        <span class="gps-status-label" id="gps-status-label">
+                            GPS OFF
+                        </span>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
+<div id="cidade-atual" class="cidade-label">
+    <span id="nomeCidade">🚩 Local...</span>
+    <span class="separador">|</span>
+
+    <span class="temp-value">
+    🌡️ <span id="temperaturaAtual">Temp. °C</span>
+</span>
+
+    <span class="separador">|</span>
+
+  <span class="label">💧</span>
+<span id="umidadeAtual">Umidade</span>
+</div>
+
+<!-- LABEL DE ALERTA ABAIXO -->
+
+
+<div id="alerta-sound-clima" class="alerta-clima-label" style="display: none;"></div>
+
+
+    </div>
+
+
+    <!-- MENU SEMPRE NO CANTO DIREITO -->
+  <button class="btn-menu-toggle" 
+        id="btn-menu-toggle" 
+        onclick="this.classList.toggle('active')"
+        aria-label="Abrir menu de controles">
+
+    <div class="menu-hamburger" id="menu-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="menu-label">
+        MENU
+    </div>
+</button>
+
+</header>
 
   
   <!-- MENU DROPDOWN -->
@@ -468,10 +741,21 @@
       </div>
     </div>
 
-    <div class="speed-widget">
-      <img src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
-      <div class="speed-value" id="speed-display">0</div>
-    </div>
+
+   <!-- Speed e Recentralizar Mapa -->
+
+<div class="speed-widget" id="speedWidget">
+
+    <img
+        id="speedIcon"
+        src="/imagens_app/ic_speed_limit.png"
+        onerror="this.style.opacity='0.5'"
+        alt="Velocidade"
+        class="speed-bg">
+
+    <div class="speed-value" id="speed-display">0</div>
+
+</div>
 
     <!-- Sidebar de controles -->
     <div class="sidebar-controls" id="sidebar-controls">
@@ -616,9 +900,7 @@
             
             <div class="current-position-status" id="pos-status">Clique acima para inserir as coordenadas.</div>
           </div>
-
-
-         
+        
 
           <!-- Botão de Inclusão - AÇÃO DIRETA, SEM CONFIRMAÇÃO ADICIONAL -->
           <button class="btn-submit-radar" id="btn-submit-radar">
@@ -643,8 +925,12 @@
     <source src="audio_app/alerta_sound_destaque.mp3" type="audio/mpeg">
   </audio>
 
+   <audio id="alerta-sound-clima" preload="auto">
+    <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
+  </audio>
 
 <script>
+
  // ===================================================================
 // VARIÁVEIS GLOBAIS
 // ===================================================================
@@ -706,9 +992,9 @@ let gpsAccuracyAtual = 999;
 let gpsLastUpdateTime = 0;
 
 
-// ===================================================================
+// ======================
 // CONFIGURAÇÃO DO GITHUB
-// ===================================================================
+// ======================
 
 let GITHUB_CONFIG = {
     owner: 'seabhra',
@@ -740,6 +1026,9 @@ let GITHUB_CONFIG = {
 // Flag para controle de modo offline
 let RADAR_MODO_OFFLINE = false;
 let RADAR_PENDENTES_SINCRONIZAR = [];
+// Radares inseridos nesta sessão que precisam ser preservados no mapa
+// até o CDN da jsdelivr/raw.githubusercontent propagar o commit novo
+let radaresAdicionadosNestaSessao = [];
 
 async function carregarConfigGitHub() {
     console.log('[Radar X9] 🔄 Carregando configuração...');
@@ -1320,16 +1609,44 @@ function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, rad
     };
 }
 
+
+
+// =================================
+// TEMA DO MAPA MATRIX (DIA E NOITE)
+// =================================
+
 function aplicarTemaMapa() {
     if (!map) return;
+
     var hora = new Date().getHours();
-    var urlAtual = (hora >= 19 || hora < 6)
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    var mapContainer = map.getContainer(); // Pega a div que segura o mapa
+
+    // Define se é dia (6h às 18h) ou noite (18h às 6h)
+    var isNight = (hora >= 19 || hora < 6);
+
+    // Troca a URL base do mapa: Voyager (Dia) ou Dark (Noite)
+    var urlTema = isNight 
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
         : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-    if (tileLayer) {
-        tileLayer.setUrl(urlAtual);
+
+    // Troca a classe CSS que aplica o filtro Matrix
+    if (isNight) {
+        mapContainer.classList.remove('matrix-day');
+        mapContainer.classList.add('matrix-night');
     } else {
-        tileLayer = L.tileLayer(urlAtual, { attribution: '', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+        mapContainer.classList.remove('matrix-night');
+        mapContainer.classList.add('matrix-day');
+    }
+
+    // Atualiza o tile do mapa
+    if (tileLayer) {
+        tileLayer.setUrl(urlTema);
+    } else {
+        tileLayer = L.tileLayer(urlTema, { 
+            attribution: '', 
+            subdomains: 'abcd', 
+            maxZoom: 19 
+        }).addTo(map);
     }
 }
 
@@ -1610,6 +1927,7 @@ function resetarMapa() {
     removerRota();
     esconderAlertaVisual();
     showNotification("Mapa resetado");
+    historicoDistanciasRadar = {};
 }
 
 function extrairCoordenadas(record, index) {
@@ -1661,9 +1979,9 @@ function atualizarBussola(headingDegrees) {
     if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
 }
 
-// ===================================================================
-// GPS / ÍCONE DE ROTA FLUIDO - CORRIGIDO
-// ===================================================================
+// =========================
+// GPS / ÍCONE DE ROTA FLUIDO
+// ==========================
 var _navAnim = {
     rafId: null,
     fromLat: null,
@@ -1839,7 +2157,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 }
 
 //================================
-// função iniciar Navegação de GPS
+// FUNÇÃO INICIAR NAVEGAÇÃO GPS
 //================================
 
 function startGPSTracking() {
@@ -1852,18 +2170,530 @@ function startGPSTracking() {
             if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
             processarNovaPosicao(position.coords.latitude, position.coords.longitude, speedKmh, position.coords.heading, position.coords.accuracy);
         }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
+
+        
     );
     browserGpsTimeout = setTimeout(function() {
         if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); }
     }, 8000);
 }
 
+//================================
+// FUNÇÃO GPS CIDADE ATUAL 
+//================================
+
+const cidadeLabel = document.getElementById("cidade-atual");
+
+let ultimaCidade = "";
+
+function startGPSTracking() {
+
+    if (!navigator.geolocation) { 
+        hideFullscreenLoading(); 
+        showNotification("GPS não suportado."); 
+        return; 
+    }
+
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+    }
+
+    watchId = navigator.geolocation.watchPosition(
+
+        function(position) {
+
+            if (gpsSource !== 'appinventor') {
+                gpsSource = 'browser';
+            }
+
+            var speedKmh = 0;
+
+            if (position.coords.speed !== null && position.coords.speed >= 0) {
+                speedKmh = Math.round(position.coords.speed * 3.6);
+            }
+
+
+            // ATUALIZA CIDADE AQUI
+            atualizarCidade(
+                position.coords.latitude,
+                position.coords.longitude
+            );
+
+
+            processarNovaPosicao(
+                position.coords.latitude,
+                position.coords.longitude,
+                speedKmh,
+                position.coords.heading,
+                position.coords.accuracy
+            );
+
+
+        }, 
+
+        showError, 
+
+        { 
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+           timeout: 10000
+        }
+
+    );
+
+
+    browserGpsTimeout = setTimeout(function() {
+
+        if (!gpsInitialized && gpsSource === 'none') { 
+            showNotification("Aguardando GPS do app..."); 
+            hideFullscreenLoading(); 
+        }
+
+    }, 8000);
+
+}
+
 //=====================================
-// FUNÇÃO VERIFICAR PROXIMIDADE RADARES
+// FUNÇÃO ACCURACY DISTANCIA METROS
+//=====================================
+function distanciaMetros(lat1, lon1, lat2, lon2){
+
+    const R = 6371000;
+
+    const dLat = (lat2-lat1) * Math.PI/180;
+    const dLon = (lon2-lon1) * Math.PI/180;
+
+    const a =
+        Math.sin(dLat/2)**2 +
+        Math.cos(lat1*Math.PI/180) *
+        Math.cos(lat2*Math.PI/180) *
+        Math.sin(dLon/2)**2;
+
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+}
+//=====================================
+// FUNÇÃO INTEGRAÇÃO ACCURACY GPS
 //=====================================
 
+let melhorPrecisao = Infinity;
+
+const historico = [];
+
+function sucesso(position){
+
+    const acc = position.coords.accuracy;
+
+    // 1. Ignora leituras ruins
+    if(acc > 15){
+        console.log("GPS ignorado:", acc + " m");
+        return;
+    }
+
+    // 2. Guarda a melhor precisão obtida
+    if(acc < melhorPrecisao){
+        melhorPrecisao = acc;
+    }
+
+    // 3. Guarda histórico para suavizar o GPS
+    historico.push({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+    });
+
+    if(historico.length > 5){
+        historico.shift();
+    }
+
+    // 4. Calcula média
+    userLat = historico.reduce((s,p)=>s+p.lat,0)/historico.length;
+    userLng = historico.reduce((s,p)=>s+p.lng,0)/historico.length;
+
+    console.log(
+        "GPS:",
+        userLat,
+        userLng,
+        "Precisão:",
+        melhorPrecisao.toFixed(1)+" m"
+    );
+
+}
+//=====================================
+// FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
+//=====================================
+async function atualizarCidade(lat, lng){
+
+    try {
+
+        const resposta = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+        );
+
+        const dados = await resposta.json();
+
+        const cidade =
+            dados.address.city ||
+            dados.address.town ||
+            dados.address.municipality ||
+            dados.address.village;
+
+
+        if(cidade && cidade !== ultimaCidade){
+
+
+            ultimaCidade = cidade;
+
+           document.getElementById("nomeCidade").textContent = 
+    "🚩 " + cidade;
+
+            cidadeLabel.style.color =
+                corCidade(cidade);
+
+            cidadeLabel.classList.add("mudou");
+
+            setTimeout(()=>{
+                cidadeLabel.classList.remove("mudou");
+            },400);
+            
+            // Exemplo de como evitar o erro quebrando a página:
+          
+            if (data && data.address && data.address.city) {
+           console.log("Cidade:", data.address.city);
+         } else {
+           console.log("Não foi possível encontrar a cidade.");
+           }
+
+        }
+
+    } catch(e){
+        console.log("Erro cidade:",e);
+    }
+}
+//=========================
+// MUDANÇA DA COR DA CIDADE
+//=========================
+function corCidade(nome){
+
+    let hash = 0;
+
+    for(let i = 0; i < nome.length; i++){
+        hash = nome.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    let hue = Math.abs(hash) % 360;
+
+    // Evita faixas pouco agradáveis
+    if (hue >= 20 && hue <= 40) hue = 45;      // remove marrom
+    if (hue >= 250 && hue <= 295) hue = 210;   // troca roxo por azul
+
+    return `hsl(${hue},100%,68%)`;
+}
+
+navigator.geolocation.getCurrentPosition(async(pos)=>{
+
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+
+    await atualizarCidade();
+
+    await atualizarTemperatura();
+
+});
+
+
+//============================================
+// FUNÇÃO ATUALIZAR TEMPERATURA E UMIDADE LOCAL
+//============================================
+
+async function atualizarTemperatura() {
+
+    if (!userLat || !userLng) return;
+
+    try{
+        // COLOQUE SUA CHAVE DA OPENWEATHERMAP ABAIXO (Substitua o texto)
+        const API_KEY = 'a5c507ef270b147035538e0d6019bce1'; 
+        
+        // units=metric garante que venha em Celsius. lang=pt_br traz as descrições em português.
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
+
+        const resposta = await fetch(url);
+        
+        // Se a chave estiver errada ou expirada, vai cair no catch
+        if (!resposta.ok) throw new Error('Erro na API de clima: ' + resposta.status);
+
+        const dados = await resposta.json();
+
+        // A OpenWeatherMap organiza temperatura e umidade dentro de "main"
+        const temperatura = dados.main.temp;
+        const umidade = dados.main.humidity;
+
+        // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
+        document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
+        
+       
+        // Verifica se a umidade veio da API
+        console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
+
+       if (umidade !== undefined && umidade !== null) {
+    document.getElementById('umidadeAtual').textContent = umidade + '%';
+    
+       } else {
+    document.getElementById('umidadeAtual').textContent = 'N/A';
+    console.warn("A API não retornou o valor de umidade.");
+}
+        posicionarTemperatura(temperatura);
+        
+        // Chama a verificação de alerta de clima
+        verificarAlertasClima();
+
+    }catch(e){
+        console.error("Erro clima:", e);
+    }
+
+}
+//=====================================
+// FUNÇÃO POSIONAR TEMPERATURA LOCAL
+//=====================================
+function posicionarTemperatura(temp){
+
+    const minimo = -20;
+
+    const maximo = 50;
+
+    let porcentagem =
+
+        ((temp-minimo)/(maximo-minimo))*100;
+
+    porcentagem = Math.max(0,Math.min(100,porcentagem));
+
+    document.getElementById("ponteiroTemp").style.left =
+        porcentagem+"%";
+
+}
+
+ // =======================================================
+// SISTEMA DE ALERTA DE CLIMA (Umidade e Temperatura)
+// =======================================================
+
+// Configuração do Som (Coloque o caminho do seu arquivo de áudio aqui)
+const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3'); // <-- Troque 'alerta.mp3' pelo som que você quer
+somAlerta.volume = 0.5;
+
+let alertaAtivoAtual = ''; // Evita que o som toque em loop
+
+function verificarAlertasClima() {
+    // Pega os valores que JÁ ESTÃO na tela (colocados pelo seu código de API)
+    const tempTexto = document.getElementById('temperaturaAtual').textContent;
+    const umidTexto = document.getElementById('umidadeAtual').textContent;
+    
+    // Extrai apenas os números (removendo °C, %, emojis, etc)
+    const temp = parseFloat(tempTexto.replace(/[^0-9.-]/g, ''));
+    const umid = parseFloat(umidTexto.replace(/[^0-9.-]/g, ''));
+    
+    // Se não conseguir ler números, sai da função
+    if (isNaN(temp) || isNaN(umid)) return;
+
+    const alertaDiv = document.getElementById('alerta-sound-clima');
+    let novoAlerta = '';
+
+    // Limpa classes anteriores
+    alertaDiv.className = 'alerta-clima-label';
+
+    // Condição 1: Calor Extremo (Acima de 40°C - ajuste o valor como achar melhor)
+    if (temp >= 40) {
+        novoAlerta = 'quente';
+        alertaDiv.innerHTML = '🔥 ALERTA: Temperatura Extrema!';
+        alertaDiv.classList.add('alerta-quente');
+    } 
+    // Condição 2: Frio Extremo (Abaixo de 5°C - ajuste o valor como achar melhor)
+    else if (temp <= 5) {
+        novoAlerta = 'frio';
+        alertaDiv.innerHTML = '❄️ ALERTA: Frio Extremo!';
+        alertaDiv.classList.add('alerta-frio');
+    } 
+    // Condição 3: Umidade Baixa (Abaixo de 20% - ajuste o valor como achar melhor)
+    else if (umid <= 20) {
+        novoAlerta = 'seco';
+        alertaDiv.innerHTML = '🏜️ ATENÇÃO: Umidade do Ar Baixa!';
+        alertaDiv.classList.add('alerta-seco');
+    }
+
+    // Mostra o alerta e toca o som
+    if (novoAlerta !== '') {
+        alertaDiv.style.display = 'flex';
+        
+        // Toca o som apenas UMA VEZ quando o alerta aparece (não fica tocando sem parar)
+        if (novoAlerta !== alertaAtivoAtual) {
+            somAlerta.play().catch(e => console.log("Aguardando interação do usuário para tocar o som."));
+            alertaAtivoAtual = novoAlerta;
+        }
+    } else {
+        alertaDiv.style.display = 'none';
+        alertaAtivoAtual = ''; // Reseta se o clima estiver normal
+    }
+}
+
+// =======================================================
+// OBSERVADOR AUTOMÁTICO (A MÁGICA ACONTECE AQUI)
+// =======================================================
+// Fica observando o elemento de temperatura. Quando o SEU código de API
+// atualizar a temperatura na tela, ele roda a função de alerta automaticamente.
+
+const observer = new MutationObserver(function() {
+    verificarAlertasClima();
+});
+
+// Configuração do observador
+const configObserver = { childList: true, subtree: true };
+
+// Inicia a observação no elemento de temperatura e umidade
+const elemTemp = document.getElementById('temperaturaAtual');
+const elemUmid = document.getElementById('umidadeAtual');
+
+if (elemTemp) observer.observe(elemTemp, configObserver);
+if (elemUmid) observer.observe(elemUmid, configObserver);
+
+
+// =============================================
+// NORMALIZAÇÃO E CLASSIFICAÇÃO DE AUDIO ALERTAS
+// =============================================
+function normalizarTexto(texto) {
+    if (!texto) return '';
+    return texto
+        .toString()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+        .toLowerCase()
+        .trim();
+}
+
+function classificarAlerta(tipoOriginal) {
+    var tipoNorm = normalizarTexto(tipoOriginal);
+
+    // DESTAQUE (pontos turísticos) — verifica pelo nome do lugar
+    for (var d = 0; d < TIPOS_ALERTA_DESTAQUE.length; d++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_DESTAQUE[d]))) return 'destaque';
+    }
+    if (tipoNorm.includes('alerta de lugares em destaque') || tipoNorm.includes('(ale)')) return 'destaque';
+
+    for (var r = 0; r < TIPOS_ALERTA_RISCO.length; r++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_RISCO[r]))) return 'risco';
+    }
+
+    for (var m = 0; m < TIPOS_ALERTA_MOBILIDADE.length; m++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_MOBILIDADE[m]))) return 'mobilidade';
+    }
+
+    for (var rr = 0; rr < TIPOS_ALERTA_RADAR.length; rr++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_RADAR[rr]))) return 'radar';
+    }
+
+    // Fallback: se não bateu em nenhuma lista, trata como radar padrão
+    return 'radar';
+}
+
+function deveAlertaRadar(tipoOriginal) {
+    var tipoNorm = normalizarTexto(tipoOriginal);
+    for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {
+        if (tipoNorm.includes(normalizarTexto(TIPOS_SEM_ALERTA[i]))) return false;
+    }
+    return true;
+}
+
+// ===================================================================
+// DISPARAR ALERTA (mostra tarja + som)
+// ===================================================================
+function dispararAlerta(radarData, distancia) {
+    var tipo = classificarAlerta(radarData.tipoOriginal);
+    tipoAlertaAtivo = tipo;
+    ultimoRadarAlertado = radarData.id;
+    contagemTocarSom = 0;
+
+    var $container = $("#alert-container");
+    var $bar = $container.find(".alert-bar");
+    var $icon = $("#alert-icon");
+    var $title = $("#alert-title");
+    var $text = $("#alert-text");
+
+    $bar.removeClass('alert-bar-radar alert-bar-risco alert-bar-mobilidade alert-bar-destaque ' +
+                      'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico');
+    $bar.addClass('alert-bar-' + tipo);
+
+    var tipoExibicao = ajusteNomes[radarData.tipoOriginal] || radarData.tipoOriginal;
+    $icon.attr('src', getIconUrl(radarData.tipoOriginal, radarData.velocidade_maxima));
+
+    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO DE MOBILIDADE', destaque: 'PONTOS TURÍSTICOS' };
+    $title.text(titulos[tipo] || 'ATENÇÃO!');
+    $text.text(tipoExibicao + ' — ' + Math.round(distancia) + 'm');
+
+    if (distancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
+        $bar.addClass('alert-bar-' + tipo + '-critico');
+    }
+
+    $container.stop(true, true).show();
+    ajustarPosicaoSpeedWidget(true);
+
+    tocarSomAlerta(tipo);
+
+    if (alertTimeout) clearTimeout(alertTimeout);
+    alertTimeout = setTimeout(function () { esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
+}
+
+// ===================================================================
+// ATUALIZAR DISTÂNCIA (mesmo radar, sem re-disparar do zero)
+// ===================================================================
+function atualizarDistanciaAlerta(distancia) {
+    var $text = $("#alert-text");
+    var base = $text.text().split(' — ')[0];
+    $text.text(base + ' — ' + Math.round(distancia) + 'm');
+
+    if (alertTimeout) clearTimeout(alertTimeout);
+    alertTimeout = setTimeout(function () { esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
+}
+
+// ===================================================================
+// FECHAR IMEDIATAMENTE (usuário se afastou / mudou de direção)
+// ===================================================================
+function fecharAlertaImediatamente() {
+    if (alertTimeout) { clearTimeout(alertTimeout); alertTimeout = null; }
+    $("#alert-container").stop(true, true).hide();
+    ajustarPosicaoSpeedWidget(false);
+    pararTodosSons();
+    cancelarSequenciaSom();
+    tipoAlertaAtivo = null;
+}
+
+// ===================================================================
+// ESCONDER COM ANIMAÇÃO (fim do tempo / passou pelo radar)
+// ===================================================================
+function esconderAlertaVisual() {
+    if (alertTimeout) { clearTimeout(alertTimeout); alertTimeout = null; }
+    var tipoAnterior = tipoAlertaAtivo;
+
+    $("#alert-container").fadeOut(200, function () {
+        $(this).find(".alert-bar").removeClass(
+            'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico'
+        );
+    });
+    ajustarPosicaoSpeedWidget(false);
+    pararTodosSons();
+    cancelarSequenciaSom();
+
+    if (tipoAnterior && somAlertaHabilitado) {
+        silenciarAlertaComBeep(tipoAnterior);
+    }
+    tipoAlertaAtivo = null;
+}
+
+//======================================
+// Nova variável — controla APENAS o som
+//======================================
+var somAlertaHabilitado = true;
+
+//=====================================
+// FUNÇÃO VERIFICAR PROXIMIDADE RADARES (sem depender de alertaHabilitado)
+//=====================================
 function verificarProximidadeRadares() {
-    if (!alertaHabilitado || radarMarkers.length === 0) return;
+    if (radarMarkers.length === 0) return;   // <-- removido "!alertaHabilitado ||"
     let radarMaisProximo = null;
     let menorDistancia = Infinity;
     radarMarkers.forEach(function(marker) {
@@ -1886,348 +2716,50 @@ function verificarProximidadeRadares() {
     }
 }
 
-//================================
-// FUNÇÃO ALERTA RADAR
-//================================
-
-function deveAlertaRadar(tipoOriginal) {
-    if (!tipoOriginal) return false;
-    var tipoLimpo = tipoOriginal.trim();
-    for (var i = 0; i < TIPOS_SEM_ALERTA.length; i++) {  
-        if (tipoLimpo === TIPOS_SEM_ALERTA[i]) return false;
-    }
-    return true;
-}
-
-function dispararAlertaMobilidadeIA(mensagem) {
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
-    $(".alert-bar").css("background", "");
-    $("#alert-title").text("✅ ALERTA DE MOBILIDADE!");
-    $("#alert-text").text(mensagem);
-    $(".alert-bar").addClass("alert-bar-mobilidade");
-    $("#alert-icon").attr("src", "/imagens_app/ic_zona_verde.png");
-    
-    tocarSomAlerta('mobilidade');
-
-    if (!$("#alert-container").is(":visible")) { 
-        $("#alert-container").fadeIn(200); 
-        ajustarPosicaoSpeedWidget(true);
-    }
-    clearTimeout(alertTimeout);
-    alertTimeout = setTimeout(function() { 
-        if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
-    }, ALERT_CONFIG.TEMPO_ALERTA);
-}
-
-function classificarAlerta(tipoOriginal) {
-    if (!tipoOriginal) return 'radar';
-    var tipoLimpo = tipoOriginal.trim();
-    
-    for (var i = 0; i < TIPOS_ALERTA_RISCO.length; i++) {
-        if (tipoLimpo === TIPOS_ALERTA_RISCO[i] || tipoLimpo.includes(TIPOS_ALERTA_RISCO[i])) return 'risco';
-    }
-    
-    for (var j = 0; j < TIPOS_ALERTA_MOBILIDADE.length; j++) {
-        if (tipoLimpo === TIPOS_ALERTA_MOBILIDADE[j] || tipoLimpo.includes(TIPOS_ALERTA_MOBILIDADE[j])) return 'mobilidade';
-    }
-    for (var j = 0; j < TIPOS_ALERTA_DESTAQUE.length; j++) {
-        if (tipoLimpo === TIPOS_ALERTA_DESTAQUE[j] || tipoLimpo.includes(TIPOS_ALERTA_DESTAQUE[j])) return 'destaque';
-    }
-    return 'radar';
-}
-
-
-//================================
-// FUNÇÃO DISPARAR ALERTAS
-//================================
-
-function dispararAlerta(radar, distancia) {
-    const distanciaAtual = calcularDistancia(userLat, userLng, radar.latitude, radar.longitude);
-    if (distanciaAtual > ALERT_CONFIG.DISTANCIA_MAXIMA || distanciaAtual <= ALERT_CONFIG.DISTANCIA_PASSAR_RADAR) {
-        cancelarSequenciaSom();
-        return;
-    }
-
-    const tipoAlerta = classificarAlerta(radar.tipoOriginal);
-    const tipoAjustado = ajusteNomes[radar.tipoOriginal] || radar.tipoOriginal;
-    const velInfo = radar.velocidade_maxima ? " | " + radar.velocidade_maxima + " km/h" : "";
-
-    $(".alert-bar").removeClass(
-        "alert-bar-critico alert-bar-risco alert-bar-risco-critico " +
-        "alert-bar-mobilidade alert-bar-mobilidade-critico " +
-        "alert-bar-radar alert-bar-radar-critico " +
-        "alert-bar-destaque alert-bar-destaque-critico"
-    );
-
-    $(".alert-bar").css("background", "");
-
-    if (tipoAlerta === "risco") {
-        $("#alert-title").text("🚨 ALERTA DE RISCO!");
-        $(".alert-bar").addClass("alert-bar-risco");
-
-    } else if (tipoAlerta === "mobilidade") {
-        $("#alert-title").text("📢 ALERTA DE MOBILIDADE!");
-        $(".alert-bar").addClass("alert-bar-mobilidade");
-
-    } else if (tipoAlerta === "destaque") {
-        $("#alert-title").text("🏛️ ALERTA DE DESTAQUE!");
-        $(".alert-bar").addClass("alert-bar-destaque");
-
-    } else {
-        $("#alert-title").text("⚠️ ALERTA DE RADAR!");
-        $(".alert-bar").addClass("alert-bar-radar");
-    }
-
-    $("#alert-text").text(
-        tipoAjustado + velInfo + " - a " + Math.round(distanciaAtual) + " metros"
-    );
-
-    $("#alert-icon").attr(
-        "src",
-        getIconUrl(radar.tipoOriginal, radar.velocidade_maxima)
-    );
-
-    // [REMOVIDO] bloco quebrado que usava "alertBar" e "radar.tipo" (não existiam)
-    // O som já é disparado corretamente mais abaixo, via tocarSomAlerta(tipoAlerta)
-
-    const isNewAlert = !$("#alert-container").is(":visible") || ultimoRadarAlertado !== radar.id;
-
-    if (isNewAlert) { 
-        $("#alert-container").fadeIn(200);   
-        contagemTocarSom = 0; 
-        ajustarPosicaoSpeedWidget(true);
-    }
-
-    tipoAlertaAtivo = tipoAlerta; // [ADICIONADO] necessário para o beep de silenciar tocar o som certo
-
-    if (alertaHabilitado) {
-        var deveTocar = false;
-        if (tipoAlerta === 'radar') { 
-            if (contagemTocarSom < ALERT_CONFIG.DISPAROS_SOM_ANTES_DE_SILENCIAR) deveTocar = true; 
-        } else { 
-            if (isNewAlert) deveTocar = true; 
-        }
-
-        if (deveTocar) { 
-            tocarSomAlerta(tipoAlerta); 
-            contagemTocarSom++; 
-        }
-    }
-
-    if (distanciaAtual <= ALERT_CONFIG.DISTANCIA_CRITICA) {
-        if (tipoAlerta === 'risco') $(".alert-bar").addClass("alert-bar-risco-critico");
-        else if (tipoAlerta === 'mobilidade') $(".alert-bar").addClass("alert-bar-mobilidade-critico");
-        else if (tipoAlerta === 'destaque') $(".alert-bar").addClass("alert-bar-destaque-critico");
-        else $(".alert-bar").addClass("alert-bar-critico");
-    }
-
-    ultimoRadarAlertado = radar.id;
-    clearTimeout(alertTimeout);
-    alertTimeout = setTimeout(function() { 
-        if ($("#alert-container").is(":visible")) esconderAlertaVisual(); 
-    }, ALERT_CONFIG.TEMPO_ALERTA);
-}
-
-function atualizarDistanciaAlerta(distancia) {
-    if (!$("#alert-container").is(":visible")) return;
-    var textoAtual = $("#alert-text").text();
-    var partes = textoAtual.split(" - a ");
-    if (partes.length >= 2) $("#alert-text").text(partes[0] + " - a " + Math.round(distancia) + " metros");
-}
-
-function fecharAlertaImediatamente() {
-    pararTodosSons();
-    clearTimeout(alertTimeout);
-    cancelarSequenciaSom();
-}
-
-function esconderAlertaVisualSemBeep() {
-    $("#alert-container").fadeOut(150);
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
-    $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
-    contagemTocarSom = 0;
-    clearTimeout(alertTimeout);
-    ultimoRadarAlertado = null;
-    tipoAlertaAtivo = null;
-    ajustarPosicaoSpeedWidget(false);
-}
-
-function esconderAlertaVisual() {
-    silenciarAlertaComBeep(tipoAlertaAtivo);
-    $("#alert-container").fadeOut(150);
-    $(".alert-bar").removeClass("alert-bar-critico alert-bar-risco alert-bar-risco-critico alert-bar-mobilidade alert-bar-mobilidade-critico alert-bar-destaque alert-bar-destaque-critico");
-    $(".alert-bar").css("background", "linear-gradient(90deg, #cc0000, #990000)");
-    contagemTocarSom = 0;
-    fecharAlertaImediatamente();
-    ajustarPosicaoSpeedWidget(false);
-}
-
-// ===================================================================
-// AUDIO ENGINE
-// ===================================================================
-var _audioCtx = null;
-var _audioDesbloqueado = false;
-
-function getAudioCtx() {
-    if (!_audioCtx) {
-        _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    return _audioCtx;
-}
-
-function desbloquearAudioMobile() {
-    if (_audioDesbloqueado) return;
-    try {
-        var ctx = getAudioCtx();
-        if (ctx.state === 'suspended') {
-            ctx.resume().then(function () {
-                _audioDesbloqueado = true;
-                console.log('[Radar X9] ✅ AudioContext desbloqueado');
-            });
-        } else {
-            _audioDesbloqueado = true;
-        }
-    } catch (e) {
-        console.error('[Radar X9] Falha ao desbloquear AudioContext:', e);
-    }
-}
-
-['click', 'touchstart', 'touchend', 'keydown'].forEach(function (evt) {
-    document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
-});
-
-var _sequenciaSomId = 0;
-var _alertaPrincipalEstaTocando = false;
-var _soundListeners = {};
-var contagemTocarSom = 0;
-
-function cancelarSequenciaSom() {
-    _sequenciaSomId++;
-    _alertaPrincipalEstaTocando = false;
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el && _soundListeners[id]) {
-            el.removeEventListener('ended', _soundListeners[id]);
-            delete _soundListeners[id];
-            el.pause();
-            el.currentTime = 0;
-        }
-    });
-}
-
-function pararTodosSons() {
-    cancelarSequenciaSom();
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) {
-            el.pause();
-            el.currentTime = 0;
-        }
-    });
-}
-
-function tocarSomAlerta(tipoAlerta) {
-    if (typeof AppInventor !== 'undefined') {
-        enviarParaAppInventor('SOM', [tipoAlerta || 'radar']);
-    }
-
-    if (_alertaPrincipalEstaTocando) return;
-
-    var soundId = 'alert-sound-radar';
-    if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
-    else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
-
-    var sound = document.getElementById(soundId)
-             || document.getElementById('alert-sound-radar');
-
-    if (!sound) {
-        console.warn('[Radar X9] Elemento de áudio não encontrado:', soundId);
-        return;
-    }
-
-    _sequenciaSomId++;
-    var meuId = _sequenciaSomId;
-    _alertaPrincipalEstaTocando = true;
-
-    var toques = 0;
-    var numToques = 3;
-
-    if (_soundListeners[soundId]) {
-        sound.removeEventListener('ended', _soundListeners[soundId]);
-        delete _soundListeners[soundId];
-    }
-
-    function onEnded() {
-        if (meuId !== _sequenciaSomId) {
-            sound.removeEventListener('ended', onEnded);
-            delete _soundListeners[soundId];
-            _alertaPrincipalEstaTocando = false;
-            return;
-        }
-
-        toques++;
-        if (toques < numToques) {
-            sound.currentTime = 0;
-            sound.play().catch(function(err) {
-                console.warn('[Radar X9] Falha ao tocar mp3 (toque ' + (toques+1) + '):', err);
-            });
-        } else {
-            sound.removeEventListener('ended', onEnded);
-            delete _soundListeners[soundId];
-            _alertaPrincipalEstaTocando = false;
-        }
-    }
-
-    _soundListeners[soundId] = onEnded;
-    sound.addEventListener('ended', onEnded);
-
-    sound.currentTime = 0;
-    sound.play().catch(function(err) {
-        console.warn('[Radar X9] Falha ao iniciar mp3 (' + soundId + '):', err);
-        sound.removeEventListener('ended', onEnded);
-        delete _soundListeners[soundId];
-        _alertaPrincipalEstaTocando = false;
-    });
-}
-
-// ===================================================================
-// BOTÃO SILENCIAR
-// ===================================================================
+//============================================
+// BOTÃO SILENCIAR — versão única, consolidada
+//============================================
 function inicializarBotaoAlertaToggle() {
     var alertBtn  = document.getElementById('btn-alert-toggle');
     var alertIcon = document.getElementById('alert-toggle-icon');
     if (!alertBtn) return;
 
     alertBtn.addEventListener('click', function () {
-        alertaHabilitado = !alertaHabilitado;
+        somAlertaHabilitado = !somAlertaHabilitado;
 
-        if (alertaHabilitado) {
+        if (somAlertaHabilitado) {
             alertBtn.classList.remove('alert-off');
             if (alertIcon) {
                 alertIcon.src = '/imagens_app/ic_sound_on.png';
                 alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
             }
-            cancelarSequenciaSom();
-            contagemTocarSom = 0;
+            // Religou o som: se já tem alerta visível na tela, deixa o som voltar a tocar
+            // no próximo ciclo, sem esconder a tarja
+            if ($("#alert-container").is(":visible")) {
+                contagemTocarSom = 0;
+            }
             tocarBeepConfirmacao('on');
-            showNotification('Alerta LIGADO');
+            showNotification('Som LIGADO');
         } else {
             alertBtn.classList.add('alert-off');
             if (alertIcon) {
                 alertIcon.src = '/imagens_app/ic_sound_off.png';
                 alertIcon.onerror = function () { this.src = 'https://cdn-icons-png.flaticon.com/512/3398/3398405.png'; };
             }
-            cancelarSequenciaSom();
+            // Desligou o som: apenas para o áudio corrente, a tarja continua visível
             pararTodosSons();
+            cancelarSequenciaSom();
             tocarBeepConfirmacao('off');
-            showNotification('Alerta DESLIGADO');
+            showNotification('Som DESLIGADO');
         }
-
-        if ($("#alert-container").is(":visible")) {
-            esconderAlertaVisualSemBeep();
-        }
+        // Nota: propositalmente NÃO chama esconderAlertaVisual() nem
+        // esconderAlertaVisualSemBeep() aqui — a tarja não deve ser afetada.
     });
 }
+
+// =================================
+// BEEPS DE CONFIRMAÇÃO E SILENCIAR 
+// =================================
 
 function tocarBeepConfirmacao(estado) {
     try {
@@ -2292,6 +2824,7 @@ function _tocarBeep(ctx, tipoAlerta) {
         gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.4);
+
     } else if (tipoAlerta === 'mobilidade') {
         osc.type = 'sine';
         osc.frequency.setValueAtTime(600, ctx.currentTime);
@@ -2302,13 +2835,26 @@ function _tocarBeep(ctx, tipoAlerta) {
         gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.35);
+
+    } else if (tipoAlerta === 'destaque') {
+        // Som de silêncio específico para DESTAQUE (Mais agudo e contínuo)
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(1000, ctx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
+
     } else {
+        // Som de silêncio padrão para RADAR
         osc.type = 'sine';
         osc.frequency.setValueAtTime(1050, ctx.currentTime);
         gain.gain.setValueAtTime(0.6, ctx.currentTime);
         gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.18);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.18);
+        
         var osc2 = ctx.createOscillator();
         var gain2 = ctx.createGain();
         osc2.connect(gain2);
@@ -2322,6 +2868,207 @@ function _tocarBeep(ctx, tipoAlerta) {
     }
 }
 
+// =====================================
+// AUDIO ENGINE DESBLOQUEAR AUDIO MOBILE
+// =====================================
+var _audioCtx = null;
+var _audioDesbloqueado = false;
+
+function getAudioCtx() {
+    if (!_audioCtx) {
+        _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return _audioCtx;
+}
+
+function desbloquearAudioMobile() {
+    if (_audioDesbloqueado) return;
+    try {
+        var ctx = getAudioCtx();
+        if (ctx.state === 'suspended') {
+            ctx.resume().then(function () {
+                _audioDesbloqueado = true;
+                console.log('[Radar X9] ✅ AudioContext desbloqueado');
+            });
+        } else {
+            _audioDesbloqueado = true;
+        }
+    } catch (e) {
+        console.error('[Radar X9] Falha ao desbloquear AudioContext:', e);
+    }
+}
+
+['click', 'touchstart', 'touchend', 'keydown'].forEach(function (evt) {
+    document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
+});
+
+// ==================================
+// DESBLOQUEIO DOS  AUDIOS DE ALERTA 
+// ==================================
+var _alertSoundsDesbloqueados = false;
+
+
+function desbloquearAudiosDeAlerta() {
+    var ids = ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'];
+    var algumDesbloqueado = false;
+
+    ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+
+        // Se já está desbloqueado, pula
+        if (el._desbloqueado) return;
+
+        el.muted = true;
+        el.play().then(function () {
+            el.pause();
+            el.currentTime = 0;
+            el.muted = false;
+            el._desbloqueado = true;
+            console.log('[Radar X9] Áudio desbloqueado:', id);
+        }).catch(function () {
+            el.muted = false;
+            // Não marcou como desbloqueado → tentará de novo no próximo toque
+        });
+    });
+
+    // Só considera globalmente desbloqueado se todos existentes já foram
+    _alertSoundsDesbloqueados = ids.every(function(id) {
+        var el = document.getElementById(id);
+        return !el || el._desbloqueado;
+    });
+}
+
+['click', 'touchstart', 'touchend', 'keydown'].forEach(function (evt) {
+    document.addEventListener(evt, desbloquearAudiosDeAlerta, { once: false, passive: true });
+});
+
+var _sequenciaSomId = 0;
+var _alertaPrincipalEstaTocando = false;
+var _soundListeners = {};
+var contagemTocarSom = 0;
+
+function cancelarSequenciaSom() {
+    _sequenciaSomId++;
+    _alertaPrincipalEstaTocando = false;
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && _soundListeners[id]) {
+            el.removeEventListener('ended', _soundListeners[id]);
+            delete _soundListeners[id];
+            el.pause();
+            el.currentTime = 0;
+        }
+    });
+}
+
+function pararTodosSons() {
+    cancelarSequenciaSom();
+    _alertaPrincipalEstaTocando = false; // ← ADICIONAR ISSO
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.pause();
+            el.currentTime = 0;
+        }
+    });
+}
+
+//=============================
+// PORTA DE DISPARO DOS ÁUDIOS 
+//=============================
+function tocarSomAlerta(tipoAlerta) {
+    if (!somAlertaHabilitado) return;
+
+    // App Inventor (não quebra se der erro)
+    try {
+        if (typeof enviarAlertaSonoroParaAppInventor === 'function') {
+            enviarAlertaSonoroParaAppInventor(tipoAlerta);
+        }
+    } catch(e) {}
+
+    if (_alertaPrincipalEstaTocando) {
+        console.log('[Radar X9] Som já tocando, ignorando...');
+        return;
+    }
+
+    var soundId = 'alert-sound-radar';
+    if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
+    else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
+    else if (tipoAlerta === 'destaque') soundId = 'alert-sound-destaque';
+
+    var sound = document.getElementById(soundId)
+             || document.getElementById('alert-sound-radar');
+
+    if (!sound) {
+        console.error('[Radar X9] ERRO: Elemento <audio> não encontrado:', soundId);
+        return;
+    }
+
+    // Se o áudio não carregou, loga mas tenta mesmo assim
+    if (sound.readyState === 0) {
+        console.warn('[Radar X9] Áudio ainda não carregou (readyState=0):', soundId);
+    }
+
+    _sequenciaSomId++;
+    var meuId = _sequenciaSomId;
+    _alertaPrincipalEstaTocando = true;
+
+    // SAFETY TIMEOUT: se travar, libera em 8 segundos
+    var safetyTimer = setTimeout(function() {
+        if (meuId === _sequenciaSomId && _alertaPrincipalEstaTocando) {
+            console.warn('[Radar X9] Safety timeout liberou áudio travado');
+            _alertaPrincipalEstaTocando = false;
+            if (_soundListeners[soundId]) {
+                sound.removeEventListener('ended', _soundListeners[soundId]);
+                delete _soundListeners[soundId];
+            }
+        }
+    }, 8000);
+
+    var toques = 0;
+    var numToques = 3;
+
+    // Limpa listener anterior do mesmo elemento
+    if (_soundListeners[soundId]) {
+        sound.removeEventListener('ended', _soundListeners[soundId]);
+        delete _soundListeners[soundId];
+    }
+
+    function onEnded() {
+        clearTimeout(safetyTimer);
+        if (meuId !== _sequenciaSomId) {
+            _alertaPrincipalEstaTocando = false;
+            return;
+        }
+        toques++;
+        if (toques < numToques) {
+            sound.currentTime = 0;
+            sound.play().catch(function(err) {
+                console.error('[Radar X9] Falha no toque', toques+1, ':', err);
+                _alertaPrincipalEstaTocando = false;
+            });
+        } else {
+            sound.removeEventListener('ended', onEnded);
+            delete _soundListeners[soundId];
+            _alertaPrincipalEstaTocando = false;
+        }
+    }
+
+    _soundListeners[soundId] = onEnded;
+    sound.addEventListener('ended', onEnded);
+
+    sound.currentTime = 0;
+    sound.play().catch(function(err) {
+        clearTimeout(safetyTimer);
+        console.error('[Radar X9] Falha ao iniciar áudio:', err);
+        sound.removeEventListener('ended', onEnded);
+        delete _soundListeners[soundId];
+        _alertaPrincipalEstaTocando = false;
+    });
+}
+
+//====================================================================
 // ===================================================================
 // FUNÇÃO PARA ANIMAR O BOTÃO ADICIONAR RADAR
 // ===================================================================
@@ -2441,25 +3188,76 @@ async function initMap() {
     aplicarTemaMapa();
     setInterval(aplicarTemaMapa, 300000);
     inicializarBussolaHardware();
+
+   // ==========================
+// RECENTRALIZAR MAPA
+// ==========================
+
+let mapaCentralizado = true;
+
+const speedWidget = document.getElementById("speedWidget");
+const speedIcon = document.getElementById("speedIcon");
+
+// Função chamada APENAS quando o usuário arrasta o mapa com o mouse ou dedo
+function desativarCentralizacao(){
+    // Se o mapa já não está centralizado, não faz nada (evita processamento à toa)
+    if(!mapaCentralizado) return;
+
+    console.log("ARRASTOU O MAPA - Desativando centralização");
+    mapaCentralizado = false;
+
+    // Troca o ícone para o botão de recentralizar
+    speedIcon.src = "/imagens_app/ic_recentralizar.png";
     
-    map.on('dragstart', function() { 
-        isFollowing = false; 
-        if (returnToGpsTimer) clearTimeout(returnToGpsTimer); 
-    });
-    map.on('dragend', function() {
-        returnToGpsTimer = setTimeout(function() {
-            if (!isFollowing) {
-                var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
-                if (marcadorAtivo) { 
-                    isFollowing = true; 
-                    map.setView(marcadorAtivo.getLatLng(), map.getZoom(), { animate: true, duration: 0.5 }); 
-                    showNotification("Voltando à sua posição atual"); 
-                }
-            }
-        }, TEMPO_RETORNO_GPS);
-    });
+    // Adiciona a classe visual (caso tenha animação de pulse no CSS)
+    speedWidget.classList.add("recentralizar");
+}
+
+// Função chamada quando o usuário clica no botão para voltar para o GPS
+function recentralizarMapa(){
+    if(mapaCentralizado) return; // Já está centralizado, não faz nada
+
+    console.log("RECENTRALIZANDO MAPA");
+    mapaCentralizado = true;
+
+    // Volta para a posição do usuário
+    map.flyTo(
+        [userLat, userLng],
+        map.getZoom(),
+        {
+            animate: true,
+            duration: 0.6
+        }
+    );
+
+    // Troca o ícone de volta para o padrão
+    speedIcon.src = "/imagens_app/ic_speed_limit.png";
     
+    // Remove a classe visual
+    speedWidget.classList.remove("recentralizar");
+}
+
+// ==========================================
+// EVENTOS DO LEAFLT (APENAS ARRASTAR)
+// ==========================================
+
+// O usuário ARRASTOU o mapa com mouse ou toque
+map.on("dragstart", desativarCentralizacao);
+
+// (Removido: zoomstart e movestart para o ícone não ficar mudando sem querer)
+// (Removido: Lógica de retorno automático com setTimeout para respeitar o botão)
+
+// Clique no botão de recentralizar
+speedWidget.addEventListener("click", () => {
+    if(!mapaCentralizado){
+        recentralizarMapa();
+    }
+});
+
+    //=============================
     // Configurar eventos dos botões
+    //==============================
+
     $("#btn-calc-route").click(async function() {
         var endereco = $("#route-query").val().trim();
         if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
@@ -2817,6 +3615,8 @@ function inicializarBotaoAddRadar() {
     const iconPreviewName = document.getElementById('icon-preview-name');
     const speedButtons = document.querySelectorAll('.speed-btn');
     const btnCaptureLocation = document.getElementById('btn-capture-location');
+     const btnMenuToggle = document.getElementById('btn-menu-toggle');
+
 
     let currentPosition = { lat: null, lng: null };
     let gpsObtido = false;
@@ -2909,54 +3709,99 @@ function inicializarBotaoAddRadar() {
         }
     }
 
-    async function atualizarPosicaoAtual() {
-        let lat = userLat;
-        let lng = userLng;
+//======================
+//ATUALIZAR POSIÇÃO ATUAL
+//=======================
+async function atualizarPosicaoAtual() {
+    let lat = userLat;
+    let lng = userLng;
 
-        if (!lat || !lng || (lat === -19.919055 && lng === -43.938641)) {
-            posStatus.textContent = '🔄 Aguardando sinal GPS...';
-            try {
-                const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, {
-                        enableHighAccuracy: true,
-                        timeout: 15000
-                    });
-                });
-                lat = pos.coords.latitude;
-                lng = pos.coords.longitude;
-                posStatus.textContent = '✅ GPS obtido com sucesso!';
-            } catch (e) {
-                posStatus.textContent = '⚠️ GPS indisponível. Use o GPS do app.';
-                return false;
-            }
-        }
+    // Se ainda não recebemos nenhuma posição real do App Inventor, aguarda
+    if (!gpsInitialized || !lat || !lng || (lat === -19.919055 && lng === -43.938641)) {
+        posStatus.textContent = '🔄 Aguardando GPS do app...';
 
-        if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
-            currentPosition.lat = lat;
-            currentPosition.lng = lng;
-            posLat.value = lat.toFixed(6);
-            posLng.value = lng.toFixed(6);
-            gpsObtido = true;
-            posStatus.textContent = '🔄 Buscando endereço...';
+        const posicaoRecebida = await new Promise((resolve) => {
+            const inicioEspera = Date.now();
+            const TIMEOUT_ESPERA = 15000;
 
-            try {
-                const endereco = await buscarEnderecoPorCoordenadas(lat, lng);
-                if (endereco) {
-                    radarAddress.value = endereco;
-                    posStatus.textContent = '✅ Endereço encontrado!';
-                } else {
-                    posStatus.textContent = '⚠️ Endereço não encontrado. Preencha manualmente.';
+            const intervalo = setInterval(() => {
+                if (gpsInitialized && userLat && userLng &&
+                    !(userLat === -19.919055 && userLng === -43.938641)) {
+                    clearInterval(intervalo);
+                    resolve({ lat: userLat, lng: userLng });
+                } else if (Date.now() - inicioEspera > TIMEOUT_ESPERA) {
+                    clearInterval(intervalo);
+                    resolve(null);
                 }
-            } catch (e) {
-                posStatus.textContent = '⚠️ Erro ao buscar endereço. Preencha manualmente.';
-                console.warn('[Radar X9] Erro ao buscar endereço:', e);
-            }
-            return true;
-        } else {
-            posStatus.textContent = '❌ Coordenadas inválidas';
+            }, 300);
+        });
+
+        if (!posicaoRecebida) {
+            posStatus.textContent = '⚠️ GPS do app não respondeu. Verifique se o LocationSensor está ativo.';
             return false;
         }
+
+        lat = posicaoRecebida.lat;
+        lng = posicaoRecebida.lng;
+        posStatus.textContent = '✅ GPS obtido via App Inventor!';
     }
+
+    if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+        currentPosition.lat = lat;
+        currentPosition.lng = lng;
+        posLat.value = lat.toFixed(6);
+        posLng.value = lng.toFixed(6);
+        gpsObtido = true;
+        posStatus.textContent = '🔄 Buscando endereço...';
+
+        try {
+            const endereco = await buscarEnderecoPorCoordenadas(lat, lng);
+            if (endereco) {
+                radarAddress.value = endereco;
+                posStatus.textContent = '✅ Endereço encontrado!';
+            } else {
+                posStatus.textContent = '⚠️ Endereço não encontrado. Preencha manualmente.';
+            }
+        } catch (e) {
+            posStatus.textContent = '⚠️ Erro ao buscar endereço. Preencha manualmente.';
+            console.warn('[Radar X9] Erro ao buscar endereço:', e);
+        }
+        return true;
+    } else {
+        posStatus.textContent = '❌ Coordenadas inválidas';
+        return false;
+    }
+}
+
+//=====================    
+//BOTÃO MENU TOGLE
+//=====================
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Pega o botão pelo ID
+    const btnMenuToggle = document.getElementById('btn-menu-toggle');
+
+    // Verifica se o botão existe na página para evitar erros
+    if (btnMenuToggle) {
+        
+        // Adiciona o evento de clique
+        btnMenuToggle.addEventListener('click', () => {
+            
+            // Adiciona ou remove a classe 'active' a cada clique
+            btnMenuToggle.classList.toggle('active');
+
+            // OPCIONAL: Se você tiver um menu lateral para abrir/fechar, adicione a lógica aqui
+            // Exemplo:
+            // const menuLateral = document.getElementById('menu-lateral');
+            // menuLateral.classList.toggle('open');
+        });
+    }
+});
+
+
+//=====================    
+//BOTÃO ADICIONAR RADAR
+//=====================
 
     btnAddRadar.addEventListener('click', async () => {
         modalAddRadar.classList.add('active');
@@ -3124,8 +3969,8 @@ async function salvarRadarNoGitHub(novoRadar, proximoId, arquivoPath) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                message: `Adicionado radar #${proximoId}: ${novoRadar.tipo} em ${novoRadar.endereco}`,
-                content: updatedContent,
+                message: `Adicionado radar #${proximoId}: ${tipo} em ${endereco}`,
+                content: updatedContent, // O base64 do novo conteúdo
                 sha: data.sha,
                 branch: branch
             })
@@ -3230,24 +4075,36 @@ try {
                 localStorage.setItem('radarx9_pendentes', JSON.stringify(RADAR_PENDENTES_SINCRONIZAR));
             } catch (e) {}
         }
-
-        animarBotaoRadar(salvouNoGitHub ? 'adicionado' : 'erro');
+         //========================
+         // Criar marcador no mapa
+         //=======================
+               
+     animarBotaoRadar(salvouNoGitHub ? 'adicionado' : 'erro');
 
         // Criar marcador no mapa
         const novoMarker = criarRadarNoMapa({
             ...novoRadar,
             id: proximoId,
-            tipoOriginal: tipo
+            tipoOriginal: tipo,
+            isUsuario: true
         });
         if (novoMarker) {
             radarMarkers.push(novoMarker);
             if (salvouNoGitHub) {
                 showNotification(`✅ Radar #${proximoId} salvo no GitHub!`);
+
+                // [ADICIONADO] Registra na lista de sessão para sobreviver
+                // a um possível carregarRadares() antes do CDN propagar o commit
+                radaresAdicionadosNestaSessao.push({
+                    radar: { ...novoRadar },
+                    id: proximoId
+                });
             }
             novoMarker.openPopup();
         }
-
+         //================================
         // Fechar modal e limpar formulário
+        //=================================
         if (typeof fecharModal === 'function') fecharModal();
         document.getElementById('radar-type').value = '';
         document.getElementById('radar-address').value = '';
@@ -3257,12 +4114,12 @@ try {
         });
         document.getElementById('icon-preview-group').style.display = 'none';
 
-        // Recarregar radares do GitHub após alguns segundos
-        if (salvouNoGitHub) {
-            setTimeout(() => {
-                carregarRadares();
-            }, 3000);
-        }
+       // Recarregar radares do GitHub após alguns segundos
+       // if (salvouNoGitHub) {
+       //     setTimeout(() => {
+       //       carregarRadares();
+       //  }, 3000);
+       // }
 
     } catch (error) {
         animarBotaoRadar('erro');
@@ -3360,7 +4217,7 @@ async function carregarRadares() {
     let recordsCurados = [];
     let recordsUsuarios = [];
     let fonte = '';
-
+   
     //==========================================
     // ---- 1. Radares curados (radares.json) ----
     //===========================================
@@ -3399,23 +4256,39 @@ async function carregarRadares() {
     //===========================================================================
     // ---- 2. Radares enviados por usuários (radares_app.json) ----
     //===========================================================================
+    // CORREÇÃO: Substituído o código de backend (SHA/Blob/Buffer) por fetch direto via CDN/Raw.
+    // O GitHub serve arquivos JSON publicamente, não há necessidade de API autenticada para LER.
 
     try {
-        const cdnResponseApp = await fetchComTimeout(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-        if (cdnResponseApp.ok) {
-            const dataApp = await cdnResponseApp.json();
-            recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
+        const cdnAppResponse = await fetchComTimeout(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
+        if (cdnAppResponse.ok) {
+            const data = await cdnAppResponse.json();
+            recordsUsuarios = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+            if (recordsUsuarios.length > 0) console.log('[Radar X9] ✅ Radares de usuários carregados (CDN App)');
         }
-    } catch (e) { console.warn('[Radar X9] CDN usuários falhou:', e.message); }
+    } catch (e) { console.warn('[Radar X9] CDN App falhou:', e.message); }
 
     if (recordsUsuarios.length === 0) {
         try {
-            const rawResponseApp = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-            if (rawResponseApp.ok) {
-                const dataApp = await rawResponseApp.json();
-                recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
+            const rawAppResponse = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
+            if (rawAppResponse.ok) {
+                const data = await rawAppResponse.json();
+                recordsUsuarios = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
+                if (recordsUsuarios.length > 0) console.log('[Radar X9] ✅ Radares de usuários carregados (Raw App)');
             }
-        } catch (e) { console.warn('[Radar X9] Raw usuários falhou:', e.message); }
+        } catch (e) { console.warn('[Radar X9] Raw App falhou:', e.message); }
+    }
+
+    // Fallback local para radares de usuários
+    if (recordsUsuarios.length === 0) {
+        try {
+            var responseApp = await fetchComTimeout('radares_app.json?v=' + Date.now(), {}, 8000);
+            if (responseApp.ok) {
+                var dataApp = await responseApp.json();
+                recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
+                if (recordsUsuarios.length > 0) console.log('[Radar X9] ✅ Radares de usuários carregados (Local)');
+            }
+        } catch (e) { console.warn('[Radar X9] Arquivo local App falhou:', e.message); }
     }
 
     // ---- 3. Fallback: cache local (mescla ambos, se existirem) ----
@@ -3443,8 +4316,9 @@ async function carregarRadares() {
     if (recordsUsuarios.length > 0) {
         renderizarRadaresNoMapa(recordsUsuarios, 'Compartilhados por usuários', true);
     }
+    
 
-    if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
+  if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
         try {
             localStorage.setItem('radarx9_radares_cache', JSON.stringify({ recordsCurados: recordsCurados, recordsUsuarios: recordsUsuarios }));
         } catch (e) {}
@@ -3452,24 +4326,75 @@ async function carregarRadares() {
         RADAR_MODO_OFFLINE = true;
     }
 
+    // [ADICIONADO] Reinsere radares desta sessão que ainda não voltaram
+    // na resposta do CDN (cache da jsdelivr/raw.githubusercontent costuma
+    // levar mais tempo que o esperado para refletir um commit novo)
+
+    if (radaresAdicionadosNestaSessao.length > 0) {
+        radaresAdicionadosNestaSessao.forEach(function(item) {
+            var jaExiste = radarMarkers.some(function(m) {
+                return m.radarData &&
+                       Math.abs(m.radarData.latitude - item.radar.latitude) < 0.00001 &&
+                       Math.abs(m.radarData.longitude - item.radar.longitude) < 0.00001;
+            });
+            if (!jaExiste) {
+                var markerRecriado = criarRadarNoMapa({
+                    ...item.radar,
+                    id: item.id,
+                    tipoOriginal: item.radar.tipo,
+                    isUsuario: true
+                });
+                if (markerRecriado) {
+                    radarMarkers.push(markerRecriado);
+                    console.log('[Radar X9] 🧩 Radar #' + item.id + ' reinserido (ainda não propagado no CDN)');
+                }
+            } else {
+                console.log('[Radar X9] ✅ Radar #' + item.id + ' já veio do CDN, removendo da lista de sessão');
+            }
+        });
+
+        // Limpa da lista de sessão os que já vieram confirmados pelo CDN
+        radaresAdicionadosNestaSessao = radaresAdicionadosNestaSessao.filter(function(item) {
+            return !radarMarkers.some(function(m) {
+                return m.radarData && m.radarData.id === item.id && m.radarData.isUsuario;
+            }) || !recordsUsuarios.some(function(r) {
+                var coords = String(r[9] || '').split(',').map(function(s){return parseFloat(s.trim());});
+                return coords.length === 2 &&
+                       Math.abs(coords[0] - item.radar.latitude) < 0.00001 &&
+                       Math.abs(coords[1] - item.radar.longitude) < 0.00001;
+            });
+        });
+    }
+
     $("#loading").hide();
 }
-// ===========================
-// RENDERIZAR RADARES NO MAPA
-// ===========================
+
+// ==============================
+// RENDERIZAR RADARES APP NO MAPA
+// ==============================
 
 function renderizarRadaresNoMapa(records, origem, isUsuario) {
     if (!map) return;
     var radaresExternos = records || [];
     var contador = 0;
-    // [ADICIONADO] offset de ID para não colidir com os IDs dos radares curados
     var idOffset = isUsuario ? 100000 : 0;
+    
+    console.log('[Radar X9] 📊 Renderizando ' + radaresExternos.length + ' radares de: ' + origem);
 
     for (var i = 0; i < radaresExternos.length; i++) {
         var record = radaresExternos[i];
+        
+        // Log para depuração
+        console.log('[Radar X9] Registro ' + i + ':', record);
+        
         var coords = extrairCoordenadas(record, i);
-        if (!coords) continue;
+        if (!coords) {
+            console.warn('[Radar X9] ⚠️ Coordenadas não encontradas para registro ' + i + ':', record);
+            continue;
+        }
 
+        console.log('[Radar X9] ✅ Coordenadas extraídas:', coords);
+        
         var finalLat = coords.lat;
         var finalLng = coords.lng;
         var endereco = record[2] || "Endereço não informado";
@@ -3481,6 +4406,7 @@ function renderizarRadaresNoMapa(records, origem, isUsuario) {
         var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
 
         var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
+
         setTimeout(function(mk, fb) {
             return function() {
                 var el = mk.getElement();
@@ -3577,24 +4503,69 @@ async function solicitarPermissaoBussolaIOS() {
     return false;
 }
 
-// =======================
-// INTEGRAÇÃO APP INVENTOR
-// =======================
+// =====================================
+// NOVA FORMA DE INTEGRAÇÃO APP INVENTOR
+// =====================================
+var ultimoWebViewString = '';
+
+function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
+    if (typeof AppInventor === 'undefined') return;
+
+    var mapaTextos = {
+        radar: 'ALERTA DE RADAR',
+        risco: 'ALERTA DE RISCO',
+        mobilidade: 'AVISO DE MOBILIDADE',
+        destaque: 'PONTOS TURISTICOS'
+    };
+    var texto = mapaTextos[tipoAlerta] || 'ALERTA DE RADAR';
+
+    try {
+        AppInventor.setWebViewString(texto);
+        ultimoWebViewString = texto; // [FIX] sincroniza para o poll não reler/apagar isso
+        console.log('[Radar X9] → AppInventor (som nativo):', texto);
+    } catch (e) {
+        console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
+    }
+}
+
 function enviarParaAppInventor(acao, dados) {
     if (typeof AppInventor !== 'undefined') {
         try {
             var mensagem = acao + '|' + dados.join('|');
             AppInventor.setWebViewString(mensagem);
+            ultimoWebViewString = mensagem; // [FIX] idem
             console.log('[Radar X9] → AppInventor:', mensagem);
             return true;
-        } catch (e) { console.error('[Radar X9] Erro ao enviar para AppInventor:', e); return false; }
+        } catch (e) {
+            console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
+            return false;
+        }
     }
     return false;
 }
 
-// ===================================================================
-// INTEGRAÇÃO APP INVENTOR - RECEBER DADOS DO APP INVENTOR
-// ===================================================================
+function pollAppInventor() {
+    if (typeof AppInventor !== 'undefined') {
+        try {
+            var current = AppInventor.getWebViewString();
+            if (current && current !== ultimoWebViewString) {
+                ultimoWebViewString = current;
+                receberDadosAppInventor(current);
+
+                // [FIX] só limpa o canal quando for de fato uma mensagem GPS recebida,
+                // nunca um texto de alerta que você mesmo acabou de enviar
+                if (current.indexOf('GPS|') === 0) {
+                    AppInventor.setWebViewString('');
+                    ultimoWebViewString = '';
+                }
+            }
+        } catch (e) {}
+    }
+}
+
+// ====================================
+// FUNÇÃO RECEBER DADOS DO APP INVENTOR
+// ====================================
 
 function receberDadosAppInventor(dadosStr) {
     if (!dadosStr || typeof dadosStr !== 'string') return;
@@ -3618,20 +4589,7 @@ function receberDadosAppInventor(dadosStr) {
 }
 
 
-var ultimoWebViewString = '';
-function pollAppInventor() {
-    if (typeof AppInventor !== 'undefined') {
-        try {
-            var current = AppInventor.getWebViewString();
-            if (current && current !== ultimoWebViewString) {
-                ultimoWebViewString = current;
-                receberDadosAppInventor(current);
-                AppInventor.setWebViewString('');
-            }
-        } catch(e) {}
-    }
-}
-setInterval(pollAppInventor, 500);
+
 
 
 // ===================================================================

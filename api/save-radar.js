@@ -1,9 +1,3 @@
-// /api/save-radar.js
-// Vercel Serverless Function
-// Recebe os dados de um novo radar do front-end (via POST) e grava
-// no radares_app.json do GitHub usando o GITHUB_TOKEN guardado como
-// variável de ambiente no servidor. O token nunca é exposto ao cliente.
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido. Use POST.' });
@@ -15,78 +9,121 @@ export default async function handler(req, res) {
   const APP_PATH = process.env.GITHUB_APP_PATH || 'radares_app.json';
 
   if (!GITHUB_TOKEN) {
-    return res.status(500).json({ error: 'GITHUB_TOKEN não configurado no servidor (variável de ambiente ausente na Vercel).' });
+    return res.status(500).json({ error: 'GITHUB_TOKEN não configurado no servidor.' });
   }
 
   const { tipo, endereco, velocidade, latitude, longitude } = req.body || {};
 
   if (!tipo || !endereco || !velocidade || latitude === undefined || longitude === undefined) {
-    return res.status(400).json({ error: 'Dados incompletos do radar. Necessário: tipo, endereco, velocidade, latitude, longitude.' });
+    return res.status(400).json({ error: 'Dados incompletos do radar.' });
   }
 
   try {
-    // 1. Descobrir a branch padrão do repositório
+    // 1. Descobrir a branch padrão
     const repoInfoResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, {
-      headers: {
-        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
+      headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
     });
     if (!repoInfoResp.ok) {
       const detalhe = await repoInfoResp.text().catch(() => '');
-      return res.status(repoInfoResp.status).json({ error: `Não foi possível ler o repositório (${repoInfoResp.status}): ${detalhe.slice(0, 300)}` });
+      return res.status(repoInfoResp.status).json({ error: `Erro ao ler repositório: ${detalhe.slice(0, 300)}` });
     }
     const repoInfo = await repoInfoResp.json();
     const branch = repoInfo.default_branch || 'main';
 
-    // 2. Buscar conteúdo atual do arquivo radares_app.json
-    const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${APP_PATH}`;
-    const getResp = await fetch(`${url}?ref=${encodeURIComponent(branch)}`, {
-      headers: {
-        'Authorization': `Bearer ${GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      }
+    // 2. BUSCAR METADADOS DO ARQUIVO (Para pegar o SHA)
+    const urlContents = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${APP_PATH}?ref=${encodeURIComponent(branch)}`;
+    const metaResp = await fetch(urlContents, {
+      headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
     });
-    if (!getResp.ok) {
-      const detalhe = await getResp.text().catch(() => '');
-      return res.status(getResp.status).json({ error: `Erro ao buscar arquivo (${getResp.status}): ${detalhe.slice(0, 300)}` });
+    if (!metaResp.ok) {
+      const detalhe = await metaResp.text().catch(() => '');
+      return res.status(metaResp.status).json({ error: `Erro ao buscar metadados (${metaResp.status}): ${detalhe.slice(0, 300)}` });
     }
-    const fileData = await getResp.json();
+    const fileMetaData = await metaResp.json();
+    const fileSha = fileMetaData.sha;
 
-    let jsonData;
-    try {
-      const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
-      jsonData = JSON.parse(content);
-    } catch (e) {
-      return res.status(500).json({ error: 'Erro ao interpretar radares_app.json: ' + e.message });
+    // 3. LER O CONTEÚDO VIA BLOB (Suporta arquivos até 100 MB, ignorando o limite de 1MB do /contents/)
+    const urlBlob = `https://api.github.com/repos/${OWNER}/${REPO}/git/blobs/${fileSha}`;
+    const blobResp = await fetch(urlBlob, {
+      headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (!blobResp.ok) {
+      const detalhe = await blobResp.text().catch(() => '');
+      return res.status(blobResp.status).json({ error: `Erro ao buscar blob (${blobResp.status}): ${detalhe.slice(0, 300)}` });
     }
-    if (!jsonData.records) jsonData.records = [];
+    const blobData = await blobResp.json();
+    const content = Buffer.from(blobData.content, 'base64').toString('utf-8');
 
-    // 3. Calcular o próximo ID (evita colisão com IDs já existentes)
-    const idsExistentes = jsonData.records
-      .map(r => Number(r[0]))
-      .filter(n => !isNaN(n));
-    const proximoId = idsExistentes.length > 0 ? Math.max(...idsExistentes) + 1 : 100001;
+    // 4. PARSE DO JSON
+    let records = [];
+    let hadRecordsWrapper = true;
 
-    // 4. Montar novo registro no mesmo formato dos demais campos
+    if (content.trim()) {
+      try {
+        const parsed = JSON.parse(content);
+        if (Array.isArray(parsed)) {
+          records = parsed;
+          hadRecordsWrapper = false;
+        } else if (parsed && Array.isArray(parsed.records)) {
+          records = parsed.records;
+          hadRecordsWrapper = true;
+        } else {
+          return res.status(500).json({ error: 'Formato inesperado no radares_app.json.' });
+        }
+      } catch (e) {
+        return res.status(500).json({ error: 'Erro ao interpretar radares_app.json: ' + e.message });
+      }
+    }
+
+    // 5. Calcular próximo ID
+    let proximoId = 1;
+    if (records.length > 0) {
+      const ids = records.map(reg => Array.isArray(reg) ? reg[0] : null).filter(id => typeof id === 'number' && !isNaN(id));
+      if (ids.length > 0) proximoId = Math.max(...ids) + 1;
+    }
+
+    // 6. Extrair bairro
+    let bairro = "Único";
+    if (endereco) {
+      const partes = endereco.split(',').map(p => p.trim());
+      if (partes.length >= 2) bairro = partes[partes.length - 2];
+      else if (partes.length === 1) bairro = partes[0];
+    }
+
+    // 7. Data formatada
+    const now = new Date();
+    const dataFormatada = now.toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    });
+
+    // 8. Montar novo registro
     const novoRegistro = [
       proximoId,
-      String(proximoId),
+      String(proximoId).padStart(6, '0'),
       endereco,
       tipo,
       String(velocidade),
-      "Único",
+      bairro,
       "Único",
       `M${String(proximoId).padStart(6, '0')}`,
       `KBH${String(proximoId).padStart(6, '0')}`,
-      `${Number(latitude).toFixed(6)}, ${Number(longitude).toFixed(6)}`
+      `${Number(latitude).toFixed(6)}, ${Number(longitude).toFixed(6)}`,
+      dataFormatada
     ];
-    jsonData.records.push(novoRegistro);
 
-    const updatedContent = Buffer.from(JSON.stringify(jsonData, null, 2), 'utf-8').toString('base64');
+    // 9. Adicionar ao array e montar JSON
+    records.push(novoRegistro);
 
-    // 5. Gravar (PUT) de volta no GitHub
-    const putResp = await fetch(url, {
+    const conteudoAtualizado = hadRecordsWrapper
+      ? JSON.stringify({ records: records }, null, 2)
+      : JSON.stringify(records, null, 2);
+
+    const updatedContentBase64 = Buffer.from(conteudoAtualizado, 'utf-8').toString('base64');
+
+    // 10. Gravar no GitHub
+    const urlPut = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${APP_PATH}`;
+    const putResp = await fetch(urlPut, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${GITHUB_TOKEN}`,
@@ -95,8 +132,8 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         message: `Adicionado radar #${proximoId}: ${tipo} em ${endereco}`,
-        content: updatedContent,
-        sha: fileData.sha,
+        content: updatedContentBase64,
+        sha: fileSha,
         branch: branch
       })
     });
@@ -106,9 +143,17 @@ export default async function handler(req, res) {
       return res.status(putResp.status).json({ error: `Erro ao salvar (${putResp.status}): ${detalhe.slice(0, 300)}` });
     }
 
-    return res.status(200).json({ success: true, id: proximoId, persistido: true, branch });
+    return res.status(200).json({
+      success: true,
+      id: proximoId,
+      persistido: true,
+      branch,
+      totalRadaresAgora: records.length,
+      registro: novoRegistro
+    });
 
   } catch (err) {
+    console.error('Erro ao salvar radar:', err);
     return res.status(500).json({ error: err.message || 'Erro desconhecido ao salvar radar.' });
   }
 }
