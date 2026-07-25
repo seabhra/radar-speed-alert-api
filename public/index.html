@@ -2554,9 +2554,9 @@ if (elemTemp) observer.observe(elemTemp, configObserver);
 if (elemUmid) observer.observe(elemUmid, configObserver);
 
 
-// =======================================
-// NORMALIZAÇÃO E CLASSIFICAÇÃO DE ALERTAS
-// =======================================
+// =============================================
+// NORMALIZAÇÃO E CLASSIFICAÇÃO DE AUDIO ALERTAS
+// =============================================
 function normalizarTexto(texto) {
     if (!texto) return '';
     return texto
@@ -2868,9 +2868,9 @@ function _tocarBeep(ctx, tipoAlerta) {
     }
 }
 
-// ===================================================================
-// AUDIO ENGINE
-// ===================================================================
+// =====================================
+// AUDIO ENGINE DESBLOQUEAR AUDIO MOBILE
+// =====================================
 var _audioCtx = null;
 var _audioDesbloqueado = false;
 
@@ -2902,9 +2902,9 @@ function desbloquearAudioMobile() {
     document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
 });
 
-// ===================================================================
-// DESBLOQUEIO DOS <audio> DE ALERTA (necessário p/ tocar sem gesto depois)
-// ===================================================================
+// ==================================
+// DESBLOQUEIO DOS  AUDIOS DE ALERTA 
+// ==================================
 var _alertSoundsDesbloqueados = false;
 
 
@@ -3068,6 +3068,7 @@ function tocarSomAlerta(tipoAlerta) {
     });
 }
 
+//====================================================================
 // ===================================================================
 // FUNÇÃO PARA ANIMAR O BOTÃO ADICIONAR RADAR
 // ===================================================================
@@ -4368,9 +4369,9 @@ async function carregarRadares() {
     $("#loading").hide();
 }
 
-// ===========================
-// RENDERIZAR RADARES_APP NO MAPA
-// ===========================
+// ==============================
+// RENDERIZAR RADARES APP NO MAPA
+// ==============================
 
 function renderizarRadaresNoMapa(records, origem, isUsuario) {
     if (!map) return;
@@ -4505,6 +4506,7 @@ async function solicitarPermissaoBussolaIOS() {
 // =====================================
 // NOVA FORMA DE INTEGRAÇÃO APP INVENTOR
 // =====================================
+var ultimoWebViewString = '';
 
 function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
     if (typeof AppInventor === 'undefined') return;
@@ -4513,33 +4515,52 @@ function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
         radar: 'ALERTA DE RADAR',
         risco: 'ALERTA DE RISCO',
         mobilidade: 'AVISO DE MOBILIDADE',
-        destaque: 'PONTOS TURISTICOS'   // sem acento — igual ao bloco
+        destaque: 'PONTOS TURISTICOS'
     };
-
     var texto = mapaTextos[tipoAlerta] || 'ALERTA DE RADAR';
 
     try {
         AppInventor.setWebViewString(texto);
+        ultimoWebViewString = texto; // [FIX] sincroniza para o poll não reler/apagar isso
         console.log('[Radar X9] → AppInventor (som nativo):', texto);
     } catch (e) {
         console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
     }
 }
 
-// ==========================
-// FUNÇÃO ENVIAR APP INVENTOR
-// ===========================
 function enviarParaAppInventor(acao, dados) {
     if (typeof AppInventor !== 'undefined') {
         try {
             var mensagem = acao + '|' + dados.join('|');
             AppInventor.setWebViewString(mensagem);
-            
+            ultimoWebViewString = mensagem; // [FIX] idem
             console.log('[Radar X9] → AppInventor:', mensagem);
             return true;
-        } catch (e) { console.error('[Radar X9] Erro ao enviar para AppInventor:', e); return false; }
+        } catch (e) {
+            console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
+            return false;
+        }
     }
     return false;
+}
+
+function pollAppInventor() {
+    if (typeof AppInventor !== 'undefined') {
+        try {
+            var current = AppInventor.getWebViewString();
+            if (current && current !== ultimoWebViewString) {
+                ultimoWebViewString = current;
+                receberDadosAppInventor(current);
+
+                // [FIX] só limpa o canal quando for de fato uma mensagem GPS recebida,
+                // nunca um texto de alerta que você mesmo acabou de enviar
+                if (current.indexOf('GPS|') === 0) {
+                    AppInventor.setWebViewString('');
+                    ultimoWebViewString = '';
+                }
+            }
+        } catch (e) {}
+    }
 }
 
 // ====================================
@@ -4568,20 +4589,7 @@ function receberDadosAppInventor(dadosStr) {
 }
 
 
-var ultimoWebViewString = '';
-function pollAppInventor() {
-    if (typeof AppInventor !== 'undefined') {
-        try {
-            var current = AppInventor.getWebViewString();
-            if (current && current !== ultimoWebViewString) {
-                ultimoWebViewString = current;
-                receberDadosAppInventor(current);
-                AppInventor.setWebViewString('');
-            }
-        } catch(e) {}
-    }
-}
-setInterval(pollAppInventor, 500);
+
 
 
 // ===================================================================
