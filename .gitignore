@@ -2,3 +2,7 @@ node_modules/
 .env
 .env.local
 .vercel/
+Info/
+/radares.json
+/radares_apps.json
+/radares_apps.jsonl
