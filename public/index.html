@@ -690,7 +690,6 @@ h1 span {
 
 <!-- LABEL DE ALERTA ABAIXO -->
 
-
 <div id="alerta-sound-clima" class="alerta-clima-label" style="display: none;"></div>
 
 
@@ -924,7 +923,6 @@ h1 span {
    <audio id="alert-sound-destaque" preload="auto">
     <source src="audio_app/alerta_sound_destaque.mp3" type="audio/mpeg">
   </audio>
-
    <audio id="alerta-sound-clima" preload="auto">
     <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
   </audio>
@@ -1608,8 +1606,6 @@ function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, rad
         estaAfastando: (diff > ALERT_CONFIG.ANGULO_AFASTANDO) && tendencia.estaAfastando
     };
 }
-
-
 
 // =================================
 // TEMA DO MAPA MATRIX (DIA E NOITE)
@@ -2621,7 +2617,7 @@ function dispararAlerta(radarData, distancia) {
     var tipoExibicao = ajusteNomes[radarData.tipoOriginal] || radarData.tipoOriginal;
     $icon.attr('src', getIconUrl(radarData.tipoOriginal, radarData.velocidade_maxima));
 
-    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO DE MOBILIDADE', destaque: 'PONTOS TURÍSTICOS' };
+    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO DE MOBILIDADE', destaque: 'DESCUBRA A CIDADE' };
     $title.text(titulos[tipo] || 'ATENÇÃO!');
     $text.text(tipoExibicao + ' — ' + Math.round(distancia) + 'm');
 
