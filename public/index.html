@@ -2982,17 +2982,14 @@ function pararTodosSons() {
 function tocarSomAlerta(tipoAlerta) {
     if (!somAlertaHabilitado) return;
 
-    // App Inventor (não quebra se der erro)
     try {
         if (typeof enviarAlertaSonoroParaAppInventor === 'function') {
             enviarAlertaSonoroParaAppInventor(tipoAlerta);
         }
-    } catch(e) {}
-
-    if (_alertaPrincipalEstaTocando) {
-        console.log('[Radar X9] Som já tocando, ignorando...');
-        return;
+    } catch (e) {
+        console.error('[Radar X9] Erro ao enviar alerta:', e);
     }
+
 
     var soundId = 'alert-sound-radar';
     if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
