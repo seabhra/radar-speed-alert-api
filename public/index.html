@@ -923,7 +923,7 @@ h1 span {
    <audio id="alert-sound-destaque" preload="auto">
     <source src="audio_app/alerta_sound_destaque.mp3" type="audio/mpeg">
   </audio>
-   <audio id="alerta-sound-clima" preload="auto">
+   <audio id="alerta-sound-climatico" preload="auto">
     <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
   </audio>
 
@@ -2489,7 +2489,7 @@ function verificarAlertasClima() {
     // Se não conseguir ler números, sai da função
     if (isNaN(temp) || isNaN(umid)) return;
 
-    const alertaDiv = document.getElementById('alerta-sound-clima');
+    const alertaDiv = document.getElementById('alerta-sound-climatico');
     let novoAlerta = '';
 
     // Limpa classes anteriores
@@ -4516,6 +4516,14 @@ function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
     var texto = mapaTextos[tipoAlerta] || 'ALERTA DE RADAR';
 
     try {
+        // [FIX-2] limpa antes de escrever: se dois alertas do MESMO tipo
+        // acontecem em sequência, o texto enviado seria idêntico ao anterior
+        // e o lado nativo (App Inventor) não percebe "mudança" no WebViewString,
+        // então o som nativo não dispara de novo. Passar por '' garante uma
+        // transição de valor real toda vez.
+        AppInventor.setWebViewString('');
+        ultimoWebViewString = '';
+
         AppInventor.setWebViewString(texto);
         ultimoWebViewString = texto; // [FIX] sincroniza para o poll não reler/apagar isso
         console.log('[Radar X9] → AppInventor (som nativo):', texto);
