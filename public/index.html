@@ -2146,8 +2146,12 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
         map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.5 });
     }
 
-    if (alertaHabilitado) verificarProximidadeRadares();
-    else fecharAlertaImediatamente();
+   // Usa somAlertaHabilitado para controlar a verificação também
+    verificarProximidadeRadares(); 
+   //if (somAlertaHabilitado) verificarProximidadeRadares();
+// Se o som estiver desligado, ainda queremos mostrar o alerta visual, então NÃO devemos fechar imediatamente
+// else fecharAlertaImediatamente(); // <-- REMOVA ESTA LINHA
+   
 
     if (destinoAtual) verificarChegadaDestino();
 }
@@ -2683,8 +2687,8 @@ function esconderAlertaVisual() {
 //======================================
 // Nova variável — controla APENAS o som
 //======================================
-var somAlertaHabilitado = true;
 
+let somAlertaHabilitado = true;
 //=====================================
 // FUNÇÃO VERIFICAR PROXIMIDADE RADARES (sem depender de alertaHabilitado)
 //=====================================
@@ -2722,6 +2726,7 @@ function inicializarBotaoAlertaToggle() {
 
     alertBtn.addEventListener('click', function () {
         somAlertaHabilitado = !somAlertaHabilitado;
+        alertaHabilitado = somAlertaHabilitado; // Mantém compatibilidade
 
         if (somAlertaHabilitado) {
             alertBtn.classList.remove('alert-off');
@@ -4511,19 +4516,11 @@ function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
         radar: 'ALERTA DE RADAR',
         risco: 'ALERTA DE RISCO',
         mobilidade: 'AVISO DE MOBILIDADE',
-        destaque: 'PONTOS TURISTICOS'
+        destaque: 'DESCUBRA A CIDADE'
     };
     var texto = mapaTextos[tipoAlerta] || 'ALERTA DE RADAR';
 
     try {
-        // [FIX-2] limpa antes de escrever: se dois alertas do MESMO tipo
-        // acontecem em sequência, o texto enviado seria idêntico ao anterior
-        // e o lado nativo (App Inventor) não percebe "mudança" no WebViewString,
-        // então o som nativo não dispara de novo. Passar por '' garante uma
-        // transição de valor real toda vez.
-        AppInventor.setWebViewString('');
-        ultimoWebViewString = '';
-
         AppInventor.setWebViewString(texto);
         ultimoWebViewString = texto; // [FIX] sincroniza para o poll não reler/apagar isso
         console.log('[Radar X9] → AppInventor (som nativo):', texto);
