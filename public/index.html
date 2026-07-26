@@ -4514,10 +4514,10 @@ function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
     if (typeof AppInventor === 'undefined') return;
 
     var mapaTextos = {
-        radar: 'ALERTA DE RADAR',
-        risco: 'ALERTA DE RISCO',
-        mobilidade: 'AVISO DE MOBILIDADE',
-        destaque: 'DESCUBRA A CIDADE'
+        radar: 'RADAR',
+        risco: 'RISCO',
+        mobilidade: 'MOBILIDADE',
+        destaque: 'DESTAQUE'
     };
     var texto = mapaTextos[tipoAlerta] || 'ALERTA DE RADAR';
 
