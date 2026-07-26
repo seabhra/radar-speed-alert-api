@@ -4511,61 +4511,52 @@ async function solicitarPermissaoBussolaIOS() {
 var ultimoWebViewString = '';
 
 function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
-    if (typeof AppInventor === 'undefined') return;
+
+    if (typeof AppInventor === 'undefined') {
+        console.warn('[Radar X9] AppInventor não disponível');
+        return false;
+    }
 
     var mapaTextos = {
         radar: 'RADAR',
         risco: 'RISCO',
         mobilidade: 'MOBILIDADE',
         destaque: 'DESTAQUE',
-        destaque: 'CLIMA'
-
+        clima: 'CLIMA'
     };
-    var texto = mapaTextos[tipoAlerta] || 'ALERTA DE RADAR';
+
+    var texto = mapaTextos[tipoAlerta];
+
+    if (!texto) {
+        console.warn('[Radar X9] Tipo de alerta desconhecido:', tipoAlerta);
+        return false;
+    }
 
     try {
+
         AppInventor.setWebViewString(texto);
-        ultimoWebViewString = texto; // [FIX] sincroniza para o poll não reler/apagar isso
-        console.log('[Radar X9] → AppInventor (som nativo):', texto);
+
+        ultimoWebViewString = texto;
+
+        console.log(
+            '[Radar X9] → App Inventor:',
+            texto
+        );
+
+        return true;
+
     } catch (e) {
-        console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
+
+        console.error(
+            '[Radar X9] Erro ao enviar para App Inventor:',
+            e
+        );
+
+        return false;
     }
 }
 
-function enviarParaAppInventor(acao, dados) {
-    if (typeof AppInventor !== 'undefined') {
-        try {
-            var mensagem = acao + '|' + dados.join('|');
-            AppInventor.setWebViewString(mensagem);
-            ultimoWebViewString = mensagem; // [FIX] idem
-            console.log('[Radar X9] → AppInventor:', mensagem);
-            return true;
-        } catch (e) {
-            console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
-            return false;
-        }
-    }
-    return false;
-}
 
-function pollAppInventor() {
-    if (typeof AppInventor !== 'undefined') {
-        try {
-            var current = AppInventor.getWebViewString();
-            if (current && current !== ultimoWebViewString) {
-                ultimoWebViewString = current;
-                receberDadosAppInventor(current);
-
-                // [FIX] só limpa o canal quando for de fato uma mensagem GPS recebida,
-                // nunca um texto de alerta que você mesmo acabou de enviar
-                if (current.indexOf('GPS|') === 0) {
-                    AppInventor.setWebViewString('');
-                    ultimoWebViewString = '';
-                }
-            }
-        } catch (e) {}
-    }
-}
 
 // ====================================
 // FUNÇÃO RECEBER DADOS DO APP INVENTOR
