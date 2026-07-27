@@ -2800,6 +2800,19 @@
       "KBH000224",
       "-20.142811, -43.960435",
       "27/07/2026, 13:00:00"
+    ],
+    [
+      225,
+      "000225",
+      "Rodovia Presidente Juscelino Kubitschek, Lagoa do Miguelão C, Nova Lima",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "80",
+      "Lagoa do Miguelão C",
+      "Único",
+      "M000225",
+      "KBH000225",
+      "-20.144210, -43.959591",
+      "27/07/2026, 13:25:29"
     ]
   ]
 }
