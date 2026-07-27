@@ -2787,6 +2787,19 @@
       "KBH000223",
       "-20.071557, -43.983512",
       "27/07/2026, 12:53:10"
+    ],
+    [
+      224,
+      "000224",
+      "Rodovia Presidente Juscelino Kubitschek, Lagoa do Miguelão C, Nova Lima",
+      "Radar Inteligente de Velocidade Média (RIV)",
+      "100",
+      "Lagoa do Miguelão C",
+      "Único",
+      "M000224",
+      "KBH000224",
+      "-20.142811, -43.960435",
+      "27/07/2026, 13:00:00"
     ]
   ]
 }
