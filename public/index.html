@@ -316,25 +316,24 @@ h1 span {
 
 .matrix-day .leaflet-tile-pane .leaflet-tile {
     filter:
-        grayscale(0.05)      /* Mantém cores do mapa-base */
-        sepia(0.18)          /* Tom quente reduzido para não competir com o verde */
-        hue-rotate(82deg)    /* Verde matrix afinado */
-        saturate(1.35)       /* Saturação controlada — evita "manchas" de cor */
-        brightness(0.97)     /* Levemente reduzido em vez de aumentado */
-        contrast(1.60);     /* ALTO: aresta das ruas e texto saltam */
+        grayscale(0.10)
+        sepia(0.22)
+        hue-rotate(72deg)
+        saturate(2.05)
+        brightness(0.96)
+        contrast(1.55);
 
     transition: filter .4s ease;
 }
 
-/* Película verde mais perceptível, mas ainda transparente */
 .matrix-day .leaflet-map-pane::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
 
-    background: rgba(50, 195, 110, 0.07);
-    mix-blend-mode: multiply;   /* Fundos claros ficam verde-matrix sem apagar linhas escuras */
+    background:
+        rgba(70, 210, 125, .08);
 
     z-index: 400;
 }
