@@ -344,19 +344,21 @@ h1 span {
    Atmosfera escura, mas ruas e labels em destaque
    ======================================== */
 
+
 .matrix-night .leaflet-tile-pane .leaflet-tile {
     filter:
-        grayscale(0.08)
-        sepia(0.30)
-        hue-rotate(80deg)
-        saturate(1.65)       /* Saturação menor para não "grudar" cor nas ruas */
-        brightness(0.72)     /* Escurecido, mas não tanto a ponto de engolir labels */
-        contrast(1.75);      /* MUITO ALTO: ruas claras saltam do fundo escurecido */
+        grayscale(0.32)
+        sepia(0.48)
+        hue-rotate(76deg)
+        saturate(2.3)
+        brightness(0.95)
+        contrast(1.4);
 
     transition: filter .4s ease;
 }
 
-/* Overlay noturno mais intenso + leve brilho nas áreas claras */
+
+/* Verde mais profundo à noite, mas mais transparente */
 .matrix-night .leaflet-map-pane::after {
     content: "";
     position: absolute;
@@ -364,17 +366,10 @@ h1 span {
     pointer-events: none;
 
     background:
-        linear-gradient(
-            180deg,
-            rgba(0, 40, 15, 0.25) 0%,
-            rgba(0, 100, 45, 0.10) 100%
-        );
-
-    mix-blend-mode: overlay;   /* Ilumina pixels já claros (ruas/labels) e escurece o resto */
+        rgba(0, 145, 65, .08);
 
     z-index: 400;
 }
-
 
 
     /* ===============
