@@ -2982,6 +2982,19 @@
       "KBH000238",
       "-19.935783, -43.932130",
       "28/07/2026, 09:26:50"
+    ],
+    [
+      239,
+      "000239",
+      "Avenida Nossa Senhora do Carmo, São Pedro, Regional Centro-Sul",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "São Pedro",
+      "Único",
+      "M000239",
+      "KBH000239",
+      "-19.945586, -43.934835",
+      "28/07/2026, 09:29:05"
     ]
   ]
 }
