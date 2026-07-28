@@ -311,23 +311,23 @@ h1 span {
     
 /* ========================================
    TEMA MATRIX — DIA
-   Verde claro, tecnológico e com contraste
+   Verde claro, tecnológico e com vias bem definidas
    ======================================== */
 
 .matrix-day .leaflet-tile-pane .leaflet-tile {
     filter:
-        grayscale(0.18)
-        sepia(0.30)
+        grayscale(0.15)
+        sepia(0.28)
         hue-rotate(72deg)
-        saturate(2.15)
-        brightness(1.05)
-        contrast(1.22);
+        saturate(1.85)
+        brightness(1.08)
+        contrast(1.35);
 
     transition: filter .4s ease;
 }
 
 
-/* Película verde muito suave */
+/* Película verde muito suave, sem cobrir as vias */
 .matrix-day .leaflet-map-pane::after {
     content: "";
     position: absolute;
@@ -335,7 +335,7 @@ h1 span {
     pointer-events: none;
 
     background:
-        rgba(70, 210, 125, .08);
+        rgba(70, 210, 125, .06);
 
     z-index: 400;
 }
@@ -343,23 +343,23 @@ h1 span {
 
 /* ========================================
    TEMA MATRIX — NOITE
-   Verde profundo, mas com ruas destacadas
+   Verde profundo, porém com ruas visíveis
    ======================================== */
 
 .matrix-night .leaflet-tile-pane .leaflet-tile {
     filter:
-        grayscale(0.38)
-        sepia(0.55)
+        grayscale(0.32)
+        sepia(0.48)
         hue-rotate(76deg)
-        saturate(2.8)
-        brightness(0.78)
-        contrast(1.42);
+        saturate(2.3)
+        brightness(0.95)
+        contrast(1.4);
 
     transition: filter .4s ease;
 }
 
 
-/* Verde mais profundo à noite */
+/* Verde mais profundo à noite, mas mais transparente */
 .matrix-night .leaflet-map-pane::after {
     content: "";
     position: absolute;
@@ -367,11 +367,10 @@ h1 span {
     pointer-events: none;
 
     background:
-        rgba(0, 145, 65, .13);
+        rgba(0, 145, 65, .08);
 
     z-index: 400;
 }
-
 
 /* ========================================
    REALCE GERAL DO MAPA
