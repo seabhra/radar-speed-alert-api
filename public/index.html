@@ -3186,6 +3186,13 @@ async function initMap() {
         showNotification("Erro de conexão. Os mapas não puderam carregar."); 
         return; 
     }
+
+    // No seu código HTML
+    function updateMap(lat, lon) {
+    // Atualiza o mapa aqui
+    console.log("Nova localização:", lat, lon);
+
+}
     //=============================
     // CONFIGURAÇÃO INICIAL DO MAPA
     //=============================
@@ -3234,7 +3241,7 @@ function agendarRecentragemAutomatica(){
 
     recentragemTimeout = setTimeout(function () {
         recentralizarMapa();
-    }, 5000);
+    }, 10000);
 }
 
 // Função chamada quando o usuário clica no botão OU quando o timer de 5s dispara
