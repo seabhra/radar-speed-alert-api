@@ -3743,6 +3743,60 @@ function inicializarBotaoAddRadar() {
         }
     }
 
+
+// ===========================
+// RECEBER GPS DO APP INVENTOR
+// ===========================
+function atualizarLocalizacao(lat, lon) {
+    // Valida os dados
+    if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+        console.warn("⚠️ Coordenadas inválidas recebidas:", lat, lon);
+        return false;
+    }
+    
+    // Evita coordenadas padrão (ex: Belo Horizonte)
+    if (lat === -19.919055 && lon === -43.938641) {
+        console.log("⏳ Coordenadas padrão, aguardando GPS real...");
+        return false;
+    }
+    
+    console.log("📡 GPS Atualizado:", lat, lon);
+    
+    // Atualiza variáveis globais
+    window.userLat = lat;
+    window.userLng = lon;
+    window.gpsInitialized = true;
+    window.ultimaAtualizacao = Date.now();
+    
+    // Atualiza UI se existir
+    const posStatus = document.getElementById('posStatus');
+    if (posStatus) {
+        posStatus.textContent = `✅ GPS: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+        posStatus.style.color = '#00ff00';
+    }
+    
+    // Atualiza campos de entrada
+    const posLat = document.getElementById('posLat');
+    const posLng = document.getElementById('posLng');
+    if (posLat) posLat.value = lat.toFixed(6);
+    if (posLng) posLng.value = lon.toFixed(6);
+    
+    // Chama a função existente
+    if (typeof atualizarPosicaoAtual === 'function') {
+        atualizarPosicaoAtual();
+    }
+    
+    // Chama outras funções se existirem
+    if (typeof obterCidade === 'function') {
+        obterCidade(lat, lon);
+    }
+    if (typeof obterClima === 'function') {
+        obterClima(lat, lon);
+    }
+    
+    return true;
+}
+
 //======================
 //ATUALIZAR POSIÇÃO ATUAL
 //=======================
