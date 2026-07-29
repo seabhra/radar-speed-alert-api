@@ -344,31 +344,27 @@ h1 span {
    Atmosfera escura, mas ruas e labels em destaque
    ======================================== */
 
-
 .matrix-night .leaflet-tile-pane .leaflet-tile {
     filter:
-        grayscale(0.32)
-        sepia(0.48)
-        hue-rotate(76deg)
-        saturate(2.3)
+        invert(1)              /* fundo claro -> escuro, vias escuras -> claras */
+        hue-rotate(180deg)      /* corrige o matiz que a inversão bagunça */
         brightness(0.95)
-        contrast(1.4);
+        contrast(1.15)
+        saturate(1.4)
+        sepia(0.25)             /* puxa levemente pro verde */
+        hue-rotate(60deg);      /* ajusta o tom final pro verde-matrix */
 
     transition: filter .4s ease;
 }
 
-
-/* Verde mais profundo à noite, mas mais transparente */
 .matrix-night .leaflet-map-pane::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-
-    background:
-        rgba(0, 145, 65, .08);
-
+    background: rgba(0, 40, 20, .25); /* verde escuro, mais opaco que antes */
     z-index: 400;
+    mix-blend-mode: multiply; /* escurece sem lavar as vias */
 }
 
 
@@ -1741,9 +1737,9 @@ function finalizarNavegacao() {
     ultimaPosicaoMarcador = { lat: null, lng: null };
     posicaoSuavizadaGPS = { lat: null, lng: null };
     ultimaAtualizacaoCamera = 0;
-    zoomAtualEfetivo = 17;
+    zoomAtualEfetivo = 18;
     centroAtualEfetivo = { lat: null, lng: null };
-    zoomAlvo = 17;
+    zoomAlvo = 18;
     bearingAlvo = 0;
     bearingAtual = 0;
     bearingAlvoAnterior = null;
@@ -3190,40 +3186,66 @@ async function initMap() {
         showNotification("Erro de conexão. Os mapas não puderam carregar."); 
         return; 
     }
-    
-    map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
+    //=============================
+    // CONFIGURAÇÃO INICIAL DO MAPA
+    //=============================
+    map = L.map('map', {
+     center: [userLat, userLng],
+      zoom: 18,
+       zoomControl: false,
+        rotate: true,
+         bearing: 0 });
     if (typeof map.setBearing !== 'function') console.warn('[Radar X9] AVISO: leaflet-rotate pode não ter carregado.');
     aplicarTemaMapa();
     setInterval(aplicarTemaMapa, 300000);
     inicializarBussolaHardware();
 
-   // ==========================
+// ==========================
 // RECENTRALIZAR MAPA
 // ==========================
 
 let mapaCentralizado = true;
+let recentragemTimeout = null; // timer da recentragem automática
 
 const speedWidget = document.getElementById("speedWidget");
 const speedIcon = document.getElementById("speedIcon");
 
-// Função chamada APENAS quando o usuário arrasta o mapa com o mouse ou dedo
+// Função chamada quando o usuário arrasta o mapa com o mouse ou dedo
 function desativarCentralizacao(){
-    // Se o mapa já não está centralizado, não faz nada (evita processamento à toa)
-    if(!mapaCentralizado) return;
+    if (mapaCentralizado) {
+        console.log("ARRASTOU O MAPA - Desativando centralização");
+        mapaCentralizado = false;
 
-    console.log("ARRASTOU O MAPA - Desativando centralização");
-    mapaCentralizado = false;
+        // Troca o ícone para o botão de recentralizar
+        speedIcon.src = "/imagens_app/ic_recentralizar.png";
 
-    // Troca o ícone para o botão de recentralizar
-    speedIcon.src = "/imagens_app/ic_recentralizar.png";
-    
-    // Adiciona a classe visual (caso tenha animação de pulse no CSS)
-    speedWidget.classList.add("recentralizar");
+        // Adiciona a classe visual (caso tenha animação de pulse no CSS)
+        speedWidget.classList.add("recentralizar");
+    }
+
+    // Toda vez que o usuário arrasta, (re)inicia a contagem dos 5s.
+    // Se ele arrastar de novo antes do tempo acabar, o timer reinicia.
+    agendarRecentragemAutomatica();
 }
 
-// Função chamada quando o usuário clica no botão para voltar para o GPS
+// Agenda a recentralização automática após 5s sem novo arraste
+function agendarRecentragemAutomatica(){
+    if (recentragemTimeout) clearTimeout(recentragemTimeout);
+
+    recentragemTimeout = setTimeout(function () {
+        recentralizarMapa();
+    }, 5000);
+}
+
+// Função chamada quando o usuário clica no botão OU quando o timer de 5s dispara
 function recentralizarMapa(){
-    if(mapaCentralizado) return; // Já está centralizado, não faz nada
+    if (mapaCentralizado) return; // Já está centralizado, não faz nada
+
+    // Cancela qualquer timer pendente (evita chamada dupla se o botão for clicado antes do timeout)
+    if (recentragemTimeout) {
+        clearTimeout(recentragemTimeout);
+        recentragemTimeout = null;
+    }
 
     console.log("RECENTRALIZANDO MAPA");
     mapaCentralizado = true;
@@ -3240,24 +3262,21 @@ function recentralizarMapa(){
 
     // Troca o ícone de volta para o padrão
     speedIcon.src = "/imagens_app/ic_speed_limit.png";
-    
+
     // Remove a classe visual
     speedWidget.classList.remove("recentralizar");
 }
 
 // ==========================================
-// EVENTOS DO LEAFLT (APENAS ARRASTAR)
+// EVENTOS DO LEAFLET (APENAS ARRASTAR)
 // ==========================================
 
 // O usuário ARRASTOU o mapa com mouse ou toque
 map.on("dragstart", desativarCentralizacao);
 
-// (Removido: zoomstart e movestart para o ícone não ficar mudando sem querer)
-// (Removido: Lógica de retorno automático com setTimeout para respeitar o botão)
-
 // Clique no botão de recentralizar
 speedWidget.addEventListener("click", () => {
-    if(!mapaCentralizado){
+    if (!mapaCentralizado) {
         recentralizarMapa();
     }
 });
