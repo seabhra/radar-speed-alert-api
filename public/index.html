@@ -171,7 +171,7 @@ h1 span {
 .separador{
     color: #fff;
 } 
-/* Cores dos Alertas */
+/* Cores dos Alertas climaticos*/
 .alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
 .alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
 .alerta-seco   { background: rgba(255, 165, 0, 0.15); color: #ffcc00; border: 1px solid rgba(255, 165, 0, 0.3); }
@@ -182,6 +182,36 @@ h1 span {
     50% { opacity: 0.5; }
 }
 
+/* ALERTA DE NORMALIDADE */
+.alerta-normalidade-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 3px 12px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(0, 255, 136, 0.12);
+    color: #00ff88;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    animation: fadeInNormal 0.5s ease-out;
+}
+
+@keyframes fadeInNormal {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ALERTA DE POLUIÇÃO */
+.alerta-poluicao {
+    background: rgba(255, 68, 68, 0.15);
+    color: #ff4444;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    animation: piscarAlerta 1.5s infinite;
+}
 /* ======================== */
 /* GPS STATUS */
 /* ======================== */
@@ -675,6 +705,7 @@ h1 span {
 
         </div>
 
+
 <!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
 <div id="cidade-atual" class="cidade-label">
     <span id="nomeCidade">🚩 Local...</span>
@@ -682,19 +713,26 @@ h1 span {
 
     <span class="temp-value">
     🌡️ <span id="temperaturaAtual">Temp. °C</span>
-</span>
+    </span>
 
     <span class="separador">|</span>
 
-  <span class="label">💧</span>
-<span id="umidadeAtual">Umidade</span>
+    <span class="label">💧</span>
+    <span id="umidadeAtual">Umidade %</span>
+
+    <!-- NOVO: POLUIÇÃO DO AR -->
+    <span class="separador">|</span>
+    <span class="label">🌫️</span>
+    <span id="poluicaoAtual">Poluição %</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
+<div id="alerta-sound-climatico" class="alerta-clima-label" style="display: none;"></div>
 
-<div id="alerta-sound-clima" class="alerta-clima-label" style="display: none;"></div>
-
-
+<!-- NOVO: ALERTA DE NORMALIDADE (aparece quando o clima está normal) -->
+<div id="alerta-normalidade" class="alerta-normalidade-label" style="display: none;">
+    ✅ Clima normal. Aproveite o seu dia!
+</div>
     </div>
 
 
@@ -2190,69 +2228,51 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
     if (destinoAtual) verificarChegadaDestino();
 }
 
-//================================
-// FUNÇÃO INICIAR NAVEGAÇÃO GPS
-//================================
+//===========================================
+// FUNÇÃO INICIAR NAVEGAÇÃO GPS E CIDADE ATUAL
+//===========================================
 
-function startGPSTracking() {
-    if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
-    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-    watchId = navigator.geolocation.watchPosition(
-        function(position) {
-            if (gpsSource !== 'appinventor') gpsSource = 'browser';
-            var speedKmh = 0;
-            if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
-            processarNovaPosicao(position.coords.latitude, position.coords.longitude, speedKmh, position.coords.heading, position.coords.accuracy);
-        }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
-
-        
-    );
-    browserGpsTimeout = setTimeout(function() {
-        if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); }
-    }, 8000);
-}
-
-//================================
-// FUNÇÃO GPS CIDADE ATUAL 
-//================================
 
 const cidadeLabel = document.getElementById("cidade-atual");
 
 let ultimaCidade = "";
-
 function startGPSTracking() {
-
     if (!navigator.geolocation) { 
         hideFullscreenLoading(); 
         showNotification("GPS não suportado."); 
         return; 
     }
-
+    
     if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
     }
 
+    // MOSTRA ALERTA DE NORMALIDADE AO INICIAR O GPS
+    setTimeout(() => {
+        const alertaNormalDiv = document.getElementById('alerta-normalidade');
+        if (alertaNormalDiv) {
+            alertaNormalDiv.style.display = 'flex';
+            alertaNormalDiv.innerHTML = '🔄 Aguardando dados do clima...';
+            setTimeout(() => {
+                alertaNormalDiv.style.display = 'none';
+            }, 3000);
+        }
+    }, 500);
+
     watchId = navigator.geolocation.watchPosition(
-
         function(position) {
-
             if (gpsSource !== 'appinventor') {
                 gpsSource = 'browser';
             }
 
             var speedKmh = 0;
-
             if (position.coords.speed !== null && position.coords.speed >= 0) {
                 speedKmh = Math.round(position.coords.speed * 3.6);
             }
 
-
-            // ATUALIZA CIDADE AQUI
-            atualizarCidade(
-                position.coords.latitude,
-                position.coords.longitude
-            );
-
+            // ATUALIZA CIDADE E CLIMA
+            atualizarCidade(position.coords.latitude, position.coords.longitude);
+            atualizarTemperatura(); // Chama a função que busca clima + poluição
 
             processarNovaPosicao(
                 position.coords.latitude,
@@ -2262,29 +2282,21 @@ function startGPSTracking() {
                 position.coords.accuracy
             );
 
-
         }, 
-
         showError, 
-
         { 
             enableHighAccuracy: true,
             maximumAge: 1000,
-           timeout: 10000
+            timeout: 10000
         }
-
     );
 
-
     browserGpsTimeout = setTimeout(function() {
-
         if (!gpsInitialized && gpsSource === 'none') { 
             showNotification("Aguardando GPS do app..."); 
             hideFullscreenLoading(); 
         }
-
     }, 8000);
-
 }
 
 //=====================================
@@ -2435,55 +2447,153 @@ navigator.geolocation.getCurrentPosition(async(pos)=>{
 });
 
 
-//============================================
-// FUNÇÃO ATUALIZAR TEMPERATURA E UMIDADE LOCAL
-//============================================
+
+//================================================
+// FUNÇÃO ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
+//================================================
 
 async function atualizarTemperatura() {
-
     if (!userLat || !userLng) return;
 
-    try{
-        // COLOQUE SUA CHAVE DA OPENWEATHERMAP ABAIXO (Substitua o texto)
-        const API_KEY = 'a5c507ef270b147035538e0d6019bce1'; 
+    try {
+        const API_KEY = 'a5c507ef270b147035538e0d6019bce1';
         
-        // units=metric garante que venha em Celsius. lang=pt_br traz as descrições em português.
-        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
-
-        const resposta = await fetch(url);
+        // ==========================================
+        // 1. BUSCA DADOS DE CLIMA (Temperatura + Umidade)
+        // ==========================================
+        const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
+        const respostaClima = await fetch(urlClima);
         
-        // Se a chave estiver errada ou expirada, vai cair no catch
-        if (!resposta.ok) throw new Error('Erro na API de clima: ' + resposta.status);
+        if (!respostaClima.ok) throw new Error('Erro na API de clima: ' + respostaClima.status);
+        const dadosClima = await respostaClima.json();
 
-        const dados = await resposta.json();
+        const temperatura = dadosClima.main.temp;
+        const umidade = dadosClima.main.humidity;
 
-        // A OpenWeatherMap organiza temperatura e umidade dentro de "main"
-        const temperatura = dados.main.temp;
-        const umidade = dados.main.humidity;
-
-        // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
+        // Atualiza temperatura
         document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
         
-       
-        // Verifica se a umidade veio da API
-        console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
+        // Atualiza umidade
+        if (umidade !== undefined && umidade !== null) {
+            document.getElementById('umidadeAtual').textContent = umidade + '%';
+        } else {
+            document.getElementById('umidadeAtual').textContent = 'N/A';
+            console.warn("A API não retornou o valor de umidade.");
+        }
 
-       if (umidade !== undefined && umidade !== null) {
-    document.getElementById('umidadeAtual').textContent = umidade + '%';
-    
-       } else {
-    document.getElementById('umidadeAtual').textContent = 'N/A';
-    console.warn("A API não retornou o valor de umidade.");
-}
-        posicionarTemperatura(temperatura);
+        // ==========================================
+        // 2. BUSCA POLUIÇÃO DO AR (AQI)
+        // ==========================================
+        try {
+            const urlPoluicao = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${userLat}&lon=${userLng}&appid=${API_KEY}`;
+            const respostaPoluicao = await fetch(urlPoluicao);
+            
+            if (respostaPoluicao.ok) {
+                const dadosPoluicao = await respostaPoluicao.json();
+                const aqi = dadosPoluicao.list[0].main.aqi; // 1 a 5
+                
+                // Mapeia o AQI para texto e cor
+                const mapaAQI = {
+                    1: { texto: 'Boa 😊', cor: '#00ff88' },
+                    2: { texto: 'Moderada 😌', cor: '#ffcc00' },
+                    3: { texto: 'Ruim 😷', cor: '#ff8800' },
+                    4: { texto: 'Muito Ruim 🤢', cor: '#ff4444' },
+                    5: { texto: 'Péssima 😱', cor: '#cc0000' }
+                };
+                
+                const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
+                const poluicaoEl = document.getElementById('poluicaoAtual');
+                poluicaoEl.textContent = infoPoluicao.texto;
+                poluicaoEl.style.color = infoPoluicao.cor;
+                
+                console.log(`🌫️ Poluição do ar: AQI ${aqi} - ${infoPoluicao.texto}`);
+                
+                // Verifica se há alerta de poluição
+                verificarAlertaPoluicao(aqi);
+            } else {
+                document.getElementById('poluicaoAtual').textContent = 'N/A';
+                document.getElementById('poluicaoAtual').style.color = '#888';
+            }
+        } catch (e) {
+            console.warn('Erro ao buscar poluição:', e);
+            document.getElementById('poluicaoAtual').textContent = 'N/A';
+            document.getElementById('poluicaoAtual').style.color = '#888';
+        }
+
+        // ==========================================
+        // 3. VERIFICA ALERTAS DE CLIMA
+        // ==========================================
+        verificarAlertasClima(temperatura, umidade);
         
-        // Chama a verificação de alerta de clima
-        verificarAlertasClima();
+        // ==========================================
+        // 4. VERIFICA SE O CLIMA ESTÁ NORMAL
+        // ==========================================
+        verificarClimaNormal(temperatura, umidade);
 
-    }catch(e){
+    } catch(e) {
         console.error("Erro clima:", e);
     }
+}
 
+// =============================================
+// VERIFICAR ALERTA DE POLUIÇÃO
+// =============================================
+function verificarAlertaPoluicao(aqi) {
+    const alertaDiv = document.getElementById('alerta-sound-climatico');
+    
+    // Se não tem alerta de clima ativo, pode mostrar o de poluição
+    if (alertaDiv.style.display === 'none' || alertaDiv.style.display === '') {
+        if (aqi >= 4) { // Muito Ruim ou Péssima
+            alertaDiv.style.display = 'flex';
+            alertaDiv.className = 'alerta-clima-label alerta-poluicao';
+            alertaDiv.innerHTML = `🌫️ ATENÇÃO: Qualidade do Ar ${aqi >= 5 ? 'PÉSSIMA!' : 'MUITO RUIM!'}`;
+            alertaDiv.classList.add('alerta-poluicao');
+            
+            // Toca som de alerta
+            if (alertaAtivoAtual !== 'poluicao') {
+                somAlerta.play().catch(e => console.log("Aguardando interação..."));
+                alertaAtivoAtual = 'poluicao';
+            }
+        } else {
+            // Remove alerta de poluição se o AQI melhorou
+            if (alertaAtivoAtual === 'poluicao') {
+                alertaDiv.style.display = 'none';
+                alertaAtivoAtual = '';
+            }
+        }
+    }
+}
+// =============================================
+// VERIFICAR SE O CLIMA ESTÁ NORMAL (ALERTA POSITIVO)
+// =============================================
+function verificarClimaNormal(temp, umid) {
+    const alertaNormalDiv = document.getElementById('alerta-normalidade');
+    const alertaClimaDiv = document.getElementById('alerta-sound-climatico');
+    
+    // Verifica se NÃO há alertas ativos
+    const semAlertas = 
+        !(temp >= 40 || temp <= 5 || umid <= 20);
+    
+    // Verifica se a poluição está boa (AQI 1 ou 2)
+    const poluicaoEl = document.getElementById('poluicaoAtual');
+    const textoPoluicao = poluicaoEl.textContent;
+    const poluicaoBoa = textoPoluicao === 'Boa 😊' || textoPoluicao === 'Moderada 😌';
+    
+    // Se o clima está normal E a poluição está boa
+    if (semAlertas && poluicaoBoa && alertaClimaDiv.style.display !== 'flex') {
+        alertaNormalDiv.style.display = 'flex';
+        alertaNormalDiv.innerHTML = '✅ Clima normal. Aproveite o dia!';
+        
+        // Mostra por 10 segundos e depois some
+        setTimeout(() => {
+            alertaNormalDiv.style.display = 'none';
+        }, 10000);
+    } else {
+        // Esconde o alerta de normalidade se houver alertas ativos
+        if (alertaClimaDiv.style.display === 'flex') {
+            alertaNormalDiv.style.display = 'none';
+        }
+    }
 }
 //=====================================
 // FUNÇÃO POSIONAR TEMPERATURA LOCAL
@@ -2505,26 +2615,26 @@ function posicionarTemperatura(temp){
 
 }
 
- // =======================================================
+
+
+// =======================================================
 // SISTEMA DE ALERTA DE CLIMA (Umidade e Temperatura)
 // =======================================================
 
-// Configuração do Som (Coloque o caminho do seu arquivo de áudio aqui)
-const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3'); // <-- Troque 'alerta.mp3' pelo som que você quer
+const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3');
 somAlerta.volume = 0.5;
 
-let alertaAtivoAtual = ''; // Evita que o som toque em loop
+let alertaAtivoAtual = '';
 
-function verificarAlertasClima() {
-    // Pega os valores que JÁ ESTÃO na tela (colocados pelo seu código de API)
-    const tempTexto = document.getElementById('temperaturaAtual').textContent;
-    const umidTexto = document.getElementById('umidadeAtual').textContent;
+function verificarAlertasClima(temp, umid) {
+    // Se os parâmetros não foram passados, busca do DOM
+    if (temp === undefined || umid === undefined) {
+        const tempTexto = document.getElementById('temperaturaAtual').textContent;
+        const umidTexto = document.getElementById('umidadeAtual').textContent;
+        temp = parseFloat(tempTexto.replace(/[^0-9.-]/g, ''));
+        umid = parseFloat(umidTexto.replace(/[^0-9.-]/g, ''));
+    }
     
-    // Extrai apenas os números (removendo °C, %, emojis, etc)
-    const temp = parseFloat(tempTexto.replace(/[^0-9.-]/g, ''));
-    const umid = parseFloat(umidTexto.replace(/[^0-9.-]/g, ''));
-    
-    // Se não conseguir ler números, sai da função
     if (isNaN(temp) || isNaN(umid)) return;
 
     const alertaDiv = document.getElementById('alerta-sound-climatico');
@@ -2533,37 +2643,38 @@ function verificarAlertasClima() {
     // Limpa classes anteriores
     alertaDiv.className = 'alerta-clima-label';
 
-    // Condição 1: Calor Extremo (Acima de 40°C - ajuste o valor como achar melhor)
+    // Condição 1: Calor Extremo
     if (temp >= 40) {
         novoAlerta = 'quente';
         alertaDiv.innerHTML = '🔥 ALERTA: Temperatura Extrema!';
         alertaDiv.classList.add('alerta-quente');
     } 
-    // Condição 2: Frio Extremo (Abaixo de 5°C - ajuste o valor como achar melhor)
+    // Condição 2: Frio Extremo
     else if (temp <= 5) {
         novoAlerta = 'frio';
         alertaDiv.innerHTML = '❄️ ALERTA: Frio Extremo!';
         alertaDiv.classList.add('alerta-frio');
     } 
-    // Condição 3: Umidade Baixa (Abaixo de 20% - ajuste o valor como achar melhor)
+    // Condição 3: Umidade Baixa
     else if (umid <= 20) {
         novoAlerta = 'seco';
         alertaDiv.innerHTML = '🏜️ ATENÇÃO: Umidade do Ar Baixa!';
         alertaDiv.classList.add('alerta-seco');
+    } else {
+        // Se não há alertas, esconde o alerta
+        alertaDiv.style.display = 'none';
+        alertaAtivoAtual = '';
+        return;
     }
 
     // Mostra o alerta e toca o som
     if (novoAlerta !== '') {
         alertaDiv.style.display = 'flex';
         
-        // Toca o som apenas UMA VEZ quando o alerta aparece (não fica tocando sem parar)
         if (novoAlerta !== alertaAtivoAtual) {
-            somAlerta.play().catch(e => console.log("Aguardando interação do usuário para tocar o som."));
+            somAlerta.play().catch(e => console.log("Aguardando interação..."));
             alertaAtivoAtual = novoAlerta;
         }
-    } else {
-        alertaDiv.style.display = 'none';
-        alertaAtivoAtual = ''; // Reseta se o clima estiver normal
     }
 }
 
