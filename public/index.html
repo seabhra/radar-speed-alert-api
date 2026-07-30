@@ -1722,6 +1722,7 @@ function verificarChegadaDestino() {
         setTimeout(function() { finalizarNavegacao(); }, 4000);
     }
 }
+//FUNÇÃO FINALIZAR NAVEGAÇÃO
 
 function finalizarNavegacao() {
     if (!map) return;
@@ -1758,16 +1759,10 @@ function finalizarNavegacao() {
     var rb = document.getElementById('btn-rotate-map');
     if (rb) rb.classList.remove('rotated');
     
-     // Ícone volta a ser o NAVEGADOR ao finalizar navegação
-    var defaultIcon = L.divIcon({
-        html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',    
-        className: 'user-gps-marker',
-        iconSize: [50, 50],
-        iconAnchor: [25, 50],
-        popupAnchor: [0, -50]
-    });
-    userMarker = L.marker([userLat, userLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-    userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+    // VOLTA PARA O ÍCONE DE NAVEGADOR
+    if (userLat && userLng) {
+        atualizarMarcadorUsuario(userLat, userLng, 'navegador');
+    }
     
     var sidebar = document.getElementById('sidebar-controls');
     var btnMenu = document.getElementById('btn-menu-toggle');
