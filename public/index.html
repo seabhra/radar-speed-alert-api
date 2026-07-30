@@ -1918,8 +1918,11 @@ function resetarMapa() {
     map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
     isFollowing = false;
     
-    // VOLTA O ÍCONE PARA NAVEGADOR AO RESETAR O MAPA
+    // REMOVE E RECRIA O MARCADOR COM ÍCONE DE NAVEGADOR
     if (!estaEmNavegacao && userMarker) {
+        var pos = userMarker.getLatLng();
+        map.removeLayer(userMarker);
+        
         var navIcon = L.divIcon({
             html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
             className: 'user-gps-marker',
@@ -1927,7 +1930,12 @@ function resetarMapa() {
             iconAnchor: [25, 50],
             popupAnchor: [0, -50]
         });
-        userMarker.setIcon(navIcon);
+        
+        userMarker = L.marker([pos.lat, pos.lng], { 
+            icon: navIcon, 
+            zIndexOffset: 1000 
+        }).addTo(map);
+        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
         iconeCentralizado = false;
     }
     
@@ -1947,6 +1955,7 @@ function resetarMapa() {
     showNotification("Mapa resetado");
     historicoDistanciasRadar = {};
 }
+// FUNÇÃO EXTRAIR COORDENADAS
 
 function extrairCoordenadas(record, index) {
     if (!record || record.length < 9) return null;
@@ -2139,7 +2148,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 
 } else if (!estaEmNavegacao) {
     if (!userMarker) {
-        // Ícone inicial - usa ic_navigator_map.png (SEMPRE)
+        // Cria o marcador inicial com ícone de navegador
         var defaultIcon = L.divIcon({
             html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
             className: 'user-gps-marker',
@@ -2150,30 +2159,18 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
         userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
         userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
         ultimaPosicaoMarcador = { lat: smoothLat, lng: smoothLng };
-        iconeCentralizado = false; // Inicia com ícone de navegador
+        iconeCentralizado = false;
         
         if (!gpsInitialized) {
             gpsInitialized = true;
             hideFullscreenLoading();
         }
     } else {
-        // Se o ícone NÃO está centralizado, mantém o ícone de navegador
-        // Se está centralizado, mantém o ícone de GPS
-        if (!iconeCentralizado) {
-            // Mantém o ícone de navegador (navegando)
-            var navIcon = L.divIcon({
-                html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
-                className: 'user-gps-marker',
-                iconSize: [50, 50],
-                iconAnchor: [25, 50],
-                popupAnchor: [0, -50]
-            });
-            userMarker.setIcon(navIcon);
-        }
-        // Se iconeCentralizado = true, NÃO faz nada (mantém o ícone de GPS)
+        // Atualiza a posição do marcador SEM recriar
         moverMarcadorSuavemente(smoothLat, smoothLng);
     }
 }
+// VERIFICAÇÃO DE DESTINO, ROTA E NAVEGAÇÃO
 
     if (destinoAtual && routingControl && estaEmNavegacao) {
         if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
@@ -3383,44 +3380,63 @@ speedWidget.addEventListener("click", () => {
     });
 
      // BOTÃO CENTRALIZAR TROCA O ÍCONE PARA O GPS MARKER AO CENTRALIZAR
-
- $("#btn-center").click(function() {
+$("#btn-center").click(function() {
     fecharTodasBarras(); 
     isFollowing = true;
-    var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
     
-    if (marcadorAtivo) {
-        // Centraliza o mapa na posição atual
-        map.flyTo(marcadorAtivo.getLatLng(), 17, { duration: 0.5 });
-        showNotification("Centralizando na sua posição");
-        
-        // TROCA O ÍCONE PARA O GPS MARKER AO CENTRALIZAR
-        if (!estaEmNavegacao && userMarker) {
-            var gpsIcon = L.divIcon({
-                html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-                className: 'user-gps-marker',
-                iconSize: [50, 50],
-                iconAnchor: [25, 50],
-                popupAnchor: [0, -50]
-            });
-            userMarker.setIcon(gpsIcon);
-            iconeCentralizado = true; // Marca que está com ícone de GPS
-            console.log("🔄 Ícone alterado para GPS MARKER (centralizado)");
-        }
-    } else {
+    if (!userMarker) {
         showNotification("Aguardando sinal GPS...");
+        return;
+    }
+    
+    // Centraliza o mapa na posição atual
+    map.flyTo(userMarker.getLatLng(), 17, { duration: 0.5 });
+    showNotification("Centralizando na sua posição");
+    
+    // REMOVE O MARCADOR ANTES DE ADICIONAR O NOVO
+    if (!estaEmNavegacao && userMarker) {
+        // Guarda a posição atual
+        var pos = userMarker.getLatLng();
+        
+        // Remove o marcador antigo
+        map.removeLayer(userMarker);
+        
+        // Cria um NOVO marcador com o ícone GPS
+        var gpsIcon = L.divIcon({
+            html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+            className: 'user-gps-marker',
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
+        });
+        
+        userMarker = L.marker([pos.lat, pos.lng], { 
+            icon: gpsIcon, 
+            zIndexOffset: 1000 
+        }).addTo(map);
+        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+        
+        iconeCentralizado = true;
+        console.log("🔄 Ícone alterado para GPS MARKER (centralizado)");
     }
 });
 
 
     // BOTÃO REFRESH 
 
-    $("#btn-refresh").click(function() { 
+$("#btn-refresh").click(function() { 
     resetarMapa(); 
     carregarRadares(); 
     
-    // VOLTA O ÍCONE PARA NAVEGADOR
+    // REMOVE E RECRIA O MARCADOR COM ÍCONE DE NAVEGADOR
     if (!estaEmNavegacao && userMarker) {
+        // Guarda a posição atual
+        var pos = userMarker.getLatLng();
+        
+        // Remove o marcador antigo
+        map.removeLayer(userMarker);
+        
+        // Cria um NOVO marcador com o ícone de navegador
         var navIcon = L.divIcon({
             html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
             className: 'user-gps-marker',
@@ -3428,8 +3444,14 @@ speedWidget.addEventListener("click", () => {
             iconAnchor: [25, 50],
             popupAnchor: [0, -50]
         });
-        userMarker.setIcon(navIcon);
-        iconeCentralizado = false; // Volta ao estado inicial
+        
+        userMarker = L.marker([pos.lat, pos.lng], { 
+            icon: navIcon, 
+            zIndexOffset: 1000 
+        }).addTo(map);
+        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+        
+        iconeCentralizado = false;
         console.log("🔄 Ícone voltou para NAVIGATOR MAP (refresh)");
     }
 });
