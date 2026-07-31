@@ -2177,7 +2177,8 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
             hideFullscreenLoading();
         }
 
-// Dentro de processarNovaPosicao, substitua esta parte:
+
+// Dentro de processarNovaPosicao, na parte do else if (!estaEmNavegacao)
 
 } else if (!estaEmNavegacao) {
     if (!userMarker) {
@@ -2199,11 +2200,44 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
             hideFullscreenLoading();
         }
     } else {
-        // Atualiza a posição do marcador SEM recriar
+        // =============================================
+        // [NOVA LÓGICA] Se está em movimento e o ícone está como GPS, volta para NAVEGADOR
+        // =============================================
+        if (iconeCentralizado && speedKmh > 3) { // velocidade > 3 km/h = em movimento
+            console.log("🚶 Usuário em movimento - voltando para ícone de navegador");
+            
+            // Guarda a posição atual
+            var pos = userMarker.getLatLng();
+            
+            // Remove o marcador antigo
+            map.removeLayer(userMarker);
+            
+            // Cria um NOVO marcador com o ícone de NAVEGADOR
+            var navIcon = L.divIcon({
+                html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
+                className: 'user-gps-marker',
+                iconSize: [50, 50],
+                iconAnchor: [25, 50],
+                popupAnchor: [0, -50]
+            });
+            
+            userMarker = L.marker([pos.lat, pos.lng], { 
+                icon: navIcon, 
+                zIndexOffset: 1000 
+            }).addTo(map);
+            userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+            
+            iconeCentralizado = false;
+            showNotification("🧭 Modo navegação ativado");
+        }
+        
+        // Atualiza a posição do marcador
         moverMarcadorSuavemente(smoothLat, smoothLng);
     }
 }
+//=========================================
 // VERIFICAÇÃO DE DESTINO, ROTA E NAVEGAÇÃO
+//=========================================
 
     if (destinoAtual && routingControl && estaEmNavegacao) {
         if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
@@ -2494,11 +2528,11 @@ async function atualizarTemperatura() {
                 
                 // Mapeia o AQI para texto e cor
                 const mapaAQI = {
-                    1: { texto: 'Boa 😊', cor: '#00ff88' },
-                    2: { texto: 'Moderada 😌', cor: '#ffcc00' },
-                    3: { texto: 'Ruim 😷', cor: '#ff8800' },
-                    4: { texto: 'Muito Ruim 🤢', cor: '#ff4444' },
-                    5: { texto: 'Péssima 😱', cor: '#cc0000' }
+                    1: { texto: 'Boa', cor: '#00ff88' },
+                    2: { texto: 'Moderada', cor: '#ffcc00' },
+                    3: { texto: 'Ruim', cor: '#ff8800' },
+                    4: { texto: 'Muito Ruim', cor: '#ff4444' },
+                    5: { texto: 'Péssima', cor: '#cc0000' }
                 };
                 
                 const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
@@ -3496,7 +3530,7 @@ $("#btn-center").click(function() {
     }
     
     // Centraliza o mapa na posição atual
-    map.flyTo(userMarker.getLatLng(), 17, { duration: 0.5 });
+    map.flyTo(userMarker.getLatLng(), 18, { duration: 0.5 });
     showNotification("Centralizando na sua posição");
     
     // REMOVE O MARCADOR ANTES DE ADICIONAR O NOVO
