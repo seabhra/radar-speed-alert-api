@@ -3599,28 +3599,7 @@ $("#btn-center").click(function() {
     }
 });
 
-//=============================
-// FUNÇÃO VOLTAR ICONE ANTERIOR
-//=============================
-let timeoutVoltarNavegador = null;
 
-function agendarVoltaNavegador() {
-    // Cancela o timeout anterior se existir
-    if (timeoutVoltarNavegador) {
-        clearTimeout(timeoutVoltarNavegador);
-        timeoutVoltarNavegador = null;
-    }
-    
-    // Se estiver parado por 30 segundos, volta para navegador
-    timeoutVoltarNavegador = setTimeout(() => {
-        if (!estaEmNavegacao && userMarker && !iconeCentralizado) {
-            console.log("⏱️ 30 segundos parado - voltando para ícone de navegador");
-            atualizarMarcadorUsuario(userLat, userLng, 'navegador');
-            iconeCentralizado = false;
-        }
-        timeoutVoltarNavegador = null;
-    }, 30000);
-}
 
 // =============================================
 // VERIFICAR SE O USUÁRIO ESTÁ EM MOVIMENTO
@@ -3660,7 +3639,6 @@ function verificarMovimentoUsuario(lat, lng) {
 $("#btn-refresh").click(function() { 
     resetarMapa(); 
     carregarRadares(); 
-    
     
     // REMOVE E RECRIA O MARCADOR COM ÍCONE DE NAVEGADOR
     if (!estaEmNavegacao && userMarker) {
