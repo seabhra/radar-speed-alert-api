@@ -2176,44 +2176,35 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
             gpsInitialized = true;
             hideFullscreenLoading();
         }
-//==============================
-// Dentro de processarNovaPosicao
-//==============================
+
+// Dentro de processarNovaPosicao, substitua esta parte:
 
 } else if (!estaEmNavegacao) {
-    // VERIFICA SE O USUÁRIO ESTÁ EM MOVIMENTO
-    const estaEmMovimento = verificarMovimentoUsuario(smoothLat, smoothLng);
-    
     if (!userMarker) {
         // Cria o marcador inicial com ícone de navegador
-        atualizarMarcadorUsuario(smoothLat, smoothLng, 'navegador');
+        var defaultIcon = L.divIcon({
+            html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
+            className: 'user-gps-marker',
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
+        });
+        userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
+        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
         ultimaPosicaoMarcador = { lat: smoothLat, lng: smoothLng };
+        iconeCentralizado = false;
         
         if (!gpsInitialized) {
             gpsInitialized = true;
             hideFullscreenLoading();
         }
     } else {
-        // SE ESTÁ EM MOVIMENTO E O ÍCONE ESTÁ CENTRALIZADO (GPS), MUDA PARA NAVEGADOR
-        if (estaEmMovimento && iconeCentralizado) {
-            console.log("🚶 Usuário em movimento - mudando para ícone de navegador");
-            atualizarMarcadorUsuario(smoothLat, smoothLng, 'navegador');
-            iconeCentralizado = false;
-            showNotification("🧭 Modo navegação ativado");
-        }
-        
-        // Atualiza a posição do marcador
-        if (map.hasLayer(userMarker)) {
-            moverMarcadorSuavemente(smoothLat, smoothLng);
-        } else {
-            var tipoIcone = iconeCentralizado ? 'gps' : 'navegador';
-            atualizarMarcadorUsuario(smoothLat, smoothLng, tipoIcone);
-        }
+        // Atualiza a posição do marcador SEM recriar
+        moverMarcadorSuavemente(smoothLat, smoothLng);
     }
 }
-//=========================================
 // VERIFICAÇÃO DE DESTINO, ROTA E NAVEGAÇÃO
-//=========================================
+
     if (destinoAtual && routingControl && estaEmNavegacao) {
         if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
             atualizarRota();
@@ -2603,39 +2594,6 @@ function verificarClimaNormal(temp, umid) {
             alertaNormalDiv.style.display = 'none';
         }
     }
-}
-
-// =============================================
-// VERIFICAR SE O USUÁRIO ESTÁ EM MOVIMENTO
-// =============================================
-let ultimaPosicaoMovimento = { lat: null, lng: null, tempo: Date.now() };
-let tempoUltimoMovimento = Date.now();
-
-function verificarMovimentoUsuario(lat, lng) {
-    const agora = Date.now();
-    const tempoDecorrido = (agora - tempoUltimoMovimento) / 1000; // em segundos
-    
-    // Se tem uma posição anterior, calcula a distância
-    if (ultimaPosicaoMovimento.lat !== null && ultimaPosicaoMovimento.lng !== null) {
-        const distancia = calcularDistancia(
-            ultimaPosicaoMovimento.lat, 
-            ultimaPosicaoMovimento.lng, 
-            lat, 
-            lng
-        );
-        
-        // Se percorreu mais de 5 metros em menos de 5 segundos, está em movimento
-        if (distancia > 5 && tempoDecorrido < 5) {
-            tempoUltimoMovimento = agora;
-            ultimaPosicaoMovimento = { lat: lat, lng: lng };
-            return true; // Está em movimento
-        }
-    }
-    
-    // Atualiza a última posição
-    ultimaPosicaoMovimento = { lat: lat, lng: lng };
-    tempoUltimoMovimento = agora;
-    return false; // Está parado
 }
 //=====================================
 // FUNÇÃO POSIONAR TEMPERATURA LOCAL
@@ -3526,9 +3484,8 @@ speedWidget.addEventListener("click", () => {
         setTimeout(function() { $("#route-query").focus(); }, 300);
         ajustarBussolaParaBusca(true);
     });
-   //==================================================================
-// BOTÃO CENTRALIZAR - TROCA O ÍCONE PARA GPS MARKER SE ESTIVER PARADO
-//==================================================================
+
+     // BOTÃO CENTRALIZAR TROCA O ÍCONE PARA O GPS MARKER AO CENTRALIZAR
 $("#btn-center").click(function() {
     fecharTodasBarras(); 
     isFollowing = true;
@@ -3538,43 +3495,14 @@ $("#btn-center").click(function() {
         return;
     }
     
-    // Guarda a posição atual do marcador
-    var pos = userMarker.getLatLng();
-    
-    // VERIFICA SE O USUÁRIO ESTÁ EM MOVIMENTO
-    const emMovimento = verificarMovimentoUsuario(pos.lat, pos.lng);
-    
     // Centraliza o mapa na posição atual
-    map.flyTo([pos.lat, pos.lng], 17, { duration: 0.5 });
+    map.flyTo(userMarker.getLatLng(), 17, { duration: 0.5 });
+    showNotification("Centralizando na sua posição");
     
-    // SE ESTIVER EM MOVIMENTO, MANTÉM O ÍCONE DE NAVEGADOR
-    if (emMovimento) {
-        showNotification("🧭 Você está em movimento, mantendo modo navegação");
-        
-        // Remove o marcador antigo
-        map.removeLayer(userMarker);
-        
-        // Cria um NOVO marcador com o ícone de NAVEGADOR
-        var navIcon = L.divIcon({
-            html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
-            className: 'user-gps-marker',
-            iconSize: [50, 50],
-            iconAnchor: [25, 50],
-            popupAnchor: [0, -50]
-        });
-        
-        userMarker = L.marker([pos.lat, pos.lng], { 
-            icon: navIcon, 
-            zIndexOffset: 1000 
-        }).addTo(map);
-        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
-        
-        iconeCentralizado = false;
-        console.log("🧭 Ícone mantido como NAVEGADOR (usuário em movimento)");
-        
-    } else {
-        // ESTÁ PARADO - MUDA PARA ÍCONE GPS MARKER
-        showNotification("📍 Centralizando na sua posição");
+    // REMOVE O MARCADOR ANTES DE ADICIONAR O NOVO
+    if (!estaEmNavegacao && userMarker) {
+        // Guarda a posição atual
+        var pos = userMarker.getLatLng();
         
         // Remove o marcador antigo
         map.removeLayer(userMarker);
@@ -3595,44 +3523,10 @@ $("#btn-center").click(function() {
         userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
         
         iconeCentralizado = true;
-        console.log("🔄 Ícone alterado para GPS MARKER (centralizado - usuário parado)");
+        console.log("🔄 Ícone alterado para GPS MARKER (centralizado)");
     }
 });
 
-
-
-// =============================================
-// VERIFICAR SE O USUÁRIO ESTÁ EM MOVIMENTO
-// =============================================
-let ultimaPosicaoMovimento = { lat: null, lng: null, tempo: Date.now() };
-let tempoUltimoMovimento = Date.now();
-
-function verificarMovimentoUsuario(lat, lng) {
-    const agora = Date.now();
-    const tempoDecorrido = (agora - tempoUltimoMovimento) / 1000; // em segundos
-    
-    // Se tem uma posição anterior, calcula a distância
-    if (ultimaPosicaoMovimento.lat !== null && ultimaPosicaoMovimento.lng !== null) {
-        const distancia = calcularDistancia(
-            ultimaPosicaoMovimento.lat, 
-            ultimaPosicaoMovimento.lng, 
-            lat, 
-            lng
-        );
-        
-        // Se percorreu mais de 5 metros em menos de 5 segundos, está em movimento
-        if (distancia > 5 && tempoDecorrido < 5) {
-            tempoUltimoMovimento = agora;
-            ultimaPosicaoMovimento = { lat: lat, lng: lng };
-            return true; // Está em movimento
-        }
-    }
-    
-    // Atualiza a última posição
-    ultimaPosicaoMovimento = { lat: lat, lng: lng };
-    tempoUltimoMovimento = agora;
-    return false; // Está parado
-}
 
     // BOTÃO REFRESH 
 
