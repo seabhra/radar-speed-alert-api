@@ -132,8 +132,9 @@ h1 span {
     color: var(--accent-color);
 }
 
+
 /* ======================================== */
-/* CIDADE / CLIMA - NOME DA CIDADE NÃO ABREVIA */
+/* CIDADE / CLIMA */
 /* ======================================== */
 .cidade-label {
     display: flex;
@@ -168,11 +169,12 @@ h1 span {
     font-size: 12px;
 }
 
-/* DADOS CLIMÁTICOS - PODEM SER ABREVIADOS */
+/* DADOS CLIMÁTICOS */
 #temperaturaAtual,
 #umidadeAtual,
 #poluicaoAtual {
     font-size: 11px;
+    transition: all 0.3s ease;
 }
 
 /* ======================================== */
@@ -353,8 +355,9 @@ h1 span {
     margin-top: 2px;
 }
 
+
 /* ======================================== */
-/* RESPONSIVO - TELAS PEQUENAS (celular) */
+/* RESPONSIVO - APP (TELAS PEQUENAS) */
 /* ======================================== */
 @media (max-width: 600px) {
     header {
@@ -393,7 +396,7 @@ h1 span {
         letter-spacing: 0.3px;
     }
 
-    /* DADOS CLIMÁTICOS - ABREVIADOS */
+    /* APP - TEXTO ABREVIADO */
     .cidade-label {
         font-size: 10px;
         gap: 2px;
@@ -403,13 +406,15 @@ h1 span {
         font-size: 8px;
     }
     
+    /* ABREVIA OS TEXTOS NO APP */
     #temperaturaAtual {
         font-size: 9px;
     }
     
+        
     #umidadeAtual {
         font-size: 9px;
-        display: inline-block; /* GARANTE QUE APARECE */
+        display: inline-block;
     }
     
     #poluicaoAtual {
@@ -419,9 +424,6 @@ h1 span {
     .cidade-label .separador {
         margin: 0 1px;
     }
-
-    /* NÃO ESCONDE MAIS A UMIDADE */
-    /* REMOVIDO: #umidadeAtual { display: none; } */
 
     /* MENU TOGGLE MENOR */
     .btn-menu-toggle {
@@ -453,7 +455,7 @@ h1 span {
 }
 
 /* ======================================== */
-/* TELAS MUITO PEQUENAS (ex: celular antigo) */
+/* TELAS MUITO PEQUENAS */
 /* ======================================== */
 @media (max-width: 400px) {
     h1 {
@@ -464,7 +466,6 @@ h1 span {
         display: none;
     }
     
-    /* NOME DA CIDADE - NUNCA ABREVIA */
     #nomeCidade {
         font-size: 9px;
         max-width: 70px;
@@ -487,7 +488,6 @@ h1 span {
         font-size: 8px;
     }
     
-    /* ESCONDE APENAS OS LABELS EM TELAS MUITO PEQUENAS */
     .cidade-label .label {
         display: none;
     }
@@ -500,7 +500,7 @@ h1 span {
 }
 
 /* ======================================== */
-/* TABLET E TELAS GRANDES - MOSTRA TUDO */
+/* TABLET E TELAS GRANDES - TEXTO POR EXTENSO */
 /* ======================================== */
 @media (min-width: 601px) {
     .cidade-label {
@@ -522,6 +522,7 @@ h1 span {
         font-size: 12px;
     }
 }
+
 
 /* ======================================== */
 /* CONTROLES DA BARRA LATERAL  */
@@ -1026,24 +1027,24 @@ h1 span {
 
 
 
-<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
+<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO - APARENCIA NO SITE -->
 <div id="cidade-atual" class="cidade-label">
     <span id="nomeCidade">📍Local...</span>
     <span class="separador">|</span>
 
     <span class="temp-value">
-        🌡️ <span id="temperaturaAtual">Temp. °C</span>
+        🌡️ <span id="temperaturaAtual" class="clima-temp">Temperatura °C</span>
     </span>
 
     <span class="separador">|</span>
 
     <span class="label">💧</span>
-    <span id="umidadeAtual">Umidade %</span>
+    <span id="umidadeAtual" class="clima-umidade">Umidade %</span>
 
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️</span>
-    <span id="poluicaoAtual">Poluição</span>
+    <span id="poluicaoAtual" class="clima-poluicao">Poluição</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
@@ -1353,6 +1354,33 @@ let gpsLastUpdateTime = 0;
 let iconeCentralizado = false; // Controla se o ícone está no modo centralizado
 // alerta de clima normal
 let alertaNormalidadeMostrado = false;
+
+
+// =============================================
+// CONTROLE DE TEXTOS - APP vs SITE
+// =============================================
+function ajustarTextosClima() {
+    const isMobile = window.innerWidth <= 600;
+    const tempEl = document.getElementById('temperaturaAtual');
+    const umidEl = document.getElementById('umidadeAtual');
+    const poluEl = document.getElementById('poluicaoAtual');
+    
+    if (isMobile) {
+        // APP - Textos abreviados (mantém os valores numéricos)
+        // Os textos serão controlados pela função atualizarTemperatura()
+        // mas marcamos como modo app
+        document.body.classList.add('modo-app');
+        document.body.classList.remove('modo-site');
+    } else {
+        // SITE - Textos por extenso
+        document.body.classList.add('modo-site');
+        document.body.classList.remove('modo-app');
+    }
+}
+
+// Executa no carregamento e no redimensionamento
+document.addEventListener('DOMContentLoaded', ajustarTextosClima);
+window.addEventListener('resize', ajustarTextosClima);
 
 // ======================
 // CONFIGURAÇÃO DO GITHUB
