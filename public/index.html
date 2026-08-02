@@ -2886,6 +2886,9 @@ navigator.geolocation.getCurrentPosition(async(pos)=>{
 // FUNÇÃO ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
 //================================================
 
+// =============================================
+// ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
+// =============================================
 async function atualizarTemperatura() {
     if (!userLat || !userLng) return;
 
@@ -2893,7 +2896,7 @@ async function atualizarTemperatura() {
         const API_KEY = 'a5c507ef270b147035538e0d6019bce1';
         
         // ==========================================
-        // 1. BUSCA DADOS DE CLIMA (Temperatura + Umidade)
+        // 1. BUSCA DADOS DE CLIMA
         // ==========================================
         const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
         const respostaClima = await fetch(urlClima);
@@ -2904,79 +2907,85 @@ async function atualizarTemperatura() {
         const temperatura = dadosClima.main.temp;
         const umidade = dadosClima.main.humidity;
 
-        // Atualiza temperatura
-        document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
+        // ==========================================
+        // ATUALIZA TEMPERATURA (com símbolo °C)
+        // ==========================================
+        const tempEl = document.getElementById('temperaturaAtual');
+        if (tempEl) {
+            tempEl.textContent = temperatura.toFixed(1) + '°C';
+            tempEl.style.color = '#ffffff';
+        }
         
-        // Atualiza umidade
-        if (umidade !== undefined && umidade !== null) {
-            document.getElementById('umidadeAtual').textContent = umidade + '%';
-        } else {
-            document.getElementById('umidadeAtual').textContent = 'N/A';
-            console.warn("A API não retornou o valor de umidade.");
+        // ==========================================
+        // ATUALIZA UMIDADE
+        // ==========================================
+        const umidEl = document.getElementById('umidadeAtual');
+        if (umidEl) {
+            if (umidade !== undefined && umidade !== null) {
+                umidEl.textContent = umidade + '%';
+            } else {
+                umidEl.textContent = '--%';
+            }
+            umidEl.style.color = '#ffffff';
         }
 
         // ==========================================
-// 2. BUSCA POLUIÇÃO DO AR (AQI)
-// ==========================================
-try {
-    const urlPoluicao = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${userLat}&lon=${userLng}&appid=${API_KEY}`;
-    const respostaPoluicao = await fetch(urlPoluicao);
-    
-    if (respostaPoluicao.ok) {
-        const dadosPoluicao = await respostaPoluicao.json();
-        const aqi = dadosPoluicao.list[0].main.aqi; // 1 a 5
-        
-        // Pega os componentes (PM2.5 é o mais comum para qualidade do ar)
-        const componentes = dadosPoluicao.list[0].components;
-        const pm25 = componentes.pm2_5 ? Math.round(componentes.pm2_5) : null;
-        const pm10 = componentes.pm10 ? Math.round(componentes.pm10) : null;
-        
-        // Escolhe o valor para exibir (prioriza PM2.5, se não tiver usa PM10)
-        let valorPoluicao = pm25 || pm10 || 0;
-        
-        // Mapeia o AQI para texto e cor (SEM EMOJIS)
-        const mapaAQI = {
-            1: { texto: 'Boa', cor: '#00cc66', faixa: '0-50' },
-            2: { texto: 'Moderada', cor: '#ffcc00', faixa: '51-100' },
-            3: { texto: 'Ruim', cor: '#ff8800', faixa: '101-150' },
-            4: { texto: 'Muito Ruim', cor: '#ff4444', faixa: '151-200' },
-            5: { texto: 'Péssima', cor: '#cc0000', faixa: '201-300' }
-        };
-        
-        const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
-        const poluicaoEl = document.getElementById('poluicaoAtual');
-        
-        // EXIBE: "Moderado 44" (texto + valor do PM2.5)
-        if (valorPoluicao > 0) {
-            poluicaoEl.textContent = `${infoPoluicao.texto} ${valorPoluicao}`;
-        } else {
-            poluicaoEl.textContent = infoPoluicao.texto;
+        // 2. BUSCA POLUIÇÃO DO AR
+        // ==========================================
+        try {
+            const urlPoluicao = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${userLat}&lon=${userLng}&appid=${API_KEY}`;
+            const respostaPoluicao = await fetch(urlPoluicao);
+            
+            if (respostaPoluicao.ok) {
+                const dadosPoluicao = await respostaPoluicao.json();
+                const aqi = dadosPoluicao.list[0].main.aqi;
+                
+                const componentes = dadosPoluicao.list[0].components;
+                const pm25 = componentes.pm2_5 ? Math.round(componentes.pm2_5) : null;
+                const pm10 = componentes.pm10 ? Math.round(componentes.pm10) : null;
+                let valorPoluicao = pm25 || pm10 || 0;
+                
+                const mapaAQI = {
+                    1: { texto: 'Boa', cor: '#00cc66' },
+                    2: { texto: 'Moderada', cor: '#ffcc00' },
+                    3: { texto: 'Ruim', cor: '#ff8800' },
+                    4: { texto: 'Muito Ruim', cor: '#ff4444' },
+                    5: { texto: 'Péssima', cor: '#cc0000' }
+                };
+                
+                const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
+                const poluEl = document.getElementById('poluicaoAtual');
+                
+                if (poluEl) {
+                    if (valorPoluicao > 0) {
+                        poluEl.textContent = infoPoluicao.texto + ' ' + valorPoluicao;
+                    } else {
+                        poluEl.textContent = infoPoluicao.texto;
+                    }
+                    poluEl.style.color = infoPoluicao.cor;
+                }
+                
+                verificarAlertaPoluicao(aqi);
+            } else {
+                const poluEl = document.getElementById('poluicaoAtual');
+                if (poluEl) {
+                    poluEl.textContent = 'N/A';
+                    poluEl.style.color = '#888';
+                }
+            }
+        } catch (e) {
+            console.warn('Erro ao buscar poluição:', e);
+            const poluEl = document.getElementById('poluicaoAtual');
+            if (poluEl) {
+                poluEl.textContent = 'N/A';
+                poluEl.style.color = '#888';
+            }
         }
-        
-        poluicaoEl.style.color = infoPoluicao.cor;
-        
-        console.log(`🌫️ Poluição do ar: AQI ${aqi} - ${infoPoluicao.texto} (PM2.5: ${valorPoluicao})`);
-        
-        // Verifica se há alerta de poluição
-        verificarAlertaPoluicao(aqi);
-    } else {
-        document.getElementById('poluicaoAtual').textContent = 'N/A';
-        document.getElementById('poluicaoAtual').style.color = '#888';
-    }
-} catch (e) {
-    console.warn('Erro ao buscar poluição:', e);
-    document.getElementById('poluicaoAtual').textContent = 'N/A';
-    document.getElementById('poluicaoAtual').style.color = '#888';
-}
 
         // ==========================================
-        // 3. VERIFICA ALERTAS DE CLIMA
+        // 3. VERIFICA ALERTAS
         // ==========================================
         verificarAlertasClima(temperatura, umidade);
-        
-        // ==========================================
-        // 4. VERIFICA SE O CLIMA ESTÁ NORMAL
-        // ==========================================
         verificarClimaNormal(temperatura, umidade);
 
     } catch(e) {
