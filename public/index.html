@@ -59,69 +59,73 @@
         overflow: hidden;
     }
     
-    /* CSS HEADER DO APP */
+
  
-    header {
+ /* ======================================== */
+/* CSS HEADER RESPONSIVO */
+/* ======================================== */
+header {
     background-color: var(--panel-color);
-    padding: 10px 15px;
-
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    border-bottom:2px solid var(--accent-color);
-    box-shadow:0 4px 15px rgba(0,255,136,0.1);
-
-    z-index:1000;
-    flex-shrink:0;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--accent-color);
+    box-shadow: 0 4px 15px rgba(0,255,136,0.1);
+    z-index: 1000;
+    flex-shrink: 0;
+    min-height: 60px;
+    gap: 8px;
+    flex-wrap: nowrap;
 }
 
-
-/* ======================== */
-/* HEADER LEFT (ÍCONE + TÍTULO) */
-/* ======================== */
-
-/* 1. Alinha o ícone e o título lado a lado */
+/* ======================================== */
+/* HEADER LEFT */
+/* ======================================== */
 .header-left {
     display: flex;
-    align-items: center; /* Alinha verticalmente ao centro */
-    gap: 10px; /* Espaço entre o ícone e o texto */
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0; /* Permite encolher */
+    overflow: hidden;
 }
 
-/* Ajuste de tamanho do ícone */
-/* Ajuste de tamanho do ícone */
 .app-icon {
-    width: 36px;
-    height: 36px;
-    object-fit: cover; /* Impede que a imagem fique oval/esticada */
-    border-radius: 8px; /* Opcional: Arredonda levemente as bordas para ficar mais bonito */
-    flex-shrink: 0; /* Impede que o ícone encolha se o texto ficar muito grande */
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
 }
 
-/* ======================== */
+/* ======================================== */
 /* TÍTULO DO APP */
-/* ======================== */
-
+/* ======================================== */
 .titulo-app {
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    flex: 1;
 }
 
 .titulo-linha {
     display: flex;
-    align-items: center; /* Garante que H1 e GPS fiquem na mesma linha e altura */
-    gap: 12px; /* Espaço entre o "RADAR X9" e o indicador de GPS */
-    white-space: nowrap; /* Impede que o GPS quebre de linha */
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    flex-wrap: nowrap;
 }
 
 h1 {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 800;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
-    margin: 0; /* Remove margem padrão para não desalinhar */
+    margin: 0;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 }
 
 h1 span {
@@ -129,49 +133,48 @@ h1 span {
 }
 
 
-/* ======================== */
-/* CIDADE / TEMPERATURA */
-/* ======================== */
 
+/* ======================================== */
+/* CIDADE / CLIMA - ABREVIADO EM TELAS PEQUENAS */
+/* ======================================== */
 .cidade-label {
-    margin-left: 0px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1;
-    white-space: nowrap;
-    font-size: 13px;
-   font-weight: 700;
-   letter-spacing: 0.4px;
-   text-transform: uppercase;
-}
-
-/* LABEL DE ALERTA DE CLIMA */
-.alerta-clima-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 4px; /* Espaço abaixo da linha da cidade */
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.65rem;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     text-transform: uppercase;
-    animation: piscarAlerta 1.5s infinite;
+    white-space: nowrap;
+    overflow: hidden;
+    flex: 1;
+    min-width: 0;
 }
 
-.temp-value,
+.cidade-label .separador {
+    margin: 0 2px;
+    opacity: 0.4;
+}
+
+.cidade-label .label {
+    font-size: 10px;
+}
+
+#nomeCidade {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+}
+
 #temperaturaAtual,
 #umidadeAtual,
-.label,
-.separador{
-    color: #fff;
-} 
+#poluicaoAtual {
+    font-size: 10px;
+}
+/*=============================*/
 /* Cores dos Alertas climaticos*/
+/*==============================*/
 .alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
 .alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
 .alerta-seco   { background: rgba(255, 165, 0, 0.15); color: #ffcc00; border: 1px solid rgba(255, 165, 0, 0.3); }
@@ -212,47 +215,58 @@ h1 span {
     border: 1px solid rgba(255, 68, 68, 0.3);
     animation: piscarAlerta 1.5s infinite;
 }
-/* ======================== */
-/* GPS STATUS */
-/* ======================== */
-
+/* ======================================== */
+/* GPS STATUS - menor em telas pequenas */
+/* ======================================== */
 .gps-status-wrapper {
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
-    margin-left: 0px; /* Zerado pois o gap do .titulo-linha já dá o espaço */
-    padding: 4px 10px; 
-    border-radius: 20px; 
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 20px;
     background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,255,255,0.06); 
-    cursor: default; 
+    border: 1px solid rgba(255,255,255,0.06);
+    cursor: default;
     user-select: none;
     transition: border-color 0.4s ease;
+    flex-shrink: 0;
 }
+
+.gps-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--gps-sem);
+    position: relative;
+    flex-shrink: 0;
+    transition: background-color 0.4s ease;
+}
+
+.gps-status-dot::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background-color: inherit;
+    opacity: 0.5;
+    animation: gpsPulse 2s ease-in-out infinite;
+}
+
+.gps-status-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: color 0.4s ease;
+}
+
 
 .gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
 .gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
 .gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
 
-.gps-status-dot {
-    width: 10px; 
-    height: 10px; 
-    border-radius: 50%; 
-    background-color: var(--gps-sem);
-    position: relative; 
-    flex-shrink: 0; 
-    transition: background-color 0.4s ease;
-}
-
-.gps-status-dot::after {
-    content: ''; 
-    position: absolute; 
-    inset: -3px; 
-    border-radius: 50%;
-    background-color: inherit; 
-    opacity: 0.5;
-    animation: gpsPulse 2s ease-in-out infinite;
-}
 
 .gps-status-dot.ok   { background-color: var(--gps-ok); }
 .gps-status-dot.warn { background-color: var(--gps-instavel); }
@@ -263,46 +277,248 @@ h1 span {
     50%      { transform: scale(2.2); opacity: 0; }
 }
 
-.gps-status-label {
-    font-size: 0.6rem; 
-    font-weight: 700; 
-    letter-spacing: 0.8px;
-    text-transform: uppercase; 
-    color: var(--text-muted); 
-    white-space: nowrap;
-    transition: color 0.4s ease;
-}
-
 .gps-status-wrapper.gps-ok   .gps-status-label { color: var(--gps-ok); }
 .gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
 .gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
 
-  /* CSS BOTÃO MENU TOGLE */
+ 
 
+/* ======================================== */
+/* BOTÃO MENU TOGGLE - FLOAT EM TELAS PEQUENAS */
+/* ======================================== */
+.btn-menu-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: none;
+    border: 1.5px solid rgba(0, 255, 136, 0.3);
+    border-radius: 10px;
+    padding: 6px 10px 4px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    z-index: 99999;
+    flex-shrink: 0;
+}
+
+.btn-menu-toggle:hover {
+    border-color: var(--accent-color);
+    background: rgba(0, 255, 136, 0.06);
+}
+
+.btn-menu-toggle:active {
+    transform: scale(0.93);
+}
+
+.menu-hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 18px;
+}
+
+.menu-hamburger span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+}
+
+.btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+    transform: translateY(5px) rotate(45deg);
+}
+
+.btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+    transform: translateY(-5px) rotate(-45deg);
+}
+
+.menu-label {
+    font-size: 0.45rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-top: 2px;
+}
+
+/* ======================================== */
+/* RESPONSIVO - TELAS PEQUENAS (celular) */
+/* ======================================== */
+@media (max-width: 600px) {
+    header {
+        padding: 6px 10px;
+        min-height: 50px;
+        gap: 4px;
+    }
+
+    .app-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    h1 {
+        font-size: 0.85rem;
+        letter-spacing: 0.3px;
+    }
+
+    .gps-status-wrapper {
+        padding: 2px 6px;
+    }
+    
+    .gps-status-dot {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .gps-status-label {
+        font-size: 0.4rem;
+        letter-spacing: 0.3px;
+    }
+
+    /* ABREVIA A CIDADE E CLIMA */
+    .cidade-label {
+        font-size: 9px;
+        gap: 2px;
+    }
+    
+    .cidade-label .label {
+        font-size: 8px;
+    }
+    
+    #nomeCidade {
+        max-width: 50px;
+        font-size: 8px;
+    }
+    
+    #temperaturaAtual,
+    #umidadeAtual,
+    #poluicaoAtual {
+        font-size: 8px;
+    }
+    
+    .cidade-label .separador {
+        margin: 0 1px;
+    }
+
+    /* ESCONDE ALGUNS TEXTOS EM TELAS MUITO PEQUENAS */
+    #umidadeAtual {
+        display: none;
+    }
+    
+    .cidade-label .separador:nth-child(4) {
+        display: none;
+    }
+
+    /* MENU TOGGLE MENOR */
     .btn-menu-toggle {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 2px; background: none; border: 1.5px solid rgba(0, 255, 136, 0.3);
-        border-radius: 10px; padding: 8px 14px 6px; cursor: pointer;
-        transition: all 0.25s ease; user-select: none; -webkit-user-select: none;
-        position: relative; z-index: 99999;
+        padding: 4px 8px 3px;
+        border-radius: 8px;
     }
-    .btn-menu-toggle:hover { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.06); }
-    .btn-menu-toggle:active { transform: scale(0.93); }
-    .menu-hamburger { display: flex; flex-direction: column; gap: 4px; width: 22px; }
+    
+    .menu-hamburger {
+        width: 14px;
+        gap: 2.5px;
+    }
+    
     .menu-hamburger span {
-        display: block; height: 2.5px; width: 100%;
-        background-color: var(--accent-color); border-radius: 2px;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center;
+        height: 1.8px;
     }
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+    
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+        transform: translateY(4px) rotate(45deg);
+    }
+    
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+        transform: translateY(-4px) rotate(-45deg);
+    }
+    
     .menu-label {
-        font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px;
-        color: var(--accent-color); text-transform: uppercase; line-height: 1; margin-top: 2px;
+        font-size: 0.4rem;
+        letter-spacing: 0.8px;
     }
+}
 
+/* ======================================== */
+/* TELAS MUITO PEQUENAS (ex: celular antigo) */
+/* ======================================== */
+@media (max-width: 400px) {
+    h1 {
+        font-size: 0.7rem;
+    }
+    
+    .gps-status-label {
+        display: none; /* Esconde o texto GPS, só o ponto */
+    }
+    
+    .cidade-label {
+        font-size: 7px;
+    }
+    
+    #nomeCidade {
+        max-width: 35px;
+        font-size: 7px;
+    }
+    
+    #temperaturaAtual {
+        font-size: 7px;
+    }
+    
+    #poluicaoAtual {
+        font-size: 7px;
+    }
+    
+    /* ESCONDE EM TELAS MUITO PEQUENAS */
+    .cidade-label .label {
+        display: none;
+    }
+    
+    .cidade-label .separador:nth-child(2),
+    .cidade-label .separador:nth-child(4),
+    .cidade-label .separador:nth-child(6) {
+        display: none;
+    }
+}
 
+/* ======================================== */
+/* TABLET E TELAS GRANDES - MOSTRA TUDO */
+/* ======================================== */
+@media (min-width: 601px) {
+    .cidade-label {
+        font-size: 13px;
+    }
+    
+    #nomeCidade {
+        max-width: 150px;
+        font-size: 13px;
+    }
+    
+    #temperaturaAtual,
+    #umidadeAtual,
+    #poluicaoAtual {
+        font-size: 12px;
+    }
+    
+    .cidade-label .label {
+        font-size: 12px;
+    }
+}
+
+/* ======================================== */
+/* CONTROLES DA BARRA LATERAL  */
+/* ======================================== */
     .sidebar-controls {
         position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width);
         z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -804,22 +1020,22 @@ h1 span {
 
 <!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
 <div id="cidade-atual" class="cidade-label">
-    <span id="nomeCidade">🚩 Local...</span>
+    <span id="nomeCidade">📍Local</span>
     <span class="separador">|</span>
 
     <span class="temp-value">
-    🌡️ <span id="temperaturaAtual">Temp. °C</span>
+        🌡️<span id="temperaturaAtual">Temp</span>
     </span>
 
     <span class="separador">|</span>
 
     <span class="label">💧</span>
-    <span id="umidadeAtual">Umidade %</span>
+    <span id="umidadeAtual" class="umidade-mobile">Umid</span>
 
-    <!-- NOVO: POLUIÇÃO DO AR -->
+    <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️</span>
-    <span id="poluicaoAtual">Poluição</span>
+    <span id="poluicaoAtual">Pol</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
@@ -2501,6 +2717,51 @@ function sucesso(position){
     );
 
 }
+
+// =============================================
+// CONTROLE RESPONSIVO DO HEADER
+// =============================================
+function ajustarHeaderResponsivo() {
+    const width = window.innerWidth;
+    const cidadeLabel = document.getElementById('cidade-atual');
+    const nomeCidade = document.getElementById('nomeCidade');
+    const temperatura = document.getElementById('temperaturaAtual');
+    const umidade = document.getElementById('umidadeAtual');
+    const poluicao = document.getElementById('poluicaoAtual');
+    const gpsLabel = document.getElementById('gps-status-label');
+    
+    if (width < 400) {
+        // Muito pequeno - apenas o essencial
+        if (nomeCidade) nomeCidade.textContent = '📍';
+        if (temperatura) temperatura.textContent = '🌡️';
+        if (umidade) umidade.textContent = '💧';
+        if (poluicao) poluicao.textContent = '🏜️';
+        if (gpsLabel) gpsLabel.textContent = '';
+    } else if (width < 600) {
+        // Pequeno - abreviado
+        if (nomeCidade) nomeCidade.textContent = 'Local';
+        if (temperatura) temperatura.textContent = 'Temp';
+        if (umidade) umidade.textContent = 'Umid';
+        if (poluicao) poluicao.textContent = 'Pol';
+        if (gpsLabel) gpsLabel.textContent = 'GPS';
+    } else {
+        // Normal - completo
+        // Deixa o HTML cuidar
+    }
+}
+
+// Executa no carregamento e no redimensionamento
+document.addEventListener('DOMContentLoaded', ajustarHeaderResponsivo);
+window.addEventListener('resize', ajustarHeaderResponsivo);
+
+// Também executa quando a cidade/clima é atualizado
+function atualizarCidade(lat, lng) {
+    // ... seu código existente ...
+    
+    // Depois de atualizar, ajusta o header
+    ajustarHeaderResponsivo();
+}
+
 //=====================================
 // FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
 //=====================================
