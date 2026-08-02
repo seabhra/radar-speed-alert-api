@@ -2516,43 +2516,58 @@ async function atualizarTemperatura() {
         }
 
         // ==========================================
-        // 2. BUSCA POLUIÇÃO DO AR (AQI)
-        // ==========================================
-        try {
-            const urlPoluicao = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${userLat}&lon=${userLng}&appid=${API_KEY}`;
-            const respostaPoluicao = await fetch(urlPoluicao);
-            
-            if (respostaPoluicao.ok) {
-                const dadosPoluicao = await respostaPoluicao.json();
-                const aqi = dadosPoluicao.list[0].main.aqi; // 1 a 5
-                
-                // Mapeia o AQI para texto e cor
-                const mapaAQI = {
-                    1: { texto: 'Boa', cor: '#00ff88' },
-                    2: { texto: 'Moderada', cor: '#ffcc00' },
-                    3: { texto: 'Ruim', cor: '#ff8800' },
-                    4: { texto: 'Muito Ruim', cor: '#ff4444' },
-                    5: { texto: 'Péssima', cor: '#cc0000' }
-                };
-                
-                const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
-                const poluicaoEl = document.getElementById('poluicaoAtual');
-                poluicaoEl.textContent = infoPoluicao.texto;
-                poluicaoEl.style.color = infoPoluicao.cor;
-                
-                console.log(`🌫️ Poluição do ar: AQI ${aqi} - ${infoPoluicao.texto}`);
-                
-                // Verifica se há alerta de poluição
-                verificarAlertaPoluicao(aqi);
-            } else {
-                document.getElementById('poluicaoAtual').textContent = 'N/A';
-                document.getElementById('poluicaoAtual').style.color = '#888';
-            }
-        } catch (e) {
-            console.warn('Erro ao buscar poluição:', e);
-            document.getElementById('poluicaoAtual').textContent = 'N/A';
-            document.getElementById('poluicaoAtual').style.color = '#888';
+// 2. BUSCA POLUIÇÃO DO AR (AQI)
+// ==========================================
+try {
+    const urlPoluicao = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${userLat}&lon=${userLng}&appid=${API_KEY}`;
+    const respostaPoluicao = await fetch(urlPoluicao);
+    
+    if (respostaPoluicao.ok) {
+        const dadosPoluicao = await respostaPoluicao.json();
+        const aqi = dadosPoluicao.list[0].main.aqi; // 1 a 5
+        
+        // Pega os componentes (PM2.5 é o mais comum para qualidade do ar)
+        const componentes = dadosPoluicao.list[0].components;
+        const pm25 = componentes.pm2_5 ? Math.round(componentes.pm2_5) : null;
+        const pm10 = componentes.pm10 ? Math.round(componentes.pm10) : null;
+        
+        // Escolhe o valor para exibir (prioriza PM2.5, se não tiver usa PM10)
+        let valorPoluicao = pm25 || pm10 || 0;
+        
+        // Mapeia o AQI para texto e cor (SEM EMOJIS)
+        const mapaAQI = {
+            1: { texto: 'Boa', cor: '#00cc66', faixa: '0-50' },
+            2: { texto: 'Moderada', cor: '#ffcc00', faixa: '51-100' },
+            3: { texto: 'Ruim', cor: '#ff8800', faixa: '101-150' },
+            4: { texto: 'Muito Ruim', cor: '#ff4444', faixa: '151-200' },
+            5: { texto: 'Péssima', cor: '#cc0000', faixa: '201-300' }
+        };
+        
+        const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
+        const poluicaoEl = document.getElementById('poluicaoAtual');
+        
+        // EXIBE: "Moderado 44" (texto + valor do PM2.5)
+        if (valorPoluicao > 0) {
+            poluicaoEl.textContent = `${infoPoluicao.texto} ${valorPoluicao}`;
+        } else {
+            poluicaoEl.textContent = infoPoluicao.texto;
         }
+        
+        poluicaoEl.style.color = infoPoluicao.cor;
+        
+        console.log(`🌫️ Poluição do ar: AQI ${aqi} - ${infoPoluicao.texto} (PM2.5: ${valorPoluicao})`);
+        
+        // Verifica se há alerta de poluição
+        verificarAlertaPoluicao(aqi);
+    } else {
+        document.getElementById('poluicaoAtual').textContent = 'N/A';
+        document.getElementById('poluicaoAtual').style.color = '#888';
+    }
+} catch (e) {
+    console.warn('Erro ao buscar poluição:', e);
+    document.getElementById('poluicaoAtual').textContent = 'N/A';
+    document.getElementById('poluicaoAtual').style.color = '#888';
+}
 
         // ==========================================
         // 3. VERIFICA ALERTAS DE CLIMA
@@ -2569,7 +2584,8 @@ async function atualizarTemperatura() {
     }
 }
 
-// =============================================
+
+f// =============================================
 // VERIFICAR ALERTA DE POLUIÇÃO
 // =============================================
 function verificarAlertaPoluicao(aqi) {
@@ -2580,7 +2596,10 @@ function verificarAlertaPoluicao(aqi) {
         if (aqi >= 4) { // Muito Ruim ou Péssima
             alertaDiv.style.display = 'flex';
             alertaDiv.className = 'alerta-clima-label alerta-poluicao';
-            alertaDiv.innerHTML = `🌫️ ATENÇÃO: Qualidade do Ar ${aqi >= 5 ? 'PÉSSIMA!' : 'MUITO RUIM!'}`;
+            
+            // SEM EMOJIS
+            const textoAlerta = aqi >= 5 ? 'ATENÇÃO: Qualidade do Ar PÉSSIMA!' : 'ATENÇÃO: Qualidade do Ar MUITO RUIM!';
+            alertaDiv.innerHTML = `🌫️ ${textoAlerta}`;
             alertaDiv.classList.add('alerta-poluicao');
             
             // Toca som de alerta
@@ -2597,6 +2616,8 @@ function verificarAlertaPoluicao(aqi) {
         }
     }
 }
+
+
 // =============================================
 // VERIFICAR SE O CLIMA ESTÁ NORMAL (ALERTA POSITIVO)
 // =============================================
@@ -2608,15 +2629,15 @@ function verificarClimaNormal(temp, umid) {
     const semAlertas = 
         !(temp >= 40 || temp <= 5 || umid <= 20);
     
-    // Verifica se a poluição está boa (AQI 1 ou 2)
+    // Verifica se a poluição está boa (AQI 1 ou 2) - SEM EMOJIS
     const poluicaoEl = document.getElementById('poluicaoAtual');
     const textoPoluicao = poluicaoEl.textContent;
-    const poluicaoBoa = textoPoluicao === 'Boa 😊' || textoPoluicao === 'Moderada 😌';
+    const poluicaoBoa = textoPoluicao.includes('Boa') || textoPoluicao.includes('Moderada');
     
     // Se o clima está normal E a poluição está boa
     if (semAlertas && poluicaoBoa && alertaClimaDiv.style.display !== 'flex') {
         alertaNormalDiv.style.display = 'flex';
-        alertaNormalDiv.innerHTML = '✅ Clima normal. Aproveite o dia!';
+        alertaNormalDiv.innerHTML = '✅ Clima normal. Aproveite!';
         
         // Mostra por 10 segundos e depois some
         setTimeout(() => {
@@ -2629,6 +2650,7 @@ function verificarClimaNormal(temp, umid) {
         }
     }
 }
+
 //=====================================
 // FUNÇÃO POSIONAR TEMPERATURA LOCAL
 //=====================================
@@ -2660,6 +2682,7 @@ somAlerta.volume = 0.5;
 
 let alertaAtivoAtual = '';
 
+
 function verificarAlertasClima(temp, umid) {
     // Se os parâmetros não foram passados, busca do DOM
     if (temp === undefined || umid === undefined) {
@@ -2677,19 +2700,19 @@ function verificarAlertasClima(temp, umid) {
     // Limpa classes anteriores
     alertaDiv.className = 'alerta-clima-label';
 
-    // Condição 1: Calor Extremo
+    // Condição 1: Calor Extremo (Acima de 40°C)
     if (temp >= 40) {
         novoAlerta = 'quente';
         alertaDiv.innerHTML = '🔥 ALERTA: Temperatura Extrema!';
         alertaDiv.classList.add('alerta-quente');
     } 
-    // Condição 2: Frio Extremo
+    // Condição 2: Frio Extremo (Abaixo de 5°C)
     else if (temp <= 5) {
         novoAlerta = 'frio';
         alertaDiv.innerHTML = '❄️ ALERTA: Frio Extremo!';
         alertaDiv.classList.add('alerta-frio');
     } 
-    // Condição 3: Umidade Baixa
+    // Condição 3: Umidade Baixa (Abaixo de 20%)
     else if (umid <= 20) {
         novoAlerta = 'seco';
         alertaDiv.innerHTML = '🏜️ ATENÇÃO: Umidade do Ar Baixa!';
