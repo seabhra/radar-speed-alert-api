@@ -133,15 +133,16 @@ h1 span {
 }
 
 
+
 /* ======================================== */
-/* CIDADE / CLIMA */
+/* CIDADE / CLIMA - COM EMOJIS VISÍVEIS */
 /* ======================================== */
 .cidade-label {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.3px;
     text-transform: uppercase;
@@ -149,32 +150,240 @@ h1 span {
     overflow: hidden;
     flex: 1;
     min-width: 0;
+    color: #ffffff; /* Fonte branca */
 }
 
 .cidade-label .separador {
-    margin: 0 2px;
+    margin: 0 3px;
     opacity: 0.4;
+    color: #ffffff;
 }
 
 .cidade-label .label {
-    font-size: 10px;
+    font-size: 13px;
+    color: #ffffff;
 }
 
-/* NOME DA CIDADE - NUNCA ABREVIA */
+/* NOME DA CIDADE */
 #nomeCidade {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 120px;
     flex-shrink: 0;
-    font-size: 12px;
+    font-size: 14px;
+    color: #ffffff;
 }
 
-/* DADOS CLIMÁTICOS */
+/* DADOS CLIMÁTICOS - FONTE BRANCA */
 #temperaturaAtual,
 #umidadeAtual,
 #poluicaoAtual {
-    font-size: 11px;
+    font-size: 13px;
+    color: #ffffff;
     transition: all 0.3s ease;
+}
+
+/* EMOJIS - GARANTE QUE APARECEM */
+.temp-value,
+.label {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+/* ======================================== */
+/* RESPONSIVO - APP (TELAS PEQUENAS) */
+/* ======================================== */
+@media (max-width: 600px) {
+    header {
+        padding: 6px 10px;
+        min-height: 50px;
+        gap: 4px;
+    }
+
+    .app-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    h1 {
+        font-size: 0.85rem;
+        letter-spacing: 0.3px;
+    }
+
+    /* NOME DA CIDADE */
+    #nomeCidade {
+        font-size: 12px;
+        max-width: 80px;
+    }
+
+    .gps-status-wrapper {
+        padding: 2px 6px;
+    }
+    
+    .gps-status-dot {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .gps-status-label {
+        font-size: 0.4rem;
+        letter-spacing: 0.3px;
+    }
+
+    /* APP - FONTES MAIORES E EMOJIS VISÍVEIS */
+    .cidade-label {
+        font-size: 12px;
+        gap: 4px;
+    }
+    
+    .cidade-label .label {
+        font-size: 11px;
+        color: #ffffff;
+    }
+    
+    #nomeCidade {
+        font-size: 12px;
+    }
+    
+    #temperaturaAtual {
+        font-size: 11px;
+        color: #ffffff;
+    }
+    
+    #umidadeAtual {
+        font-size: 11px;
+        color: #ffffff;
+        display: inline-block;
+    }
+    
+    #poluicaoAtual {
+        font-size: 11px;
+        color: #ffffff;
+    }
+    
+    /* EMOJIS NO APP - TAMANHO MAIOR */
+    .temp-value {
+        font-size: 12px;
+    }
+    
+    .cidade-label .label {
+        font-size: 11px;
+    }
+    
+    .cidade-label .separador {
+        margin: 0 2px;
+    }
+
+    /* MENU TOGGLE */
+    .btn-menu-toggle {
+        padding: 4px 8px 3px;
+        border-radius: 8px;
+    }
+    
+    .menu-hamburger {
+        width: 14px;
+        gap: 2.5px;
+    }
+    
+    .menu-hamburger span {
+        height: 1.8px;
+    }
+    
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+        transform: translateY(4px) rotate(45deg);
+    }
+    
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+        transform: translateY(-4px) rotate(-45deg);
+    }
+    
+    .menu-label {
+        font-size: 0.4rem;
+        letter-spacing: 0.8px;
+    }
+}
+
+/* ======================================== */
+/* TELAS MUITO PEQUENAS */
+/* ======================================== */
+@media (max-width: 400px) {
+    h1 {
+        font-size: 0.7rem;
+    }
+    
+    .gps-status-label {
+        display: none;
+    }
+    
+    .cidade-label {
+        font-size: 10px;
+        gap: 3px;
+    }
+    
+    #nomeCidade {
+        font-size: 10px;
+        max-width: 60px;
+    }
+    
+    #temperaturaAtual {
+        font-size: 10px;
+        color: #ffffff;
+    }
+    
+    #umidadeAtual {
+        font-size: 10px;
+        color: #ffffff;
+        display: inline-block;
+    }
+    
+    #poluicaoAtual {
+        font-size: 10px;
+        color: #ffffff;
+    }
+    
+    .temp-value {
+        font-size: 10px;
+    }
+    
+    .cidade-label .label {
+        font-size: 10px;
+    }
+    
+    .cidade-label .separador {
+        margin: 0 1px;
+    }
+}
+
+/* ======================================== */
+/* TABLET E TELAS GRANDES */
+/* ======================================== */
+@media (min-width: 601px) {
+    .cidade-label {
+        font-size: 15px;
+        gap: 8px;
+    }
+    
+    #nomeCidade {
+        max-width: 200px;
+        font-size: 15px;
+        color: #ffffff;
+    }
+    
+    #temperaturaAtual,
+    #umidadeAtual,
+    #poluicaoAtual {
+        font-size: 14px;
+        color: #ffffff;
+    }
+    
+    .cidade-label .label {
+        font-size: 14px;
+        color: #ffffff;
+    }
+    
+    .temp-value {
+        font-size: 14px;
+    }
 }
 
 /* ======================================== */
@@ -355,173 +564,6 @@ h1 span {
     margin-top: 2px;
 }
 
-
-/* ======================================== */
-/* RESPONSIVO - APP (TELAS PEQUENAS) */
-/* ======================================== */
-@media (max-width: 600px) {
-    header {
-        padding: 6px 10px;
-        min-height: 50px;
-        gap: 4px;
-    }
-
-    .app-icon {
-        width: 28px;
-        height: 28px;
-    }
-
-    h1 {
-        font-size: 0.85rem;
-        letter-spacing: 0.3px;
-    }
-
-    /* NOME DA CIDADE - NUNCA ABREVIA */
-    #nomeCidade {
-        font-size: 11px;
-        max-width: 100px;
-    }
-
-    .gps-status-wrapper {
-        padding: 2px 6px;
-    }
-    
-    .gps-status-dot {
-        width: 6px;
-        height: 6px;
-    }
-    
-    .gps-status-label {
-        font-size: 0.4rem;
-        letter-spacing: 0.3px;
-    }
-
-    /* APP - TEXTO ABREVIADO */
-    .cidade-label {
-        font-size: 10px;
-        gap: 2px;
-    }
-    
-    .cidade-label .label {
-        font-size: 8px;
-    }
-    
-    /* ABREVIA OS TEXTOS NO APP */
-    #temperaturaAtual {
-        font-size: 9px;
-    }
-    
-        
-    #umidadeAtual {
-        font-size: 9px;
-        display: inline-block;
-    }
-    
-    #poluicaoAtual {
-        font-size: 9px;
-    }
-    
-    .cidade-label .separador {
-        margin: 0 1px;
-    }
-
-    /* MENU TOGGLE MENOR */
-    .btn-menu-toggle {
-        padding: 4px 8px 3px;
-        border-radius: 8px;
-    }
-    
-    .menu-hamburger {
-        width: 14px;
-        gap: 2.5px;
-    }
-    
-    .menu-hamburger span {
-        height: 1.8px;
-    }
-    
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
-        transform: translateY(4px) rotate(45deg);
-    }
-    
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
-        transform: translateY(-4px) rotate(-45deg);
-    }
-    
-    .menu-label {
-        font-size: 0.4rem;
-        letter-spacing: 0.8px;
-    }
-}
-
-/* ======================================== */
-/* TELAS MUITO PEQUENAS */
-/* ======================================== */
-@media (max-width: 400px) {
-    h1 {
-        font-size: 0.7rem;
-    }
-    
-    .gps-status-label {
-        display: none;
-    }
-    
-    #nomeCidade {
-        font-size: 9px;
-        max-width: 70px;
-    }
-    
-    .cidade-label {
-        font-size: 8px;
-    }
-    
-    #temperaturaAtual {
-        font-size: 8px;
-    }
-    
-    #umidadeAtual {
-        font-size: 8px;
-        display: inline-block;
-    }
-    
-    #poluicaoAtual {
-        font-size: 8px;
-    }
-    
-    .cidade-label .label {
-        display: none;
-    }
-    
-    .cidade-label .separador:nth-child(2),
-    .cidade-label .separador:nth-child(4),
-    .cidade-label .separador:nth-child(6) {
-        display: none;
-    }
-}
-
-/* ======================================== */
-/* TABLET E TELAS GRANDES - TEXTO POR EXTENSO */
-/* ======================================== */
-@media (min-width: 601px) {
-    .cidade-label {
-        font-size: 13px;
-    }
-    
-    #nomeCidade {
-        max-width: 200px;
-        font-size: 13px;
-    }
-    
-    #temperaturaAtual,
-    #umidadeAtual,
-    #poluicaoAtual {
-        font-size: 12px;
-    }
-    
-    .cidade-label .label {
-        font-size: 12px;
-    }
-}
 
 
 /* ======================================== */
@@ -1027,24 +1069,25 @@ h1 span {
 
 
 
-<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO - APARENCIA NO SITE -->
+
+<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
 <div id="cidade-atual" class="cidade-label">
     <span id="nomeCidade">📍Local...</span>
     <span class="separador">|</span>
 
     <span class="temp-value">
-        🌡️ <span id="temperaturaAtual" class="clima-temp">Temperatura °C</span>
+        🌡️ <span id="temperaturaAtual">Temp. °C</span>
     </span>
 
     <span class="separador">|</span>
 
     <span class="label">💧</span>
-    <span id="umidadeAtual" class="clima-umidade">Umidade %</span>
+    <span id="umidadeAtual">Umid. %</span>
 
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️</span>
-    <span id="poluicaoAtual" class="clima-poluicao">Poluição</span>
+    <span id="poluicaoAtual">IQAr</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
