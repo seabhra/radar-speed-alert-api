@@ -87,7 +87,7 @@ header {
     align-items: center;
     gap: 8px;
     flex: 1;
-    min-width: 0; /* Permite encolher */
+    min-width: 0;
     overflow: hidden;
 }
 
@@ -132,17 +132,15 @@ h1 span {
     color: var(--accent-color);
 }
 
-
-
 /* ======================================== */
-/* CIDADE / CLIMA - ABREVIADO EM TELAS PEQUENAS */
+/* CIDADE / CLIMA - NOME DA CIDADE NÃO ABREVIA */
 /* ======================================== */
 .cidade-label {
     display: flex;
     align-items: center;
     gap: 4px;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.3px;
     text-transform: uppercase;
@@ -161,62 +159,24 @@ h1 span {
     font-size: 10px;
 }
 
+/* NOME DA CIDADE - NUNCA ABREVIA */
 #nomeCidade {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 80px;
+    max-width: 120px;
+    flex-shrink: 0;
+    font-size: 12px;
 }
 
+/* DADOS CLIMÁTICOS - PODEM SER ABREVIADOS */
 #temperaturaAtual,
 #umidadeAtual,
 #poluicaoAtual {
-    font-size: 10px;
-}
-/*=============================*/
-/* Cores dos Alertas climaticos*/
-/*==============================*/
-.alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
-.alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
-.alerta-seco   { background: rgba(255, 165, 0, 0.15); color: #ffcc00; border: 1px solid rgba(255, 165, 0, 0.3); }
-
-/* Animação para piscar */
-@keyframes piscarAlerta {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    font-size: 11px;
 }
 
-/* ALERTA DE NORMALIDADE */
-.alerta-normalidade-label {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 2px;
-    padding: 0px 4px;
-    border-radius: 0px;
-    font-size: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    background: transparent;
-    color: #00ff88;
-    border: none; /* Remove a borda */
-    animation: fadeInNormal 0.5s ease-out;
-}
-
-@keyframes fadeInNormal {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ALERTA DE POLUIÇÃO */
-.alerta-poluicao {
-    background: rgba(255, 68, 68, 0.15);
-    color: #ff4444;
-    border: 1px solid rgba(255, 68, 68, 0.3);
-    animation: piscarAlerta 1.5s infinite;
-}
 /* ======================================== */
-/* GPS STATUS - menor em telas pequenas */
+/* GPS STATUS */
 /* ======================================== */
 .gps-status-wrapper {
     display: flex;
@@ -262,11 +222,9 @@ h1 span {
     transition: color 0.4s ease;
 }
 
-
 .gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
 .gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
 .gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
-
 
 .gps-status-dot.ok   { background-color: var(--gps-ok); }
 .gps-status-dot.warn { background-color: var(--gps-instavel); }
@@ -281,10 +239,51 @@ h1 span {
 .gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
 .gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
 
- 
+/* ======================================== */
+/* ALERTAS CLIMÁTICOS */
+/* ======================================== */
+.alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
+.alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
+.alerta-seco   { background: rgba(255, 165, 0, 0.15); color: #ffcc00; border: 1px solid rgba(255, 165, 0, 0.3); }
+
+@keyframes piscarAlerta {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ALERTA DE NORMALIDADE */
+.alerta-normalidade-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    padding: 0px 4px;
+    border-radius: 0px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    background: transparent;
+    color: #00ff88;
+    border: none;
+    animation: fadeInNormal 0.5s ease-out;
+}
+
+@keyframes fadeInNormal {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ALERTA DE POLUIÇÃO */
+.alerta-poluicao {
+    background: rgba(255, 68, 68, 0.15);
+    color: #ff4444;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    animation: piscarAlerta 1.5s infinite;
+}
 
 /* ======================================== */
-/* BOTÃO MENU TOGGLE - FLOAT EM TELAS PEQUENAS */
+/* BOTÃO MENU TOGGLE */
 /* ======================================== */
 .btn-menu-toggle {
     display: flex;
@@ -374,6 +373,12 @@ h1 span {
         letter-spacing: 0.3px;
     }
 
+    /* NOME DA CIDADE - NUNCA ABREVIA */
+    #nomeCidade {
+        font-size: 11px;
+        max-width: 100px;
+    }
+
     .gps-status-wrapper {
         padding: 2px 6px;
     }
@@ -388,9 +393,9 @@ h1 span {
         letter-spacing: 0.3px;
     }
 
-    /* ABREVIA A CIDADE E CLIMA */
+    /* DADOS CLIMÁTICOS - ABREVIADOS */
     .cidade-label {
-        font-size: 9px;
+        font-size: 10px;
         gap: 2px;
     }
     
@@ -398,29 +403,25 @@ h1 span {
         font-size: 8px;
     }
     
-    #nomeCidade {
-        max-width: 50px;
-        font-size: 8px;
+    #temperaturaAtual {
+        font-size: 9px;
     }
     
-    #temperaturaAtual,
-    #umidadeAtual,
+    #umidadeAtual {
+        font-size: 9px;
+        display: inline-block; /* GARANTE QUE APARECE */
+    }
+    
     #poluicaoAtual {
-        font-size: 8px;
+        font-size: 9px;
     }
     
     .cidade-label .separador {
         margin: 0 1px;
     }
 
-    /* ESCONDE ALGUNS TEXTOS EM TELAS MUITO PEQUENAS */
-    #umidadeAtual {
-        display: none;
-    }
-    
-    .cidade-label .separador:nth-child(4) {
-        display: none;
-    }
+    /* NÃO ESCONDE MAIS A UMIDADE */
+    /* REMOVIDO: #umidadeAtual { display: none; } */
 
     /* MENU TOGGLE MENOR */
     .btn-menu-toggle {
@@ -460,27 +461,33 @@ h1 span {
     }
     
     .gps-status-label {
-        display: none; /* Esconde o texto GPS, só o ponto */
+        display: none;
+    }
+    
+    /* NOME DA CIDADE - NUNCA ABREVIA */
+    #nomeCidade {
+        font-size: 9px;
+        max-width: 70px;
     }
     
     .cidade-label {
-        font-size: 7px;
-    }
-    
-    #nomeCidade {
-        max-width: 35px;
-        font-size: 7px;
+        font-size: 8px;
     }
     
     #temperaturaAtual {
-        font-size: 7px;
+        font-size: 8px;
+    }
+    
+    #umidadeAtual {
+        font-size: 8px;
+        display: inline-block;
     }
     
     #poluicaoAtual {
-        font-size: 7px;
+        font-size: 8px;
     }
     
-    /* ESCONDE EM TELAS MUITO PEQUENAS */
+    /* ESCONDE APENAS OS LABELS EM TELAS MUITO PEQUENAS */
     .cidade-label .label {
         display: none;
     }
@@ -501,7 +508,7 @@ h1 span {
     }
     
     #nomeCidade {
-        max-width: 150px;
+        max-width: 200px;
         font-size: 13px;
     }
     
@@ -1018,24 +1025,25 @@ h1 span {
         </div>
 
 
+
 <!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
 <div id="cidade-atual" class="cidade-label">
-    <span id="nomeCidade">📍Local</span>
+    <span id="nomeCidade">📍Local...</span>
     <span class="separador">|</span>
 
     <span class="temp-value">
-        🌡️<span id="temperaturaAtual">Temp</span>
+        🌡️ <span id="temperaturaAtual">Temp. °C</span>
     </span>
 
     <span class="separador">|</span>
 
     <span class="label">💧</span>
-    <span id="umidadeAtual" class="umidade-mobile">Umid</span>
+    <span id="umidadeAtual">Umidade %</span>
 
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️</span>
-    <span id="poluicaoAtual">Pol</span>
+    <span id="poluicaoAtual">Poluição</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
