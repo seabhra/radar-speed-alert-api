@@ -731,7 +731,7 @@ h1 span {
 
 <!-- NOVO: ALERTA DE NORMALIDADE (aparece quando o clima está normal) -->
 <div id="alerta-normalidade" class="alerta-normalidade-label" style="display: none;">
-    ✅ Clima normal. Aproveite o seu dia!
+    ✅ Clima normal. Aproveite!
 </div>
     </div>
 
@@ -1031,6 +1031,8 @@ let gpsLastUpdateTime = 0;
 
 // No início do script, junto com as outras variáveis globais
 let iconeCentralizado = false; // Controla se o ícone está no modo centralizado
+// alerta de clima normal
+let alertaNormalidadeMostrado = false;
 
 // ======================
 // CONFIGURAÇÃO DO GITHUB
@@ -1951,6 +1953,9 @@ function resetarMapa() {
     map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
     isFollowing = false;
     
+    // RESETA O ALERTA DE NORMALIDADE
+    alertaNormalidadeMostrado = false;
+    
     // REMOVE E RECRIA O MARCADOR COM ÍCONE DE NAVEGADOR
     if (!estaEmNavegacao && userMarker) {
         var pos = userMarker.getLatLng();
@@ -1988,6 +1993,7 @@ function resetarMapa() {
     showNotification("Mapa resetado");
     historicoDistanciasRadar = {};
 }
+
 // FUNÇÃO EXTRAIR COORDENADAS
 
 function extrairCoordenadas(record, index) {
@@ -2270,6 +2276,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 const cidadeLabel = document.getElementById("cidade-atual");
 
 let ultimaCidade = "";
+
 function startGPSTracking() {
     if (!navigator.geolocation) { 
         hideFullscreenLoading(); 
@@ -2281,17 +2288,17 @@ function startGPSTracking() {
         navigator.geolocation.clearWatch(watchId);
     }
 
-    // MOSTRA ALERTA DE NORMALIDADE AO INICIAR O GPS
-    setTimeout(() => {
-        const alertaNormalDiv = document.getElementById('alerta-normalidade');
-        if (alertaNormalDiv) {
-            alertaNormalDiv.style.display = 'flex';
-            alertaNormalDiv.innerHTML = '🔄 Aguardando dados do clima...';
-            setTimeout(() => {
-                alertaNormalDiv.style.display = 'none';
-            }, 3000);
-        }
-    }, 500);
+    // REMOVA ou COMENTE esta parte:
+    // setTimeout(() => {
+    //     const alertaNormalDiv = document.getElementById('alerta-normalidade');
+    //     if (alertaNormalDiv) {
+    //         alertaNormalDiv.style.display = 'flex';
+    //         alertaNormalDiv.innerHTML = '🔄 Aguardando dados do clima...';
+    //         setTimeout(() => {
+    //             alertaNormalDiv.style.display = 'none';
+    //         }, 3000);
+    //     }
+    // }, 500);
 
     watchId = navigator.geolocation.watchPosition(
         function(position) {
@@ -2306,7 +2313,7 @@ function startGPSTracking() {
 
             // ATUALIZA CIDADE E CLIMA
             atualizarCidade(position.coords.latitude, position.coords.longitude);
-            atualizarTemperatura(); // Chama a função que busca clima + poluição
+            atualizarTemperatura();
 
             processarNovaPosicao(
                 position.coords.latitude,
@@ -2618,6 +2625,7 @@ function verificarAlertaPoluicao(aqi) {
 }
 
 
+
 // =============================================
 // VERIFICAR SE O CLIMA ESTÁ NORMAL (ALERTA POSITIVO)
 // =============================================
@@ -2634,15 +2642,25 @@ function verificarClimaNormal(temp, umid) {
     const textoPoluicao = poluicaoEl.textContent;
     const poluicaoBoa = textoPoluicao.includes('Boa') || textoPoluicao.includes('Moderada');
     
-    // Se o clima está normal E a poluição está boa
+    // Se o clima está normal E a poluição está boa E NÃO há alertas de clima
     if (semAlertas && poluicaoBoa && alertaClimaDiv.style.display !== 'flex') {
-        alertaNormalDiv.style.display = 'flex';
-        alertaNormalDiv.innerHTML = '✅ Clima normal. Aproveite!';
         
-        // Mostra por 10 segundos e depois some
-        setTimeout(() => {
-            alertaNormalDiv.style.display = 'none';
-        }, 10000);
+        // Só mostra se ainda NÃO foi mostrado nesta sessão
+        if (!alertaNormalidadeMostrado) {
+            alertaNormalDiv.style.display = 'flex';
+            alertaNormalDiv.innerHTML = '✅ Clima normal. Aproveite!';
+            
+            // Toca o beep ao aparecer
+            tocarBeepNormalidade();
+            
+            // Marca como já mostrado
+            alertaNormalidadeMostrado = true;
+            
+            // Mostra por 8 segundos e depois some
+            setTimeout(() => {
+                alertaNormalDiv.style.display = 'none';
+            }, 8000);
+        }
     } else {
         // Esconde o alerta de normalidade se houver alertas ativos
         if (alertaClimaDiv.style.display === 'flex') {
@@ -2651,6 +2669,38 @@ function verificarClimaNormal(temp, umid) {
     }
 }
 
+// =============================================
+// BEEP DE NORMALIDADE (som suave e agradável)
+// =============================================
+function tocarBeepNormalidade() {
+    try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Toca duas notas suaves (C5 e E5)
+        var notas = [523, 659]; // C5 e E5
+        var duracao = 0.15;
+        
+        notas.forEach(function(freq, index) {
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + (index * 0.2));
+            
+            gain.gain.setValueAtTime(0.15, ctx.currentTime + (index * 0.2));
+            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + (index * 0.2) + duracao);
+            
+            osc.start(ctx.currentTime + (index * 0.2));
+            osc.stop(ctx.currentTime + (index * 0.2) + duracao);
+        });
+        
+        console.log('🔔 Beep de normalidade tocado');
+    } catch(e) {
+        console.warn('Beep de normalidade falhou:', e);
+    }
+}
 //=====================================
 // FUNÇÃO POSIONAR TEMPERATURA LOCAL
 //=====================================
@@ -3584,12 +3634,15 @@ $("#btn-center").click(function() {
     }
 });
 
-
-    // BOTÃO REFRESH 
-
+     //==============
+    // BOTÃO REFRESH
+    //=============== 
 $("#btn-refresh").click(function() { 
     resetarMapa(); 
     carregarRadares(); 
+    
+    // RESETA O ALERTA DE NORMALIDADE PARA APARECER NO REFRESH
+    alertaNormalidadeMostrado = false;
     
     // REMOVE E RECRIA O MARCADOR COM ÍCONE DE NAVEGADOR
     if (!estaEmNavegacao && userMarker) {
@@ -3617,6 +3670,11 @@ $("#btn-refresh").click(function() {
         iconeCentralizado = false;
         console.log("🔄 Ícone voltou para NAVIGATOR MAP (refresh)");
     }
+    
+    // Força a verificação do clima novamente após o refresh
+    setTimeout(() => {
+        atualizarTemperatura();
+    }, 1000);
 });
     
     
