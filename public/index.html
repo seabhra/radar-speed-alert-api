@@ -137,12 +137,13 @@ h1 span {
 /* ======================================== */
 /* CIDADE / CLIMA - COM EMOJIS VISÍVEIS */
 /* ======================================== */
+
 .cidade-label {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.3px;
     text-transform: uppercase;
@@ -150,44 +151,57 @@ h1 span {
     overflow: hidden;
     flex: 1;
     min-width: 0;
-    color: #ffffff; /* Fonte branca */
+    color: #ffffff;
 }
 
 .cidade-label .separador {
-    margin: 0 3px;
+    margin: 0 2px;
     opacity: 0.4;
     color: #ffffff;
 }
 
 .cidade-label .label {
-    font-size: 13px;
+    font-size: 12px;
     color: #ffffff;
+}
+
+/* EMOJIS - Tamanho fixo */
+.temp-value,
+.cidade-label .label {
+    font-size: 13px;
+    flex-shrink: 0;
 }
 
 /* NOME DA CIDADE */
 #nomeCidade {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 120px;
+    max-width: 100px;
     flex-shrink: 0;
-    font-size: 14px;
+    font-size: 13px;
     color: #ffffff;
 }
 
-/* DADOS CLIMÁTICOS - FONTE BRANCA */
+/* DADOS CLIMÁTICOS - APENAS NÚMEROS */
 #temperaturaAtual,
 #umidadeAtual,
 #poluicaoAtual {
-    font-size: 13px;
+    font-size: 12px;
     color: #ffffff;
     transition: all 0.3s ease;
+    min-width: 30px;
 }
 
-/* EMOJIS - GARANTE QUE APARECEM */
-.temp-value,
-.label {
-    font-size: 14px;
-    color: #ffffff;
+#temperaturaAtual {
+    min-width: 40px;
+}
+
+#umidadeAtual {
+    min-width: 30px;
+}
+
+#poluicaoAtual {
+    min-width: 40px;
 }
 
 /* ======================================== */
@@ -210,10 +224,9 @@ h1 span {
         letter-spacing: 0.3px;
     }
 
-    /* NOME DA CIDADE */
     #nomeCidade {
-        font-size: 12px;
-        max-width: 80px;
+        font-size: 11px;
+        max-width: 70px;
     }
 
     .gps-status-wrapper {
@@ -230,48 +243,38 @@ h1 span {
         letter-spacing: 0.3px;
     }
 
-    /* APP - FONTES MAIORES E EMOJIS VISÍVEIS */
+    /* APP - FONTES AJUSTADAS */
     .cidade-label {
-        font-size: 12px;
-        gap: 4px;
+        font-size: 11px;
+        gap: 3px;
     }
     
+    .temp-value,
     .cidade-label .label {
         font-size: 11px;
-        color: #ffffff;
     }
     
     #nomeCidade {
-        font-size: 12px;
+        font-size: 11px;
     }
     
     #temperaturaAtual {
-        font-size: 11px;
-        color: #ffffff;
+        font-size: 10px;
+        min-width: 35px;
     }
     
     #umidadeAtual {
-        font-size: 11px;
-        color: #ffffff;
-        display: inline-block;
+        font-size: 10px;
+        min-width: 25px;
     }
     
     #poluicaoAtual {
-        font-size: 11px;
-        color: #ffffff;
-    }
-    
-    /* EMOJIS NO APP - TAMANHO MAIOR */
-    .temp-value {
-        font-size: 12px;
-    }
-    
-    .cidade-label .label {
-        font-size: 11px;
+        font-size: 10px;
+        min-width: 35px;
     }
     
     .cidade-label .separador {
-        margin: 0 2px;
+        margin: 0 1px;
     }
 
     /* MENU TOGGLE */
@@ -316,37 +319,33 @@ h1 span {
     }
     
     .cidade-label {
-        font-size: 10px;
-        gap: 3px;
+        font-size: 9px;
+        gap: 2px;
+    }
+    
+    .temp-value,
+    .cidade-label .label {
+        font-size: 9px;
     }
     
     #nomeCidade {
-        font-size: 10px;
-        max-width: 60px;
+        font-size: 9px;
+        max-width: 50px;
     }
     
     #temperaturaAtual {
-        font-size: 10px;
-        color: #ffffff;
+        font-size: 8px;
+        min-width: 30px;
     }
     
     #umidadeAtual {
-        font-size: 10px;
-        color: #ffffff;
-        display: inline-block;
+        font-size: 8px;
+        min-width: 20px;
     }
     
     #poluicaoAtual {
-        font-size: 10px;
-        color: #ffffff;
-    }
-    
-    .temp-value {
-        font-size: 10px;
-    }
-    
-    .cidade-label .label {
-        font-size: 10px;
+        font-size: 8px;
+        min-width: 30px;
     }
     
     .cidade-label .separador {
@@ -359,30 +358,33 @@ h1 span {
 /* ======================================== */
 @media (min-width: 601px) {
     .cidade-label {
-        font-size: 15px;
-        gap: 8px;
+        font-size: 14px;
+        gap: 6px;
+    }
+    
+    .temp-value,
+    .cidade-label .label {
+        font-size: 14px;
     }
     
     #nomeCidade {
-        max-width: 200px;
-        font-size: 15px;
-        color: #ffffff;
+        max-width: 150px;
+        font-size: 14px;
     }
     
-    #temperaturaAtual,
-    #umidadeAtual,
+    #temperaturaAtual {
+        font-size: 13px;
+        min-width: 45px;
+    }
+    
+    #umidadeAtual {
+        font-size: 13px;
+        min-width: 30px;
+    }
+    
     #poluicaoAtual {
-        font-size: 14px;
-        color: #ffffff;
-    }
-    
-    .cidade-label .label {
-        font-size: 14px;
-        color: #ffffff;
-    }
-    
-    .temp-value {
-        font-size: 14px;
+        font-size: 13px;
+        min-width: 45px;
     }
 }
 
@@ -2821,7 +2823,7 @@ function ajustarHeaderResponsivo() {
         if (nomeCidade) nomeCidade.textContent = 'Local';
         if (temperatura) temperatura.textContent = 'Temp';
         if (umidade) umidade.textContent = 'Umid';
-        if (poluicao) poluicao.textContent = 'Pol';
+        if (poluicao) poluicao.textContent = 'IQAr';
         if (gpsLabel) gpsLabel.textContent = 'GPS';
     } else {
         // Normal - completo
@@ -2867,7 +2869,7 @@ async function atualizarCidade(lat, lng){
             ultimaCidade = cidade;
 
            document.getElementById("nomeCidade").textContent = 
-    "🚩 " + cidade;
+    "📍" + cidade;
 
             cidadeLabel.style.color =
                 corCidade(cidade);
@@ -2925,10 +2927,6 @@ navigator.geolocation.getCurrentPosition(async(pos)=>{
 
 
 
-//================================================
-// FUNÇÃO ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
-//================================================
-
 // =============================================
 // ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
 // =============================================
@@ -2951,7 +2949,7 @@ async function atualizarTemperatura() {
         const umidade = dadosClima.main.humidity;
 
         // ==========================================
-        // ATUALIZA TEMPERATURA (com símbolo °C)
+        // ATUALIZA TEMPERATURA (APENAS O NÚMERO + °C)
         // ==========================================
         const tempEl = document.getElementById('temperaturaAtual');
         if (tempEl) {
@@ -2960,7 +2958,7 @@ async function atualizarTemperatura() {
         }
         
         // ==========================================
-        // ATUALIZA UMIDADE
+        // ATUALIZA UMIDADE (APENAS O NÚMERO + %)
         // ==========================================
         const umidEl = document.getElementById('umidadeAtual');
         if (umidEl) {
@@ -2992,8 +2990,8 @@ async function atualizarTemperatura() {
                     1: { texto: 'Boa', cor: '#00cc66' },
                     2: { texto: 'Moderada', cor: '#ffcc00' },
                     3: { texto: 'Ruim', cor: '#ff8800' },
-                    4: { texto: 'Muito Ruim', cor: '#ff4444' },
-                    5: { texto: 'Péssima', cor: '#cc0000' }
+                    4: { texto: 'Péssima', cor: '#ff4444' },
+                    5: { texto: 'Insalubre', cor: '#cc0000' }
                 };
                 
                 const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
@@ -3035,7 +3033,6 @@ async function atualizarTemperatura() {
         console.error("Erro clima:", e);
     }
 }
-
 
 // =============================================
 // VERIFICAR ALERTA DE POLUIÇÃO
