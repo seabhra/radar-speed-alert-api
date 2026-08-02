@@ -1071,25 +1071,23 @@ h1 span {
 
 
 
-
-<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO VERSÃO SITE-->
+<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
 <div id="cidade-atual" class="cidade-label">
     <span id="nomeCidade">📍Local...</span>
     <span class="separador">|</span>
 
-    <span class="temp-value">
-        🌡️ <span id="temperaturaAtual">Temperatura °C</span>
-    </span>
+    <span class="temp-value">🌡️</span>
+    <span id="temperaturaAtual">--°C</span>
 
     <span class="separador">|</span>
 
     <span class="label">💧</span>
-    <span id="umidadeAtual">Umidade %</span>
+    <span id="umidadeAtual">--%</span>
 
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️</span>
-    <span id="poluicaoAtual">Poluição</span>
+    <span id="poluicaoAtual">--</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
@@ -1402,24 +1400,19 @@ let alertaNormalidadeMostrado = false;
 
 
 // =============================================
-// CONTROLE DE TEXTOS - APP vs SITE
+// CONTROLE DE TEXTOS - SITE vs APP
 // =============================================
 function ajustarTextosClima() {
     const isMobile = window.innerWidth <= 600;
-    const tempEl = document.getElementById('temperaturaAtual');
-    const umidEl = document.getElementById('umidadeAtual');
-    const poluEl = document.getElementById('poluicaoAtual');
+    const cidadeLabel = document.getElementById('cidade-atual');
     
-    if (isMobile) {
-        // APP - Textos abreviados (mantém os valores numéricos)
-        // Os textos serão controlados pela função atualizarTemperatura()
-        // mas marcamos como modo app
-        document.body.classList.add('modo-app');
-        document.body.classList.remove('modo-site');
-    } else {
-        // SITE - Textos por extenso
-        document.body.classList.add('modo-site');
-        document.body.classList.remove('modo-app');
+    if (cidadeLabel) {
+        cidadeLabel.classList.remove('modo-site', 'modo-app');
+        if (isMobile) {
+            cidadeLabel.classList.add('modo-app');
+        } else {
+            cidadeLabel.classList.add('modo-site');
+        }
     }
 }
 
@@ -2799,101 +2792,69 @@ function sucesso(position){
 
 }
 
+
+
 // =============================================
 // CONTROLE RESPONSIVO DO HEADER
 // =============================================
 function ajustarHeaderResponsivo() {
     const width = window.innerWidth;
-    const cidadeLabel = document.getElementById('cidade-atual');
-    const nomeCidade = document.getElementById('nomeCidade');
-    const temperatura = document.getElementById('temperaturaAtual');
-    const umidade = document.getElementById('umidadeAtual');
-    const poluicao = document.getElementById('poluicaoAtual');
     const gpsLabel = document.getElementById('gps-status-label');
+    const cidadeLabel = document.getElementById('cidade-atual');
     
     if (width < 400) {
-        // Muito pequeno - apenas o essencial
-        if (nomeCidade) nomeCidade.textContent = '📍';
-        if (temperatura) temperatura.textContent = '🌡️';
-        if (umidade) umidade.textContent = '💧';
-        if (poluicao) poluicao.textContent = '🏜️';
         if (gpsLabel) gpsLabel.textContent = '';
+        if (cidadeLabel) {
+            cidadeLabel.classList.add('tela-muito-pequena');
+            cidadeLabel.classList.remove('modo-app', 'modo-site');
+        }
     } else if (width < 600) {
-        // Pequeno - abreviado
-        if (nomeCidade) nomeCidade.textContent = 'Local';
-        if (temperatura) temperatura.textContent = 'Temp';
-        if (umidade) umidade.textContent = 'Umid';
-        if (poluicao) poluicao.textContent = 'IQAr';
         if (gpsLabel) gpsLabel.textContent = 'GPS';
+        if (cidadeLabel) {
+            cidadeLabel.classList.remove('tela-muito-pequena');
+            cidadeLabel.classList.add('modo-app');
+            cidadeLabel.classList.remove('modo-site');
+        }
     } else {
-        // Normal - completo
-        // Deixa o HTML cuidar
+        if (gpsLabel) gpsLabel.textContent = 'GPS';
+        if (cidadeLabel) {
+            cidadeLabel.classList.remove('tela-muito-pequena', 'modo-app');
+            cidadeLabel.classList.add('modo-site');
+        }
     }
 }
 
-// Executa no carregamento e no redimensionamento
-document.addEventListener('DOMContentLoaded', ajustarHeaderResponsivo);
-window.addEventListener('resize', ajustarHeaderResponsivo);
-
-// Também executa quando a cidade/clima é atualizado
-function atualizarCidade(lat, lng) {
-    // ... seu código existente ...
-    
-    // Depois de atualizar, ajusta o header
-    ajustarHeaderResponsivo();
-}
 
 //=====================================
 // FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
 //=====================================
-async function atualizarCidade(lat, lng){
-
+// =============================================
+// ATUALIZAR NOME DA CIDADE LOCAL
+// =============================================
+async function atualizarCidade(lat, lng) {
     try {
-
         const resposta = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
         );
-
         const dados = await resposta.json();
+        const cidade = dados.address.city ||
+                       dados.address.town ||
+                       dados.address.municipality ||
+                       dados.address.village;
 
-        const cidade =
-            dados.address.city ||
-            dados.address.town ||
-            dados.address.municipality ||
-            dados.address.village;
-
-
-        if(cidade && cidade !== ultimaCidade){
-
-
+        if (cidade && cidade !== ultimaCidade) {
             ultimaCidade = cidade;
-
-           document.getElementById("nomeCidade").textContent = 
-    "📍" + cidade;
-
-            cidadeLabel.style.color =
-                corCidade(cidade);
-
-            cidadeLabel.classList.add("mudou");
-
-            setTimeout(()=>{
-                cidadeLabel.classList.remove("mudou");
-            },400);
-            
-            // Exemplo de como evitar o erro quebrando a página:
-          
-            if (data && data.address && data.address.city) {
-           console.log("Cidade:", data.address.city);
-         } else {
-           console.log("Não foi possível encontrar a cidade.");
-           }
-
+            const nomeEl = document.getElementById("nomeCidade");
+            if (nomeEl) {
+                nomeEl.textContent = "📍" + cidade;
+                nomeEl.style.color = corCidade(cidade);
+            }
         }
-
-    } catch(e){
-        console.log("Erro cidade:",e);
+    } catch (e) {
+        console.log("Erro cidade:", e);
     }
 }
+
 //=========================
 // MUDANÇA DA COR DA CIDADE
 //=========================
@@ -2930,6 +2891,9 @@ navigator.geolocation.getCurrentPosition(async(pos)=>{
 // =============================================
 // ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
 // =============================================
+// =============================================
+// ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
+// =============================================
 async function atualizarTemperatura() {
     if (!userLat || !userLng) return;
 
@@ -2949,23 +2913,38 @@ async function atualizarTemperatura() {
         const umidade = dadosClima.main.humidity;
 
         // ==========================================
-        // ATUALIZA TEMPERATURA (APENAS O NÚMERO + °C)
+        // DETECTA SE É MOBILE
+        // ==========================================
+        const isMobile = window.innerWidth <= 600;
+        
+        // ==========================================
+        // ATUALIZA TEMPERATURA
         // ==========================================
         const tempEl = document.getElementById('temperaturaAtual');
         if (tempEl) {
-            tempEl.textContent = temperatura.toFixed(1) + '°C';
+            const valorTemp = temperatura.toFixed(1) + '°C';
+            if (isMobile) {
+                // APP: apenas o valor "26.9°C"
+                tempEl.textContent = valorTemp;
+            } else {
+                // SITE: "Temperatura 26.9°C"
+                tempEl.textContent = 'Temperatura ' + valorTemp;
+            }
             tempEl.style.color = '#ffffff';
         }
         
         // ==========================================
-        // ATUALIZA UMIDADE (APENAS O NÚMERO + %)
+        // ATUALIZA UMIDADE
         // ==========================================
         const umidEl = document.getElementById('umidadeAtual');
         if (umidEl) {
-            if (umidade !== undefined && umidade !== null) {
-                umidEl.textContent = umidade + '%';
+            let valorUmid = (umidade !== undefined && umidade !== null) ? umidade + '%' : '--%';
+            if (isMobile) {
+                // APP: apenas o valor "40%"
+                umidEl.textContent = valorUmid;
             } else {
-                umidEl.textContent = '--%';
+                // SITE: "Umidade 40%"
+                umidEl.textContent = 'Umidade ' + valorUmid;
             }
             umidEl.style.color = '#ffffff';
         }
@@ -2998,10 +2977,19 @@ async function atualizarTemperatura() {
                 const poluEl = document.getElementById('poluicaoAtual');
                 
                 if (poluEl) {
+                    let valorPol = '';
                     if (valorPoluicao > 0) {
-                        poluEl.textContent = infoPoluicao.texto + ' ' + valorPoluicao;
+                        valorPol = infoPoluicao.texto + ' ' + valorPoluicao;
                     } else {
-                        poluEl.textContent = infoPoluicao.texto;
+                        valorPol = infoPoluicao.texto;
+                    }
+                    
+                    if (isMobile) {
+                        // APP: apenas o valor "Moderada 6"
+                        poluEl.textContent = valorPol;
+                    } else {
+                        // SITE: "Poluição Moderada 6"
+                        poluEl.textContent = 'Poluição ' + valorPol;
                     }
                     poluEl.style.color = infoPoluicao.cor;
                 }
@@ -3010,7 +2998,11 @@ async function atualizarTemperatura() {
             } else {
                 const poluEl = document.getElementById('poluicaoAtual');
                 if (poluEl) {
-                    poluEl.textContent = 'N/A';
+                    if (isMobile) {
+                        poluEl.textContent = 'N/A';
+                    } else {
+                        poluEl.textContent = 'Poluição N/A';
+                    }
                     poluEl.style.color = '#888';
                 }
             }
@@ -3018,7 +3010,11 @@ async function atualizarTemperatura() {
             console.warn('Erro ao buscar poluição:', e);
             const poluEl = document.getElementById('poluicaoAtual');
             if (poluEl) {
-                poluEl.textContent = 'N/A';
+                if (isMobile) {
+                    poluEl.textContent = 'N/A';
+                } else {
+                    poluEl.textContent = 'Poluição N/A';
+                }
                 poluEl.style.color = '#888';
             }
         }
@@ -5448,12 +5444,17 @@ function receberDadosAppInventor(dadosStr) {
 // ===================================================================
 document.addEventListener('DOMContentLoaded', async function() {
   
+    ajustarTextosClima();
+    ajustarHeaderResponsivo();
     carregarRadaresPendentes(); 
     initMap(); 
     inicializarBussolaHardware(); // nome corrigido, ver bug 2 abaixo
     setTimeout(()=>{ const l=document.getElementById('loading-fullscreen'); if(l){l.classList.add('fade-out');setTimeout(()=>{if(l)l.style.display='none';},600);} }, 1500);
 });
-
+window.addEventListener('resize', function() {
+    ajustarTextosClima();
+    ajustarHeaderResponsivo();
+});
 </script>
 </body>
 </html>
