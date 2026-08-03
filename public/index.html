@@ -637,32 +637,44 @@ h1 span {
 }
 
 
+
 /* ========================================
    TEMA MATRIX — NOITE
-   Atmosfera escura, mas ruas e labels em destaque
+   Verde escuro estilo terminal Matrix
    ======================================== */
 
-.matrix-night .leaflet-tile-pane .leaflet-tile {
-    filter:
-        invert(1)              /* fundo claro -> escuro, vias escuras -> claras */
-        hue-rotate(180deg)      /* corrige o matiz que a inversão bagunça */
-        brightness(0.95)
-        contrast(1.15)
-        saturate(1.4)
-        sepia(0.25)             /* puxa levemente pro verde */
-        hue-rotate(60deg);      /* ajusta o tom final pro verde-matrix */
+.matrix-night .leaflet-tile-pane .leaflet-tile{
 
-    transition: filter .4s ease;
+    filter:
+        grayscale(.35)
+        sepia(.65)
+        hue-rotate(78deg)
+        saturate(2.35)
+        brightness(.42)
+        contrast(1.45);
+
+    transition:filter .4s ease;
 }
 
-.matrix-night .leaflet-map-pane::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: rgba(0, 40, 20, .25); /* verde escuro, mais opaco que antes */
-    z-index: 400;
-    mix-blend-mode: multiply; /* escurece sem lavar as vias */
+/* véu verde */
+
+.matrix-night .leaflet-map-pane::after{
+
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+
+    background:
+        linear-gradient(
+            rgba(0,18,8,.18),
+            rgba(0,32,14,.26)
+        ),
+        rgba(12,40,22,.22);
+
+    mix-blend-mode:multiply;
+
+    z-index:400;
 }
 
 
@@ -1073,21 +1085,21 @@ h1 span {
 
 <!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
 <div id="cidade-atual" class="cidade-label">
-    <span id="nomeCidade">📍Local...</span>
+    <span id="nomeCidade">📍Local</span>
     <span class="separador">|</span>
 
     <span class="temp-value">🌡️</span>
-    <span id="temperaturaAtual">--°C</span>
+    <span id="temperaturaAtual">Temperatura °C</span>
 
     <span class="separador">|</span>
 
     <span class="label">💧</span>
-    <span id="umidadeAtual">--%</span>
+    <span id="umidadeAtual">Umidade %</span>
 
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️</span>
-    <span id="poluicaoAtual">--</span>
+    <span id="poluicaoAtual">Poluição</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
