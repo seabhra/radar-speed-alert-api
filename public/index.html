@@ -746,126 +746,63 @@ h1 span {
 
 }    
 /* CSS TARJAS DE ALERTAS DE RADARES - HARMONIZADO */
-#alert-container { 
-    position: absolute; 
-    bottom: 0; 
-    left: 0;
-    right: 90px; /* CRIA ESPAÇO DO LADO DIREITO PARA O BOTÃO */
-    width: auto; /* DEIXA O right: 90px CONTROLAR A LARGURA */
-    max-width: 100%;
-    z-index: 1000; 
-    display: none; 
-    animation: slideUp 0.3s ease-out; 
-    pointer-events: none; 
+
+/* CSS ALERTAS DE RADARES*/
+    #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
+    
+    .alert-bar{
+    color:white;
+
+    display:flex;
+    align-items:center;
+    gap:15px;
+
+    width:100%;
+    box-sizing:border-box;
+
+    /* topo | direita | baixo | esquerda */
+    padding:18px 95px 18px 18px;
+
+    transition:all .2s ease;
+}
+  .alert-info{
+    flex:1;
+    min-width:0;
 }
 
-/* Em telas pequenas, ajusta o espaço */
-@media (max-width: 600px) {
-    #alert-container {
-        right: 80px; /* Ajuste para telas menores */
-    }
+.alert-info h3{
+    margin:0 0 3px;
+    font-size:1.05rem;
+    font-weight:800;
+    line-height:1.15;
 }
 
-/* O resto do CSS permanece igual */
-@keyframes slideUp { 
-    from { transform: translateY(100%); } 
-    to { transform: translateY(0); } 
+.alert-info p{
+    margin:0;
+    font-size:.88rem;
+    line-height:1.2;
+    opacity:.95;
 }
+  
+    .alert-bar-radar, .alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]) { background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); }
+    .alert-bar-risco { background: linear-gradient(90deg, #e6a800, #b38600); border-top: 2px solid #ffcc00; box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); }
+    .alert-bar-mobilidade { background: linear-gradient(90deg, #00b359, #008040); border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
+    .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
+    
+    .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
+    .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
+    .alert-info p { font-size: 0.95rem; opacity: 0.95; }
+    
+ /* CSS ALERTA DE DESTAQUE */
+.alert-bar-destaque {background: linear-gradient(90deg, #1fc7c7, #109090) !important;border-top: 2px solid #5fecec !important;box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5) !important;}
+.alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
+.alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
+.alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
+.alert-bar img {width: 50px;height: 50px;filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));}
 
-@keyframes pulseAlerta { 
-    0% { transform: scale(1); filter: brightness(1); } 
-    50% { transform: scale(1.02); filter: brightness(1.4); } 
-    100% { transform: scale(1); filter: brightness(1); } 
-}
 
-.alert-bar { 
-    color: white; 
-    padding: 14px 18px; 
-    display: flex; 
-    align-items: center; 
-    gap: 12px; 
-    transition: all 0.2s ease; 
-    border-radius: 0 12px 0 0;
-    width: 100%; /* OCUPA 100% DO CONTAINER */
-    min-height: 70px;
-    box-sizing: border-box; /* IMPORTANTE: INCLUI PADDING NA LARGURA */
-}
-
-/* Estilos por tipo de alerta */
-.alert-bar-radar, 
-.alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]) { 
-    background: linear-gradient(90deg, #cc0000, #990000); 
-    border-top: 2px solid #ff5555; 
-    box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); 
-}
-
-.alert-bar-risco { 
-    background: linear-gradient(90deg, #e6a800, #b38600); 
-    border-top: 2px solid #ffcc00; 
-    box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); 
-}
-
-.alert-bar-mobilidade { 
-    background: linear-gradient(90deg, #00b359, #008040); 
-    border-top: 2px solid #00e066; 
-    box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); 
-}
-
-.alert-bar-destaque {
-    background: linear-gradient(90deg, #1fc7c7, #109090) !important;
-    border-top: 2px solid #5fecec !important;
-    box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5) !important;
-}
-
-.alert-bar-destaque .alert-info h3 {
-    color: #ffffff;
-    text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);
-}
-
-.alert-bar-destaque img {
-    filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));
-}
-
-.alert-bar-critico, 
-.alert-bar-risco-critico, 
-.alert-bar-mobilidade-critico, 
-.alert-bar-destaque-critico {
-    animation: pulseAlerta 0.8s ease-in-out infinite;
-}
-
-/* ÍCONE DO ALERTA */
-.alert-bar img { 
-    width: 42px; 
-    height: 42px; 
-    flex-shrink: 0; /* Impede que o ícone encolha */
-    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); 
-    object-fit: contain;
-}
-
-/* CONTEÚDO DO ALERTA - COM JUSTIFY E TAMANHOS HARMONIZADOS */
-.alert-info { 
-    flex: 1;
-    min-width: 0; /* Permite que o texto quebre */
-    text-align: center; /* centraliza o texto */
-    word-break: break-word; /* Quebra palavras longas */
-}
-
-.alert-info h3 { 
-    font-size: 0.85rem; 
-    margin-bottom: 2px; 
-    text-transform: uppercase; 
-    font-weight: 800; 
-    letter-spacing: 0.5px;
-    text-align: left; /* Título alinhado à esquerda */
-}
-
-.alert-info p { 
-    font-size: 0.75rem; 
-    opacity: 0.95; 
-    text-align: justify; /* Texto justificado */
-    line-height: 1.3;
-    margin: 0;
-}
 
               
     /* CSS DE NOTIFICAÇÃO */
