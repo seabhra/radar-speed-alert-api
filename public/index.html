@@ -745,63 +745,53 @@ h1 span {
     display:none;
 
 }    
-/* CSS TARJAS DE ALERTAS DE RADARES - HARMONIZADO */
+/* CSS TARJAS DE ALERTAS DE RADARES*/
 
-/* CSS ALERTAS DE RADARES*/
-    #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
+    #alert-container { 
+        position: absolute;
+         bottom: 0; 
+         left: 0;
+          width: 100%; 
+          z-index: 1000; 
+          display: none; 
+          animation: slideUp 0.3s ease-out; 
+          pointer-events: none;
+         }
+
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
     
-    .alert-bar{
-    color:white;
-
-    display:flex;
-    align-items:center;
-    gap:15px;
-
-    width:100%;
-    box-sizing:border-box;
-
-    /* topo | direita | baixo | esquerda */
-    padding:18px 95px 18px 18px;
-
-    transition:all .2s ease;
-}
-  .alert-info{
-    flex:1;
-    min-width:0;
-}
-
-.alert-info h3{
-    margin:0 0 3px;
-    font-size:1.05rem;
-    font-weight:800;
-    line-height:1.15;
-}
-
-.alert-info p{
-    margin:0;
-    font-size:.88rem;
-    line-height:1.2;
-    opacity:.95;
-}
-  
+     
     .alert-bar-radar, .alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]) { background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); }
     .alert-bar-risco { background: linear-gradient(90deg, #e6a800, #b38600); border-top: 2px solid #ffcc00; box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); }
     .alert-bar-mobilidade { background: linear-gradient(90deg, #00b359, #008040); border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
-    
+    .alert-bar-destaque {background: linear-gradient(90deg, #1fc7c7, #109090) !important;border-top: 2px solid #5fecec !important;box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5) !important;}
+    .alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
+    .alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
+    .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
     .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
-    .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
-    .alert-info p { font-size: 0.95rem; opacity: 0.95; }
-    
- /* CSS ALERTA DE DESTAQUE */
-.alert-bar-destaque {background: linear-gradient(90deg, #1fc7c7, #109090) !important;border-top: 2px solid #5fecec !important;box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5) !important;}
-.alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
-.alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
-.alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
-.alert-bar img {width: 50px;height: 50px;filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));}
+   
+ .alert-info {
+    text-align: center;
+    padding-right: 60px;
+}
 
+.alert-info h3 {
+    font-size: .95rem;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    font-weight: 800;
+    text-align: center;
+}
+
+.alert-info p {
+    font-size: .72rem;
+    line-height: 1.15;
+    opacity: 0.95;
+    text-align: center;
+}
+ 
 
 
               
