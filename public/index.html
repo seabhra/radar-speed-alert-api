@@ -749,24 +749,24 @@ h1 span {
 #alert-container { 
     position: absolute; 
     bottom: 0; 
-    left: 0; 
-    width: calc(100% - 90px); /* OCUPA 100% MENOS O ESPAÇO DO BOTÃO */
-    max-width: 100%; /* PERMITE OCUPAR TODA A LARGURA DISPONÍVEL */
+    left: 0;
+    right: 90px; /* CRIA ESPAÇO DO LADO DIREITO PARA O BOTÃO */
+    width: auto; /* DEIXA O right: 90px CONTROLAR A LARGURA */
+    max-width: 100%;
     z-index: 1000; 
     display: none; 
     animation: slideUp 0.3s ease-out; 
     pointer-events: none; 
 }
 
-
 /* Em telas pequenas, ajusta o espaço */
 @media (max-width: 600px) {
     #alert-container {
-        width: calc(100% - 80px); /* Ajuste para telas menores */
-        max-width: 100%;
+        right: 80px; /* Ajuste para telas menores */
     }
 }
 
+/* O resto do CSS permanece igual */
 @keyframes slideUp { 
     from { transform: translateY(100%); } 
     to { transform: translateY(0); } 
@@ -786,9 +786,9 @@ h1 span {
     gap: 12px; 
     transition: all 0.2s ease; 
     border-radius: 0 12px 0 0;
-    max-width: 100%;
+    width: 100%; /* OCUPA 100% DO CONTAINER */
     min-height: 70px;
-    width: 100%; /* GARANTE QUE OCUPA 100% DO CONTAINER */
+    box-sizing: border-box; /* IMPORTANTE: INCLUI PADDING NA LARGURA */
 }
 
 /* Estilos por tipo de alerta */
