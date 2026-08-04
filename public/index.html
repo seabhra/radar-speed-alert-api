@@ -782,38 +782,46 @@ h1 span {
     .alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
    
-    .alert-bar {
+ .alert-bar {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
+
+    /* reserva espaço para o botão à direita */
     padding: 6px 70px 6px 20px;
 }
 
 .alert-bar img {
-    width: 50px;
-    height: 5opx;
+    width: 46px;
+    height: 46px;
     flex-shrink: 0;
-    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(0 0 4px rgba(0,0,0,.45));
 }
-   
- .alert-info {
+
+.alert-info {
+    flex: 1;
+    min-width: 0;
     text-align: center;
-    padding-right: 60px;
+    padding-right: 0;      /* remove o deslocamento */
 }
 
 .alert-info h3 {
+    margin: 0 0 2px;
     font-size: .95rem;
-    margin-bottom: 2px;
-    text-transform: uppercase;
     font-weight: 800;
-    text-align: center;
+    text-transform: uppercase;
+    line-height: 1.1;
+
+    white-space: nowrap;   /* nunca quebra */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .alert-info p {
+    margin: 0;
     font-size: .80rem;
-    line-height: 1.20;
-    opacity: 0.95;
-    text-align: justify;
+    line-height: 1.2;
+    text-align: center;    /* mais harmonioso que justify */
 }
  
 
