@@ -226,7 +226,7 @@ h1 span {
     }
 
     #nomeCidade {
-        font-size: 11px;
+        font-size: 12px;
         max-width: 70px;
     }
 
@@ -610,7 +610,7 @@ h1 span {
     
 /* ========================================
    TEMA MATRIX — DIA
-   Ruas e labels nítidos, fundo limpo sem "lavado"
+   Ruas como linhas grossas únicas, não duplas
    ======================================== */
 
 .matrix-day .leaflet-tile-pane .leaflet-tile {
@@ -619,12 +619,14 @@ h1 span {
         sepia(0.22)
         hue-rotate(72deg)
         saturate(2.05)
-        brightness(0.96)
-        contrast(1.55);
+        brightness(0.90)          /* ↓ compensa o contraste alto */
+        contrast(1.85)              /* ↑ funde as duas bordas em uma faixa */
+        drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35)); /* halo verde = linha grossa */
 
     transition: filter .4s ease;
 }
 
+/* véu mais sutil para não "lavar" as ruas */
 .matrix-day .leaflet-map-pane::after {
     content: "";
     position: absolute;
@@ -632,7 +634,13 @@ h1 span {
     pointer-events: none;
 
     background:
-        rgba(70, 210, 125, .08);
+        linear-gradient(
+            180deg,
+            rgba(0, 200, 80, .04) 0%,
+            rgba(0, 180, 70, .08) 100%
+        );
+
+    mix-blend-mode: soft-light;
 
     z-index: 400;
 }
@@ -824,8 +832,6 @@ h1 span {
     text-align: center;    /* mais harmonioso que justify */
 }
  
-
-
               
     /* CSS DE NOTIFICAÇÃO */
 
