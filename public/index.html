@@ -1004,7 +1004,57 @@ h1 span {
         .gps-status-label { display: none; }
     }
 
-        
+/* Wrapper que segura ícone + halo */
+.nav-pulse-wrapper {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ícone do navegador — fica acima do halo */
+.nav-pulse-icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* Halo pulsante atrás do ícone */
+.nav-pulse-ring {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(0, 255, 136, 0.35);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    animation: navPulse 2s ease-out infinite;
+}
+
+@keyframes navPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.6);
+        opacity: 0.8;
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.6);
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(2.2);
+        opacity: 0;
+        box-shadow: 0 0 0 12px rgba(0, 255, 136, 0);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(0.6);
+        opacity: 0;
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+    }
+}
 
 </style>
 <base target="_blank">
@@ -4065,14 +4115,21 @@ $("#btn-refresh").click(function() {
         // Remove o marcador antigo
         map.removeLayer(userMarker);
         
-        // Cria um NOVO marcador com o ícone de navegador
+        //marcador com o ícone de navegador pulsante
         var navIcon = L.divIcon({
-            html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
-            className: 'user-gps-marker',
-            iconSize: [50, 50],
-            iconAnchor: [25, 50],
-            popupAnchor: [0, -50]
-        });
+    html: `
+        <div class="nav-pulse-wrapper">
+            <div class="nav-pulse-ring"></div>
+            <img src="/imagens_app/ic_navigator_map.png" 
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" 
+                 class="nav-pulse-icon">
+        </div>
+    `,
+    className: 'user-gps-marker',
+    iconSize: [50, 50],
+    iconAnchor: [25, 50],
+    popupAnchor: [0, -50]
+});
         
         userMarker = L.marker([pos.lat, pos.lng], { 
             icon: navIcon, 
@@ -4095,6 +4152,14 @@ $("#btn-refresh").click(function() {
     $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
     
     
+    // Ativar pulso do icon navegador intenso
+document.querySelector('.nav-pulse-ring').style.animationDuration = '1s';
+document.querySelector('.nav-pulse-ring').style.background = 'rgba(0, 255, 136, 0.6)';
+
+// Voltar icon navegador ao normal
+document.querySelector('.nav-pulse-ring').style.animationDuration = '2s';
+document.querySelector('.nav-pulse-ring').style.background = 'rgba(0, 255, 136, 0.35)';
+
 // ===================================================================
 // INICIALIÇÃO GERAL E CARREGAMENTOS DE FUNÇÕES
 // ===================================================================
