@@ -1004,18 +1004,21 @@ h1 span {
         .gps-status-label { display: none; }
     }
 
-/* Wrapper que segura ícone + halo */
-.nav-pulse-wrapper {
+
+/* ========================================
+   PULSO DO ÍCONE DE NAVEGAÇÃO
+   ======================================== */
+.nav-pulse-wrap {
     position: relative;
     width: 50px;
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: none;
 }
 
-/* Ícone do navegador — fica acima do halo */
-.nav-pulse-icon {
+.nav-pulse-wrap img {
     width: 50px;
     height: 50px;
     object-fit: contain;
@@ -1024,36 +1027,29 @@ h1 span {
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
-/* Halo pulsante atrás do ícone */
-.nav-pulse-ring {
+.nav-pulse-halo {
     position: absolute;
-    width: 20px;
-    height: 20px;
-    background: rgba(0, 255, 136, 0.35);
-    border-radius: 50%;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    margin-left: -8px;
+    background: rgba(0, 255, 136, 0.35);
+    border-radius: 50%;
     z-index: 1;
-    animation: navPulse 2s ease-out infinite;
+    animation: navPulse 2.2s ease-out infinite;
+}
+
+.nav-pulse-halo.intenso {
+    animation: navPulse 1s ease-out infinite;
+    background: rgba(0, 255, 136, 0.6);
 }
 
 @keyframes navPulse {
-    0% {
-        transform: translate(-50%, -50%) scale(0.6);
-        opacity: 0.8;
-        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.6);
-    }
-    70% {
-        transform: translate(-50%, -50%) scale(2.2);
-        opacity: 0;
-        box-shadow: 0 0 0 12px rgba(0, 255, 136, 0);
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(0.6);
-        opacity: 0;
-        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
-    }
+    0%   { transform: scale(0.5);  opacity: 0.9; box-shadow: 0 0 0 0 rgba(0,255,136,0.6); }
+    70%  { transform: scale(2.8);  opacity: 0;   box-shadow: 0 0 0 14px rgba(0,255,136,0); }
+    100% { transform: scale(0.5);  opacity: 0;   box-shadow: 0 0 0 0 rgba(0,255,136,0); }
 }
 
 </style>
@@ -1649,6 +1645,38 @@ setInterval(function() {
     }
 }, 5000);
 
+// ===================================================================
+// CRIAR ICONE NAVEGADOR PULSANTE
+// ===================================================================
+
+function criarIconeNavegador(pulsarIntenso) {
+    var haloClass = 'nav-pulse-halo' + (pulsarIntenso ? ' intenso' : '');
+    var htmlStr = 
+        '<div class="nav-pulse-wrap">' +
+            '<div class="' + haloClass + '"></div>' +
+            '<img src="/imagens_app/ic_navigator_map.png"' +
+                 ' onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'"' +
+                 ' style="width:50px;height:50px;">' +
+        '</div>';
+    
+    return L.divIcon({
+        html: htmlStr,
+        className: 'user-gps-marker',
+        iconSize: [50, 50],
+        iconAnchor: [25, 50],
+        popupAnchor: [0, -50]
+    });
+}
+
+function ativarPulsoIntenso() {
+    var halo = document.querySelector('.nav-pulse-halo');
+    if (halo) halo.classList.add('intenso');
+}
+
+function desativarPulsoIntenso() {
+    var halo = document.querySelector('.nav-pulse-halo');
+    if (halo) halo.classList.remove('intenso');
+}
 
 // ===================================================================
 // MAPEAMENTO DE ÍCONES
@@ -2379,13 +2407,7 @@ function resetarMapa() {
         var pos = userMarker.getLatLng();
         map.removeLayer(userMarker);
         
-        var navIcon = L.divIcon({
-            html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
-            className: 'user-gps-marker',
-            iconSize: [50, 50],
-            iconAnchor: [25, 50],
-            popupAnchor: [0, -50]
-        });
+       var navIcon = criarIconeNavegador(false); // pulso normal
         
         userMarker = L.marker([pos.lat, pos.lng], { 
             icon: navIcon, 
@@ -2607,13 +2629,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 } else if (!estaEmNavegacao) {
     if (!userMarker) {
         // Cria o marcador inicial com ícone de navegador
-        var defaultIcon = L.divIcon({
-            html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
-            className: 'user-gps-marker',
-            iconSize: [50, 50],
-            iconAnchor: [25, 50],
-            popupAnchor: [0, -50]
-        });
+      var defaultIcon = criarIconeNavegador(true);
         userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
         userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
         ultimaPosicaoMarcador = { lat: smoothLat, lng: smoothLng };
@@ -4116,20 +4132,7 @@ $("#btn-refresh").click(function() {
         map.removeLayer(userMarker);
         
         //marcador com o ícone de navegador pulsante
-        var navIcon = L.divIcon({
-    html: `
-        <div class="nav-pulse-wrapper">
-            <div class="nav-pulse-ring"></div>
-            <img src="/imagens_app/ic_navigator_map.png" 
-                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" 
-                 class="nav-pulse-icon">
-        </div>
-    `,
-    className: 'user-gps-marker',
-    iconSize: [50, 50],
-    iconAnchor: [25, 50],
-    popupAnchor: [0, -50]
-});
+        var navIcon = criarIconeNavegador(false);
         
         userMarker = L.marker([pos.lat, pos.lng], { 
             icon: navIcon, 
