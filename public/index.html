@@ -244,33 +244,33 @@ h1 span {
         letter-spacing: 0.3px;
     }
 
-    /* APP - FONTES AJUSTADAS */
+    /* APP - FONTES AJUSTADAS NOVAMENTE*/
     .cidade-label {
-        font-size: 11px;
+        font-size: 12px;
         gap: 3px;
     }
     
     .temp-value,
     .cidade-label .label {
-        font-size: 11px;
+        font-size: 12px;
     }
     
     #nomeCidade {
-        font-size: 11px;
+        font-size: 12px;
     }
     
     #temperaturaAtual {
-        font-size: 10px;
+        font-size: 12px;
         min-width: 35px;
     }
     
     #umidadeAtual {
-        font-size: 10px;
+        font-size: 12px;
         min-width: 25px;
     }
     
     #poluicaoAtual {
-        font-size: 10px;
+        font-size: 12px;
         min-width: 35px;
     }
     
@@ -644,41 +644,51 @@ h1 span {
    Verde escuro estilo terminal Matrix
    ======================================== */
 
-.matrix-night .leaflet-tile-pane .leaflet-tile{
-
+.matrix-night .leaflet-tile-pane .leaflet-tile {
     filter:
         grayscale(.35)
         sepia(.65)
         hue-rotate(78deg)
         saturate(2.35)
-        brightness(.42)
-        contrast(1.45);
+        brightness(.78)        /* ↑ antes .42 — matava o verde */
+        contrast(1.25);       /* ↓ levemente para não estourar */
 
-    transition:filter .4s ease;
+    transition: filter .4s ease;
 }
 
-/* véu verde */
-
-.matrix-night .leaflet-map-pane::after{
-
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
+/* véu verde — mais sutil para não virar poço preto */
+.matrix-night .leaflet-map-pane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
 
     background:
         linear-gradient(
-            rgba(0,18,8,.18),
-            rgba(0,32,14,.26)
-        ),
-        rgba(12,40,22,.22);
+            180deg,
+            rgba(0, 255, 65, .06) 0%,
+            rgba(0, 40, 15, .35) 100%
+        );
 
-    mix-blend-mode:multiply;
+    /* overlay mantém o verde vivo sem apagar as ruas */
+    mix-blend-mode: overlay;
 
-    z-index:400;
+    z-index: 400;
 }
+    /* ======================
+   CSS RUAS BRILHAM DE NOITE
+   ========================= */
 
-
+.matrix-night .leaflet-tile-pane .leaflet-tile {
+    filter:
+        grayscale(.35)
+        sepia(.65)
+        hue-rotate(78deg)
+        saturate(2.35)
+        brightness(.78)
+        contrast(1.25)
+        drop-shadow(0 0 1px rgba(0, 255, 65, .25)); /* leve brilho nas bordas */
+}
     /* ===============
    CSS DA BÚSSOLA
    ================ */
@@ -780,15 +790,15 @@ h1 span {
 }
 
 .alert-bar img {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     flex-shrink: 0;
     filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.45));
 }
    
  .alert-info {
     text-align: center;
-    padding-right: 80px;
+    padding-right: 60px;
 }
 
 .alert-info h3 {
@@ -803,7 +813,7 @@ h1 span {
     font-size: .80rem;
     line-height: 1.20;
     opacity: 0.95;
-    text-align: center;
+    text-align: left;
 }
  
 
