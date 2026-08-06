@@ -763,7 +763,8 @@ h1 span {
 
     display:none;
 
-}    
+} 
+
 /* CSS TARJAS DE ALERTAS DE RADARES*/
 
     #alert-container { 
@@ -788,8 +789,11 @@ h1 span {
     .alert-bar-destaque {background: linear-gradient(90deg, #1fc7c7, #109090) !important;border-top: 2px solid #5fecec !important;box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5) !important;}
     .alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
     .alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
-    .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
-   
+    .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico, .alert-bar-servico-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
+   .alert-bar-servico {background: linear-gradient(90deg, #ff8c00, #e67e00);border-top: 2px solid #ffb347;box-shadow: 0 -5px 20px rgba(255, 140, 0, 0.4);
+}
+
+
  .alert-bar {
     display: flex;
     align-items: center;
@@ -1271,7 +1275,7 @@ h1 span {
               <option value="Passagem Sob Túnel Viário (TUV)">🚇 Túnel Viário (TUV)</option>
               <option value="Apenas Trânsito Local (ATL)">🏘️ Trânsito Local (ATL)</option>
               <option value="Área de Escape Caminhões (ARE)">🚛 Área de Escape (ARE)</option>
-              <option value="Radar de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
+              <option value="Alerta de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
               <option value="Zona de Estudo Nuclear (ZEN)">☢️ Zona de Estudo Nuclear (ZEN)</option>
               <option value="Controle de Redução de Velocidade (CRV)">⬇️ Redução de Velocidade (CRV)</option>
          
@@ -1357,6 +1361,10 @@ h1 span {
   </audio>
    <audio id="alerta-sound-climatico" preload="auto">
     <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
+  </audio>
+
+    <audio id="alerta-sound-servico" preload="auto">
+    <source src="audio_app/alerta_sound_servico.mp3" type="audio/mpeg">
   </audio>
 
 <script>
@@ -1721,7 +1729,7 @@ const iconMap = {
     'Alerta de Alto Índice de Acidente (AIA)':'/imagens_app/ic_radar_acidente_v2.png',
     'Alerta de Alto Índice  de Acidente (AIA)':'/imagens_app/ic_radar_acidente_v2.png',
     'Alerta de Alto Índice de Acidente':'/imagens_app/ic_radar_acidente_v2.png',
-    'Radar de Caminhão na Faixa Esquerda (CFE)':'/imagens_app/ic_radar_truck_v2.png',
+    'Alerta de Caminhão na Faixa Esquerda (CFE)':'/imagens_app/ic_radar_truck_v2.png',
     'Zona de Estudo Nuclear (ZEN)':'/imagens_app/ic_radar_nuclear_v2.png',
     'Área de Escape Caminhões (ARE)':'/imagens_app/ic_area_escape.png',
     'Apenas Trânsito Local (ATL)':'/imagens_app/ic_local_traffic_v2.png',
@@ -1756,12 +1764,18 @@ const iconMap = {
     'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato - Nações Unidas - Artesanato': '/imagens_app/ic_polo_artesanato.png',
     'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas': '/imagens_app/ic_polo_artesanato.png',
 
+     //=== ALERTA DE SERVIÇO ===
+    'Alerta de Serviço - Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
+    'Alerta de Serviço - WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
+    'Alerta de Serviço - WC Público Comum (COM)': '/imagens_app/ic_publico.png',
+    'Alerta de Serviço - Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_banheiro.png',
+
+
     'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
 const TIPOS_ALERTA_RADAR = [
     'Detector de Parada sobre Faixa de Pedestres  (DPFP)',
-    'Radar de Caminhão na Faixa Esquerda (CFE)',
     'Detector de Conversão em Local Proibido (DCP)',
     'Detector de Redução de Velocidade (REV)',
     'Verificador de Cinto de Segurança (VCS)',
@@ -1774,8 +1788,8 @@ const TIPOS_ALERTA_RADAR = [
     'Detector de Tráfego em Local Proibido  (DTLP)',
     'Detector de Invasão de Faixa Exclusiva (MOVE)',
     'Detector de Invasão de Faixa Exclusiva (DIFEX)',
-    'Controle Inteligente de Velocidade (CIV)',
-    'Apenas Trânsito Local (ATL)'
+    'Controle Inteligente de Velocidade (CIV)'
+    
 ];
 
 const TIPOS_ALERTA_RISCO = [
@@ -1793,6 +1807,8 @@ const TIPOS_ALERTA_RISCO = [
 const TIPOS_ALERTA_MOBILIDADE = [
     'Detector de Faixa Preferencial de Ônibus (BUS)',
     'Detector de Faixa Preferencial de Ônibus',
+    'Alerta de Caminhão na Faixa Esquerda (CFE)',
+    'Apenas Trânsito Local (ATL)',
     'Faixa Preferencial de Ônibus (BUS)',
     'Faixa Preferencial de Ônibus',
     'Leitor de Reconhecimento Facial (OCR-F)',
@@ -1830,6 +1846,17 @@ const TIPOS_ALERTA_DESTAQUE = [
 'Museu Abílio Barreto - História',
 'Polo de Artesanato de Nações Unidas - Artesanato'
 ];
+
+const TIPOS_ALERTA_SERVIÇO = [
+
+'Ponto Amigo do Cidadão', 
+'WC Público Comum',
+'WC Público Autolimpante',
+'Recarga Carro Elétrico'
+];
+
+
+
 
 
 const TIPOS_SEM_ALERTA = [];
@@ -3297,6 +3324,9 @@ function normalizarTexto(texto) {
         .trim();
 }
 
+// =============================================
+// CLASSIFICAÇÃO DE AUDIO ALERTAS
+// =============================================
 function classificarAlerta(tipoOriginal) {
     var tipoNorm = normalizarTexto(tipoOriginal);
 
@@ -3312,7 +3342,12 @@ function classificarAlerta(tipoOriginal) {
 
     for (var m = 0; m < TIPOS_ALERTA_MOBILIDADE.length; m++) {
         if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_MOBILIDADE[m]))) return 'mobilidade';
+        
     }
+
+    for (var rr = 0; rr < TIPOS_ALERTA_SERVIÇO.length; rr++) {
+    if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_SERVIÇO[rr]))) return 'servico';
+}
 
     for (var rr = 0; rr < TIPOS_ALERTA_RADAR.length; rr++) {
         if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_RADAR[rr]))) return 'radar';
@@ -3345,14 +3380,14 @@ function dispararAlerta(radarData, distancia) {
     var $title = $("#alert-title");
     var $text = $("#alert-text");
 
-    $bar.removeClass('alert-bar-radar alert-bar-risco alert-bar-mobilidade alert-bar-destaque ' +
-                      'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico');
+    $bar.removeClass('alert-bar-radar alert-bar-risco alert-bar-mobilidade alert-bar-destaque alert-bar-servico ' +
+                  'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico alert-bar-servico-critico');
     $bar.addClass('alert-bar-' + tipo);
 
     var tipoExibicao = ajusteNomes[radarData.tipoOriginal] || radarData.tipoOriginal;
     $icon.attr('src', getIconUrl(radarData.tipoOriginal, radarData.velocidade_maxima));
 
-    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO DE MOBILIDADE', destaque: 'DESCUBRA A CIDADE' };
+    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO MOBILIDADE', destaque: 'DESCUBRA A CIDADE', servico: 'REDES DE SERVIÇOS' };
     $title.text(titulos[tipo] || 'ATENÇÃO!');
     $text.text(tipoExibicao + ' — ' + Math.round(distancia) + 'm');
 
@@ -3402,7 +3437,7 @@ function esconderAlertaVisual() {
 
     $("#alert-container").fadeOut(200, function () {
         $(this).find(".alert-bar").removeClass(
-            'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico'
+            'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico alert-bar-destaque-servico'
         );
     });
     ajustarPosicaoSpeedWidget(false);
@@ -3578,6 +3613,16 @@ function _tocarBeep(ctx, tipoAlerta) {
         gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.3);
+    }
+        else if (tipoAlerta === 'servico') {
+        // Som de silêncio específico para SERVICO (Mais agudo e contínuo)
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(1000, ctx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
 
     } else {
         // Som de silêncio padrão para RADAR
@@ -3635,6 +3680,8 @@ function desbloquearAudioMobile() {
     document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
 });
 
+
+//===================================
 // ==================================
 // DESBLOQUEIO DOS  AUDIOS DE ALERTA 
 // ==================================
@@ -3642,7 +3689,7 @@ var _alertSoundsDesbloqueados = false;
 
 
 function desbloquearAudiosDeAlerta() {
-    var ids = ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'];
+    var ids = ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque', 'alert-sound-servico'];
     var algumDesbloqueado = false;
 
     ids.forEach(function(id) {
@@ -3684,7 +3731,7 @@ var contagemTocarSom = 0;
 function cancelarSequenciaSom() {
     _sequenciaSomId++;
     _alertaPrincipalEstaTocando = false;
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque', 'alert-sound-servico'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el && _soundListeners[id]) {
             el.removeEventListener('ended', _soundListeners[id]);
@@ -3698,7 +3745,7 @@ function cancelarSequenciaSom() {
 function pararTodosSons() {
     cancelarSequenciaSom();
     _alertaPrincipalEstaTocando = false; // ← ADICIONAR ISSO
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque', 'alert-sound-servico'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el) {
             el.pause();
@@ -3729,6 +3776,7 @@ function tocarSomAlerta(tipoAlerta) {
     if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
     else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
     else if (tipoAlerta === 'destaque') soundId = 'alert-sound-destaque';
+    else if (tipoAlerta === 'servico') soundId = 'alert-sound-servico';
 
     var sound = document.getElementById(soundId)
              || document.getElementById('alert-sound-radar');
@@ -5471,8 +5519,6 @@ function receberDadosAppInventor(dadosStr) {
         }
     }
 }
-
-
 
 
 
