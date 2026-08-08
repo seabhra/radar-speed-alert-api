@@ -1695,7 +1695,7 @@ const iconMap = {
 
     'Controlador Eletrônico Misto (DAS) + (CEV)':'/imagens_app/ic_radar_cem_cev.png',
     'Controlador Eletrônico Misto (DAS) + (DCP)':'/imagens_app/ic_radar_cem_dcp.png',
-    'Controlador Eletrônico Misto (DAS) + (MOVE)':'/imagens_app/ic_radar_cem_move.png',
+    'Controlador Eletrônico Misto (DAS) + (DIV)':'/imagens_app/ic_radar_cem_move.png',
 
     'Detector de Avanço de Semáforo (DAS)':'/imagens_app/ic_radar_das_v2.png',
     'Detector de Avanço de Semáforo':'/imagens_app/ic_radar_das_v2.png',
@@ -1783,10 +1783,12 @@ const TIPOS_ALERTA_RADAR = [
     'Detector de Redução de Velocidade (REV)',
     'Verificador de Cinto de Segurança (VCS)',
     'Detector de Uso de Celular (DUC)',
+    
+     //=== ALERTA DE RADARES MISTOS ===
 
     'Controlador Eletrônico Misto (DAS) + (CEV)',
     'Controlador Eletrônico Misto (DAS) + (DCP)',
-    'Controlador Eletrônico Misto (DAS) + (MOVE)',
+    'Controlador Eletrônico Misto (DAS) + (DIV)',
 
     'Controlador Eletrônico de Velocidade (CEV)',
     'Detector de Avanço de Semáforo (DAS)',
@@ -1870,6 +1872,7 @@ const ajusteNomes = {
     'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
     'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
 
+//=== ALERTA DE RADARES MISTOS ===
     'Controlador Eletrônico Misto (DAS + CEV)': 'Radar Misto Velocidade+Semáforo (CEM)',
     'Controlador Eletrônico Misto (DAS + DCP)': 'Radar Misto Semáforo+Conversão (CEM)',
     'Controlador Eletrônico Misto (DAS + DIF)': 'Radar Misto Semáforo+Faixa (CEM)',
@@ -1939,7 +1942,7 @@ function getIconUrl(tipo, velocidade) {
         return iconMap['Controlador Eletrônico Misto (DAS) + (DCP)'];
     }
     if (tipoLimpo.includes('Misto') && tipoLimpo.includes('MOVE')) {
-        return iconMap['Controlador Eletrônico Misto (DAS) + (MOVE)'];
+        return iconMap['Controlador Eletrônico Misto (DAS) + (DIV)'];
     }
 
          // === VERIFICAR DEPOIS RADARES GENÉRICOS ===
