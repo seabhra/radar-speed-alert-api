@@ -1747,7 +1747,7 @@ const iconMap = {
     'Alerta de Lugares em Destaque (ALE) - Mercado Central - Arte e Gastronomia': '/imagens_app/ic_mercado_central.png',
     'Alerta de Lugares em Destaque (ALE) - Mirante do Mangabeiras - Panorama': '/imagens_app/ic_mirante_mangabeiras.png',
     'Alerta de Lugares em Destaque (ALE) - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
-    'Alerta de Lugares em Destaque (ALE) - Mercado Novo - Gastronomia': '/imagens_app/ic_mercado_novo.png',
+    'Alerta de Lugares em Destaque (ALE) - Mercado Novo - Arte e Gastronomia': '/imagens_app/ic_mercado_novo.png',
     'Alerta de Lugares em Destaque (ALE) - Santa Tereza - Circuito Boêmio': '/imagens_app/ic_santa_tereza.png',
     'Alerta de Lugares em Destaque (ALE) - Rua Sapucaí - Panorama e Gastronomia': '/imagens_app/ic_rua_sapucai.png',
     'Alerta de Lugares em Destaque (ALE) - Praça da Liberdade - Arte e Cultura': '/imagens_app/ic_praca_liberdade.png',
@@ -1764,13 +1764,13 @@ const iconMap = {
     'Alerta de Lugares em Destaque (ALE) - Praça da Savassi - Gastronomia': '/imagens_app/ic_praca_savassi.png',
     'Alerta de Lugares em Destaque (ALE) - Museu de Artes e Ofícios - História': '/imagens_app/ic_museu_artes_oficios.png',
     'Alerta de Lugares em Destaque (ALE) - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
-    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato - Nações Unidas - Artesanato Mineiro': '/imagens_app/ic_polo_artesanato.png',
+    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas - Arte Mineira': '/imagens_app/ic_polo_artesanato.png',
     
      //=== ALERTA DE SERVIÇO ===
-    'Alerta de Serviço - Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
-    'Alerta de Serviço - WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
-    'Alerta de Serviço - WC Público Comum (COM)': '/imagens_app/ic_publico.png',
-    'Alerta de Serviço - Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_banheiro.png',
+    'Rede de Serviço - Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
+    'Rede de Serviço - WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
+    'Rede de Serviço - WC Público Comum (COM)': '/imagens_app/ic_publico.png',
+    'Rede de Serviço - Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_banheiro.png',
 
 
     'default': '/imagens_app/ic_radar_cev_v2.png'
@@ -1832,9 +1832,9 @@ const TIPOS_ALERTA_MOBILIDADE = [
 
 const TIPOS_ALERTA_DESTAQUE = [
 'Mercado Central - Arte e Gastronomia', 
+'Mercado Novo - Arte e Gastronomia', 
 'Mirante do Mangabeiras - Panorama',
 'Parque Mangabeiras - Natureza',
-'Mercado Novo - Gastronomia',
 'Santa Tereza - Circuito Boêmio',
 'Rua Sapucaí - Panorama e Gastronomia',
 'Praça da Liberdade - Arte e Cultura', 
@@ -1850,7 +1850,7 @@ const TIPOS_ALERTA_DESTAQUE = [
 'Praça da Savassi - Gastronomia',
 'Museu de Artes e Ofícios - História',
 'Museu Abílio Barreto - História',
-'Polo de Artesanato de Nações Unidas - Artesanato Mineiro'
+'Polo de Artesanato de Nações Unidas - Arte MIneira'
 ];
 
 const TIPOS_ALERTA_SERVIÇO = [
@@ -3416,7 +3416,7 @@ function dispararAlerta(radarData, distancia) {
     var tipoExibicao = ajusteNomes[radarData.tipoOriginal] || radarData.tipoOriginal;
     $icon.attr('src', getIconUrl(radarData.tipoOriginal, radarData.velocidade_maxima));
 
-    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO MOBILIDADE', destaque: 'DESCUBRA A CIDADE', servico: 'REDES DE SERVIÇOS' };
+    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO MOBILIDADE', destaque: 'DESCUBRA A CIDADE', servico: 'REDE DE SERVIÇOS' };
     $title.text(titulos[tipo] || 'ATENÇÃO!');
     $text.text(tipoExibicao + ' — ' + Math.round(distancia) + 'm');
 
