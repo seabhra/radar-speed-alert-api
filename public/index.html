@@ -1695,7 +1695,7 @@ const iconMap = {
 
     'Controlador Eletrônico Misto (DAS) + (CEV)':'/imagens_app/ic_radar_cem_cev.png',
     'Controlador Eletrônico Misto (DAS) + (DCP)':'/imagens_app/ic_radar_cem_dcp.png',
-    'Controlador Eletrônico Misto (DAS) + (DIV)':'/imagens_app/ic_radar_cem_move.png',
+    'Controlador Eletrônico Misto (DAS) + (DIF)':'/imagens_app/ic_radar_cem_move.png',
 
     'Detector de Avanço de Semáforo (DAS)':'/imagens_app/ic_radar_das_v2.png',
     'Detector de Avanço de Semáforo':'/imagens_app/ic_radar_das_v2.png',
@@ -1942,7 +1942,7 @@ function getIconUrl(tipo, velocidade) {
         return iconMap['Controlador Eletrônico Misto (DAS) + (DCP)'];
     }
     if (tipoLimpo.includes('Misto') && tipoLimpo.includes('MOVE')) {
-        return iconMap['Controlador Eletrônico Misto (DAS) + (DIV)'];
+        return iconMap['Controlador Eletrônico Misto (DAS) + (DIF)'];
     }
 
          // === VERIFICAR DEPOIS RADARES GENÉRICOS ===
