@@ -303,7 +303,7 @@
       [278, "1553", "Rua Platina, Esq. Av. Silva Lobo", "Detector de Conversão em Local Proibido", "60", "Prado/Gameleira", "Único", "1", "1", "-19.925808,-43.972279"],
       [279, "1554", "Rua Desembargador Barcelos, Esq. Av. Silva Lobo", "Detector de Avanço de Semáforo", "60", "Gameleira/Prado", "Único", "1", "1", "-19.924320,-43.941300"],
       [280, "1555", "Rua Desembargador Barcelos, Esq. Av. Silva Lobo", "Detector de Conversão em Local Proibido", "60", "Gameleira/Prado", "Único", "1", "1", "-19.926181,-43.972419"],
-      [281, "1563", "Av. Vilarinho, esquina com Rua Maçon Ribeiro", "Controlador Eletrônico Misto (CEM) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)", "60", "Bairro/Centro", "Único", "1009", "BRI1009", "-19.818647,-43.952469"],
+      [281, "1563", "Av. Vilarinho, esquina com Rua Maçon Ribeiro", "Controlador Eletrônico Misto (DIF) - Semáforo (DAS) e Detector de Invasão de Faixa (DIF)", "60", "Bairro/Centro", "Único", "1009", "BRI1009", "-19.818647,-43.952469"],
       [282, "1564", "Av. Vilarinho, esquina com Rua Maçon Ribeiro", "Detector de Invasão de Faixa Exclusiva - MOVE", "60", "Bairro/Centro", "Único", "1009", "BRI1009", "-19.818789,-43.952420"],
       [283, "1565", "Av. Presidente Antônio Carlos, 4157", "Detector de Avanço de Semáforo", "60", "Bairro/Centro", "Único", "1816", "BRI1816", "-19.918610,-43.941020"],
       [284, "1566", "Av. Presidente Antônio Carlos, esquina com Rua Estoril", "Detector de Avanço de Semáforo", "60", "Centro/Bairro", "Único", "1391", "BRI1391", "-19.918585,-43.940750"],
