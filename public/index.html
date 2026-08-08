@@ -1744,7 +1744,6 @@ const iconMap = {
 
 
      //=== ALERTA DE LUGARES EM DESTAQUE (ALE) ===
-    // Variações com hífen "-" (formato do radares.json)
     'Alerta de Lugares em Destaque (ALE) - Mercado Central - Gastronomia': '/imagens_app/ic_mercado_central.png',
     'Alerta de Lugares em Destaque (ALE) - Mirante do Mangabeiras - Mirante': '/imagens_app/ic_mirante_mangabeiras.png',
     'Alerta de Lugares em Destaque (ALE) - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
@@ -1964,7 +1963,13 @@ function getIconUrl(tipo, velocidade) {
         tipoLimpo === 'Controle de Redução de Velocidade')
         return iconMap['Controle de Redução de Velocidade (CRV)'];
 
-    var isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('CEM') || tipoLimpo.includes('Controlador Eletrônico');
+    var isRadarVelocidade = (tipoLimpo.includes('Velocidade') || 
+                         tipoLimpo.includes('CEV') || 
+                         tipoLimpo.includes('CEM') || 
+                         tipoLimpo.includes('Controlador Eletrônico')) 
+                         && !tipoLimpo.includes('Misto');
+
+
     if (isRadarVelocidade) {
         var velStr = String(velocidade || '').trim();
         var velNum = parseInt(velStr.replace(/[^0-9]/g, ''), 10);
