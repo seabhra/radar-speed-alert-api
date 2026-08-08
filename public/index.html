@@ -1767,10 +1767,10 @@ const iconMap = {
     'Lugares em Destaque - Polo de Artesanato de Nações Unidas - Arte Mineira': '/imagens_app/ic_polo_artesanato.png',
     
      //=== ALERTA DE SERVIÇO ===
-    'Rede de Serviço - Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
-    'Rede de Serviço - WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
-    'Rede de Serviço - WC Público Comum (COM)': '/imagens_app/ic_publico.png',
-    'Rede de Serviço - Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_amigo.png',
+    'Rede de Serviços - Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
+    'Rede de Serviços - WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
+    'Rede de Serviços - WC Público Comum (COM)': '/imagens_app/ic_publico.png',
+    'Rede de Serviços - Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_amigo.png',
 
 
     'default': '/imagens_app/ic_radar_cev_v2.png'
@@ -1936,16 +1936,16 @@ function getIconUrl(tipo, velocidade) {
 
     // === Matching parcial para SERVIÇOS ===
     if (tipoLimpo.includes('Recarga') || tipoLimpo.includes('Elétrico') || tipoLimpo.includes('REC')) {
-        return iconMap['Rede de Serviço - Recarga Carro Elétrico (REC)'];
+        return iconMap['Rede de Serviços - Recarga Carro Elétrico (REC)'];
     }
     if (tipoLimpo.includes('Autolimpante') || tipoLimpo.includes('AUT')) {
-        return iconMap['Rede de Serviço - WC Público Autolimpante (AUT)'];
+        return iconMap['Rede de Serviços - WC Público Autolimpante (AUT)'];
     }
     if (tipoLimpo.includes('WC Público Comum') || tipoLimpo.includes('COM')) {
-        return iconMap['Rede de Serviço - WC Público Comum (COM)'];
+        return iconMap['Rede de Serviços - WC Público Comum (COM)'];
     }
     if (tipoLimpo.includes('Abrigo Amigo') || tipoLimpo.includes('PAA') || tipoLimpo.includes('Abrigo Amigo')) {
-        return iconMap['Rede de Serviço - Ponto Abrigo Amigo (PAA)'];
+        return iconMap['Rede de Serviços - Ponto Abrigo Amigo (PAA)'];
     }
 
 
