@@ -1767,10 +1767,10 @@ const iconMap = {
     'Lugares em Destaque - Polo de Artesanato de Nações Unidas - Arte Mineira': '/imagens_app/ic_polo_artesanato.png',
     
      //=== ALERTA DE SERVIÇO ===
-    'Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
-    'WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
-    'WC Público Comum (COM)': '/imagens_app/ic_publico.png',
-    'Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_banheiro.png',
+    'Rede de Serviço - Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
+    'Rede de Serviço - WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
+    'Rede de Serviço - WC Público Comum (COM)': '/imagens_app/ic_publico.png',
+    'Rede de Serviço - Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_amigo.png',
 
 
     'default': '/imagens_app/ic_radar_cev_v2.png'
@@ -1855,7 +1855,7 @@ const TIPOS_ALERTA_DESTAQUE = [
 
 const TIPOS_ALERTA_SERVIÇO = [
 
-'Ponto Amigo do Cidadão', 
+' Ponto Abrigo Amigo', 
 'WC Público Comum',
 'WC Público Autolimpante',
 'Recarga Carro Elétrico'
@@ -1932,6 +1932,22 @@ function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
 function getIconUrl(tipo, velocidade) {
     const tipoLimpo = tipo ? tipo.trim() : "";
     if (!tipoLimpo) return iconMap['default'];
+
+
+    // === Matching parcial para SERVIÇOS ===
+    if (tipoLimpo.includes('Recarga') || tipoLimpo.includes('Elétrico') || tipoLimpo.includes('REC')) {
+        return iconMap['Rede de Serviço - Recarga Carro Elétrico (REC)'];
+    }
+    if (tipoLimpo.includes('Autolimpante') || tipoLimpo.includes('AUT')) {
+        return iconMap['Rede de Serviço - WC Público Autolimpante (AUT)'];
+    }
+    if (tipoLimpo.includes('WC Público Comum') || tipoLimpo.includes('COM')) {
+        return iconMap['Rede de Serviço - WC Público Comum (COM)'];
+    }
+    if (tipoLimpo.includes('Abrigo Amigo') || tipoLimpo.includes('PAA') || tipoLimpo.includes('Abrigo Amigo')) {
+        return iconMap['Rede de Serviço - Ponto Abrigo Amigo (PAA)'];
+    }
+
 
       // === RADARES MISTOS — verificar PRIMEIRO, antes do genérico ===
     if (tipoLimpo.includes('Misto') && tipoLimpo.includes('CEV')) {
