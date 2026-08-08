@@ -1876,7 +1876,7 @@ const ajusteNomes = {
 
     'Controlador Eletrônico Misto (CEM)': 'Radar Misto Velocidade+Semáforo (CEM)',
     'Controlador Eletrônico Misto': 'Radar Misto Velocidade+Semáforo (CEM)',
-    
+
     'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
     'Controle de Redução de Velocidade': 'Painel de Redução de Velocidade (PRV)',
     'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
@@ -1930,6 +1930,19 @@ function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
 function getIconUrl(tipo, velocidade) {
     const tipoLimpo = tipo ? tipo.trim() : "";
     if (!tipoLimpo) return iconMap['default'];
+
+      // === RADARES MISTOS — verificar PRIMEIRO, antes do genérico ===
+    if (tipoLimpo.includes('Misto') && tipoLimpo.includes('CEV')) {
+        return iconMap['Controlador Eletrônico Misto (DAS) + (CEV)'];
+    }
+    if (tipoLimpo.includes('Misto') && tipoLimpo.includes('DCP')) {
+        return iconMap['Controlador Eletrônico Misto (DAS) + (DCP)'];
+    }
+    if (tipoLimpo.includes('Misto') && tipoLimpo.includes('MOVE')) {
+        return iconMap['Controlador Eletrônico Misto (DAS) + (MOVE)'];
+    }
+
+         // === VERIFICAR DEPOIS RADARES GENÉRICOS ===
 
     if (tipoLimpo.includes('Média') || tipoLimpo.includes('(RIV)') || tipoLimpo.includes('RIV')) {
         return iconMap['Radar Inteligente de Velocidade Média (RIV)'];
