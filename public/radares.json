@@ -147,7 +147,7 @@
       
       [132, "1365", "Av. Afonso Pena, 776, Próx. Sede da Prefeitura", "Rede de Serviços - Ponto Abrigo Amigo (PAA)", "60", "Praça Sete/Mangabeiras", "Único", "10", "KBH0010", "-19.920163, -43.938122"],
       
-      [133, "1366", "Av. Barão Homem de Melo", "Rede de Serviços - Recarga Carro Elétrico (ERE), 424", "60", "Calafate/Buritis", "Único", "12", "KBH0012", "-19.937594, -43.972675"],
+      [133, "1366", "Av. Barão Homem de Melo, Próx. Rua José Machado", "Rede de Serviços - Recarga Carro Elétrico (ERE)", "60", "Calafate/Buritis", "Único", "12", "KBH0012", "-19.937594, -43.972675"],
       
       [134, "1367", "Anel Rodoviário Celso Mello Azevedo, 6192", "Controlador Eletrônico de Velocidade", "70", "Rio de Janeiro/Vitória", "Único", "14", "KBH0014", "-19.993278, -43.961128"],
       [135, "1368", "Anel Rodoviário c/ Rua Juarez Teixeira Pinto, 299 - Pista Marginal", "Controlador Eletrônico de Velocidade", "50", "Rio de Janeiro/Vitória", "Único", "16", "KBH0016", "-19.9613,-43.9992"],
@@ -573,28 +573,28 @@
       [543, "1831","Rua Pará de Minas, Próx. Rua Curupaiti","Alerta de Poluição Elevada (APE)","60","Centro/Glória","1001047","KBH5301047","-19.914592, -43.985741"],
       [544, "1832","Av. Padre Eustáquio, Próx. Rua Graça","Alerta de Poluição Elevada (APE)","60","Centro/Glória","1001048","KBH5301048","-19.915269, -43.971608"],
 
-      [545, "1833","Av. Augusto de Lima , Próx. Rua Santa Catarina","Alerta de Lugares em Destaque (ALE) - Mercado Central - Arte e Gastronomia","60","Afonso Pena/Praça Raul Soares","1001049","KBH5301049","-19.923134, -43.943227"],
-      [546, "1834","Av. Afonso Pena, Próx. Parque Municipal","Alerta de Lugares em Destaque (ALE) - Palácio das Artes - Arte e Cultura","60","Mangabeiras/Parque Municipal","1001050","KBH5301050","-19.925960, -43.934253"],
-      [547, "1835","Av. Otacílio Negrão de Lima, Próx. Parque Guanabara","Alerta de Lugares em Destaque (ALE) - Igreja da Pampulha - Arte e Cultura","60","Mineirão/Parque Guanabara","1001051","KBH5301051","-19.859347, -43.978317"],
-      [548, "1836","Nações Unidas, Sabará - Brasil","Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas - Arte Mineira","60","UPA/Bairro","1001052","KBH5301052","-19.878808, -43.868218"],
-      [549, "1837","Nações Unidas, Sabará - Brasil","Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas - Arte Mineira ","60","General Carneiro/Nações Unidas","1001053","KBH5301053","-19.878478, -43.860774"],
+      [545, "1833","Av. Augusto de Lima , Próx. Rua Santa Catarina","Lugares em Destaque - Mercado Central - Arte e Gastronomia","60","Afonso Pena/Praça Raul Soares","1001049","KBH5301049","-19.923134, -43.943227"],
+      [546, "1834","Av. Afonso Pena, Próx. Parque Municipal","Lugares em Destaque - Palácio das Artes - Arte e Cultura","60","Mangabeiras/Parque Municipal","1001050","KBH5301050","-19.925960, -43.934253"],
+      [547, "1835","Av. Otacílio Negrão de Lima, Próx. Parque Guanabara","Lugares em Destaque - Igreja da Pampulha - Arte e Cultura","60","Mineirão/Parque Guanabara","1001051","KBH5301051","-19.859347, -43.978317"],
+      [548, "1836","Nações Unidas, Sabará - Brasil","Lugares em Destaque - Polo de Artesanato de Nações Unidas - Arte Mineira","60","UPA/Bairro","1001052","KBH5301052","-19.878808, -43.868218"],
+      [549, "1837","Nações Unidas, Sabará - Brasil","Lugares em Destaque - Polo de Artesanato de Nações Unidas - Arte Mineira ","60","General Carneiro/Nações Unidas","1001053","KBH5301053","-19.878478, -43.860774"],
       [550, "1838","Rua Das Nações, Próx. Rua Chile","Controlador Eletrônico de Velocidade (CEV)","30","Belo Horizonte/Nações Unidas","1001054","KBH5301054","-19.878547, -43.867425"],
-      [551, "1839","Rua da Bahia, Próx. Avenida Augusto de Lima","Alerta de Lugares em Destaque (ALE) - Edifício Maletta - Arte e Gastronomia","60","Praça da Estação/Savassi","1001055","KBH5301055","-19.924969, -43.937483"],
-      [552, "1840","Avenida Afonso Pena, Próx. Rua da Bahia","Alerta de Lugares em Destaque (ALE) - Feira de Artesanato da Afonso Pena - Compra (Aos domingos)","60","Rodoviária/Mangabeiras","1001056","KBH5301056","-19.923149, -43.936233"],
-      [553, "1841","Avenida Olegário Maciel, Próx. Rua dos Tupis","Alerta de Lugares em Destaque (ALE) - Mercado Novo - Arte e Gastronomia","60","Rodoviária/Praça Raul Soares","1001057","KBH5301057","-19.920775, -43.944696"],
-      [554, "1842","Rua Dr. Emir Soares, Próx. Rua Pedro José Pardo","Alerta de Lugares em Destaque (ALE) - Mirante do Mangabeiras - Panorama","30","Praça do Papa/Praça do Mirante","1001058","KBH5301058","-19.951789, -43.912660"],
-      [555, "1843","Avenida Prudente de Morais, Próx. Rua Josafá Belo","Alerta de Lugares em Destaque (ALE) - Museu Histórico Abílio Barreto - História","60","Loudes/São Pedro","1001059","KBH5301059","-19.937253, -43.947231"],
-      [556, "1844","Praça Rui Barbosa, Próx. Estação Ferroviária","Alerta de Lugares em Destaque (ALE) - Museu Artes e Ofícios - História","60","Parque Municipal/Floresta","1001060","KBH530106-","-19.916875, -43.933620"],
-      [557, "1845","Avenida Otacílio Negrão de Lima, Próx. Igreja da Pampulha","Alerta de Lugares em Destaque (ALE) - Parque Guanabara - Diversão e Lazer","40","Zoológico/Estádio do Mineirão","1001061","KBH5301061","-19.859512, -43.978423"],
-      [558, "1846","Avenida José do Patrocínio Pontes, Próx. Praça Dimas Perrin","Alerta de Lugares em Destaque (ALE) - Parque Mangabeiras - Natureza","40","Praça do Papa/Parque Mangabeiras","1001062","KBH5301062","-19.955388, -43.907701"],
-      [559, "1847","Avenida Afonso Pena, Próx. Avenida Álvarez Cabral","Alerta de Lugares em Destaque (ALE) - Parque Municipal - Parque e Diversão","60","Rodoviária/Mangabeiras","1001063","KBH5301063","-19.924473, -43.935203"],
-      [560, "1848","Avenida José do Patrocínio Pontes, Próx. Praça do Estado de Israel","Alerta de Lugares em Destaque (ALE) - Parque da Serra do Curral - Ecoturismo","40","Praça do Paça/Mangabeiras","1001064","KBH5301064","-19.961767, -43.918851"],
-      [561, "1849","Avenida João Pinheiro, Próx. Rua Gonçalves Dias","Alerta de Lugares em Destaque (ALE) - Praça da Liberdade - Arte e Lazer","60","Centro/Savassi","1001065","KBH5301065","-19.931125, -43.937800"],
-      [562, "1850","Praça Israel Pinheiro, Próx. Rua Salomão de Vasconcelos","Alerta de Lugares em Destaque (ALE) - Praça do Papa - Panorama ","40","Rodoviária/Mangabeiras","1001066","KBH5301066","-19.958261, -43.914410"],
-      [563, "1851","Avenida Critovão Colombo, Próx. Rua Getúlio Vargas","Alerta de Lugares em Destaque (ALE) - Praça da Savassi - Gastronomia","40","Praça da Liberdade/São Pedro","1001067","KBH5301067","-19.938125, -43.935632"],
-      [564, "1852","Rua Sapucaí, Próx. Avenida Assis Chateuabriand","Alerta de Lugares em Destaque (ALE) - Mirante da Rua Sapucaí - Panorama e Gastronomia","60","Centro/Floresta","1001068","KBH5301068","-19.917513, -43.932651"],
-      [565, "1853","Rua Dores do Indaiá, Próx. Rua Alvinópolis","Alerta de Lugares em Destaque (ALE) - Santa Tereza - Circuito Boêmio","60","Floresta/Santa Tereza","1001069","KBH5301069","-19.916055, -43.910846"],
-      [566, "1854","Av. Otacílio Negrão de Lima, 7111, Próx. Rua Benito Masci","Alerta de Lugares em Destaque (ALE) - Parque Ecológico da Pampulha - Ecoturismo","60","Mineirão/Toca da Raposa","1001070","KBH5301070","-19.860637, -43.995684"]
+      [551, "1839","Rua da Bahia, Próx. Avenida Augusto de Lima","Lugares em Destaque - Edifício Maletta - Arte e Gastronomia","60","Praça da Estação/Savassi","1001055","KBH5301055","-19.924969, -43.937483"],
+      [552, "1840","Avenida Afonso Pena, Próx. Rua da Bahia","Lugares em Destaque - Feira de Artesanato da Afonso Pena - Compra (Aos domingos)","60","Rodoviária/Mangabeiras","1001056","KBH5301056","-19.923149, -43.936233"],
+      [553, "1841","Avenida Olegário Maciel, Próx. Rua dos Tupis","Lugares em Destaque - Mercado Novo - Arte e Gastronomia","60","Rodoviária/Praça Raul Soares","1001057","KBH5301057","-19.920775, -43.944696"],
+      [554, "1842","Rua Dr. Emir Soares, Próx. Rua Pedro José Pardo","Lugares em Destaque - Mirante do Mangabeiras - Panorama","30","Praça do Papa/Praça do Mirante","1001058","KBH5301058","-19.951789, -43.912660"],
+      [555, "1843","Avenida Prudente de Morais, Próx. Rua Josafá Belo","Lugares em Destaque - Museu Histórico Abílio Barreto - História","60","Loudes/São Pedro","1001059","KBH5301059","-19.937253, -43.947231"],
+      [556, "1844","Praça Rui Barbosa, Próx. Estação Ferroviária","Lugares em Destaque - Museu Artes e Ofícios - História","60","Parque Municipal/Floresta","1001060","KBH530106-","-19.916875, -43.933620"],
+      [557, "1845","Avenida Otacílio Negrão de Lima, Próx. Igreja da Pampulha","Lugares em Destaque - Parque Guanabara - Diversão e Lazer","40","Zoológico/Estádio do Mineirão","1001061","KBH5301061","-19.859512, -43.978423"],
+      [558, "1846","Avenida José do Patrocínio Pontes, Próx. Praça Dimas Perrin","Lugares em Destaque - Parque Mangabeiras - Natureza","40","Praça do Papa/Parque Mangabeiras","1001062","KBH5301062","-19.955388, -43.907701"],
+      [559, "1847","Avenida Afonso Pena, Próx. Avenida Álvarez Cabral","Lugares em Destaque - Parque Municipal - Parque e Diversão","60","Rodoviária/Mangabeiras","1001063","KBH5301063","-19.924473, -43.935203"],
+      [560, "1848","Avenida José do Patrocínio Pontes, Próx. Praça do Estado de Israel","Lugares em Destaque - Parque da Serra do Curral - Ecoturismo","40","Praça do Paça/Mangabeiras","1001064","KBH5301064","-19.961767, -43.918851"],
+      [561, "1849","Avenida João Pinheiro, Próx. Rua Gonçalves Dias","Lugares em Destaque - Praça da Liberdade - Arte e Lazer","60","Centro/Savassi","1001065","KBH5301065","-19.931125, -43.937800"],
+      [562, "1850","Praça Israel Pinheiro, Próx. Rua Salomão de Vasconcelos","Lugares em Destaque - Praça do Papa - Panorama ","40","Rodoviária/Mangabeiras","1001066","KBH5301066","-19.958261, -43.914410"],
+      [563, "1851","Avenida Critovão Colombo, Próx. Rua Getúlio Vargas","Lugares em Destaque - Praça da Savassi - Gastronomia","40","Praça da Liberdade/São Pedro","1001067","KBH5301067","-19.938125, -43.935632"],
+      [564, "1852","Rua Sapucaí, Próx. Avenida Assis Chateuabriand","Lugares em Destaque - Mirante da Rua Sapucaí - Panorama e Gastronomia","60","Centro/Floresta","1001068","KBH5301068","-19.917513, -43.932651"],
+      [565, "1853","Rua Dores do Indaiá, Próx. Rua Alvinópolis","Lugares em Destaque - Santa Tereza - Circuito Boêmio","60","Floresta/Santa Tereza","1001069","KBH5301069","-19.916055, -43.910846"],
+      [566, "1854","Av. Otacílio Negrão de Lima, 7111, Próx. Rua Benito Masci","Lugares em Destaque - Parque Ecológico da Pampulha - Ecoturismo","60","Mineirão/Toca da Raposa","1001070","KBH5301070","-19.860637, -43.995684"]
 
       
 
