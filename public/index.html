@@ -1692,8 +1692,11 @@ function desativarPulsoIntenso() {
 const iconMap = {
     'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
     'Controlador Eletrônico de Velocidade (CEV)':'/imagens_app/ic_radar_cev_v2.png',
-    'Controlador Eletrônico Misto (CEM)':'/imagens_app/ic_radar_cev_v2.png',
-    'Controlador Eletrônico Misto':'/imagens_app/ic_radar_cev_v2.png',
+
+    'Controlador Eletrônico Misto (DAS) + (CEV)':'/imagens_app/ic_radar_cem_cev.png',
+    'Controlador Eletrônico Misto (DAS) + (DCP)':'/imagens_app/ic_radar_cem_dcp.png',
+    'Controlador Eletrônico Misto (DAS) + (MOVE)':'/imagens_app/ic_radar_cem_move.png',
+
     'Detector de Avanço de Semáforo (DAS)':'/imagens_app/ic_radar_das_v2.png',
     'Detector de Avanço de Semáforo':'/imagens_app/ic_radar_das_v2.png',
     'Detector de Tráfego em Local Proibido':'/imagens_app/ic_radar_dtlp_v2.png',
@@ -1780,9 +1783,11 @@ const TIPOS_ALERTA_RADAR = [
     'Detector de Redução de Velocidade (REV)',
     'Verificador de Cinto de Segurança (VCS)',
     'Detector de Uso de Celular (DUC)',
-    'Controlador Eletrônico Misto (CEV) + (DAS)',
+
+    'Controlador Eletrônico Misto (DAS) + (CEV)',
     'Controlador Eletrônico Misto (DAS) + (DCP)',
     'Controlador Eletrônico Misto (DAS) + (MOVE)',
+
     'Controlador Eletrônico de Velocidade (CEV)',
     'Detector de Avanço de Semáforo (DAS)',
     'Detector de Tráfego em Local Proibido  (DTLP)',
@@ -1864,11 +1869,14 @@ const TIPOS_SEM_ALERTA = [];
 const ajusteNomes = {
     'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
     'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
-    'Controlador Eletrônico Misto (CEV + DAS)': 'Radar Misto Velocidade+Semáforo (CEM)',
+
+    'Controlador Eletrônico Misto (DAS + CEV)': 'Radar Misto Velocidade+Semáforo (CEM)',
     'Controlador Eletrônico Misto (DAS + DCP)': 'Radar Misto Semáforo+Conversão (CEM)',
     'Controlador Eletrônico Misto (DAS + DIF)': 'Radar Misto Semáforo+Faixa (CEM)',
+
     'Controlador Eletrônico Misto (CEM)': 'Radar Misto Velocidade+Semáforo (CEM)',
     'Controlador Eletrônico Misto': 'Radar Misto Velocidade+Semáforo (CEM)',
+    
     'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
     'Controle de Redução de Velocidade': 'Painel de Redução de Velocidade (PRV)',
     'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
