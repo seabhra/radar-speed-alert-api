@@ -615,18 +615,18 @@ h1 span {
 
 .matrix-day .leaflet-tile-pane .leaflet-tile {
     filter:
-        grayscale(0.10)
-        sepia(0.22)
+        grayscale(0.15)
+        sepia(0.30)
         hue-rotate(72deg)
-        saturate(2.05)
-        brightness(0.90)          /* ↓ compensa o contraste alto */
-        contrast(1.85)              /* ↑ funde as duas bordas em uma faixa */
-        drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35)); /* halo verde = linha grossa */
+        saturate(1.80)
+        brightness(0.58)          /* ↓↓↓ escurece fundos claros */
+        contrast(1.35)            /* ↓ evita que vire preto puro */
+        drop-shadow(0 0 1.2px rgba(0, 220, 80, 0.45));
 
     transition: filter .4s ease;
 }
 
-/* véu mais sutil para não "lavar" as ruas */
+/* véu noturno — comprime as altas-luzes para verde-escuro */
 .matrix-day .leaflet-map-pane::after {
     content: "";
     position: absolute;
@@ -636,15 +636,25 @@ h1 span {
     background:
         linear-gradient(
             180deg,
-            rgba(0, 200, 80, .04) 0%,
-            rgba(0, 180, 70, .08) 100%
+            rgba(0, 40, 15, .55) 0%,    /* topo mais fechado */
+            rgba(0, 60, 25, .40) 100%   /* base mais suave */
         );
 
-    mix-blend-mode: soft-light;
+    mix-blend-mode: multiply;         /* escurece sem lavar */
 
     z-index: 400;
 }
 
+/* camada extra só para “queimar” o branco residual em verde musgo */
+.matrix-day .leaflet-tile-pane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: rgba(0, 80, 30, .25);
+    mix-blend-mode: color;
+    z-index: 401;
+}
 
 
 /* ========================================
