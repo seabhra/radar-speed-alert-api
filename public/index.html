@@ -2573,7 +2573,16 @@ function extrairCoordenadas(record, index) {
 
 function atualizarBussola(headingDegrees) {
     var needle = document.getElementById('compass-needle-img');
-    if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
+    if (needle) {
+        needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
+    }
+
+    // Gira o ícone de navegação conforme a direção do movimento
+    var navIcon = document.querySelector('.nav-pulse-wrap img');
+
+    if (navIcon && headingDegrees != null && !isNaN(headingDegrees)) {
+        navIcon.style.transform = 'rotate(' + headingDegrees + 'deg)';
+    }
 }
 
 // =========================
