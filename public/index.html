@@ -615,18 +615,19 @@ h1 span {
 
 .matrix-day .leaflet-tile-pane .leaflet-tile {
     filter:
-        grayscale(0.10)
-        sepia(0.22)
-        hue-rotate(72deg)
-        saturate(2.05)
-        brightness(0.90)          /* ↓ compensa o contraste alto */
-        contrast(1.85)              /* ↑ funde as duas bordas em uma faixa */
+        grayscale(1)          /* 1 → remove qualquer tom quente (fim do brilho âmbar) */
+        sepia(1)              /* 1 → base uniforme; hue-rotate passa a gerar verde puro */
+        hue-rotate(85deg)     /* 72° ainda puxava pro dourado; 85° é verde fechado */
+        saturate(1.55)
+        brightness(0.80)      /* ↓ escurece o conjunto */
+        contrast(1.55)        /* 1.85 esmagava os meios-tons e "queimava" as bordas */
         drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35)); /* halo verde = linha grossa */
 
     transition: filter .4s ease;
 }
 
-/* véu mais sutil para não "lavar" as ruas */
+/* véu multiply: escurece SÓ as partes claras, tingindo-as de verde.
+   Branco × verde = verde escuro; preto × verde = preto (nada é "lavado") */
 .matrix-day .leaflet-map-pane::after {
     content: "";
     position: absolute;
@@ -636,11 +637,11 @@ h1 span {
     background:
         linear-gradient(
             180deg,
-            rgba(0, 200, 80, .04) 0%,
-            rgba(0, 180, 70, .08) 100%
+            rgba(0, 120, 50, .28) 0%,
+            rgba(0,  85, 40, .40) 100%
         );
 
-    mix-blend-mode: soft-light;
+    mix-blend-mode: multiply;   /* era soft-light → quase não fazia efeito */
 
     z-index: 400;
 }
