@@ -1407,7 +1407,11 @@ let watchId = null;
 let gpsSource = 'none';
 let gpsInitialized = false;
 let browserGpsTimeout = null;
-let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
+let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 18 };
+
+let coordenadasRotaNavegacao = [];
+let ultimoSegmentoRota = -1;
+let distanciaDaRota = Infinity;
 
 let estaEmNavegacao = false;
 let startRouteMarker = null;
@@ -2106,6 +2110,135 @@ function calcularCentroMapaComOffset(lat, lng, bearing) {
     };
 }
 
+// ============================================================
+// ENCONTRA O PONTO DA ROTA MAIS PRÓXIMO DO GPS
+// ============================================================
+function encontrarPontoMaisProximoDaRota(lat, lng) {
+
+    if (!coordenadasRotaNavegacao || coordenadasRotaNavegacao.length < 2) {
+        return {
+            lat: lat,
+            lng: lng,
+            distancia: Infinity,
+            segmento: -1,
+            heading: null
+        };
+    }
+
+    let melhor = null;
+    let menorDistancia = Infinity;
+
+    // Escala aproximada para transformar lat/lng em plano local
+    const cosLat = Math.cos(lat * Math.PI / 180);
+
+    const xGPS = lng * cosLat;
+    const yGPS = lat;
+
+    for (let i = 0; i < coordenadasRotaNavegacao.length - 1; i++) {
+
+        const a = coordenadasRotaNavegacao[i];
+        const b = coordenadasRotaNavegacao[i + 1];
+
+        const ax = a.lng * cosLat;
+        const ay = a.lat;
+
+        const bx = b.lng * cosLat;
+        const by = b.lat;
+
+        const dx = bx - ax;
+        const dy = by - ay;
+
+        const comprimento2 = dx * dx + dy * dy;
+
+        let t = 0;
+
+        if (comprimento2 > 0) {
+            t = ((xGPS - ax) * dx + (yGPS - ay) * dy) / comprimento2;
+            t = Math.max(0, Math.min(1, t));
+        }
+
+        const px = ax + t * dx;
+        const py = ay + t * dy;
+
+        const diferencaX = xGPS - px;
+        const diferencaY = yGPS - py;
+
+        const distancia2 =
+            diferencaX * diferencaX +
+            diferencaY * diferencaY;
+
+        if (distancia2 < menorDistancia) {
+
+            menorDistancia = distancia2;
+
+            const pontoLat = py;
+            const pontoLng = px / cosLat;
+
+            melhor = {
+                lat: pontoLat,
+                lng: pontoLng,
+                distancia: calcularDistancia(
+                    lat,
+                    lng,
+                    pontoLat,
+                    pontoLng
+                ),
+                segmento: i,
+                heading: calcularBearing(
+                    a.lat,
+                    a.lng,
+                    b.lat,
+                    b.lng
+                )
+            };
+        }
+    }
+
+    return melhor;
+}
+
+// ============================================================
+// AJUSTA O GPS PARA A LINHA DA ROTA
+// ============================================================
+function ajustarPosicaoNaVia(lat, lng) {
+
+    const resultado = encontrarPontoMaisProximoDaRota(lat, lng);
+
+    if (!resultado) {
+        return {
+            lat: lat,
+            lng: lng
+        };
+    }
+
+    distanciaDaRota = resultado.distancia;
+
+    // Se o GPS estiver muito longe da rota,
+    // NÃO força o marcador para a via.
+    // Isso evita erros em ruas paralelas.
+    const LIMITE_AJUSTE_VIA = 30;
+
+    if (resultado.distancia > LIMITE_AJUSTE_VIA) {
+        return {
+            lat: lat,
+            lng: lng,
+            heading: null,
+            ajustado: false
+        };
+    }
+
+    ultimoSegmentoRota = resultado.segmento;
+
+    return {
+        lat: resultado.lat,
+        lng: resultado.lng,
+        heading: resultado.heading,
+        ajustado: true
+    };
+}
+//===============
+//SUAVIZAR POSIÇÃO
+//================
 function suavizarPosicao(novaLat, novaLng) {
     if (posicaoSuavizada.lat === null) {
         posicaoSuavizada.lat = novaLat;
@@ -2135,7 +2268,40 @@ function calcularTendenciaDistancia(radarId, distanciaAtual) {
     return { estaAproximando: true, estaAfastando: false, diferenca: 0 };
 }
 
+//=========================
+//MOVER MARCADOR SUAVEMENTE
+//=========================
 function moverMarcadorSuavemente(targetLat, targetLng) {
+
+//AJUSTR POSIÇÃO NA VIA
+if (estaEmNavegacao && coordenadasRotaNavegacao.length >= 2) {
+
+    const posicaoCorrigida = ajustarPosicaoNaVia(
+        targetLat,
+        targetLng
+    );
+
+    targetLat = posicaoCorrigida.lat;
+    targetLng = posicaoCorrigida.lng;
+
+    if (
+        posicaoCorrigida.heading !== null &&
+        posicaoCorrigida.heading !== undefined
+    ) {
+        headingIconeNavegacao = posicaoCorrigida.heading;
+
+        headingIconeSuavizado = suavizarBearing(
+            headingIconeNavegacao,
+            headingIconeSuavizado,
+            0.15
+        );
+    }
+}
+//==================
+//MWRCADOR PARA MOVER
+//===================
+
+
     var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
     if (!marcadorParaMover) return;
     if (ultimaPosicaoMarcador.lat === null) {
@@ -2284,6 +2450,9 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     endRouteMarker.bindPopup("<b>DESTINO</b><br>Você chegou ao seu destino!", { closeButton: false, autoClose: true, closeOnClick: true });
 }
 
+//==============
+//ATUALIZAR ROTA
+//==============
 function atualizarRota() {
     if (!destinoAtual || !userLat || !userLng || !routingControl) return;
     routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
@@ -2299,6 +2468,7 @@ function verificarChegadaDestino() {
         setTimeout(function() { finalizarNavegacao(); }, 4000);
     }
 }
+
 //FUNÇÃO FINALIZAR NAVEGAÇÃO
 
 function finalizarNavegacao() {
@@ -2379,17 +2549,34 @@ function criarRota(destLat, destLng) {
     
     routingControl.on('routesfound', function(e) {
         let route = e.routes[0];
-        if (route.coordinates && route.coordinates.length >= 2) {
-            var p1 = route.coordinates[0];
-            var p2 = route.coordinates[1];
-            var heading = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
-            headingIconeNavegacao = heading;
-            headingIconeSuavizado = heading;
-            _navAnim.headingAlvo      = heading;
-            _navAnim.headingSuavizado = heading;
-            bearingAlvo = heading;
-            bearingAtual = heading;
-        }
+       if (route.coordinates && route.coordinates.length >= 2) {
+
+    // Guarda a geometria completa da rota
+    coordenadasRotaNavegacao = route.coordinates;
+
+    // Direção inicial apenas para iniciar a navegação
+    var p1 = route.coordinates[0];
+    var p2 = route.coordinates[1];
+
+    var headingInicial = calcularBearing(
+        p1.lat,
+        p1.lng,
+        p2.lat,
+        p2.lng
+    );
+
+    headingIconeNavegacao = headingInicial;
+    headingIconeSuavizado = headingInicial;
+
+    _navAnim.headingAlvo = headingInicial;
+    _navAnim.headingSuavizado = headingInicial;
+
+    bearingAlvo = headingInicial;
+    bearingAtual = headingInicial;
+
+    ultimoSegmentoRota = 0;
+}
+
         let dk = (route.summary.totalDistance / 1000).toFixed(1);
         let tm = Math.round(route.summary.totalTime / 60);
         $("#loading").hide();
@@ -2438,8 +2625,10 @@ function atualizarCameraNavegacaoSuave() {
     let zoomDesejado = calcularZoomPorVelocidade();
     zoomAlvo = zoomAlvo * 0.85 + zoomDesejado * 0.15;
     let zoomArredondado = Math.round(zoomAlvo * 10) / 10;
+
     let latCam = ultimaPosicaoMarcador.lat || posicaoSuavizada.lat || userLat;
     let lngCam = ultimaPosicaoMarcador.lng || posicaoSuavizada.lng || userLng;
+
     let c = calcularCentroMapaComOffset(latCam, lngCam, bearingAtual);
     let mudancaZoom = Math.abs(zoomArredondado - zoomAtualEfetivo);
     let mudancaPos = 0;
@@ -2571,17 +2760,29 @@ function extrairCoordenadas(record, index) {
     return { lat: lat, lng: lng };
 }
 
-function atualizarBussola(headingDegrees) {
+//=================
+//ATUALIZAR BÚSSOLA
+//=================
+   function atualizarBussola(headingDegrees) {
+
     var needle = document.getElementById('compass-needle-img');
+
     if (needle) {
-        needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
+        needle.style.transform =
+            'rotate(' + headingDegrees + 'deg)';
     }
 
-    // Gira o ícone de navegação conforme a direção do movimento
-    var navIcon = document.querySelector('.nav-pulse-wrap img');
+    var navIcon =
+        document.querySelector('.nav-pulse-wrap img');
 
-    if (navIcon && headingDegrees != null && !isNaN(headingDegrees)) {
-        navIcon.style.transform = 'rotate(' + headingDegrees + 'deg)';
+    if (
+        navIcon &&
+        headingDegrees != null &&
+        !isNaN(headingDegrees)
+    ) {
+
+        navIcon.style.transform =
+            'rotate(' + headingDegrees + 'deg)';
     }
 }
 
