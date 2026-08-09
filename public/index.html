@@ -3666,7 +3666,7 @@ function dispararAlerta(radarData, distancia) {
  
    /* ── TEXTO ÚNICO: tipo + velocidade + distância ── */
     var vel = radarData.velocidade_maxima || '';
-    var textoAlerta = tipoExibicao + (' - ' + vel ? ' ' + vel + ' km' : '') + ' - ' + ' m';
+    var textoAlerta = tipoExibicao + (vel ? ' ' + vel + ' km' : '') + ' - ' + Math.round(distancia) + ' m';
     $text.text(textoAlerta);
     /* ─────────────────────────────────────────────── */
 
@@ -3688,8 +3688,10 @@ function dispararAlerta(radarData, distancia) {
 // ===================================================================
 function atualizarDistanciaAlerta(distancia) {
     var $text = $("#alert-text");
-    var base = $text.text().split(' — ')[0];
-    $text.text(base + ' — ' + Math.round(distancia) + 'm');
+    /* pega tudo antes do " - " final (preserva "tipo — 60 km") */
+    var base = $text.data('alert-base') || $text.text().split(' - ')[0];
+    $text.text(base + ' - ' + Math.round(distancia) + ' m');
+}
 
     if (alertTimeout) clearTimeout(alertTimeout);
     alertTimeout = setTimeout(function () { esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
