@@ -615,6 +615,46 @@ h1 span {
 
 .matrix-day .leaflet-tile-pane .leaflet-tile {
     filter:
+        grayscale(0.10)
+        sepia(0.22)
+        hue-rotate(72deg)
+        saturate(2.05)
+        brightness(0.90)          /* ↓ compensa o contraste alto */
+        contrast(1.85)              /* ↑ funde as duas bordas em uma faixa */
+        drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35)); /* halo verde = linha grossa */
+
+    transition: filter .4s ease;
+}
+
+/* véu mais sutil para não "lavar" as ruas */
+.matrix-day .leaflet-map-pane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 200, 80, .04) 0%,
+            rgba(0, 180, 70, .08) 100%
+        );
+
+    mix-blend-mode: soft-light;
+
+    z-index: 400;
+}
+
+
+
+/* ========================================
+   TEMA MATRIX — NOITE
+   Verde escuro estilo terminal Matrix
+   ======================================== */
+
+.matrix-night .leaflet-tile-pane .leaflet-tile {
+
+    filter:
         grayscale(0.15)
         sepia(0.30)
         hue-rotate(72deg)
@@ -627,7 +667,7 @@ h1 span {
 }
 
 /* véu noturno — comprime as altas-luzes para verde-escuro */
-.matrix-day .leaflet-map-pane::after {
+.matrix-night .leaflet-map-pane::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -646,7 +686,7 @@ h1 span {
 }
 
 /* camada extra só para “queimar” o branco residual em verde musgo */
-.matrix-day .leaflet-tile-pane::after {
+.matrix-night .leaflet-tile-pane::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -654,44 +694,6 @@ h1 span {
     background: rgba(0, 80, 30, .25);
     mix-blend-mode: color;
     z-index: 401;
-}
-
-
-/* ========================================
-   TEMA MATRIX — NOITE
-   Verde escuro estilo terminal Matrix
-   ======================================== */
-
-.matrix-night .leaflet-tile-pane .leaflet-tile {
-    filter:
-        grayscale(.35)
-        sepia(.65)
-        hue-rotate(78deg)
-        saturate(2.35)
-        brightness(.78)        /* ↑ antes .42 — matava o verde */
-        contrast(1.25);       /* ↓ levemente para não estourar */
-
-    transition: filter .4s ease;
-}
-
-/* véu verde — mais sutil para não virar poço preto */
-.matrix-night .leaflet-map-pane::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(0, 255, 65, .06) 0%,
-            rgba(0, 40, 15, .35) 100%
-        );
-
-    /* overlay mantém o verde vivo sem apagar as ruas */
-    mix-blend-mode: overlay;
-
-    z-index: 400;
 }
     /* ======================
    CSS RUAS BRILHAM DE NOITE
