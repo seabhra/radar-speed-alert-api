@@ -612,9 +612,49 @@ h1 span {
    TEMA MATRIX — DIA
    Ruas como linhas grossas únicas, não duplas
    ======================================== */
-
-.matrix-day .leaflet-tile-pane .leaflet-tile {
+   .matrix-day .leaflet-tile-pane .leaflet-tile {
     filter:
+        grayscale(0.10)
+        sepia(0.22)
+        hue-rotate(72deg)
+        saturate(2.05)
+        brightness(0.90)          /* ↓ compensa o contraste alto */
+        contrast(1.85)              /* ↑ funde as duas bordas em uma faixa */
+        drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35)); /* halo verde = linha grossa */
+
+    transition: filter .4s ease;
+}
+
+/* véu mais sutil para não "lavar" as ruas */
+.matrix-day .leaflet-map-pane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 200, 80, .04) 0%,
+            rgba(0, 180, 70, .08) 100%
+        );
+
+    mix-blend-mode: soft-light;
+
+    z-index: 400;
+}
+
+
+
+
+/* ========================================
+   TEMA MATRIX — NOITE
+   Verde escuro estilo terminal Matrix
+   ======================================== */
+
+.matrix-night .leaflet-tile-pane .leaflet-tile {
+
+       filter:
         grayscale(1)          /* 1 → remove qualquer tom quente (fim do brilho âmbar) */
         sepia(1)              /* 1 → base uniforme; hue-rotate passa a gerar verde puro */
         hue-rotate(85deg)     /* 72° ainda puxava pro dourado; 85° é verde fechado */
@@ -628,7 +668,7 @@ h1 span {
 
 /* véu multiply: escurece SÓ as partes claras, tingindo-as de verde.
    Branco × verde = verde escuro; preto × verde = preto (nada é "lavado") */
-.matrix-day .leaflet-map-pane::after {
+.matrix-night .leaflet-map-pane::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -646,45 +686,6 @@ h1 span {
     z-index: 400;
 }
 
-
-
-/* ========================================
-   TEMA MATRIX — NOITE
-   Verde escuro estilo terminal Matrix
-   ======================================== */
-
-.matrix-night .leaflet-tile-pane .leaflet-tile {
-
-    filter:
-        grayscale(0.25)           /* ↑ mais monocromático para os verdes dominarem */
-        sepia(0.35)               /* ↑ mais sépia para dar calor aos tons */
-        hue-rotate(80deg)         /* ↑ desloca para um verde mais escuro */
-        saturate(2.8)             /* ↑ saturação mais forte para os verdes */
-        brightness(0.65)          /* ↓ escurece tudo (claro fica verde escuro) */
-        contrast(1.60)            /* ↑ mantém definição sem queimar */
-        drop-shadow(0 0 1px rgba(0, 180, 60, 0.4)); /* halo mais intenso */
-
-    transition: filter .4s ease;
-}
-
-/* véu mais escuro para fundir com o fundo */
-.matrix-night .leaflet-map-pane::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(0, 160, 60, .12) 0%,
-            rgba(0, 120, 50, .18) 100%
-        );
-
-    mix-blend-mode: multiply;      /* ← muda de soft-light para multiply, escurece mais */
-
-    z-index: 400;
-}
 
     /* ===============
    CSS DA BÚSSOLA
