@@ -655,18 +655,18 @@ h1 span {
 .matrix-night .leaflet-tile-pane .leaflet-tile {
 
     filter:
-        grayscale(0.15)
-        sepia(0.30)
-        hue-rotate(72deg)
-        saturate(1.80)
-        brightness(0.58)          /* ↓↓↓ escurece fundos claros */
-        contrast(1.35)            /* ↓ evita que vire preto puro */
-        drop-shadow(0 0 1.2px rgba(0, 220, 80, 0.45));
+        grayscale(0.25)           /* ↑ mais monocromático para os verdes dominarem */
+        sepia(0.35)               /* ↑ mais sépia para dar calor aos tons */
+        hue-rotate(80deg)         /* ↑ desloca para um verde mais escuro */
+        saturate(2.8)             /* ↑ saturação mais forte para os verdes */
+        brightness(0.65)          /* ↓ escurece tudo (claro fica verde escuro) */
+        contrast(1.60)            /* ↑ mantém definição sem queimar */
+        drop-shadow(0 0 1px rgba(0, 180, 60, 0.4)); /* halo mais intenso */
 
     transition: filter .4s ease;
 }
 
-/* véu noturno — comprime as altas-luzes para verde-escuro */
+/* véu mais escuro para fundir com o fundo */
 .matrix-night .leaflet-map-pane::after {
     content: "";
     position: absolute;
@@ -676,39 +676,15 @@ h1 span {
     background:
         linear-gradient(
             180deg,
-            rgba(0, 40, 15, .55) 0%,    /* topo mais fechado */
-            rgba(0, 60, 25, .40) 100%   /* base mais suave */
+            rgba(0, 160, 60, .12) 0%,
+            rgba(0, 120, 50, .18) 100%
         );
 
-    mix-blend-mode: multiply;         /* escurece sem lavar */
+    mix-blend-mode: multiply;      /* ← muda de soft-light para multiply, escurece mais */
 
     z-index: 400;
 }
 
-/* camada extra só para “queimar” o branco residual em verde musgo */
-.matrix-night .leaflet-tile-pane::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: rgba(0, 80, 30, .25);
-    mix-blend-mode: color;
-    z-index: 401;
-}
-    /* ======================
-   CSS RUAS BRILHAM DE NOITE
-   ========================= */
-
-.matrix-night .leaflet-tile-pane .leaflet-tile {
-    filter:
-        grayscale(.35)
-        sepia(.65)
-        hue-rotate(78deg)
-        saturate(2.35)
-        brightness(.78)
-        contrast(1.25)
-        drop-shadow(0 0 1px rgba(0, 255, 65, .25)); /* leve brilho nas bordas */
-}
     /* ===============
    CSS DA BÚSSOLA
    ================ */
