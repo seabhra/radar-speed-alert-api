@@ -3663,7 +3663,8 @@ function dispararAlerta(radarData, distancia) {
 
     var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO MOBILIDADE', destaque: 'DESCUBRA A CIDADE', servico: 'REDE DE SERVIÇOS' };
     $title.text(titulos[tipo] || 'ATENÇÃO!');
-    $text.text(tipoExibicao + ' — ' + Math.round(distancia) + 'm');
+    var vel = radarData.velocidade_maxima || '';
+$text.text(tipoExibicao + (vel ? ' ' + vel + ' km' : '') + ' - ' + Math.round(distancia) + ' m');
 
     if (distancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
         $bar.addClass('alert-bar-' + tipo + '-critico');
