@@ -1002,10 +1002,11 @@ h1 span {
 /* ========================================
    PULSO DO ÍCONE DE NAVEGAÇÃO
    ======================================== */
+
 .nav-pulse-wrap {
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 58px;
+    height: 58px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1013,8 +1014,8 @@ h1 span {
 }
 
 .nav-pulse-wrap img {
-    width: 50px;
-    height: 50px;
+    width: 58px;
+    height: 58px;
     object-fit: contain;
     position: relative;
     z-index: 2;
@@ -1025,25 +1026,45 @@ h1 span {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 16px;
-    height: 16px;
-    margin-top: -8px;
-    margin-left: -8px;
-    background: rgba(0, 255, 136, 0.35);
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    background: rgba(0, 255, 136, 0.30);
     border-radius: 50%;
     z-index: 1;
-    animation: navPulse 2.2s ease-out infinite;
+    animation: navPulse 2.4s ease-in-out infinite;
 }
 
 .nav-pulse-halo.intenso {
-    animation: navPulse 1s ease-out infinite;
-    background: rgba(0, 255, 136, 0.6);
+    animation: navPulse 1.3s ease-in-out infinite;
+    background: rgba(99, 223, 165, 0.45);
 }
 
 @keyframes navPulse {
-    0%   { transform: scale(0.5);  opacity: 0.9; box-shadow: 0 0 0 0 rgba(0,255,136,0.6); }
-    70%  { transform: scale(2.8);  opacity: 0;   box-shadow: 0 0 0 14px rgba(0,255,136,0); }
-    100% { transform: scale(0.5);  opacity: 0;   box-shadow: 0 0 0 0 rgba(0,255,136,0); }
+    0% {
+        transform: scale(0.65);
+        opacity: 0.75;
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.45);
+    }
+
+    50% {
+        transform: scale(1.25);
+        opacity: 0.40;
+        box-shadow: 0 0 0 7px rgba(0, 255, 136, 0.12);
+    }
+
+    75% {
+        transform: scale(1.65);
+        opacity: 0.10;
+        box-shadow: 0 0 0 10px rgba(0, 255, 136, 0.03);
+    }
+
+    100% {
+        transform: scale(0.65);
+        opacity: 0.75;
+        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+    }
 }
 
 </style>
