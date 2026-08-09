@@ -3666,7 +3666,7 @@ function dispararAlerta(radarData, distancia) {
  
    /* ── TEXTO ÚNICO: tipo + velocidade + distância ── */
     var vel = radarData.velocidade_maxima || '';
-    var textoAlerta = tipoExibicao + (vel ? ' ' + vel + ' km' : '') + ' - ' + Math.round(distancia) + ' m';
+    var textoAlerta = tipoExibicao + (' - ' + vel ? ' ' + vel + ' km' : '') + ' - ' + ' m';
     $text.text(textoAlerta);
     /* ─────────────────────────────────────────────── */
 
