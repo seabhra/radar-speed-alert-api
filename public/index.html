@@ -3691,7 +3691,7 @@ function atualizarDistanciaAlerta(distancia) {
     /* pega tudo antes do " - " final (preserva "tipo — 60 km") */
     var base = $text.data('alert-base') || $text.text().split(' - ')[0];
     $text.text(base + ' - ' + Math.round(distancia) + ' m');
-}
+
 
     if (alertTimeout) clearTimeout(alertTimeout);
     alertTimeout = setTimeout(function () { esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
