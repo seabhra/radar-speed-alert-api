@@ -4177,13 +4177,7 @@ $("#btn-center").click(function() {
         map.removeLayer(userMarker);
         
         // Cria um NOVO marcador com o ícone GPS
-        var gpsIcon = L.divIcon({
-            html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-            className: 'user-gps-marker',
-            iconSize: [50, 50],
-            iconAnchor: [25, 50],
-            popupAnchor: [0, -50]
-        });
+        var gpsIcon = criarIconeNavegador(false);
         
         userMarker = L.marker([pos.lat, pos.lng], { 
             icon: gpsIcon, 
