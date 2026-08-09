@@ -1026,44 +1026,52 @@ h1 span {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 20px;
-    height: 20px;
-    margin-top: -10px;
-    margin-left: -10px;
-    background: rgba(0, 255, 136, 0.30);
+    width: 22px;
+    height: 22px;
+    margin-top: -11px;
+    margin-left: -11px;
+    background: rgba(0, 255, 136, 0.42);
     border-radius: 50%;
     z-index: 1;
-    animation: navPulse 2.4s ease-in-out infinite;
+    animation: navPulse 2s ease-out infinite;
 }
 
 .nav-pulse-halo.intenso {
-    animation: navPulse 1.3s ease-in-out infinite;
-    background: rgba(99, 223, 165, 0.45);
+    animation: navPulse 1s ease-out infinite;
+    background: rgba(99, 223, 165, 0.60);
 }
 
 @keyframes navPulse {
     0% {
-        transform: scale(0.65);
-        opacity: 0.75;
-        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.45);
+        transform: scale(0.55);
+        opacity: 0.95;
+        box-shadow:
+            0 0 0 0 rgba(0, 255, 136, 0.65),
+            0 0 8px rgba(0, 255, 136, 0.45);
     }
 
-    50% {
-        transform: scale(1.25);
-        opacity: 0.40;
-        box-shadow: 0 0 0 7px rgba(0, 255, 136, 0.12);
+    45% {
+        transform: scale(1.45);
+        opacity: 0.65;
+        box-shadow:
+            0 0 0 8px rgba(0, 255, 136, 0.22),
+            0 0 14px rgba(0, 255, 136, 0.30);
     }
 
-    75% {
-        transform: scale(1.65);
-        opacity: 0.10;
-        box-shadow: 0 0 0 10px rgba(0, 255, 136, 0.03);
+    70% {
+        transform: scale(2.25);
+        opacity: 0.20;
+        box-shadow:
+            0 0 0 16px rgba(0, 255, 136, 0.06),
+            0 0 20px rgba(0, 255, 136, 0.12);
     }
 
     100% {
-        transform: scale(0.65);
-        opacity: 0.75;
-        box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+        transform: scale(2.55);
+        opacity: 0;
+        box-shadow:
+            0 0 0 20px rgba(0, 255, 136, 0),
+            0 0 25px rgba(0, 255, 136, 0);
     }
 }
 
@@ -4198,7 +4206,14 @@ $("#btn-center").click(function() {
         map.removeLayer(userMarker);
         
         // Cria um NOVO marcador com o ícone GPS
-        var gpsIcon = criarIconeNavegador(false);
+         var gpsIcon = L.divIcon({
+            html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+            className: 'user-gps-marker',
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
+        });
+
         
         userMarker = L.marker([pos.lat, pos.lng], { 
             icon: gpsIcon, 
