@@ -726,6 +726,9 @@ h1 span {
 
 .leaflet-control-compass {
     display: none !important;
+     position: absolute;
+     top: 65px;
+     left: 5px;
 }
     .compass-base {
         position: absolute; width: 100%; height: 100%; z-index: 1;
@@ -4514,7 +4517,7 @@ speedWidget.addEventListener("click", () => {
 $("#btn-calc-route").click(async function() {
 
       // Esconde a bússola nativa
-    $(".leaflet-control-compass").hide();
+   // $(".leaflet-control-compass").hide();
 
     var endereco = $("#route-query").val().trim();
 
@@ -4559,7 +4562,7 @@ $("#route-query").keypress(function(e) {
     if (e.which == 13) {
 
         // Esconde a bússola nativa do Leaflet
-        $(".leaflet-control-compass").hide();
+        //$(".leaflet-control-compass").hide();
 
         // Executa o cálculo da rota
         $("#btn-calc-route").click();
