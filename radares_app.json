@@ -3372,6 +3372,19 @@
       "KBH000268",
       "-19.924249, -43.921970",
       "10/08/2026, 13:25:33"
+    ],
+    [
+      269,
+      "000269",
+      "Avenida Edgar Torres, Minascaixa, Venda Nova",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Minascaixa",
+      "Único",
+      "M000269",
+      "KBH000269",
+      "-19.812311, -43.958867",
+      "10/08/2026, 16:20:58"
     ]
   ]
 }
