@@ -2288,12 +2288,12 @@ if (estaEmNavegacao && coordenadasRotaNavegacao.length >= 2) {
         posicaoCorrigida.heading !== null &&
         posicaoCorrigida.heading !== undefined
     ) {
-        headingIconeNavegacao = posicaoCorrigida.heading;
 
-        headingIconeSuavizado = suavizarBearing(
-            headingIconeNavegacao,
-            headingIconeSuavizado,
-            0.15
+        headingIconeNavegacao =
+            posicaoCorrigida.heading;
+
+        atualizarIconeNavegacaoVia(
+            headingIconeNavegacao
         );
     }
 }
@@ -2765,28 +2765,84 @@ function extrairCoordenadas(record, index) {
 }
 
 //=================
-//ATUALIZAR BÚSSOLA
+// ATUALIZAR BÚSSOLA
 //=================
-   function atualizarBussola(headingDegrees) {
+function atualizarBussola(headingDegrees) {
 
-    var needle = document.getElementById('compass-needle-img');
+    // =========================================================
+    // BÚSSOLA = A bússola continua obedecendo ao heading do dispositivo/GPS
+    // =========================================================
+   
 
-    if (needle) {
+    var needle =
+        document.getElementById('compass-needle-img');
+
+    if (
+        needle &&
+        headingDegrees != null &&
+        !isNaN(headingDegrees)
+    ) {
         needle.style.transform =
             'rotate(' + headingDegrees + 'deg)';
     }
+}
+
+
+    // =========================================================
+    // ÍCONE DE NAVEGAÇÃO
+    // NÃO usar headingDegrees aqui.
+    //
+    // O ícone deve seguir a direção da VIA/ROTA.
+    // A função ajustarPosicaoNaVia() fornece essa direção.
+    // =========================================================
+
+    if (
+        estaEmNavegacao &&
+        coordenadasRotaNavegacao &&
+        coordenadasRotaNavegacao.length >= 2 &&
+        userLat != null &&
+        userLng != null
+    ) {
+
+        var posicaoVia = ajustarPosicaoNaVia(
+            userLat,
+            userLng
+        );
+
+        if (
+            posicaoVia &&
+            posicaoVia.heading != null &&
+            !isNaN(posicaoVia.heading)
+        ) {
+
+            headingIconeNavegacao = posicaoVia.heading;
+
+            atualizarIconeNavegacaoVia(
+                headingIconeNavegacao
+            );
+        }
+    }
+//======================================
+// FUNÇÃO ATUALIZAR NAVEGAÇÃO NA VIA
+//=====================================
+    function atualizarIconeNavegacaoVia(headingVia) {
 
     var navIcon =
         document.querySelector('.nav-pulse-wrap img');
 
     if (
-        navIcon &&
-        headingDegrees != null &&
-        !isNaN(headingDegrees)
+        !navIcon ||
+        headingVia == null ||
+        isNaN(headingVia)
     ) {
+        return;
+    }
 
+    if (mapaRotacionado) {
+        navIcon.style.transform = 'rotate(0deg)';
+    } else {
         navIcon.style.transform =
-            'rotate(' + headingDegrees + 'deg)';
+            'rotate(' + headingVia + 'deg)';
     }
 }
 
