@@ -2393,6 +2393,10 @@ function aplicarTemaMapa() {
     }
 }
 
+// =================================
+// AJUSTAR POSIÇÃO DO SPEED WIDGET
+// =================================
+
 function ajustarPosicaoSpeedWidget(subir) {
     var speedWidget = document.querySelector('.speed-widget');
     if (subir) {
@@ -4401,46 +4405,120 @@ speedWidget.addEventListener("click", () => {
         ajustarBussolaParaBusca(true);
     });
 
-     // BOTÃO CENTRALIZAR TROCA O ÍCONE PARA O GPS MARKER AO CENTRALIZAR
+
+//===================================================================================
+// BOTÃO CENTRALIZAR = CENTRALIZA + MOSTRA GPS MARKER + DEPOIS MUDA PARA NAVIGATOR MAP
+//====================================================================================
 $("#btn-center").click(function() {
-    fecharTodasBarras(); 
+
+    fecharTodasBarras();
     isFollowing = true;
-    
+
     if (!userMarker) {
         showNotification("Aguardando sinal GPS...");
         return;
     }
-    
+
     // Centraliza o mapa na posição atual
-    map.flyTo(userMarker.getLatLng(), 18, { duration: 0.5 });
+    map.flyTo(userMarker.getLatLng(), 18, {
+        duration: 0.5
+    });
+
     showNotification("Centralizando na sua posição");
-    
-    // REMOVE O MARCADOR ANTES DE ADICIONAR O NOVO
+
+
+    //==============================================================
+    // REMOVE E RECRIA O MARCADOR COM GPS MARKER
+    //==============================================================
     if (!estaEmNavegacao && userMarker) {
+
         // Guarda a posição atual
         var pos = userMarker.getLatLng();
-        
-        // Remove o marcador antigo
+
+        // Remove marcador atual
         map.removeLayer(userMarker);
-        
-        // Cria um NOVO marcador com o ícone GPS
-         var gpsIcon = L.divIcon({
-            html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+
+
+        //==========================================================
+        // 1º PASSO — ÍCONE GPS MARKER
+        //==========================================================
+        var gpsIcon = L.divIcon({
+            html: '<img src="/imagens_app/ic_gps_marker.png" ' +
+                  'onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" ' +
+                  'style="width:50px;height:50px;">',
+
             className: 'user-gps-marker',
             iconSize: [50, 50],
             iconAnchor: [25, 50],
             popupAnchor: [0, -50]
         });
 
-        
-        userMarker = L.marker([pos.lat, pos.lng], { 
-            icon: gpsIcon, 
-            zIndexOffset: 1000 
-        }).addTo(map);
-        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
-        
+        userMarker = L.marker(
+            [pos.lat, pos.lng],
+            {
+                icon: gpsIcon,
+                zIndexOffset: 1000
+            }
+        ).addTo(map);
+
+        userMarker.bindTooltip(
+            'Você está aqui',
+            {
+                permanent: false,
+                direction: 'top',
+                offset: [0, -25]
+            }
+        );
+
         iconeCentralizado = true;
-        console.log("🔄 Ícone alterado para GPS MARKER (centralizado)");
+
+        console.log("📍 GPS MARKER inserido");
+
+
+        //==========================================================
+        // 2º PASSO — APÓS INSERIR O GPS MARKER
+        // MUDA PARA O NAVIGATOR MAP
+        //==========================================================
+        setTimeout(function() {
+
+            // Garante que ainda existe marcador
+            if (!userMarker || estaEmNavegacao) {
+                return;
+            }
+
+            // Guarda novamente a posição
+            var posAtual = userMarker.getLatLng();
+
+            // Remove GPS MARKER
+            map.removeLayer(userMarker);
+
+            // Cria o mesmo ícone usado no REFRESH
+            var navIcon = criarIconeNavegador(false);
+
+            // Cria novamente o marcador
+            userMarker = L.marker(
+                [posAtual.lat, posAtual.lng],
+                {
+                    icon: navIcon,
+                    zIndexOffset: 1000
+                }
+            ).addTo(map);
+
+            userMarker.bindTooltip(
+                'Você está aqui',
+                {
+                    permanent: false,
+                    direction: 'top',
+                    offset: [0, -25]
+                }
+            );
+
+            // Mesmo comportamento do REFRESH
+            iconeCentralizado = false;
+
+            console.log("🧭 GPS MARKER → NAVIGATOR MAP");
+
+        }, 600); // tempo para o GPS MARKER aparecer antes da troca
     }
 });
 
@@ -4474,8 +4552,10 @@ $("#btn-refresh").click(function() {
         iconeCentralizado = false;
         console.log("🔄 Ícone voltou para NAVIGATOR MAP (refresh)");
     }
-    
+
+    //=====================================================
     // Força a verificação do clima novamente após o refresh
+    //======================================================
     setTimeout(() => {
         atualizarTemperatura();
     }, 1000);
