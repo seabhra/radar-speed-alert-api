@@ -719,7 +719,14 @@ h1 span {
     .compass-widget.hidden { opacity: 0; pointer-events: none; }
     .compass-widget.busca-ativo { top: 75px; }
 
-    
+    /* ========================================
+   OCULTAR BÚSSOLA NATIVA DO LEAFLET
+   A bússola personalizada assume a função
+   ======================================== */
+
+.leaflet-control-compass {
+    display: none !important;
+}
     .compass-base {
         position: absolute; width: 100%; height: 100%; z-index: 1;
         background-image: url('/imagens_app/ic_compass.png'); background-size: contain;
