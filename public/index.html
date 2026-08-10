@@ -4513,6 +4513,9 @@ speedWidget.addEventListener("click", () => {
 
 $("#btn-calc-route").click(async function() {
 
+      // Esconde a bússola nativa
+    $(".leaflet-control-compass").hide();
+
     var endereco = $("#route-query").val().trim();
 
     if (endereco.length < 5) {
@@ -4554,9 +4557,15 @@ $("#btn-calc-route").click(async function() {
 
 $("#route-query").keypress(function(e) {
     if (e.which == 13) {
+
+        // Esconde a bússola nativa do Leaflet
+        $(".leaflet-control-compass").hide();
+
+        // Executa o cálculo da rota
         $("#btn-calc-route").click();
     }
 });
+
     //=======================
     //FECHAR TODAS AS BARRAS
     //======================
