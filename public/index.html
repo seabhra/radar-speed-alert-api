@@ -1075,6 +1075,53 @@ h1 span {
     }
 }
 
+/* ========================================
+   INFORMAÇÃO DE DADOS DA NAVEGAÇÃO
+   ======================================== */
+
+#nav-info {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 190px;
+    padding: 8px 16px;
+
+    background: rgba(0, 0, 0, 0.78);
+    border: 1px solid rgba(0, 255, 136, 0.35);
+    border-radius: 20px;
+
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+
+    z-index: 2000;
+
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.35);
+
+    pointer-events: none;
+}
+
+#nav-info.visible {
+    display: flex;
+}
+
+#nav-distance,
+#nav-time {
+    white-space: nowrap;
+}
+
+.nav-separator {
+    margin: 0 7px;
+    opacity: 0.5;
+}
+
 </style>
 <base target="_blank">
 </head>
@@ -1253,6 +1300,12 @@ h1 span {
       <div class="loading-spinner"></div>
       <div style="margin-top:10px; color:#fff;">Processando...</div>
     </div>
+
+    <div id="nav-info">
+    <span id="nav-distance">🚗 0,0 km</span>
+    <span class="nav-separator">•</span>
+    <span id="nav-time">0 min</span>
+</div>
 
     <!-- BOTÃO + PARA ADICIONAR RADAR -->
     <button class="btn-add-radar" id="btn-add-radar">
@@ -2527,7 +2580,9 @@ function finalizarNavegacao() {
 }
 
 function removerRota() { finalizarNavegacao(); }
-
+//=========
+//CRIAR ROTA
+//==========
 function criarRota(destLat, destLng) {
     if (!userLat || !userLng) { showNotification("Aguardando posição GPS..."); return; }
     if (routingControl) { map.removeControl(routingControl); routingControl = null; }
@@ -2552,44 +2607,51 @@ function criarRota(destLat, destLng) {
     }).addTo(map);
     
     routingControl.on('routesfound', function(e) {
-        let route = e.routes[0];
-       if (route.coordinates && route.coordinates.length >= 2) {
 
-    // Guarda a geometria completa da rota
-    coordenadasRotaNavegacao = route.coordinates;
+    let route = e.routes[0];
 
-    // Direção inicial apenas para iniciar a navegação
-    var p1 = route.coordinates[0];
-    var p2 = route.coordinates[1];
+    if (route.coordinates && route.coordinates.length >= 2) {
 
-    var headingInicial = calcularBearing(
-        p1.lat,
-        p1.lng,
-        p2.lat,
-        p2.lng
-    );
+        coordenadasRotaNavegacao = route.coordinates;
 
-    headingIconeNavegacao = headingInicial;
-    headingIconeSuavizado = headingInicial;
+        var p1 = route.coordinates[0];
+        var p2 = route.coordinates[1];
 
-    _navAnim.headingAlvo = headingInicial;
-    _navAnim.headingSuavizado = headingInicial;
+        var headingInicial = calcularBearing(
+            p1.lat,
+            p1.lng,
+            p2.lat,
+            p2.lng
+        );
 
-    bearingAlvo = headingInicial;
-    bearingAtual = headingInicial;
+        headingIconeNavegacao = headingInicial;
+        headingIconeSuavizado = headingInicial;
 
-    ultimoSegmentoRota = 0;
+        _navAnim.headingAlvo = headingInicial;
+        _navAnim.headingSuavizado = headingInicial;
+
+        bearingAlvo = headingInicial;
+        bearingAtual = headingInicial;
+
+        ultimoSegmentoRota = 0;
+    }
+
+    let dk = (route.summary.totalDistance / 1000).toFixed(1);
+    let tm = Math.round(route.summary.totalTime / 60);
+
+    $("#loading").hide();
+
+    // ========================================================
+    // NÃO usar showNotification aqui.
+    // O painel permanece fixo durante toda a navegação.
+    // ========================================================
+    mostrarInfoNavegacao(dk, tm);
+
+    iniciarModoNavegacaoSuave();
+});
 }
 
-        let dk = (route.summary.totalDistance / 1000).toFixed(1);
-        let tm = Math.round(route.summary.totalTime / 60);
-        $("#loading").hide();
-        showNotification("🚗 " + dk + " km • " + tm + " min");
-        iniciarModoNavegacaoSuave();
-    });
-    routingControl.on('routingerror', function() { $("#loading").hide(); showNotification("Erro ao traçar rota."); });
-    showNotification("🚀 Navegação iniciada");
-}
+//CALCULANDO DE ORIENTAÇÃO 
 
 function calcularBearing(lat1, lng1, lat2, lng2) {
     var dLon = (lng2 - lng1) * Math.PI / 180;
@@ -4411,24 +4473,81 @@ speedWidget.addEventListener("click", () => {
     // Configurar eventos dos botões
     //==============================
 
-    $("#btn-calc-route").click(async function() {
-        var endereco = $("#route-query").val().trim();
-        if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
-        $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
-        var coords = await buscarCoordenadas(endereco);
-        if (coords) { esconderAlertaVisual(); criarRota(coords.lat, coords.lng); }
-        else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
-    });
+//============================
+// BOTÃO DE CRIAÇÃO DE ROTA
+//============================
 
-    $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
+$("#btn-calc-route").click(async function() {
 
-    function fecharTodasBarras() { 
-        searchActive = false; 
-        routeActive = false; 
-        document.getElementById('search-bar-radares').classList.remove('active'); 
-        document.getElementById('search-bar-rota').classList.remove('active'); 
-        ajustarBussolaParaBusca(false);
+    var endereco = $("#route-query").val().trim();
+
+    if (endereco.length < 5) {
+        showNotification("Digite um endereço válido.");
+        return;
     }
+
+    $("#loading").show().html(
+        "<div class='loading-spinner'></div><div>Calculando rota...</div>"
+    );
+
+    var coords = await buscarCoordenadas(endereco);
+
+    if (coords) {
+
+        esconderAlertaVisual();
+
+        // Recolhe a barra de pesquisa de rota
+        routeActive = false;
+        $("#search-bar-rota").removeClass("active");
+
+        // Retira o foco do campo
+        $("#route-query").blur();
+
+        // Cria a rota
+        criarRota(coords.lat, coords.lng);
+
+    } else {
+
+        $("#loading").hide();
+        showNotification("Endereço não encontrado.");
+    }
+
+});
+
+//============================
+// ENTER = CRIAR ROTA
+//============================
+
+$("#route-query").keypress(function(e) {
+    if (e.which == 13) {
+        $("#btn-calc-route").click();
+    }
+});
+    //=======================
+    //FECHAR TODAS AS BARRAS
+    //======================
+
+   function fecharTodasBarras() {
+
+    searchActive = false;
+    routeActive = false;
+
+    var barraRadar =
+        document.getElementById('search-bar-radares');
+
+    var barraRota =
+        document.getElementById('search-bar-rota');
+
+    if (barraRadar) {
+        barraRadar.classList.remove('active');
+    }
+
+    if (barraRota) {
+        barraRota.classList.remove('active');
+    }
+
+    ajustarBussolaParaBusca(false);
+}
 
     $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
     $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
@@ -4447,21 +4566,44 @@ speedWidget.addEventListener("click", () => {
         ajustarBussolaParaBusca(true);
     });
     
+  //====================
+//BOTÃO LATERAL DE ROTA
+//=====================
+
     $("#btn-route-bar").click(function() {
-        if (routeActive) { 
-            fecharTodasBarras(); 
-            return; 
-        }
-        if (searchActive) searchActive = false; 
-        routeActive = true;
-        $("#search-bar-radares").removeClass('active'); 
-        $("#search-bar-rota").addClass('active');
-        if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
-        setTimeout(function() { $("#route-query").focus(); }, 300);
-        ajustarBussolaParaBusca(true);
-    });
 
+    if (routeActive) {
+        fecharTodasBarras();
+        return;
+    }
 
+    if (searchActive) {
+        searchActive = false;
+    }
+
+    routeActive = true;
+
+    $("#search-bar-radares").removeClass("active");
+    $("#search-bar-rota").addClass("active");
+
+    if (!sidebarAberta) {
+        sidebarAberta = true;
+
+        document
+            .getElementById('sidebar-controls')
+            .classList.remove('retracted');
+
+        document
+            .getElementById('btn-menu-toggle')
+            .classList.remove('active');
+    }
+
+    setTimeout(function() {
+        $("#route-query").focus();
+    }, 300);
+
+    ajustarBussolaParaBusca(true);
+});
 //===================================================================================
 // BOTÃO CENTRALIZAR = CENTRALIZA + MOSTRA GPS MARKER + DEPOIS MUDA PARA NAVIGATOR MAP
 //====================================================================================
@@ -4635,6 +4777,36 @@ $("#btn-refresh").click(function() {
     carregarRadares();
     
     console.log('[Radar X9] ✅ Aplicação inicializada com sucesso!');
+}
+
+// ============================================================
+// MOSTRAR INFORMAÇÕES DA NAVEGAÇÃO
+// ============================================================
+function mostrarInfoNavegacao(distancia, tempo) {
+
+    var painel = document.getElementById('nav-info');
+    var distanciaEl = document.getElementById('nav-distance');
+    var tempoEl = document.getElementById('nav-time');
+
+    if (!painel || !distanciaEl || !tempoEl) return;
+
+    distanciaEl.textContent = '🚗 ' + distancia + ' km';
+    tempoEl.textContent = tempo + ' min';
+
+    painel.classList.add('visible');
+}
+
+
+// ============================================================
+// OCULTAR INFORMAÇÕES DA NAVEGAÇÃO
+// ============================================================
+function ocultarInfoNavegacao() {
+
+    var painel = document.getElementById('nav-info');
+
+    if (painel) {
+        painel.classList.remove('visible');
+    }
 }
 
 // ===================================================================
