@@ -605,8 +605,19 @@ h1 span {
     /* ===========
    SET DO MAPA 
    ============= */
-    .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
-    #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; position: relative; }
+    .map-wrapper { 
+        position: relative;
+         flex: 1;
+          display: flex; 
+         overflow: hidden; 
+         width: 100%; }
+
+    #map { 
+        width: 100%; 
+        height: 100%;
+         background-color: #2a2a2a; 
+         z-index: 1; 
+         position: relative; }
 
     
 /* ========================================
@@ -1106,36 +1117,61 @@ h1 span {
     }
 }
 
+
 /* ========================================
-   INFORMAÇÃO DE DADOS DA NAVEGAÇÃO
+   INFORMAÇÕES DA NAVEGAÇÃO
+   FICA SOBRE O MAPA
    ======================================== */
 
 #nav-info {
-    display: flex;
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+
     flex-direction: column;
     align-items: center;
+
+    pointer-events: none;
+    white-space: nowrap;
 }
+
+
+/* Linha do horário de chegada */
 
 #nav-arrival {
     font-size: 12px;
     font-weight: 600;
     line-height: 1.2;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 }
+
+
+/* Linha distância + tempo */
 
 #nav-route {
     display: flex;
     align-items: center;
     gap: 6px;
+
+    font-size: 12px;
 }
+
+
+/* Separador */
+
+.nav-separator {
+    opacity: 0.7;
+}
+
+
+/* Evita que os elementos internos alterem o tamanho do mapa */
 
 #nav-distance,
 #nav-time {
     white-space: nowrap;
-}
-
-.nav-separator {
-    opacity: 0.7;
 }
 
 </style>
@@ -1238,17 +1274,23 @@ h1 span {
   
   <!-- MENU DROPDOWN -->
  
-  <div class="map-wrapper">
+<div class="map-wrapper">
 
- <div id="nav-info">
-    <div id="nav-arrival">
-        🕐 Chegada: --:--
+    <div id="nav-info">
+        <div id="nav-arrival">
+            🕐 Chegada: --:--
+        </div>
+
+        <div id="nav-route">
+            <span id="nav-distance">🚗 0,0 km</span>
+            <span class="nav-separator">•</span>
+            <span id="nav-time">0 min</span>
+        </div>
     </div>
-    <div id="nav-route">
-        <span id="nav-distance">🚗 0,0 km</span>
-        <span class="nav-separator">•</span>
-        <span id="nav-time">0 min</span>
-    </div>
+
+    <!-- seu mapa -->
+    <div id="map"></div>
+
 </div>
 
     <div class="search-container" id="search-bar-radares">
@@ -1497,6 +1539,7 @@ let endRouteMarker = null;
 let routingControl = null;
 let destinoAtual = null;
 let userMarker = null;
+var destinoNavegacao = null;
 
 let ultimaAtualizacaoCamera = 0;
 const INTERVALO_CAMERA_MS = 100;
@@ -2533,6 +2576,14 @@ function atualizarHorarioChegada(minutos) {
 // FUNÇÕES DE NAVEGAÇÃO
 // ===================================================================
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+  
+ 
+    destinoNavegacao = {
+        lat: destLat,
+        lng: destLng
+    };
+    
+  
     if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
     if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
     if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
@@ -2639,6 +2690,7 @@ function criarRota(destLat, destLng) {
     if (!userLat || !userLng) { showNotification("Aguardando posição GPS..."); return; }
     if (routingControl) { map.removeControl(routingControl); routingControl = null; }
     destinoAtual = { lat: destLat, lng: destLng };
+   
     adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
     routingControl = L.Routing.control({
         waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
@@ -2701,6 +2753,38 @@ function criarRota(destLat, destLng) {
 
     iniciarModoNavegacaoSuave();
 });
+}
+
+// ===================================================================
+// VERIFICAR CHEGADA AO DESTINO
+// ===================================================================
+
+function verificarChegadaAoDestino(latAtual, lngAtual, destLat, destLng) {
+
+    var distancia = map.distance(
+        L.latLng(latAtual, lngAtual),
+        L.latLng(destLat, destLng)
+    );
+
+    // Considera chegada quando estiver a até 20 metros
+    if (distancia <= 20) {
+
+        estaEmNavegacao = false;
+
+        // Esconde informações da navegação
+        setTimeout(function() {
+            $("#nav-info").css("display", "none");
+        }, 3000);
+
+        // Mostra popup do destino
+        if (endRouteMarker) {
+            endRouteMarker.openPopup();
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 //CALCULANDO DE ORIENTAÇÃO 
@@ -4556,7 +4640,6 @@ ocultarBussolaLeaflet();
 
 $("#btn-calc-route").click(async function() {
 
-  
     var endereco = $("#route-query").val().trim();
 
     if (endereco.length < 5) {
@@ -4581,6 +4664,9 @@ $("#btn-calc-route").click(async function() {
         // Retira o foco do campo
         $("#route-query").blur();
 
+        // MOSTRA AS INFORMAÇÕES DA ROTA
+        $("#nav-info").css("display", "flex");
+
         // Cria a rota
         criarRota(coords.lat, coords.lng);
 
@@ -4589,7 +4675,6 @@ $("#btn-calc-route").click(async function() {
         $("#loading").hide();
         showNotification("Endereço não encontrado.");
     }
-
 });
 
 //============================
@@ -4631,8 +4716,21 @@ $("#route-query").keypress(function(e) {
     ajustarBussolaParaBusca(false);
 }
 
-    $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
-    $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
+//==========================
+//BOTÃO DE BUSCA RADAR BARRA
+//==========================
+    $("#btn-search-radar").click(function() { 
+        buscarRadares(            
+            $("#query").val()); 
+            $("#nav-info").css("display", "none");
+        });
+
+    $("#query").keypress(function(e) { 
+        if (e.which == 13) buscarRadares(
+            $("#query").val()); 
+            
+        });
+
 
     $("#btn-search-bar").click(function() {
         if (searchActive) { 
@@ -4698,7 +4796,7 @@ $("#btn-center").click(function() {
         showNotification("Aguardando sinal GPS...");
         return;
     }
-
+    $("#nav-info").css("display", "none");
     // Centraliza o mapa na posição atual
     map.flyTo(userMarker.getLatLng(), 18, {
         duration: 0.5
@@ -4808,6 +4906,7 @@ $("#btn-center").click(function() {
 $("#btn-refresh").click(function() { 
     resetarMapa(); 
     carregarRadares(); 
+    $("#nav-info").css("display", "none");
     
     // RESETA O ALERTA DE NORMALIDADE PARA APARECER NO REFRESH
     alertaNormalidadeMostrado = false;
