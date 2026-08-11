@@ -147,7 +147,7 @@ h1 span {
     font-weight: 700;
     letter-spacing: 0.3px;
     text-transform: uppercase;
-    white-space: nowrap;
+    white-space: nowrap;/* não permite quebra de linha */
     overflow: hidden;
     flex: 1;
     min-width: 0;
@@ -227,7 +227,7 @@ h1 span {
     }
 
     #nomeCidade {
-        font-size: 12px;
+        font-size: 13px;
         max-width: 70px;
     }
 
@@ -247,17 +247,17 @@ h1 span {
 
     /* APP - FONTES AJUSTADAS NOVAMENTE*/
     .cidade-label {
-        font-size: 12px;
+        font-size: 13px;
         gap: 3px;
     }
     
     .temp-value,
     .cidade-label .label {
-        font-size: 12px;
+        font-size: 13px;
     }
     
     #nomeCidade {
-        font-size: 12px;
+        font-size: 13px;
     }
     
     #temperaturaAtual {
@@ -321,32 +321,32 @@ h1 span {
     }
     
     .cidade-label {
-        font-size: 9px;
+        font-size: 11px;
         gap: 2px;
     }
     
     .temp-value,
     .cidade-label .label {
-        font-size: 9px;
+        font-size: 11px;
     }
     
     #nomeCidade {
-        font-size: 9px;
+        font-size: 11px;
         max-width: 50px;
     }
     
     #temperaturaAtual {
-        font-size: 8px;
+        font-size: 11px;
         min-width: 30px;
     }
     
     #umidadeAtual {
-        font-size: 8px;
+        font-size: 11px;
         min-width: 20px;
     }
     
     #poluicaoAtual {
-        font-size: 8px;
+        font-size: 11px;
         min-width: 30px;
     }
     
@@ -1110,38 +1110,23 @@ h1 span {
    INFORMAÇÃO DE DADOS DA NAVEGAÇÃO
    ======================================== */
 
-
 #nav-info {
-    position: absolute;
-
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-
-    display: none;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-
-    min-width: 190px;
-    padding: 7px 15px;
-
-    background: rgba(0, 0, 0, 0.78);
-    border: 1px solid rgba(0, 255, 136, 0.35);
-    border-radius: 20px;
-
-    color: #fff;
-    font-size: 14px;
-    font-weight: 600;
-
-    z-index: 1000;
-
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
-
-    pointer-events: none;
 }
 
-#nav-info.visible {
+#nav-arrival {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 3px;
+}
+
+#nav-route {
     display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 #nav-distance,
@@ -1150,8 +1135,7 @@ h1 span {
 }
 
 .nav-separator {
-    margin: 0 7px;
-    opacity: 0.5;
+    opacity: 0.7;
 }
 
 </style>
@@ -1256,11 +1240,16 @@ h1 span {
  
   <div class="map-wrapper">
 
-    <div id="nav-info">
-    <span id="nav-distance">🚗 0,0 km</span>
-    <span class="nav-separator">•</span>
-    <span id="nav-time">0 min</span>
-  </div>
+ <div id="nav-info">
+    <div id="nav-arrival">
+        🕐 Chegada: --:--
+    </div>
+    <div id="nav-route">
+        <span id="nav-distance">🚗 0,0 km</span>
+        <span class="nav-separator">•</span>
+        <span id="nav-time">0 min</span>
+    </div>
+</div>
 
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
@@ -2513,6 +2502,36 @@ function ocultarBussola(ocultar) {
     }
 }
 
+// ========================================
+// CALCULAR HORÁRIO DE CHEGADA
+// ========================================
+
+function atualizarHorarioChegada(minutos) {
+
+    minutos = parseInt(minutos);
+
+    if (isNaN(minutos) || minutos < 0) {
+        $("#nav-arrival").text("🕐 Chegada: --:--");
+        return;
+    }
+
+    const agora = new Date();
+
+    agora.setMinutes(agora.getMinutes() + minutos);
+
+    const horas = String(agora.getHours()).padStart(2, "0");
+    const minutosChegada = String(agora.getMinutes()).padStart(2, "0");
+
+    $("#nav-arrival").text(
+        "🕐 Chegada: " + horas + ":" + minutosChegada
+    );
+}
+
+$("#nav-distance").text("🚗 " + distancia + " km");
+
+$("#nav-time").text(tempo + " min");
+
+atualizarHorarioChegada(tempo);
 // ===================================================================
 // FUNÇÕES DE NAVEGAÇÃO
 // ===================================================================
