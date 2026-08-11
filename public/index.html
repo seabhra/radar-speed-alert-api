@@ -719,16 +719,13 @@ h1 span {
     .compass-widget.hidden { opacity: 0; pointer-events: none; }
     .compass-widget.busca-ativo { top: 75px; }
 
-    /* ========================================
+  /* ========================================
    OCULTAR BÚSSOLA NATIVA DO LEAFLET
    A bússola personalizada assume a função
    ======================================== */
 
 .leaflet-control-compass {
     display: none !important;
-     position: absolute;
-     top: 65px;
-     left: 5px;
 }
     .compass-base {
         position: absolute; width: 100%; height: 100%; z-index: 1;
@@ -4509,6 +4506,14 @@ speedWidget.addEventListener("click", () => {
     //=============================
     // Configurar eventos dos botões
     //==============================
+
+// ========================================
+// OCULTAR BÚSSOLA NATIVA DO LEAFLET
+// ========================================
+
+function ocultarBussolaLeaflet() {
+    $(".leaflet-control-compass").css("display", "none");
+}
 
 //============================
 // BOTÃO DE CRIAÇÃO DE ROTA
