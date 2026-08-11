@@ -3295,6 +3295,17 @@ function startGPSTracking() {
 
     watchId = navigator.geolocation.watchPosition(
         function(position) {
+
+            if (estaEmNavegacao && destinoNavegacao) {
+
+    verificarChegadaAoDestino(
+        lat,
+        lng,
+        destinoNavegacao.lat,
+        destinoNavegacao.lng
+    );
+}
+
             if (gpsSource !== 'appinventor') {
                 gpsSource = 'browser';
             }
