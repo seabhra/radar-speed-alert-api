@@ -719,19 +719,21 @@ h1 span {
     .compass-widget.hidden { opacity: 0; pointer-events: none; }
     .compass-widget.busca-ativo { top: 75px; }
 
-  /* ========================================
-   OCULTAR BÚSSOLA NATIVA DO LEAFLET
-   A bússola personalizada assume a função
-   ======================================== */
 
-.leaflet-control-compass {
-    display: none !important;
-}
-    .compass-base {
+  .compass-base {
         position: absolute; width: 100%; height: 100%; z-index: 1;
         background-image: url('/imagens_app/ic_compass.png'); background-size: contain;
         background-repeat: no-repeat; background-position: center; opacity: 0.9;
     }
+
+  /* ========================================
+   OCULTAR BÚSSOLA NATIVA DO LEAFLET
+   A bússola personalizada assume a função
+   ======================================== */
+    .leaflet-control-compass {
+    display: none !important;
+}
+  
     .compass-needle { position: absolute; width: 55%; height: 55%; z-index: 2; object-fit: contain; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
     .leaflet-pane, .leaflet-map-pane, .leaflet-tile-pane, .leaflet-overlay-pane, .leaflet-shadow-pane,
     .leaflet-marker-pane, .leaflet-popup-pane, .leaflet-control-pane, .leaflet-tooltip-pane { z-index: 1 !important; }
@@ -809,7 +811,7 @@ h1 span {
     .alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
     .alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico, .alert-bar-servico-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
-   .alert-bar-servico {background: linear-gradient(90deg, #ff8c00, #e67e00);border-top: 2px solid #ffb347;box-shadow: 0 -5px 20px rgba(255, 140, 0, 0.4);
+   .alert-bar-servico {background: linear-gradient(90deg, #ff00e1, #e600c4);border-top: 2px solid #ff47fc;box-shadow: 0 -5px 20px rgba(255, 140, 0, 0.4);
 }
 
 
@@ -4511,9 +4513,26 @@ speedWidget.addEventListener("click", () => {
 // OCULTAR BÚSSOLA NATIVA DO LEAFLET
 // ========================================
 
+// ========================================
+// OCULTAR BÚSSOLA NATIVA DO LEAFLET
+// ========================================
+
+// ========================================
+// OCULTAR BÚSSOLA NATIVA DO LEAFLET
+// ========================================
+
 function ocultarBussolaLeaflet() {
     $(".leaflet-control-compass").css("display", "none");
 }
+
+// Executa após o carregamento
+setTimeout(ocultarBussolaLeaflet, 100);
+
+// Reforça depois
+setTimeout(ocultarBussolaLeaflet, 500);
+setTimeout(ocultarBussolaLeaflet, 1000);
+
+ocultarBussolaLeaflet();
 
 //============================
 // BOTÃO DE CRIAÇÃO DE ROTA
@@ -4521,9 +4540,7 @@ function ocultarBussolaLeaflet() {
 
 $("#btn-calc-route").click(async function() {
 
-      // Esconde a bússola nativa
-   // $(".leaflet-control-compass").hide();
-
+  
     var endereco = $("#route-query").val().trim();
 
     if (endereco.length < 5) {
@@ -4566,9 +4583,7 @@ $("#btn-calc-route").click(async function() {
 $("#route-query").keypress(function(e) {
     if (e.which == 13) {
 
-        // Esconde a bússola nativa do Leaflet
-        //$(".leaflet-control-compass").hide();
-
+    
         // Executa o cálculo da rota
         $("#btn-calc-route").click();
     }
