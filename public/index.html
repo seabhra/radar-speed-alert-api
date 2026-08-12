@@ -4011,7 +4011,7 @@ function esconderAlertaVisual() {
 
     $("#alert-container").fadeOut(200, function () {
         $(this).find(".alert-bar").removeClass(
-            'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico alert-bar-destaque-servico'
+            'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico alert-bar-servico-critico'
         );
     });
     ajustarPosicaoSpeedWidget(false);
@@ -5012,7 +5012,7 @@ function mostrarInfoNavegacao(distancia, tempo) {
 
     // Formata distância com vírgula
     distanciaEl.textContent = '🚗 ' + String(distancia).replace('.', ',') + ' km';
-    tempoEl.textContent = tm + ' min';
+    tempoEl.textContent = tempo + ' min';
 
     // Calcula horário previsto de chegada
     if (chegadaEl && tempo > 0) {
@@ -5026,7 +5026,6 @@ function mostrarInfoNavegacao(distancia, tempo) {
     painel.classList.add('visible');
     console.log('[Radar X9] Painel navegação atualizado:', distancia, 'km |', tempo, 'min');
 }
-
 
 // ============================================================
 // OCULTAR INFORMAÇÕES DA NAVEGAÇÃO
