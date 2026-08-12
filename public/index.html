@@ -1121,59 +1121,113 @@ h1 span {
 /* ========================================
    INFORMAÇÕES DA NAVEGAÇÃO
       ======================================== */
+/* ========================================
+   INFORMAÇÕES DA NAVEGAÇÃO
+   ======================================== */
 
 #nav-info {
     display: none;
     position: absolute;
-    top: 10px;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1000;
-
+    z-index: 9999 !important;
+    
+    /* FUNDO ESCURO COM TRANSPARÊNCIA */
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
+    /* BORDA VERDE */
+    border: 1.5px solid rgba(0, 255, 136, 0.35);
+    border-radius: 14px;
+    
+    /* SOMBRA PARA DESTAQUE */
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.7),
+        0 0 20px rgba(0, 255, 136, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    
+    /* PADDING INTERNO */
+    padding: 10px 22px 8px 22px;
+    
+    /* TEXTO BRANCO */
+    color: #ffffff;
+    
+    /* CENTRALIZAÇÃO */
     flex-direction: column;
     align-items: center;
-
+    justify-content: center;
+    
     pointer-events: none;
     white-space: nowrap;
+    
+    /* TRANSIÇÃO SUAVE */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #nav-info.visible {
-    display: block;
+    display: flex !important;
+    animation: slideDownNav 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ANIMAÇÃO DE ENTRADA */
+@keyframes slideDownNav {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-15px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
 }
 
 /* Linha do horário de chegada */
-
 #nav-arrival {
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.2;
-    margin-bottom: 2px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 3px;
+    color: #00ff88;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    letter-spacing: 0.3px;
 }
 
-
 /* Linha distância + tempo */
-
 #nav-route {
     display: flex;
     align-items: center;
-    gap: 6px;
-
-    font-size: 12px;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
 }
-
 
 /* Separador */
-
 .nav-separator {
-    opacity: 0.7;
+    opacity: 0.4;
+    color: #888;
+    font-size: 16px;
 }
 
-
 /* Evita que os elementos internos alterem o tamanho do mapa */
-
 #nav-distance,
 #nav-time {
     white-space: nowrap;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ÍCONES dentro do nav-info */
+#nav-arrival::before {
+    content: "📍 ";
+    font-size: 14px;
+}
+
+#nav-distance::before {
+    content: "🚗 ";
+    font-size: 14px;
 }
 
 </style>
