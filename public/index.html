@@ -2686,9 +2686,10 @@ function finalizarNavegacao() {
 
 function removerRota() { finalizarNavegacao(); }
 
-//=========
-//CRIAR ROTA
-//==========
+//==================
+//FUNÇÃO CRIAR ROTA
+//==================
+
 function criarRota(destLat, destLng) {
     if (!userLat || !userLng) { showNotification("Aguardando posição GPS..."); return; }
     if (routingControl) { map.removeControl(routingControl); routingControl = null; }
@@ -2714,49 +2715,33 @@ function criarRota(destLat, destLng) {
     }).addTo(map);
     
     routingControl.on('routesfound', function(e) {
+        let route = e.routes[0];
+        if (route.coordinates && route.coordinates.length >= 2) {
+            coordenadasRotaNavegacao = route.coordinates;
+            var p1 = route.coordinates[0];
+            var p2 = route.coordinates[1];
+            var headingInicial = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
+            headingIconeNavegacao = headingInicial;
+            headingIconeSuavizado = headingInicial;
+            _navAnim.headingAlvo = headingInicial;
+            _navAnim.headingSuavizado = headingInicial;
+            bearingAlvo = headingInicial;
+            bearingAtual = headingInicial;
+            ultimoSegmentoRota = 0;
+        }
 
-    let route = e.routes[0];
+        let dk = (route.summary.totalDistance / 1000).toFixed(1);
+        let tm = Math.round(route.summary.totalTime / 60);
 
-    if (route.coordinates && route.coordinates.length >= 2) {
+        // ✅ CHAMADA CORRETA AQUI
+        mostrarInfoNavegacao(dk, tm);
 
-        coordenadasRotaNavegacao = route.coordinates;
-
-        var p1 = route.coordinates[0];
-        var p2 = route.coordinates[1];
-
-        var headingInicial = calcularBearing(
-            p1.lat,
-            p1.lng,
-            p2.lat,
-            p2.lng
-        );
-
-        headingIconeNavegacao = headingInicial;
-        headingIconeSuavizado = headingInicial;
-
-        _navAnim.headingAlvo = headingInicial;
-        _navAnim.headingSuavizado = headingInicial;
-
-        bearingAlvo = headingInicial;
-        bearingAtual = headingInicial;
-
-        ultimoSegmentoRota = 0;
-    }
-
-    let dk = (route.summary.totalDistance / 1000).toFixed(1);
-    let tm = Math.round(route.summary.totalTime / 60);
-
-    $("#loading").hide();
-
-    // ========================================================
-    // NÃO usar showNotification aqui.
-    // O painel permanece fixo durante toda a navegação.
-    // ========================================================
-    mostrarInfoNavegacao(dk, tm);
-
-    iniciarModoNavegacaoSuave();
-});
+        $("#loading").hide();
+        iniciarModoNavegacaoSuave();
+    });
 }
+
+
 
 // ===================================================================
 // VERIFICAR CHEGADA AO DESTINO
@@ -3535,7 +3520,7 @@ navigator.geolocation.getCurrentPosition(async(pos) => {
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
 
-    await atualizarCidade(userLat, userLng);
+    await atualizarCidade(userLat, userLng);''
     await atualizarTemperatura();
 
 });
@@ -5015,7 +5000,6 @@ $("#btn-refresh").click(function() {
 // MOSTRAR INFORMAÇÕES DA NAVEGAÇÃO
 // ============================================================
 function mostrarInfoNavegacao(distancia, tempo) {
-
     var painel = document.getElementById('nav-info');
     var distanciaEl = document.getElementById('nav-distance');
     var tempoEl = document.getElementById('nav-time');
@@ -5026,35 +5010,21 @@ function mostrarInfoNavegacao(distancia, tempo) {
         return;
     }
 
-    distanciaEl.textContent =
-        '🚗 ' + String(distancia).replace('.', ',') + ' km';
-
-    tempoEl.textContent =
-        tempo + ' min';
+    // Formata distância com vírgula
+    distanciaEl.textContent = '🚗 ' + String(distancia).replace('.', ',') + ' km';
+    tempoEl.textContent = tm + ' min';
 
     // Calcula horário previsto de chegada
     if (chegadaEl && tempo > 0) {
-
-        var chegada = new Date(
-            Date.now() + (tempo * 60 * 1000)
-        );
-
+        var chegada = new Date(Date.now() + (tempo * 60 * 1000));
         var horas = String(chegada.getHours()).padStart(2, '0');
         var minutos = String(chegada.getMinutes()).padStart(2, '0');
-
-        chegadaEl.textContent =
-            '🕐 Chegada: ' + horas + ':' + minutos;
+        chegadaEl.textContent = '🕐 Chegada: ' + horas + ':' + minutos;
     }
 
+    // Torna visível
     painel.classList.add('visible');
-
-    console.log(
-        '[Radar X9] Painel navegação atualizado:',
-        distancia,
-        'km |',
-        tempo,
-        'min'
-    );
+    console.log('[Radar X9] Painel navegação atualizado:', distancia, 'km |', tempo, 'min');
 }
 
 
