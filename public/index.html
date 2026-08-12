@@ -1246,7 +1246,7 @@ h1 span {
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
-<div id="alerta-sound-climatico" class="alerta-clima-label" style="display: none;"></div>
+<div id="alerta-sound-clima" class="alerta-clima-label" style="display: none;"></div>
 
 <!-- NOVO: ALERTA DE NORMALIDADE (aparece quando o clima está normal) -->
 <div id="alerta-normalidade" class="alerta-normalidade-label" style="display: none;">
@@ -1500,7 +1500,7 @@ h1 span {
    <audio id="alert-sound-destaque" preload="auto">
     <source src="audio_app/alerta_sound_destaque.mp3" type="audio/mpeg">
   </audio>
-   <audio id="alerta-sound-climatico" preload="auto">
+   <audio id="alerta-sound-clima" preload="auto">
     <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
   </audio>
 
@@ -3455,26 +3455,56 @@ function ajustarHeaderResponsivo() {
 //=====================================
 // FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
 //=====================================
-
 async function atualizarCidade(lat, lng) {
     try {
+
+        if (
+            lat == null ||
+            lng == null ||
+            isNaN(lat) ||
+            isNaN(lng)
+        ) {
+            console.warn("[Radar X9] Coordenadas inválidas para atualizar cidade:", lat, lng);
+            return;
+        }
+
         const resposta = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
         );
+
+        if (!resposta.ok) {
+            console.warn(
+                "[Radar X9] Nominatim respondeu:",
+                resposta.status
+            );
+            return;
+        }
+
         const dados = await resposta.json();
-        const cidade = dados.address.city ||
-                       dados.address.town ||
-                       dados.address.municipality ||
-                       dados.address.village;
+
+        if (!dados.address) {
+            console.warn("[Radar X9] Nominatim não retornou endereço:", dados);
+            return;
+        }
+
+        const cidade =
+            dados.address.city ||
+            dados.address.town ||
+            dados.address.municipality ||
+            dados.address.village;
 
         if (cidade && cidade !== ultimaCidade) {
+
             ultimaCidade = cidade;
+
             const nomeEl = document.getElementById("nomeCidade");
+
             if (nomeEl) {
                 nomeEl.textContent = "📍" + cidade;
                 nomeEl.style.color = corCidade(cidade);
             }
         }
+
     } catch (e) {
         console.log("Erro cidade:", e);
     }
@@ -3500,13 +3530,12 @@ function corCidade(nome){
     return `hsl(${hue},100%,68%)`;
 }
 
-navigator.geolocation.getCurrentPosition(async(pos)=>{
+navigator.geolocation.getCurrentPosition(async(pos) => {
 
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
 
-    await atualizarCidade();
-
+    await atualizarCidade(userLat, userLng);
     await atualizarTemperatura();
 
 });
@@ -3654,7 +3683,7 @@ async function atualizarTemperatura() {
 // VERIFICAR ALERTA DE POLUIÇÃO
 // =============================================
 function verificarAlertaPoluicao(aqi) {
-    const alertaDiv = document.getElementById('alerta-sound-climatico');
+    const alertaDiv = document.getElementById('alerta-sound-clima');
     
     // Se não tem alerta de clima ativo, pode mostrar o de poluição
     if (alertaDiv.style.display === 'none' || alertaDiv.style.display === '') {
@@ -3689,7 +3718,7 @@ function verificarAlertaPoluicao(aqi) {
 // =============================================
 function verificarClimaNormal(temp, umid) {
     const alertaNormalDiv = document.getElementById('alerta-normalidade');
-    const alertaClimaDiv = document.getElementById('alerta-sound-climatico');
+    const alertaClimaDiv = document.getElementById('alerta-sound-clima');
     
     // Verifica se NÃO há alertas ativos
     const semAlertas = 
@@ -3802,7 +3831,7 @@ function verificarAlertasClima(temp, umid) {
     
     if (isNaN(temp) || isNaN(umid)) return;
 
-    const alertaDiv = document.getElementById('alerta-sound-climatico');
+    const alertaDiv = document.getElementById('alerta-sound-clima');
     let novoAlerta = '';
 
     // Limpa classes anteriores
