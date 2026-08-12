@@ -1138,6 +1138,9 @@ h1 span {
     white-space: nowrap;
 }
 
+#nav-info.visible {
+    display: block;
+}
 
 /* Linha do horário de chegada */
 
@@ -2682,6 +2685,7 @@ function finalizarNavegacao() {
 }
 
 function removerRota() { finalizarNavegacao(); }
+
 //=========
 //CRIAR ROTA
 //==========
@@ -4973,18 +4977,52 @@ $("#btn-refresh").click(function() {
 // ============================================================
 // MOSTRAR INFORMAÇÕES DA NAVEGAÇÃO
 // ============================================================
+// ============================================================
+// MOSTRAR INFORMAÇÕES DA NAVEGAÇÃO
+// ============================================================
 function mostrarInfoNavegacao(distancia, tempo) {
 
     var painel = document.getElementById('nav-info');
     var distanciaEl = document.getElementById('nav-distance');
     var tempoEl = document.getElementById('nav-time');
+    var chegadaEl = document.getElementById('nav-arrival');
 
-    if (!painel || !distanciaEl || !tempoEl) return;
+    if (!painel || !distanciaEl || !tempoEl) {
+        console.error('[Radar X9] Elementos da navegação não encontrados');
+        return;
+    }
 
-    distanciaEl.textContent = '🚗 ' + distancia + ' km';
-    tempoEl.textContent = tempo + ' min';
+    // Distância
+    distanciaEl.textContent =
+        '🚗 ' + String(distancia).replace('.', ',') + ' km';
 
+    // Tempo
+    tempoEl.textContent =
+        tempo + (tempo === 1 ? ' min' : ' min');
+
+    // Horário estimado de chegada
+    if (chegadaEl) {
+
+        var agora = new Date();
+        var chegada = new Date(
+            agora.getTime() + (tempo * 60 * 1000)
+        );
+
+        var horas = String(chegada.getHours()).padStart(2, '0');
+        var minutos = String(chegada.getMinutes()).padStart(2, '0');
+
+        chegadaEl.textContent =
+            '🕐 Chegada: ' + horas + ':' + minutos;
+    }
+
+    // Exibe o painel
     painel.classList.add('visible');
+
+    console.log(
+        '[Radar X9] Navegação:',
+        distancia + ' km',
+        tempo + ' min'
+    );
 }
 
 
@@ -5001,7 +5039,7 @@ function ocultarInfoNavegacao() {
 }
 
 // ===================================================================
-// MODAL ADICIONAR RADAR E CAPTURA DE POSIÇÃO - CORRIGIDO
+// MODAL ADICIONAR RADAR E CAPTURA DE POSIÇÃO 
 // ===================================================================
 function openAddRadarModal() {
     document.getElementById('modal-add-radar').classList.add('active');
@@ -5023,7 +5061,7 @@ function openAddRadarModal() {
 }
 
 // ===================================================================
-// [CORREÇÃO] CAPTURAR POSIÇÃO - AGORA FUNCIONAL
+// CAPTURAR POSIÇÃO 
 // ===================================================================
 function capturarPosicaoRadar() {
     // 1. Mostra as lacunas IMEDIATAMENTE ao clicar
