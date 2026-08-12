@@ -4974,9 +4974,8 @@ $("#btn-refresh").click(function() {
     console.log('[Radar X9] ✅ Aplicação inicializada com sucesso!');
 }
 
-// ============================================================
-// MOSTRAR INFORMAÇÕES DA NAVEGAÇÃO
-// ============================================================
+
+
 // ============================================================
 // MOSTRAR INFORMAÇÕES DA NAVEGAÇÃO
 // ============================================================
@@ -4992,20 +4991,17 @@ function mostrarInfoNavegacao(distancia, tempo) {
         return;
     }
 
-    // Distância
     distanciaEl.textContent =
         '🚗 ' + String(distancia).replace('.', ',') + ' km';
 
-    // Tempo
     tempoEl.textContent =
-        tempo + (tempo === 1 ? ' min' : ' min');
+        tempo + ' min';
 
-    // Horário estimado de chegada
-    if (chegadaEl) {
+    // Calcula horário previsto de chegada
+    if (chegadaEl && tempo > 0) {
 
-        var agora = new Date();
         var chegada = new Date(
-            agora.getTime() + (tempo * 60 * 1000)
+            Date.now() + (tempo * 60 * 1000)
         );
 
         var horas = String(chegada.getHours()).padStart(2, '0');
@@ -5015,13 +5011,14 @@ function mostrarInfoNavegacao(distancia, tempo) {
             '🕐 Chegada: ' + horas + ':' + minutos;
     }
 
-    // Exibe o painel
     painel.classList.add('visible');
 
     console.log(
-        '[Radar X9] Navegação:',
-        distancia + ' km',
-        tempo + ' min'
+        '[Radar X9] Painel navegação atualizado:',
+        distancia,
+        'km |',
+        tempo,
+        'min'
     );
 }
 
