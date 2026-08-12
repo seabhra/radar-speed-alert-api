@@ -2616,13 +2616,30 @@ function atualizarRota() {
     routingControl.route();
 }
 
+//===================================
+//FUNÇÃO DE VERIFICAR CHAGADA DESTINO
+//===================================
+
 function verificarChegadaDestino() {
+
     if (!destinoAtual || !userLat || !userLng) return;
-    var distanciaDestino = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
+
+    var distanciaDestino = calcularDistancia(
+        userLat,
+        userLng,
+        destinoAtual.lat,
+        destinoAtual.lng
+    );
+
     if (distanciaDestino <= 30) {
+
         showNotification("Você chegou ao seu destino!");
+
         if (endRouteMarker) endRouteMarker.openPopup();
-        setTimeout(function() { finalizarNavegacao(); }, 4000);
+
+        setTimeout(function() {
+            finalizarNavegacao();
+        }, 4000);
     }
 }
 
@@ -2738,37 +2755,6 @@ function criarRota(destLat, destLng) {
 
 
 
-// ===================================================================
-// VERIFICAR CHEGADA AO DESTINO
-// ===================================================================
-
-function verificarChegadaAoDestino(latAtual, lngAtual, destLat, destLng) {
-
-    var distancia = map.distance(
-        L.latLng(latAtual, lngAtual),
-        L.latLng(destLat, destLng)
-    );
-
-    // Considera chegada quando estiver a até 20 metros
-    if (distancia <= 20) {
-
-        estaEmNavegacao = false;
-
-        // Esconde informações da navegação
-        setTimeout(function() {
-            $("#nav-info").css("display", "none");
-        }, 3000);
-
-        // Mostra popup do destino
-        if (endRouteMarker) {
-            endRouteMarker.openPopup();
-        }
-
-        return true;
-    }
-
-    return false;
-}
 
 //CALCULANDO DE ORIENTAÇÃO 
 
