@@ -1597,10 +1597,9 @@ let prevLat = null;
 let prevLng = null;
 let prevTime = null;
 let isFollowing = true;
-let watchId = null;
+
+
 let gpsSource = 'none';
-let gpsInitialized = false;
-let browserGpsTimeout = null;
 let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 15 };
 
 
@@ -3317,10 +3316,12 @@ let ultimaCidade = "";
 
 
 function startGPSTracking() {
+    
     // Se for usar o timeout, ele precisa ser iniciado com os parênteses e os parâmetros:
     browserGpsTimeout = setTimeout(() => {
         // O código que você quer executar após o tempo passar
         console.log("Tempo do GPS esgotou!");
+        
     }, 30000); // 30000 = 30 segundos (ou o tempo que você quiser)
 
     // Sua verificação do GPS:
@@ -3337,6 +3338,7 @@ function startGPSTracking() {
     }
 
     // Inicia o tracking GPS - ÚNICO watchPosition
+    
     watchId = navigator.geolocation.watchPosition(
         function(position) {
             // Dados da posição
