@@ -3593,6 +3593,19 @@
       "KBH000285",
       "-19.918248, -43.948208",
       "12/08/2026, 13:43:28"
+    ],
+    [
+      286,
+      "000286",
+      "Endereço não encontrado",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "40",
+      "Endereço não encontrado",
+      "Único",
+      "M000286",
+      "KBH000286",
+      "-19.766127, -43.858471",
+      "13/08/2026, 09:15:04"
     ]
   ]
 }
