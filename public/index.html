@@ -3340,78 +3340,74 @@ function startGPSTracking() {
     // Inicia o tracking GPS - ÚNICO watchPosition
     
     watchId = navigator.geolocation.watchPosition(
-        function(position) {
-            // Dados da posição
-            var lat = position.coords.latitude;
-            var lng = position.coords.longitude;
-            var speedKmh = 0;
-            
-            if (position.coords.speed !== null && position.coords.speed >= 0) {
-                speedKmh = Math.round(position.coords.speed * 3.6);
-            }
+    function(position) {
+        // Dados da posição
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        var speedKmh = 0;
+        
+        if (position.coords.speed !== null && position.coords.speed >= 0) {
+            speedKmh = Math.round(position.coords.speed * 3.6);
+        }
 
-            // Verifica chegada ao destino se estiver em navegação
-            if (estaEmNavegacao && destinoNavegacao) {
-                verificarChegadaAoDestino(
-                    lat,
-                    lng,
-                    destinoNavegacao.lat,
-                    destinoNavegacao.lng
-                );
-            }
-
-            // Define fonte do GPS
-            if (gpsSource !== 'appinventor') {
-                gpsSource = 'browser';
-            }
-
-            // ATUALIZA CIDADE E CLIMA
-            atualizarCidade(lat, lng);
-            atualizarTemperatura();
-
-            // Processa a nova posição
-            processarNovaPosicao(
+        // Verifica chegada ao destino se estiver em navegação
+        if (estaEmNavegacao && destinoNavegacao) {
+            verificarChegadaAoDestino(
                 lat,
                 lng,
-                speedKmh,
-                position.coords.heading,
-                position.coords.accuracy
+                destinoNavegacao.lat,
+                destinoNavegacao.lng
             );
-
-            // Marca GPS como inicializado
-            if (!gpsInitialized) {
-                gpsInitialized = true;
-                hideFullscreenLoading();
-            }
-
-        }, 
-        function(error) {
-            console.error("Erro GPS:", error);
-            showNotification("Erro ao obter localização: " + error.message);
-            if (!gpsInitialized) {
-                hideFullscreenLoading();
-            }
-        }, 
-        { 
-            enableHighAccuracy: true,
-            maximumAge: 1000,
-            timeout: 30000       // Aumenta o tempo de espera para 30 segundos
         }
-    );
 
-    console.log("GPS iniciado com watchId:", watchId);
+        // Define fonte do GPS
+        if (gpsSource !== 'appinventor') {
+            gpsSource = 'browser';
+        }
 
-    // Timeout para aguardar GPS
-    if (browserGpsTimeout) {
-        clearTimeout(browserGpsTimeout);
+        // ATUALIZA CIDADE E CLIMA
+        atualizarCidade(lat, lng);
+        atualizarTemperatura();
+
+        // Processa a nova posição
+        processarNovaPosicao(
+            lat,
+            lng,
+            speedKmh,
+            position.coords.heading,
+            position.coords.accuracy
+        );
+
+        // Marca GPS como inicializado
+        if (!gpsInitialized) {
+            gpsInitialized = true;
+            hideFullscreenLoading();
+        }
+
+    }, 
+    function(error) {
+        console.warn("Aviso GPS:", error.message);
+        
+        // =========================================================
+        // CORREÇÃO CRÍTICA: Ignora erros de TIMEOUT para não matar a navegação
+        // =========================================================
+        if (error.code === error.TIMEOUT) {
+            console.warn("Sinal de GPS fraco ou perdido, aguardando retorno...");
+            return; // Simplesmente ignora e deixa o watchPosition tentar de novo
+        }
+        
+        // Se for erro de permissão negada, aí sim notifica o usuário
+        if (error.code === error.PERMISSION_DENIED) {
+            showNotification("A permissão do GPS foi negada.");
+            if (!gpsInitialized) hideFullscreenLoading();
+        }
+    }, 
+    { 
+        enableHighAccuracy: true,
+        maximumAge: 2000,    // Aceita posições de até 2s. Evita forçar o hardware e causar timeouts.
+        timeout: Infinity    // NUNCA desiste! O watchPosition vai esperar o tempo que for necessário pelo sinal.
     }
-    
-    browserGpsTimeout = setTimeout(function() {
-        if (!gpsInitialized && gpsSource === 'none') { 
-            showNotification("Aguardando GPS do app..."); 
-            hideFullscreenLoading(); 
-        }
-    }, 8000);
+);
 }
 
 //===========================================
