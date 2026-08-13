@@ -1305,7 +1305,7 @@ h1 span {
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️ </span>
-    <span id="poluicaoAtual"> Poluição</span>
+    <span id="poluicaoAtual">Poluição </span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
@@ -1578,8 +1578,21 @@ let radarMarkers = [];
 let alertTimeout;
 let userLat = -19.919055;
 let userLng = -43.938641;
-let searchActive = false;
-let routeActive = false;
+
+// CONTROLE DE BARRAS LATERAIS
+let searchActive = false;    // Controla se a barra de RADARES está ativa
+let routeActive = false;     // Controla se a barra de ROTA está ativa
+
+// CONTROLE DE GPS - SEPARADO DAS BARRAS
+let gpsActive = true;        // Controla o funcionamento do GPS (INDEPENDENTE)
+
+//MENU LATERAL FECHADO COM CONTROLES
+let sidebarAberta = false;
+
+var watchId = null;
+var gpsInitialized = false; // GPS INICIALIZADO
+var browserGpsTimeout = null;  // TIME GPS BROWSER
+
 let prevLat = null;
 let prevLng = null;
 let prevTime = null;
@@ -1588,7 +1601,8 @@ let watchId = null;
 let gpsSource = 'none';
 let gpsInitialized = false;
 let browserGpsTimeout = null;
-let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 18 };
+let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 15 };
+
 
 let coordenadasRotaNavegacao = [];
 let ultimoSegmentoRota = -1;
@@ -1628,11 +1642,12 @@ const TEMPO_RETORNO_GPS = 8000;
 let refreshDelayTimer = null;
 const TEMPO_REFRESH_DELAY = 5000;
 
-let sidebarAberta = true;
 
 // Precisão do GPS para o status
 let gpsAccuracyAtual = 999;
 let gpsLastUpdateTime = 0;
+
+
 
 // No início do script, junto com as outras variáveis globais
 let iconeCentralizado = false; // Controla se o ícone está no modo centralizado
@@ -3297,77 +3312,84 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 //===========================================
 // FUNÇÃO INICIAR NAVEGAÇÃO GPS E CIDADE ATUAL
 //===========================================
-
-
 const cidadeLabel = document.getElementById("cidade-atual");
-
 let ultimaCidade = "";
 
+
 function startGPSTracking() {
-    if (!navigator.geolocation) { 
-        hideFullscreenLoading(); 
-        showNotification("GPS não suportado."); 
-        return; 
+    // Se for usar o timeout, ele precisa ser iniciado com os parênteses e os parâmetros:
+    browserGpsTimeout = setTimeout(() => {
+        // O código que você quer executar após o tempo passar
+        console.log("Tempo do GPS esgotou!");
+    }, 30000); // 30000 = 30 segundos (ou o tempo que você quiser)
+
+    // Sua verificação do GPS:
+    if (!navigator.geolocation) {
+        hideFullscreenLoading();
+        showNotification("GPS não suportado.");
+        return;
     }
     
+    // Se já existe um watch, para ele primeiro (limpeza segura)
     if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
+        watchId = null;
     }
 
-    // REMOVA ou COMENTE esta parte:
-    // setTimeout(() => {
-    //     const alertaNormalDiv = document.getElementById('alerta-normalidade');
-    //     if (alertaNormalDiv) {
-    //         alertaNormalDiv.style.display = 'flex';
-    //         alertaNormalDiv.innerHTML = '🔄 Aguardando dados do clima...';
-    //         setTimeout(() => {
-    //             alertaNormalDiv.style.display = 'none';
-    //         }, 3000);
-    //     }
-    // }, 500);
-
-    //===========================================
-// MOSTRA POSIÇÕES DA NAVEGAÇÃO
-//===========================================
+    // Inicia o tracking GPS - ÚNICO watchPosition
     watchId = navigator.geolocation.watchPosition(
         function(position) {
-
-var lat = position.coords.latitude;
-var lng = position.coords.longitude;
-
-if (estaEmNavegacao && destinoNavegacao) {
-
-            verificarChegadaAoDestino(
-                lat,
-                lng,
-                destinoNavegacao.lat,
-                destinoNavegacao.lng
-            );
-        }
-
-            if (gpsSource !== 'appinventor') {
-                gpsSource = 'browser';
-            }
-
+            // Dados da posição
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
             var speedKmh = 0;
+            
             if (position.coords.speed !== null && position.coords.speed >= 0) {
                 speedKmh = Math.round(position.coords.speed * 3.6);
             }
 
+            // Verifica chegada ao destino se estiver em navegação
+            if (estaEmNavegacao && destinoNavegacao) {
+                verificarChegadaAoDestino(
+                    lat,
+                    lng,
+                    destinoNavegacao.lat,
+                    destinoNavegacao.lng
+                );
+            }
+
+            // Define fonte do GPS
+            if (gpsSource !== 'appinventor') {
+                gpsSource = 'browser';
+            }
+
             // ATUALIZA CIDADE E CLIMA
-            atualizarCidade(position.coords.latitude, position.coords.longitude);
+            atualizarCidade(lat, lng);
             atualizarTemperatura();
 
+            // Processa a nova posição
             processarNovaPosicao(
-                position.coords.latitude,
-                position.coords.longitude,
+                lat,
+                lng,
                 speedKmh,
                 position.coords.heading,
                 position.coords.accuracy
             );
 
+            // Marca GPS como inicializado
+            if (!gpsInitialized) {
+                gpsInitialized = true;
+                hideFullscreenLoading();
+            }
+
         }, 
-        showError, 
+        function(error) {
+            console.error("Erro GPS:", error);
+            showNotification("Erro ao obter localização: " + error.message);
+            if (!gpsInitialized) {
+                hideFullscreenLoading();
+            }
+        }, 
         { 
             enableHighAccuracy: true,
             maximumAge: 1000,
@@ -3375,12 +3397,49 @@ if (estaEmNavegacao && destinoNavegacao) {
         }
     );
 
+    console.log("GPS iniciado com watchId:", watchId);
+
+    // Timeout para aguardar GPS
+    if (browserGpsTimeout) {
+        clearTimeout(browserGpsTimeout);
+    }
+    
     browserGpsTimeout = setTimeout(function() {
         if (!gpsInitialized && gpsSource === 'none') { 
             showNotification("Aguardando GPS do app..."); 
             hideFullscreenLoading(); 
         }
     }, 8000);
+}
+
+//===========================================
+// FUNÇÃO PARAR GPS
+//===========================================
+
+function stopGPSTracking() {
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        gpsInitialized = false;
+        console.log("GPS parado");
+    }
+    
+    if (browserGpsTimeout) {
+        clearTimeout(browserGpsTimeout);
+        browserGpsTimeout = null;
+    }
+}
+
+//===========================================
+// FUNÇÃO REINICIAR GPS (SE PRECISAR)
+//===========================================
+
+function restartGPSTracking() {
+    stopGPSTracking();
+    // Pequeno delay para reiniciar
+    setTimeout(function() {
+        startGPSTracking();
+    }, 500);
 }
 
 //=====================================
@@ -4716,6 +4775,13 @@ ocultarBussolaLeaflet();
 //============================
 // BOTÃO DE CRIAÇÃO DE ROTA
 //============================
+// Variáveis globais
+var gpsActive = true;        // Controla o GPS
+var routeSearchActive = false; // Controla a barra de pesquisa
+
+//============================
+// BOTÃO DE CRIAÇÃO DE ROTA
+//============================
 
 $("#btn-calc-route").click(async function() {
 
@@ -4736,8 +4802,8 @@ $("#btn-calc-route").click(async function() {
 
         esconderAlertaVisual();
 
-        // Recolhe a barra de pesquisa de rota
-        routeActive = false;
+        // Recolhe a barra de pesquisa de rota (NÃO afeta o GPS)
+        routeSearchActive = false;  // ← variável separada
         $("#search-bar-rota").removeClass("active");
 
         // Retira o foco do campo
@@ -4762,12 +4828,11 @@ $("#btn-calc-route").click(async function() {
 
 $("#route-query").keypress(function(e) {
     if (e.which == 13) {
-
-    
         // Executa o cálculo da rota
         $("#btn-calc-route").click();
     }
 });
+
 
     //=======================
     //FECHAR TODAS AS BARRAS
@@ -4863,6 +4928,7 @@ $("#route-query").keypress(function(e) {
 
     ajustarBussolaParaBusca(true);
 });
+
 //===================================================================================
 // BOTÃO CENTRALIZAR = CENTRALIZA + MOSTRA GPS MARKER + DEPOIS MUDA PARA NAVIGATOR MAP
 //====================================================================================
@@ -5064,7 +5130,7 @@ function mostrarInfoNavegacao(distancia, tempo) {
         var chegada = new Date(Date.now() + (tempo * 60 * 1000));
         var horas = String(chegada.getHours()).padStart(2, '0');
         var minutos = String(chegada.getMinutes()).padStart(2, '0');
-        chegadaEl.textContent = '🕐 Chegada: ' + horas + ':' + minutos;
+        chegadaEl.textContent = '🏁 Chegada: ' + horas + ':' + minutos;
     }
 
     // Torna visível
