@@ -172,15 +172,18 @@ h1 span {
     flex-shrink: 0;
 }
 
+
 /* NOME DA CIDADE */
 #nomeCidade {
-    white-space: nowrap; /* não permite quebra de linha */
-    overflow: visible;   /* mostra todo o conteúdo */
-    max-width: none;     /* remove o limite de largura */
-    flex-shrink: 1;      /* permite encolher se necessário, mas com prioridade */
+    white-space: nowrap;     /* não permite quebra de linha */
+    overflow: visible;       /* mostra todo o conteúdo */
+    max-width: none;         /* remove o limite de largura */
+    flex-shrink: 0;          /* NÃO encolhe - mantém o tamanho natural */
+    flex-grow: 0;            /* NÃO cresce - ocupa apenas o espaço necessário */
+    flex-basis: auto;        /* tamanho base automático */
     font-size: 14px;
     color: #ffffff;
-    min-width: 80px;     /* largura mínima para garantir visibilidade */
+    width: auto;             /* largura automática baseada no conteúdo */
 }
 
 /* DADOS CLIMÁTICOS - APENAS NÚMEROS */
@@ -208,13 +211,14 @@ h1 span {
 /* ======================================== */
 /* RESPONSIVO - APP (TELAS PEQUENAS) */
 /* ======================================== */
-/* Para telas pequenas, ajuste responsivo */
+/* Para telas pequenas */
 @media (max-width: 600px) {
     #nomeCidade {
         font-size: 13px;
-        max-width: none;    /* remove o limite em telas pequenas */
-        min-width: 100px;   /* largura mínima maior em telas pequenas */
-        flex-shrink: 0;     /* não permite encolher em telas pequenas */
+        flex-shrink: 0;      /* mantém sem encolher */
+        flex-grow: 0;        /* mantém sem crescer */
+        width: auto;         /* largura automática */
+        max-width: none;     /* sem limite */
     }
     
  
@@ -248,12 +252,14 @@ h1 span {
     }
 
     /* APP - FONTES AJUSTADAS NOVAMENTE*/
-     /* Ajuste no container pai para dar mais espaço */
+       /* Ajuste no container para não criar espaços extras */
     .cidade-label {
-        gap: 4px;          /* aumenta um pouco o espaçamento */
-        flex: 1 1 auto;    /* permite crescimento automático */
-        min-width: 0;      /* remove o min-width: 0 que estava limitando */
+        gap: 3px;            /* espaçamento consistente */
+        flex: 0 1 auto;      /* não cresce, pode encolher se necessário */
+        min-width: auto;     /* sem largura mínima fixa */
+        width: auto;         /* largura automática */
     }
+
     .temp-value,
     .cidade-label .label {
         font-size: 13px;
@@ -304,12 +310,13 @@ h1 span {
     .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
         transform: translateY(-4px) rotate(-45deg);
     }
+}
     
     .menu-label {
         font-size: 0.4rem;
         letter-spacing: 0.8px;
     }
-}
+
 
 /* ======================================== */
 /* TELAS MUITO PEQUENAS */
@@ -1293,8 +1300,8 @@ h1 span {
     <span class="separador">|</span>
 
     <span class="label">💧</span>
-    <span id="umidadeAtual">Umidade %</span>
-
+    <span id="umidadeAtual">Umidade  %</span>
+ 
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️ </span>
