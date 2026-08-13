@@ -174,14 +174,13 @@ h1 span {
 
 /* NOME DA CIDADE */
 #nomeCidade {
-    
-    /* white-space: normal;   /* permite quebra de linha */
     white-space: nowrap; /* não permite quebra de linha */
-    overflow: visible;     /* mostra todo o conteúdo */
-    max-width: 200px;
-    flex-shrink: 0;
+    overflow: visible;   /* mostra todo o conteúdo */
+    max-width: none;     /* remove o limite de largura */
+    flex-shrink: 1;      /* permite encolher se necessário, mas com prioridade */
     font-size: 14px;
     color: #ffffff;
+    min-width: 80px;     /* largura mínima para garantir visibilidade */
 }
 
 /* DADOS CLIMÁTICOS - APENAS NÚMEROS */
@@ -209,13 +208,16 @@ h1 span {
 /* ======================================== */
 /* RESPONSIVO - APP (TELAS PEQUENAS) */
 /* ======================================== */
+/* Para telas pequenas, ajuste responsivo */
 @media (max-width: 600px) {
-    header {
-        padding: 6px 10px;
-        min-height: 50px;
-        gap: 4px;
+    #nomeCidade {
+        font-size: 13px;
+        max-width: none;    /* remove o limite em telas pequenas */
+        min-width: 100px;   /* largura mínima maior em telas pequenas */
+        flex-shrink: 0;     /* não permite encolher em telas pequenas */
     }
-
+    
+ 
     .app-icon {
         width: 28px;
         height: 28px;
@@ -246,11 +248,12 @@ h1 span {
     }
 
     /* APP - FONTES AJUSTADAS NOVAMENTE*/
+     /* Ajuste no container pai para dar mais espaço */
     .cidade-label {
-        font-size: 13px;
-        gap: 3px;
+        gap: 4px;          /* aumenta um pouco o espaçamento */
+        flex: 1 1 auto;    /* permite crescimento automático */
+        min-width: 0;      /* remove o min-width: 0 que estava limitando */
     }
-    
     .temp-value,
     .cidade-label .label {
         font-size: 13px;
