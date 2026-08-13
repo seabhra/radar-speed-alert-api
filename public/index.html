@@ -3467,49 +3467,54 @@ function distanciaMetros(lat1, lon1, lat2, lon2){
 // FUNÇÃO INTEGRAÇÃO ACCURACY GPS
 //=====================================
 
-let melhorPrecisao = Infinity;
+//=====================================
+// FUNÇÃO INTEGRAÇÃO ACCURACY GPS
+//=====================================
 
+let melhorPrecisao = Infinity;
 const historico = [];
 
 function sucesso(position){
-
     const acc = position.coords.accuracy;
+    const newLat = position.coords.latitude;
+    const newLng = position.coords.longitude;
 
-    // 1. Ignora leituras ruins
-    if(acc > 15){
-        console.log("GPS ignorado:", acc + " m");
-        return;
-    }
-
-    // 2. Guarda a melhor precisão obtida
+    // 1. Registra a melhor precisão obtida (apenas para estatística)
     if(acc < melhorPrecisao){
         melhorPrecisao = acc;
     }
 
-    // 3. Guarda histórico para suavizar o GPS
-    historico.push({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-    });
-
+    // 2. Guarda histórico para suavizar (apenas para cálculos de média local, se necessário)
+    historico.push({ lat: newLat, lng: newLng });
     if(historico.length > 5){
         historico.shift();
     }
 
-    // 4. Calcula média
-    userLat = historico.reduce((s,p)=>s+p.lat,0)/historico.length;
-    userLng = historico.reduce((s,p)=>s+p.lng,0)/historico.length;
-
+    // 3. NÃO interrompa o fluxo com 'return' baseado em accuracy.
+    // A lógica de ignorar saltos absurdos já é feita no suavizarPosicao() dentro de processarNovaPosicao.
+    
     console.log(
-        "GPS:",
-        userLat,
-        userLng,
-        "Precisão:",
-        melhorPrecisao.toFixed(1)+" m"
+        "Leitura GPS Recebida - Lat:", newLat, 
+        "Lng:", newLng, 
+        "Precisão:", acc.toFixed(1) + " m",
+        "Melhor:", melhorPrecisao.toFixed(1) + " m"
     );
-
+    
+    // IMPORTANTE: Se você estiver chamando esta função 'sucesso' de algum outro lugar 
+    // além do watchPosition nativo, você deve passar os dados para a função principal:
+    if (typeof processarNovaPosicao === 'function' && gpsSource !== 'browser') {
+        let speedKmh = (position.coords.speed !== null && position.coords.speed >= 0) 
+            ? Math.round(position.coords.speed * 3.6) : 0;
+            
+        processarNovaPosicao(
+            newLat, 
+            newLng, 
+            speedKmh, 
+            position.coords.heading, 
+            acc
+        );
+    }
 }
-
 
 
 // =============================================
