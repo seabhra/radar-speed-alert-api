@@ -147,10 +147,10 @@ h1 span {
     font-weight: 700;
     letter-spacing: 0.3px;
     text-transform: uppercase;
-    white-space: nowrap;/* não permite quebra de linha */
-    overflow: hidden;
-    flex: 1;
-    min-width: 0;
+    white-space: nowrap;    /* não quebra a linha */
+    overflow: visible;     /* muda de 'hidden' para 'visible' */
+    flex: 1 1 auto;       /* permite crescer */
+    min-width: auto;      /* remove o min-width: 0 */
     color: #ffffff;
 }
 
@@ -1298,7 +1298,7 @@ h1 span {
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏜️ </span>
-    <span id="poluicaoAtual">Poluição</span>
+    <span id="poluicaoAtual"> Poluição</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
@@ -2608,7 +2608,7 @@ function atualizarHorarioChegada(minutos) {
     minutos = parseInt(minutos);
 
     if (isNaN(minutos) || minutos < 0) {
-        $("#nav-arrival").text("🕐 Chegada: --:--");
+        $("#nav-arrival").text("🏁 Chegada: --:--");
         return;
     }
 
@@ -2620,7 +2620,7 @@ function atualizarHorarioChegada(minutos) {
     const minutosChegada = String(agora.getMinutes()).padStart(2, "0");
 
     $("#nav-arrival").text(
-        "🕐 Chegada: " + horas + ":" + minutosChegada
+        "🏁 Chegada: " + horas + ":" + minutosChegada
         
     );
 }
@@ -3661,7 +3661,7 @@ async function atualizarTemperatura() {
                         poluEl.textContent = valorPol;
                     } else {
                         // SITE: "Poluição Moderada 6"
-                        poluEl.textContent = 'Poluição ' + valorPol;
+                        poluEl.textContent = ' Poluição ' + valorPol;
                     }
                     poluEl.style.color = infoPoluicao.cor;
                 }
