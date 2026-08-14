@@ -1909,7 +1909,7 @@ function criarIconeNavegador(pulsarIntenso) {
             '<div class="' + haloClass + '"></div>' +
             '<img src="/imagens_app/ic_navigator_map.png"' +
                  ' onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'"' +
-                 ' style="width:50px;height:50px;">' +
+                 ' style="width:60px;height:60px;">' +
         '</div>';
     
     return L.divIcon({
@@ -2691,7 +2691,7 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     estaEmNavegacao = true;
     ultimaPosicaoMarcador = { lat: null, lng: null };
     var startIcon = L.divIcon({
-        html: '<img id="nav-icon-img" src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;transform-origin:center center;transition:transform 0.3s ease-out;">',
+        html: '<img id="nav-icon-img" src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:60px;height:60px;transform-origin:center center;transition:transform 0.3s ease-out;">',
         className: 'route-start-marker user-navigator-marker',
         iconSize: [50, 50],
         iconAnchor: [25, 25],
@@ -3286,7 +3286,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
             
             // Cria um NOVO marcador com o ícone de NAVEGADOR
             var navIcon = L.divIcon({
-                html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
+                html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:60px;height:60px;">',
                 className: 'user-gps-marker',
                 iconSize: [50, 50],
                 iconAnchor: [25, 50],
