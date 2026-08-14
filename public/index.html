@@ -1330,8 +1330,8 @@ h1 span {
  
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
-    <span class="label">🏜️ </span>
-    <span id="poluicaoAtual">Poluição </span>
+    <span class="label">🏭</span>
+    <span id="poluicaoAtual">Poluição</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
@@ -3748,7 +3748,7 @@ async function atualizarTemperatura() {
                 const poluEl = document.getElementById('poluicaoAtual');
                 
                 if (poluEl) {
-                    let valorPol = '';
+                    let valorPol =  '';
                     if (valorPoluicao > 0) {
                         valorPol = infoPoluicao.texto + ' ' + valorPoluicao;
                     } else {
@@ -3760,7 +3760,7 @@ async function atualizarTemperatura() {
                         poluEl.textContent = valorPol;
                     } else {
                         // SITE: "Poluição Moderada 6"
-                        poluEl.textContent = ' Poluição ' + valorPol;
+                        poluEl.textContent = ' Poluição' + valorPol;
                     }
                     poluEl.style.color = infoPoluicao.cor;
                 }
