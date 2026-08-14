@@ -2726,10 +2726,7 @@ function atualizarHorarioChegada(minutos) {
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   
  
-    destinoNavegacao = {
-        lat: destLat,
-        lng: destLng
-    };
+    destinoNavegacao = {lat: destLat, lng: destLng};
     
   
     if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
@@ -2800,6 +2797,7 @@ function finalizarNavegacao() {
     if (!map) return;
     if (routingControl) { map.removeControl(routingControl); routingControl = null; }
     destinoAtual = null;
+    destinoNavegacao = null;  // ⬅️ ADICIONAR ESTA LINHA
     estaEmNavegacao = false;
     estaEmMovimento = false;
     velocidadeAtual = 0;
@@ -3238,6 +3236,9 @@ function _iniciarAnimacaoNavegacao(toLat, toLng, novoHeading) {
 //================================
 // FUNÇÃO PROCESSAR NOVA POSIÇÃO
 //================================
+//================================
+// FUNÇÃO PROCESSAR NOVA POSIÇÃO
+//================================
 function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accuracy) {
     if (!map) return;
 
@@ -3294,70 +3295,71 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
     var accReal = (accuracy !== undefined && accuracy !== null && !isNaN(accuracy)) ? accuracy : 999;
     atualizarStatusGPS({ coords: { latitude: newLat, longitude: newLng, accuracy: accReal } });
 
-    if (estaEmNavegacao && startRouteMarker) {
-        _iniciarAnimacaoNavegacao(smoothLat, smoothLng, novoHeading);
-
-        if (!gpsInitialized) {
-            gpsInitialized = true;
-            hideFullscreenLoading();
+    // =============================================
+    // [CORREÇÃO PRINCIPAL] Atualiza marcador SEMPRE
+    // =============================================
+    if (estaEmNavegacao) {
+        // Se o startRouteMarker não existir, recria ele
+        if (!startRouteMarker) {
+            console.warn("⚠️ startRouteMarker ausente durante navegação. Recriando...");
+            adicionarMarcadoresRota(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
         }
-
-
-// Dentro de processarNovaPosicao, na parte do else if (!estaEmNavegacao)
-
-} else if (!estaEmNavegacao) {
-    if (!userMarker) {
-        // Cria o marcador inicial com ícone de navegador
-      var defaultIcon = criarIconeNavegador(true);
-        userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
-        ultimaPosicaoMarcador = { lat: smoothLat, lng: smoothLng };
-        iconeCentralizado = false;
         
+        // Agora atualiza a posição (com ou sem animação)
+        if (startRouteMarker) {
+            _iniciarAnimacaoNavegacao(smoothLat, smoothLng, novoHeading);
+        }
+
         if (!gpsInitialized) {
             gpsInitialized = true;
             hideFullscreenLoading();
         }
+
     } else {
-        // =============================================
-        // [NOVA LÓGICA] Se está em movimento e o ícone está como GPS, volta para NAVEGADOR
-        // =============================================
-        if (iconeCentralizado && speedKmh > 3) { // velocidade > 3 km/h = em movimento
-            console.log("🚶 Usuário em movimento - voltando para ícone de navegador");
-            
-            // Guarda a posição atual
-            var pos = userMarker.getLatLng();
-            
-            // Remove o marcador antigo
-            map.removeLayer(userMarker);
-            
-            // Cria um NOVO marcador com o ícone de NAVEGADOR
-            var navIcon = L.divIcon({
-                html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:70px;height:70px;">',
-                className: 'user-gps-marker',
-                iconSize: [50, 50],
-                iconAnchor: [25, 50],
-                popupAnchor: [0, -50]
-            });
-            
-            userMarker = L.marker([pos.lat, pos.lng], { 
-                icon: navIcon, 
-                zIndexOffset: 1000 
-            }).addTo(map);
+        // MODO NORMAL (não está navegando)
+        if (!userMarker) {
+            var defaultIcon = criarIconeNavegador(true);
+            userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
             userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
-            
+            ultimaPosicaoMarcador = { lat: smoothLat, lng: smoothLng };
             iconeCentralizado = false;
-            showNotification("🧭 Modo navegação ativado");
-        }
-        
-        // Atualiza a posição do marcador
-        moverMarcadorSuavemente(smoothLat, smoothLng);
-    }
-}
-//=========================================
-// VERIFICAÇÃO DE DESTINO, ROTA E NAVEGAÇÃO
-//=========================================
 
+            if (!gpsInitialized) {
+                gpsInitialized = true;
+                hideFullscreenLoading();
+            }
+        } else {
+            // Se está em movimento e o ícone está como GPS, volta para NAVEGADOR
+            if (iconeCentralizado && speedKmh > 3) {
+                console.log("🚶 Usuário em movimento - voltando para ícone de navegador");
+                var pos = userMarker.getLatLng();
+                map.removeLayer(userMarker);
+
+                var navIcon = L.divIcon({
+                    html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
+                    className: 'user-gps-marker',
+                    iconSize: [50, 50],
+                    iconAnchor: [25, 50],
+                    popupAnchor: [0, -50]
+                });
+
+                userMarker = L.marker([pos.lat, pos.lng], {
+                    icon: navIcon,
+                    zIndexOffset: 1000
+                }).addTo(map);
+                userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+
+                iconeCentralizado = false;
+                showNotification("🧭 Modo navegação ativado");
+            }
+
+            moverMarcadorSuavemente(smoothLat, smoothLng);
+        }
+    }
+
+    //=========================================
+    // VERIFICAÇÃO DE DESTINO, ROTA E NAVEGAÇÃO
+    //=========================================
     if (destinoAtual && routingControl && estaEmNavegacao) {
         if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
             atualizarRota();
@@ -3371,12 +3373,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
         map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.5 });
     }
 
-   // Usa somAlertaHabilitado para controlar a verificação também
-    verificarProximidadeRadares(); 
-   //if (somAlertaHabilitado) verificarProximidadeRadares();
-// Se o som estiver desligado, ainda queremos mostrar o alerta visual, então NÃO devemos fechar imediatamente
-// else fecharAlertaImediatamente(); // <-- REMOVA ESTA LINHA
-   
+    verificarProximidadeRadares();
 
     if (destinoAtual) verificarChegadaDestino();
 }
@@ -3386,7 +3383,6 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 //===========================================
 const cidadeLabel = document.getElementById("cidade-atual");
 let ultimaCidade = "";
-
 
 function startGPSTracking() {
     
@@ -3424,13 +3420,9 @@ function startGPSTracking() {
             }
 
             // Verifica chegada ao destino se estiver em navegação
+            // ⬇️ CORREÇÃO: verificarChegadaDestino() não aceita parâmetros, usa variáveis globais
             if (estaEmNavegacao && destinoNavegacao) {
-                verificarChegadaAoDestino(
-                    lat,
-                    lng,
-                    destinoNavegacao.lat,
-                    destinoNavegacao.lng
-                );
+                verificarChegadaDestino();
             }
 
             // Define fonte do GPS
@@ -3443,13 +3435,7 @@ function startGPSTracking() {
             atualizarTemperatura();
 
             // Processa a nova posição
-            processarNovaPosicao(
-                lat,
-                lng,
-                speedKmh,
-                position.coords.heading,
-                position.coords.accuracy
-            );
+            processarNovaPosicao(lat, lng, speedKmh, position.coords.heading, position.coords.accuracy);
 
             // Marca GPS como inicializado
             if (!gpsInitialized) {
@@ -3516,7 +3502,6 @@ function restartGPSTracking() {
         startGPSTracking();
     }, 500);
 }
-
 //=====================================
 // FUNÇÃO ACCURACY DISTANCIA METROS
 //=====================================
