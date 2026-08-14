@@ -1156,9 +1156,6 @@ h1 span {
 
 /* ========================================
    INFORMAÇÕES DA NAVEGAÇÃO
-      ======================================== */
-/* ========================================
-   INFORMAÇÕES DA NAVEGAÇÃO
    ======================================== */
 
 #nav-info {
@@ -1331,7 +1328,7 @@ h1 span {
     <!-- POLUIÇÃO DO AR -->
     <span class="separador">|</span>
     <span class="label">🏭</span>
-    <span id="poluicaoAtual">Poluição</span>
+    <span id="poluicaoAtual">IQAir</span>
 </div>
 
 <!-- LABEL DE ALERTA ABAIXO -->
@@ -1909,7 +1906,7 @@ function criarIconeNavegador(pulsarIntenso) {
             '<div class="' + haloClass + '"></div>' +
             '<img src="/imagens_app/ic_navigator_map.png"' +
                  ' onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'"' +
-                 ' style="width:60px;height:60px;">' +
+                 ' style="width:70px;height:70px;">' +
         '</div>';
     
     return L.divIcon({
@@ -2691,7 +2688,7 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     estaEmNavegacao = true;
     ultimaPosicaoMarcador = { lat: null, lng: null };
     var startIcon = L.divIcon({
-        html: '<img id="nav-icon-img" src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:60px;height:60px;transform-origin:center center;transition:transform 0.3s ease-out;">',
+        html: '<img id="nav-icon-img" src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:70px;height:70px;transform-origin:center center;transition:transform 0.3s ease-out;">',
         className: 'route-start-marker user-navigator-marker',
         iconSize: [50, 50],
         iconAnchor: [25, 25],
@@ -2701,7 +2698,7 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     startRouteMarker.bindTooltip("Navegando para destino", { permanent: false, direction: "top", offset: [0, -30] });
     
     var endIcon = L.divIcon({
-        html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+        html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:45px;height:45px;">',
         className: 'route-end-marker',
         iconSize: [50, 50],
         iconAnchor: [25, 50],
@@ -3286,7 +3283,7 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
             
             // Cria um NOVO marcador com o ícone de NAVEGADOR
             var navIcon = L.divIcon({
-                html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:60px;height:60px;">',
+                html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:70px;height:70px;">',
                 className: 'user-gps-marker',
                 iconSize: [50, 50],
                 iconAnchor: [25, 50],
