@@ -60,7 +60,6 @@
     }
     
 
- 
  /* ======================================== */
 /* CSS HEADER RESPONSIVO */
 /* ======================================== */
@@ -88,7 +87,7 @@ header {
     gap: 8px;
     flex: 1;
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;        /* ⬅️ MUDADO: de 'hidden' para 'visible' */
 }
 
 .app-icon {
@@ -107,6 +106,8 @@ header {
     flex-direction: column;
     min-width: 0;
     flex: 1;
+    gap: 2px;                 /* ⬅️ NOVO: espaço entre título e dados */
+    overflow: visible;        /* ⬅️ NOVO: garante que nada seja cortado */
 }
 
 .titulo-linha {
@@ -132,80 +133,105 @@ h1 span {
     color: var(--accent-color);
 }
 
-
-
 /* ======================================== */
-/* CIDADE / CLIMA - COM EMOJIS VISÍVEIS */
+/* LINHA DE DADOS CLIMÁTICOS                */
 /* ======================================== */
-
-.cidade-label {
+.dados-clima-linha {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 4px;                 /* ⬅️ NOVO: espaço entre os blocos */
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    overflow: visible;
+}
+
+/* ======================================== */
+/* CIDADE                                   */
+/* ======================================== */
+.cidade-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
     font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.3px;
     text-transform: uppercase;
-    white-space: nowrap;    /* não quebra a linha */
-    overflow: visible;     /* muda de 'hidden' para 'visible' */
-    flex: 1 1 auto;       /* permite crescer */
-    min-width: auto;      /* remove o min-width: 0 */
+    white-space: nowrap;
+    flex-shrink: 0;           /* ⬅️ ESSENCIAL: não encolhe */
     color: #ffffff;
 }
 
-.cidade-label .separador {
+#nomeCidade {
+    white-space: nowrap;
+    overflow: visible;
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #ffffff;
+}
+
+/* ======================================== */
+/* SEPARADORES |                            */
+/* ======================================== */
+.separador {
+    display: inline-flex;
+    flex-shrink: 0;           /* ⬅️ ESSENCIAL: não deixa o | sumir */
     margin: 0 2px;
     opacity: 0.4;
     color: #ffffff;
+    font-size: 12px;
+    user-select: none;
 }
 
-.cidade-label .label {
-    font-size: 14px;
+/* ======================================== */
+/* TEMPERATURA / UMIDADE / QUALIDADE DO AR  */
+/* ======================================== */
+.temp-label,
+.umidade-label,
+.qualidade-ar-label {
+    display: inline-flex;     /* ⬅️ mantém ícone + número na mesma linha */
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;           /* ⬅️ não deixa ser espremido */
+    white-space: nowrap;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
     color: #ffffff;
 }
 
-/* EMOJIS - Tamanho fixo */
-.temp-value,
-.cidade-label .label {
-    font-size: 13px;
-    flex-shrink: 0;
-}
-
-
-/* NOME DA CIDADE */
-#nomeCidade {
-    white-space: nowrap;     /* não permite quebra de linha */
-    overflow: visible;       /* mostra todo o conteúdo */
-    max-width: none;         /* remove o limite de largura */
-    flex-shrink: 0;          /* NÃO encolhe - mantém o tamanho natural */
-    flex-grow: 0;            /* NÃO cresce - ocupa apenas o espaço necessário */
-    flex-basis: auto;        /* tamanho base automático */
-    font-size: 14px;
-    color: #ffffff;
-    width: auto;             /* largura automática baseada no conteúdo */
-}
-
-/* DADOS CLIMÁTICOS - APENAS NÚMEROS */
 #temperaturaAtual,
 #umidadeAtual,
 #poluicaoAtual {
     font-size: 12px;
+    font-weight: 600;
     color: #ffffff;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition: all 0.3s ease;
-    min-width: 30px;
 }
 
+/* Larguras mínimas só para evitar pulsação */
 #temperaturaAtual {
-    min-width: 40px;
+    min-width: 32px;
+    text-align: left;
 }
 
 #umidadeAtual {
-    min-width: 30px;
+    min-width: 24px;
+    text-align: left;
 }
 
 #poluicaoAtual {
-    min-width: 40px;
+    min-width: 32px;
+    text-align: left;
+}
+
+/* ======================================== */
+/* HEADER RIGHT (MENU)                      */
+/* ======================================== */
+.header-right {
+    flex-shrink: 0;           /* ⬅️ NOVO: botão MENU nunca encolhe */
 }
 
 /* ======================================== */
