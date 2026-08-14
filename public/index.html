@@ -850,7 +850,15 @@ h1 span {
     @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
     
      
-    .alert-bar-radar, .alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]) { background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); }
+   /* ======================================== */
+/* ALERTAS POR TIPO                         */
+/* ======================================== */
+
+/* RADAR (padrão) — exclui explicitamente os outros tipos */
+.alert-bar-radar,
+.alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]):not([class*="-destaque"]):not([class*="-servico"]) {background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555;box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);}
+    
+    
     .alert-bar-risco { background: linear-gradient(90deg, #e6a800, #b38600); border-top: 2px solid #ffcc00; box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); }
     .alert-bar-mobilidade { background: linear-gradient(90deg, #00b359, #008040); border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
@@ -858,18 +866,10 @@ h1 span {
     .alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
     .alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico, .alert-bar-servico-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
-   .alert-bar-servico {background: linear-gradient(90deg, #ff00e1, #e600c4);border-top: 2px solid #ff47fc;box-shadow: 0 -5px 20px rgba(255, 140, 0, 0.4);
-}
+   /* SERVIÇO — LILÁS/ROSA */
+   .alert-bar-servico {background: linear-gradient(90deg, #c020ff, #8a00cc);border-top: 2px solid #e080ff;box-shadow: 0 -5px 20px rgba(160, 0, 255, 0.5);}
 
-
- .alert-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    /* reserva espaço para o botão à direita */
-    padding: 6px 70px 6px 20px;
-}
+ .alert-bar { display: flex; align-items: center;  gap: 12px;padding: 6px 70px 6px 20px;}
 
 .alert-bar img {
     width: 46px;
@@ -904,6 +904,56 @@ h1 span {
     text-align: center;    /* mais harmonioso que justify */
 }
  
+ /* ======================================== */
+/* CRÍTICO (animação + cor intensificada)   */
+/* ======================================== */
+
+.alert-bar-critico,
+.alert-bar-risco-critico,
+.alert-bar-mobilidade-critico,
+.alert-bar-destaque-critico,
+.alert-bar-servico-critico {
+    animation: pulseAlerta 0.8s ease-in-out infinite;
+}
+
+/* Radar crítico */
+.alert-bar-critico {
+    background: linear-gradient(90deg, #ff0000, #cc0000) !important;
+    box-shadow: 0 -5px 25px rgba(255, 0, 0, 0.7) !important;
+}
+
+/* Risco crítico */
+.alert-bar-risco-critico {
+    background: linear-gradient(90deg, #ffcc00, #e6a800) !important;
+    box-shadow: 0 -5px 25px rgba(255, 204, 0, 0.7) !important;
+}
+
+/* Mobilidade crítico */
+.alert-bar-mobilidade-critico {
+    background: linear-gradient(90deg, #00e066, #00b359) !important;
+    box-shadow: 0 -5px 25px rgba(0, 230, 102, 0.7) !important;
+}
+
+/* Destaque crítico */
+.alert-bar-destaque-critico {
+    background: linear-gradient(90deg, #5fecec, #1fc7c7) !important;
+    box-shadow: 0 -5px 25px rgba(95, 236, 236, 0.7) !important;
+}
+
+/* Serviço crítico — lilás intenso */
+.alert-bar-servico-critico {
+    background: linear-gradient(90deg, #d040ff, #a020cc) !important;
+    box-shadow: 0 -5px 25px rgba(180, 60, 255, 0.7) !important;
+}
+
+/* ======================================== */
+/* ANIMAÇÃO                                 */
+/* ======================================== */
+
+@keyframes pulseAlerta {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.02); }
+}
               
     /* CSS DE NOTIFICAÇÃO */
 
