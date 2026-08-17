@@ -51,14 +51,14 @@
     [
       5,
       "100005",
-      "Galileo Galilei Bercário e Pré-escola, Rua Grão Pará, Funcionários",
-      "Detector de Parada sobre Faixa de Pedestres (DPFP)",
+      "Plugo, Avenida do Contorno, Barro Preto",
+      " Rede de Serviços - Recarga Carro Elétrico (REC)",
       "60",
-      "Funcionários",
+      "Barro Preto",
       "Único",
       "M100005",
       "KBH100005",
-      "-19.930816, -43.924146"
+      "-19.917806, -43.950111"
     ],
     [
       6,
@@ -399,15 +399,16 @@
     [
       34,
       "100034",
-      "Avenida Cristiano Machado, Sagrada Família, Regional Leste",
-      "Controlador Eletrônico de Velocidade (CEV)",
-      "60",
-      "Sagrada Família",
+      "Acesso OutLet, Rodovia MG-5 – Sabará ",
+      " Rede de Serviços - Recarga Carro Elétrico (REC)",
+      "40",
+      "Vila Ipê",
       "Único",
       "M100034",
       "KBH100034",
       "-19.901412, -43.928026"
     ],
+
     [
       35,
       "100035",
@@ -651,14 +652,14 @@
     [
       55,
       "100055",
-      "Minas Farma, 2000, Avenida Amazonas",
+      " Garapão, Avenida Barão Homem de Melo - Nova Granada",
       "Leitor de Reconhecimento Facial (OCR-F)",
       "60",
       "Amazonas",
       "Único",
       "M100055",
       "KBH100055",
-      "-19.925535, -43.950492"
+      "-19.935034, -43.971995"
     ],
     [
       56,
