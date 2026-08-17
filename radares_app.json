@@ -3853,6 +3853,19 @@
       "KBH000305",
       "-20.006598, -44.215997",
       "17/08/2026, 10:53:13"
+    ],
+    [
+      306,
+      "000306",
+      "TotalEnergies Posto Expresso, 505, Avenida Campos de Ourique",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "60",
+      "505",
+      "Único",
+      "M000306",
+      "KBH000306",
+      "-19.953609, -44.151538",
+      "17/08/2026, 11:05:02"
     ]
   ]
 }
