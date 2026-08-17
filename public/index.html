@@ -388,14 +388,15 @@ h1 span {
 /* ======================================== */
 
 .qualidade-ar-label {
-     display: inline-flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 2px;
     flex: 0 0 auto;
     white-space: nowrap;
     font-family: 'Rajdhani', sans-serif;
     font-size: 12px;
     font-weight: 600;
+
     color: #ffffff;
 }
 
@@ -1748,7 +1749,7 @@ h1 span {
     <span id="nomeCidade">📍Local</span>
 </div>
 
-<span class="separador">|</span>
+<span class="separador"> |</span>
 
 <span class="temp-label">
     🌡️ <span id="temperaturaAtual">Temperatura °C</span>
@@ -1763,7 +1764,7 @@ h1 span {
 <span class="separador">|</span>
 
 <span class="qualidade-ar-label">
-    🏭 <span id="poluicaoAtual">IQAir</span>
+    🏭 <span id="poluicaoAtual"> IQAir</span>
 </span>
 </div>
 
@@ -1771,11 +1772,9 @@ h1 span {
 <div id="alerta-sound-clima" class="alerta-clima-label" style="display: none;"></div>
 
 <!-- NOVO: ALERTA DE NORMALIDADE (aparece quando o clima está normal) -->
-<div id="alerta-normalidade" class="alerta-normalidade-label" style="display: none;">
-    ✅ Clima normal. Aproveite!
+<div id="alerta-normalidade" class="alerta-normalidade-label" style="display: none;">✅ Clima normal. Aproveite!</div>
+    
 </div>
-    </div>
-
 
     <!-- MENU SEMPRE NO CANTO DIREITO -->
   <button class="btn-menu-toggle" 
