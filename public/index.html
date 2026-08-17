@@ -388,20 +388,14 @@ h1 span {
 /* ======================================== */
 
 .qualidade-ar-label {
-    display: inline-flex;
+     display: inline-flex;
     align-items: center;
-
-    gap: 2px;
-
+    gap: 6px;
     flex: 0 0 auto;
-
     white-space: nowrap;
-
     font-family: 'Rajdhani', sans-serif;
-
     font-size: 12px;
     font-weight: 600;
-
     color: #ffffff;
 }
 
@@ -477,17 +471,31 @@ h1 span {
     }
 
 
-    /* ------------------------------------ */
-    /* LINHA DOS DADOS                      */
-    /* ------------------------------------ */
+  /* ======================================== */
+/* LINHA DOS DADOS CLIMÁTICOS               */
+/* ======================================== */
 
-    .dados-clima-linha {
-        gap: 3px;
+.dados-clima-linha {
+    display: flex;
+    align-items: center;
 
-        width: max-content;
+    gap: 4px;
 
-        white-space: nowrap;
-    }
+    /*
+     * Permite que o alerta de qualidade
+     * vá para uma segunda linha.
+     */
+    flex-wrap: wrap;
+
+    white-space: nowrap;
+
+    width: max-content;
+    max-width: 100%;
+
+    min-width: 0;
+
+    overflow: visible;
+}
 
 
     /* ------------------------------------ */
@@ -862,18 +870,34 @@ h1 span {
 .alerta-normalidade-label {
     display: flex;
     align-items: center;
+
+    /* força o alerta para depois de todos os dados */
+    order: 100;
+
+    /* faz o alerta ocupar uma nova linha */
+    flex-basis: 100%;
+    width: 100%;
+
     gap: 4px;
     margin-top: 2px;
     padding: 0px 4px;
+
     border-radius: 0px;
+
     font-size: 0.6rem;
     font-weight: 600;
     letter-spacing: 0.3px;
     text-transform: uppercase;
+
     background: transparent;
     color: #00ff88;
+
     border: none;
+
     animation: fadeInNormal 0.5s ease-out;
+
+    /* evita que o texto seja quebrado */
+    white-space: nowrap;
 }
 
 @keyframes fadeInNormal {
