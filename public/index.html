@@ -1792,7 +1792,7 @@ h1 span {
     <div class="dados-clima-linha">
 
         <div id="cidade-atual" class="cidade-label">
-            <span id="nomeCidade">📍Belo Horizonte</span>
+            <span id="nomeCidade">📍Local</span>
         </div>
 
         <span class="separador">|</span>
@@ -6964,6 +6964,47 @@ function receberDadosAppInventor(dadosStr) {
 // INICIALIZAÇÃO
 // ===================================================================
 document.addEventListener('DOMContentLoaded', async function() {
+
+// ==========================================
+// PONTE DE COMUNICAÇÃO: OUVIR O APP INVENTOR
+// ==========================================
+function iniciarPonteAppInventor() {
+    // Verifica se está rodando dentro do App Inventor
+    if (typeof window.AppInventor !== 'undefined') {
+        console.log("📱 Ambiente App Inventor detectado. Iniciando leitura de GPS...");
+        
+        // Verifica a cada 1 segundo se há novos dados
+        setInterval(() => {
+            try {
+                // Lê a string que o App Inventor enviou
+                let dadosRecebidos = window.AppInventor.getWebViewString();
+                
+                // Se houver dados e começar com 'GPS|', processa
+                if (dadosRecebidos && dadosRecebidos.startsWith('GPS|')) {
+                    console.log("📡 Dados brutos recebidos:", dadosRecebidos);
+                    
+                    // Chama a SUA função que já está pronta
+                    receberDadosAppInventor(dadosRecebidos);
+                    
+                    // Limpa a string para não processar a mesma leitura duas vezes
+                    window.AppInventor.setWebViewString("");
+                }
+            } catch (erro) {
+                console.warn("Erro ao ler WebViewString:", erro);
+            }
+        }, 1000); // 1000ms = 1 segundo
+    } else {
+        console.log("💻 Rodando no navegador normal. Usando GPS do navegador...");
+        // Aqui você pode manter sua lógica original de navigator.geolocation se quiser
+    }
+}
+
+// Inicia a ponte assim que a página carregar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciarPonteAppInventor);
+} else {
+    iniciarPonteAppInventor();
+}
   
     ajustarTextosClima();
     ajustarHeaderResponsivo();
