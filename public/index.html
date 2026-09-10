@@ -9,24 +9,70 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <title>Radar X9 BH - Alerta Inteligente (OSM + IA)</title>
-  
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" crossorigin="anonymous" />
-  
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js" crossorigin="anonymous"></script>
+  <title>Radar X9 BH - Alerta Inteligente</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- Leaflet -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin="anonymous"/>
 
-  <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png">
-  <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
-  <link rel="manifest" href="/favicon_io/site.webmanifest">
+<!-- Leaflet Routing Machine -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
+  crossorigin="anonymous"/>
+
+<!-- MapLibre GL -->
+<link
+  href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css"  rel="stylesheet"/>
+
+<!-- jQuery -->
+<script
+  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"
+></script>
+
+<!-- Leaflet -->
+<script
+  src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"
+></script>
+
+<!-- Leaflet Routing Machine -->
+<script
+  src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"
+  crossorigin="anonymous"
+></script>
+
+<!-- Leaflet Rotate -->
+<script
+  src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"
+  crossorigin="anonymous"
+></script>
+
+<!-- MapLibre GL -->
+<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+
+<!-- MapLibre GL para Leaflet -->
+<script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
+
+<!-- Fontes -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+  rel="stylesheet">
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap"
+  rel="stylesheet">
+
+
+<!-- Favicons -->
+<link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+<link rel="manifest" href="/favicon_io/site.webmanifest">
+
+
 
   <style>
     :root {
@@ -59,170 +105,788 @@
         overflow: hidden;
     }
     
-    /* CSS HEADER DO APP */
- 
-    header {
+/* ======================================== */
+/* HEADER RESPONSIVO                        */
+/* ======================================== */
+
+header {
     background-color: var(--panel-color);
-    padding: 10px 15px;
+    padding: 8px 12px;
 
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    border-bottom:2px solid var(--accent-color);
-    box-shadow:0 4px 15px rgba(0,255,136,0.1);
+    border-bottom: 2px solid var(--accent-color);
+    box-shadow: 0 4px 15px rgba(0,255,136,0.1);
 
-    z-index:1000;
-    flex-shrink:0;
+    z-index: 1000;
+    flex-shrink: 0;
+
+    min-height: 60px;
+    gap: 8px;
+
+    flex-wrap: nowrap;
 }
 
 
-/* ======================== */
-/* HEADER LEFT (ÍCONE + TÍTULO) */
-/* ======================== */
+/* ======================================== */
+/* HEADER LEFT                              */
+/* ======================================== */
 
-/* 1. Alinha o ícone e o título lado a lado */
+
+
 .header-left {
     display: flex;
-    align-items: center; /* Alinha verticalmente ao centro */
-    gap: 10px; /* Espaço entre o ícone e o texto */
+    align-items: center;
+
+    gap: 8px;
+
+    flex: 1 1 auto;
+    min-width: 0;
+
+    overflow: visible;
 }
 
-/* Ajuste de tamanho do ícone */
-/* Ajuste de tamanho do ícone */
+
+/* ======================================== */
+/* ÍCONE DO APP                             */
+/* ======================================== */
+
 .app-icon {
-    width: 36px;
-    height: 36px;
-    object-fit: cover; /* Impede que a imagem fique oval/esticada */
-    border-radius: 8px; /* Opcional: Arredonda levemente as bordas para ficar mais bonito */
-    flex-shrink: 0; /* Impede que o ícone encolha se o texto ficar muito grande */
+    width: 32px;
+    height: 32px;
+
+    object-fit: cover;
+    border-radius: 8px;
+
+    flex-shrink: 0;
 }
 
-/* ======================== */
-/* TÍTULO DO APP */
-/* ======================== */
+
+/* ======================================== */
+/* TÍTULO DO APP                            */
+/* ======================================== */
 
 .titulo-app {
     display: flex;
     flex-direction: column;
+
+    flex: 1 1 auto;
+
+    min-width: 0;
+
+    gap: 2px;
+
+    overflow: visible;
 }
+
+/* ======================================== */
+/* LINHA DO TÍTULO                          */
+/* ======================================== */
 
 .titulo-linha {
     display: flex;
-    align-items: center; /* Garante que H1 e GPS fiquem na mesma linha e altura */
-    gap: 12px; /* Espaço entre o "RADAR X9" e o indicador de GPS */
-    white-space: nowrap; /* Impede que o GPS quebre de linha */
+    align-items: center;
+
+    gap: 8px;
+
+    white-space: nowrap;
+    flex-wrap: nowrap;
+
+    min-width: 0;
 }
 
+
+/* ======================================== */
+/* TÍTULO                                   */
+/* ======================================== */
+
 h1 {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 800;
-    letter-spacing: 1px;
+
+    letter-spacing: 0.5px;
     text-transform: uppercase;
-    margin: 0; /* Remove margem padrão para não desalinhar */
+
+    margin: 0;
+
     display: flex;
     align-items: center;
+
+    flex-shrink: 0;
 }
+
 
 h1 span {
     color: var(--accent-color);
 }
 
 
-/* ======================== */
-/* CIDADE / TEMPERATURA */
-/* ======================== */
+/* ======================================== */
+/* LINHA DOS DADOS CLIMÁTICOS               */
+/* ======================================== */
 
-.cidade-label {
-    margin-left: 0px;
+.dados-clima-linha {
     display: flex;
     align-items: center;
-    gap: 5px;
+
+    gap: 7px;
+
+    white-space: nowrap;
+    flex-wrap: nowrap;
+
+    width: max-content;
+    min-width: max-content;
+
+    overflow: visible;
+}
+
+
+/* ======================================== */
+/* CIDADE                                   */
+/* ======================================== */
+
+.cidade-label {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 4px;
+
+    flex: 0 0 auto;
+
+    width: auto;
+    min-width: max-content;
+
+    white-space: nowrap;
+
+    color: #ffffff;
+
+    overflow: visible;
+}
+
+
+/* ======================================== */
+/* NOME DA CIDADE                           */
+/* ======================================== */
+
+#nomeCidade {
+    display: inline-block;
+
+    font-size: 12px;
+
+    color: #ffffff;
+
+    white-space: nowrap;
+
+    width: auto;
+    min-width: max-content;
+    max-width: none;
+
+    flex: 0 0 auto;
+
+    overflow: visible;
+}
+
+
+/* ======================================== */
+/* SEPARADORES                              */
+/* ======================================== */
+
+.separador {
+    display: inline-flex;
+    align-items: center;
+
+    flex: 0 0 auto;
+
+    margin: 0 2px;
+
+    opacity: 0.4;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    user-select: none;
+}
+
+
+/* ======================================== */
+/* TEMPERATURA                              */
+/* ======================================== */
+
+.temp-label {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 2px;
+
+    flex: 0 0 auto;
+
+    white-space: nowrap;
+
+    font-family: 'Rajdhani', sans-serif;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #ffffff;
+}
+
+
+#temperaturaAtual {
+    display: inline-block;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #ffffff;
+
+    white-space: nowrap;
+
+    flex: 0 0 auto;
+
+    /*
+     * Evita pequenas mudanças de largura
+     * enquanto a temperatura é atualizada.
+     */
+    min-width: 32px;
+
+    text-align: left;
+
+    transition: all 0.3s ease;
+}
+
+
+/* ======================================== */
+/* UMIDADE                                  */
+/* ======================================== */
+
+.umidade-label {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 2px;
+
+    flex: 0 0 auto;
+
+    white-space: nowrap;
+
+    font-family: 'Rajdhani', sans-serif;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #ffffff;
+}
+
+
+#umidadeAtual {
+    display: inline-block;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #ffffff;
+
+    white-space: nowrap;
+
+    flex: 0 0 auto;
+
+    min-width: 24px;
+
+    text-align: left;
+
+    transition: all 0.3s ease;
+}
+
+
+/* ======================================== */
+/* QUALIDADE DO AR                          */
+/* ======================================== */
+
+.qualidade-ar-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+    white-space: nowrap;
     font-family: 'Rajdhani', sans-serif;
     font-size: 12px;
     font-weight: 600;
-    line-height: 1;
-    white-space: nowrap;
-    font-size: 13px;
-   font-weight: 700;
-   letter-spacing: 0.4px;
-   text-transform: uppercase;
+
+    color: #ffffff;
 }
 
-/* LABEL DE ALERTA DE CLIMA */
-.alerta-clima-label {
+
+#poluicaoAtual {
+    display: inline-block;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #ffffff;
+
+    white-space: nowrap;
+
+    flex: 0 0 auto;
+
+    min-width: 32px;
+
+    text-align: left;
+
+    transition: all 0.3s ease;
+}
+
+
+/* ======================================== */
+/* HEADER RIGHT / MENU                     */
+/* ======================================== */
+
+.header-right {
+    flex: 0 0 auto;
+
+    flex-shrink: 0;
+}
+
+
+/* ======================================== */
+/* RESPONSIVO - TELAS PEQUENAS              */
+/* ======================================== */
+
+@media (max-width: 600px) {
+
+    /* ------------------------------------ */
+    /* HEADER                               */
+    /* ------------------------------------ */
+
+    header {
+        padding: 7px 8px;
+
+        gap: 6px;
+
+        min-height: 56px;
+    }
+
+
+    /* ------------------------------------ */
+    /* ÍCONE                                */
+    /* ------------------------------------ */
+
+    .app-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+
+    /* ------------------------------------ */
+    /* TÍTULO                               */
+    /* ------------------------------------ */
+
+    h1 {
+        font-size: 0.85rem;
+
+        letter-spacing: 0.3px;
+    }
+
+
+  /* ======================================== */
+/* LINHA DOS DADOS CLIMÁTICOS               */
+/* ======================================== */
+
+@media (max-width: 600px) {
+
+    .dados-clima-linha {
+        display: flex;
+        align-items: center;
+
+        gap: 7px;
+
+        flex-wrap: nowrap;
+
+        white-space: nowrap;
+
+        width: max-content;
+        min-width: max-content;
+        max-width: none;
+
+        overflow: visible;
+    }
+
+    .cidade-label {
+        gap: 4px;
+
+        width: auto;
+        min-width: max-content;
+
+        flex: 0 0 auto;
+
+        white-space: nowrap;
+    }
+
+    #nomeCidade {
+        font-size: 13px;
+
+        width: auto;
+        min-width: max-content;
+        max-width: none;
+
+        flex: 0 0 auto;
+
+        white-space: nowrap;
+
+        overflow: visible;
+    }
+
+    .separador {
+        margin: 0 2px;
+        flex: 0 0 auto;
+    }
+}
+
+
+    /* ------------------------------------ */
+    /* CIDADE                               */
+    /* ------------------------------------ */
+
+    .cidade-label {
+        gap: 3px;
+
+        width: max-content;
+        min-width: max-content;
+
+        flex: 0 0 auto;
+
+        font-size: 13px;
+    }
+
+
+    #nomeCidade {
+        font-size: 13px;
+
+        width: max-content;
+        max-width: none;
+
+        flex: 0 0 auto;
+
+        white-space: nowrap;
+    }
+
+
+    /* ------------------------------------ */
+    /* SEPARADORES                          */
+    /* ------------------------------------ */
+
+    .separador {
+        margin: 0 2px;
+
+        font-size: 12px;
+
+        flex: 0 0 auto;
+    }
+
+
+    /* ------------------------------------ */
+    /* TEMPERATURA                          */
+    /* ------------------------------------ */
+
+    .temp-label {
+        font-size: 12px;
+
+        gap: 2px;
+
+        flex: 0 0 auto;
+    }
+
+
+    #temperaturaAtual {
+        font-size: 12px;
+
+        min-width: 35px;
+    }
+
+
+    /* ------------------------------------ */
+    /* UMIDADE                              */
+    /* ------------------------------------ */
+
+    .umidade-label {
+        font-size: 12px;
+
+        gap: 2px;
+
+        flex: 0 0 auto;
+    }
+
+
+    #umidadeAtual {
+        font-size: 12px;
+
+        min-width: 25px;
+    }
+
+
+    /* ------------------------------------ */
+    /* QUALIDADE DO AR                      */
+    /* ------------------------------------ */
+
+    .qualidade-ar-label {
+        font-size: 12px;
+
+        gap: 2px;
+
+        flex: 0 0 auto;
+    }
+
+
+    #poluicaoAtual {
+        font-size: 12px;
+
+        min-width: 35px;
+    }
+
+
+    /* ------------------------------------ */
+    /* GPS                                  */
+    /* ------------------------------------ */
+
+    .gps-status-wrapper {
+        padding: 2px 6px;
+    }
+
+
+    .gps-status-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+
+    .gps-status-label {
+        font-size: 0.4rem;
+
+        letter-spacing: 0.3px;
+    }
+}
+
+
+/* ======================================== */
+/* TELAS MUITO PEQUENAS                     */
+/* ======================================== */
+
+@media (max-width: 400px) {
+
+    header {
+        padding-left: 6px;
+        padding-right: 6px;
+
+        gap: 5px;
+    }
+
+
+    .header-left {
+        gap: 5px;
+    }
+
+
+    .app-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+
+    h1 {
+        font-size: 0.78rem;
+    }
+
+
+    .cidade-label,
+    #nomeCidade {
+        font-size: 12px;
+    }
+
+
+    .temp-label,
+    .umidade-label,
+    .qualidade-ar-label {
+        font-size: 11px;
+    }
+
+
+    #temperaturaAtual,
+    #umidadeAtual,
+    #poluicaoAtual {
+        font-size: 11px;
+    }
+
+
+
+/* ======================================== */
+/* HEADER RIGHT (MENU)                      */
+/* ======================================== */
+.header-right {
+    flex-shrink: 0;           /* ⬅️ NOVO: botão MENU nunca encolhe */
+}
+    .btn-menu-toggle {
+        padding: 4px 8px 3px;
+        border-radius: 8px;
+    }
+    
+    .menu-hamburger {
+        width: 14px;
+        gap: 2.5px;
+    }
+    
+    .menu-hamburger span {
+        height: 1.8px;
+    }
+    
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+        transform: translateY(4px) rotate(45deg);
+    }
+    
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+        transform: translateY(-4px) rotate(-45deg);
+    }
+}
+    
+    .menu-label {
+        font-size: 0.4rem;
+        letter-spacing: 0.8px;
+    }
+
+
+/* ======================================== */
+/* TELAS MUITO PEQUENAS */
+/* ======================================== */
+@media (max-width: 400px) {
+    h1 {
+        font-size: 0.7rem;
+    }
+    
+    .gps-status-label {
+        display: none;
+    }
+    
+    .cidade-label {
+        font-size: 11px;
+        gap: 2px;
+    }
+    
+    .temp-value,
+    .cidade-label .label {
+        font-size: 11px;
+    }
+    
+    #nomeCidade {
+        font-size: 11px;
+        max-width: 50px;
+    }
+    
+    #temperaturaAtual {
+        font-size: 11px;
+        min-width: 30px;
+    }
+    
+    #umidadeAtual {
+        font-size: 11px;
+        min-width: 20px;
+    }
+    
+    #poluicaoAtual {
+        font-size: 11px;
+        min-width: 30px;
+    }
+    
+    .cidade-label .separador {
+        margin: 0 1px;
+    }
+}
+
+/* ======================================== */
+/* TABLET E TELAS GRANDES */
+/* ======================================== */
+@media (min-width: 601px) {
+    .cidade-label {
+        font-size: 14px;
+        gap: 6px;
+    }
+    
+    .temp-value,
+    .cidade-label .label {
+        font-size: 14px;
+    }
+    
+    #nomeCidade {
+        max-width: 150px;
+        font-size: 14px;
+    }
+    
+    #temperaturaAtual {
+        font-size: 13px;
+        min-width: 45px;
+    }
+    
+    #umidadeAtual {
+        font-size: 13px;
+        min-width: 30px;
+    }
+    
+    #poluicaoAtual {
+        font-size: 13px;
+        min-width: 45px;
+    }
+}
+
+/* ======================================== */
+/* GPS STATUS */
+/* ======================================== */
+.gps-status-wrapper {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-top: 4px; /* Espaço abaixo da linha da cidade */
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.65rem;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.06);
+    cursor: default;
+    user-select: none;
+    transition: border-color 0.4s ease;
+    flex-shrink: 0;
+}
+
+.gps-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--gps-sem);
+    position: relative;
+    flex-shrink: 0;
+    transition: background-color 0.4s ease;
+}
+
+.gps-status-dot::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background-color: inherit;
+    opacity: 0.5;
+    animation: gpsPulse 2s ease-in-out infinite;
+}
+
+.gps-status-label {
+    font-size: 0.5rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    animation: piscarAlerta 1.5s infinite;
-}
-
-.temp-value,
-#temperaturaAtual,
-#umidadeAtual,
-.label,
-.separador{
-    color: #fff;
-} 
-/* Cores dos Alertas */
-.alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
-.alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
-.alerta-seco   { background: rgba(255, 165, 0, 0.15); color: #ffcc00; border: 1px solid rgba(255, 165, 0, 0.3); }
-
-/* Animação para piscar */
-@keyframes piscarAlerta {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-/* ======================== */
-/* GPS STATUS */
-/* ======================== */
-
-.gps-status-wrapper {
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
-    margin-left: 0px; /* Zerado pois o gap do .titulo-linha já dá o espaço */
-    padding: 4px 10px; 
-    border-radius: 20px; 
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,255,255,0.06); 
-    cursor: default; 
-    user-select: none;
-    transition: border-color 0.4s ease;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: color 0.4s ease;
 }
 
 .gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
 .gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
 .gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
-
-.gps-status-dot {
-    width: 10px; 
-    height: 10px; 
-    border-radius: 50%; 
-    background-color: var(--gps-sem);
-    position: relative; 
-    flex-shrink: 0; 
-    transition: background-color 0.4s ease;
-}
-
-.gps-status-dot::after {
-    content: ''; 
-    position: absolute; 
-    inset: -3px; 
-    border-radius: 50%;
-    background-color: inherit; 
-    opacity: 0.5;
-    animation: gpsPulse 2s ease-in-out infinite;
-}
 
 .gps-status-dot.ok   { background-color: var(--gps-ok); }
 .gps-status-dot.warn { background-color: var(--gps-instavel); }
@@ -233,46 +897,145 @@ h1 span {
     50%      { transform: scale(2.2); opacity: 0; }
 }
 
-.gps-status-label {
-    font-size: 0.6rem; 
-    font-weight: 700; 
-    letter-spacing: 0.8px;
-    text-transform: uppercase; 
-    color: var(--text-muted); 
-    white-space: nowrap;
-    transition: color 0.4s ease;
-}
-
 .gps-status-wrapper.gps-ok   .gps-status-label { color: var(--gps-ok); }
 .gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
 .gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
 
-  /* CSS BOTÃO MENU TOGLE */
+/* ======================================== */
+/* ALERTAS CLIMÁTICOS */
+/* ======================================== */
+.alerta-quente { background: rgba(255, 0, 0, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); }
+.alerta-frio   { background: rgba(0, 100, 255, 0.15); color: #4da6ff; border: 1px solid rgba(0, 100, 255, 0.3); }
+.alerta-seco   { background: rgba(255, 165, 0, 0.15); color: #ffcc00; border: 1px solid rgba(255, 165, 0, 0.3); }
 
-    .btn-menu-toggle {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 2px; background: none; border: 1.5px solid rgba(0, 255, 136, 0.3);
-        border-radius: 10px; padding: 8px 14px 6px; cursor: pointer;
-        transition: all 0.25s ease; user-select: none; -webkit-user-select: none;
-        position: relative; z-index: 99999;
-    }
-    .btn-menu-toggle:hover { border-color: var(--accent-color); background: rgba(0, 255, 136, 0.06); }
-    .btn-menu-toggle:active { transform: scale(0.93); }
-    .menu-hamburger { display: flex; flex-direction: column; gap: 4px; width: 22px; }
-    .menu-hamburger span {
-        display: block; height: 2.5px; width: 100%;
-        background-color: var(--accent-color); border-radius: 2px;
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); transform-origin: center;
-    }
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-    .menu-label {
-        font-size: 0.55rem; font-weight: 700; letter-spacing: 1.5px;
-        color: var(--accent-color); text-transform: uppercase; line-height: 1; margin-top: 2px;
-    }
+@keyframes piscarAlerta {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ALERTA DE NORMALIDADE */
+.alerta-normalidade-label {
+    display: flex;
+    align-items: center;
+
+    /* força o alerta para depois de todos os dados */
+    order: 100;
+
+    /* faz o alerta ocupar uma nova linha */
+    flex-basis: 100%;
+    width: 100%;
+
+    gap: 4px;
+    margin-top: 2px;
+    padding: 0px 4px;
+
+    border-radius: 0px;
+
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+
+    background: transparent;
+    color: #00ff88;
+
+    border: none;
+
+    animation: fadeInNormal 0.5s ease-out;
+
+    /* evita que o texto seja quebrado */
+    white-space: nowrap;
+}
+
+@keyframes fadeInNormal {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ALERTA DE POLUIÇÃO */
+.alerta-poluicao {
+    background: rgba(255, 68, 68, 0.15);
+    color: #ff4444;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    animation: piscarAlerta 1.5s infinite;
+}
+
+/* ======================================== */
+/* BOTÃO MENU TOGGLE */
+/* ======================================== */
+.btn-menu-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: none;
+    border: 1.5px solid rgba(0, 255, 136, 0.3);
+    border-radius: 10px;
+    padding: 6px 10px 4px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    position: relative;
+    z-index: 99999;
+    flex-shrink: 0;
+}
+
+.btn-menu-toggle:hover {
+    border-color: var(--accent-color);
+    background: rgba(0, 255, 136, 0.06);
+}
+
+.btn-menu-toggle:active {
+    transform: scale(0.93);
+}
+
+.menu-hamburger {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 18px;
+}
+
+.menu-hamburger span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center;
+}
+
+.btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+    transform: translateY(5px) rotate(45deg);
+}
+
+.btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+    transform: translateY(-5px) rotate(-45deg);
+}
+
+.menu-label {
+    font-size: 0.45rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    line-height: 1;
+    margin-top: 2px;
+}
 
 
+
+/* ======================================== */
+/* CONTROLES DA BARRA LATERAL  */
+/* ======================================== */
     .sidebar-controls {
         position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width);
         z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -305,83 +1068,146 @@ h1 span {
     /* ===========
    SET DO MAPA 
    ============= */
-    .map-wrapper { position: relative; flex: 1; display: flex; overflow: hidden; width: 100%; }
-    #map { width: 100%; height: 100%; background-color: #2a2a2a; z-index: 1; position: relative; }
+    .map-wrapper { 
+        position: relative;
+         flex: 1;
+          display: flex; 
+         overflow: hidden; 
+         width: 100%; }
 
+    #map { 
+        width: 100%; 
+        height: 100%;
+         background-color: #2a2a2a; 
+         z-index: 1; 
+         position: relative; }
 
+    
 /* ========================================
-   TEMA MATRIX - DIA
-   Verde translúcido estilo Matrix
+   TEMA MATRIX — DIA
+   Ruas como linhas grossas únicas, não duplas
    ======================================== */
-
-.matrix-day .leaflet-tile-pane .leaflet-tile{
+   .matrix-day .leaflet-tile-pane .leaflet-tile {
     filter:
-        grayscale(0.35)
-        sepia(0.45)
-        hue-rotate(78deg)
-        saturate(2.4)
-        brightness(1.18)
-        contrast(1.08)
-        opacity(.90);
+        grayscale(0.10)
+        sepia(0.22)
+        hue-rotate(72deg)
+        saturate(2.05)
+        brightness(0.90)          /* ↓ compensa o contraste alto */
+        contrast(1.85)              /* ↑ funde as duas bordas em uma faixa */
+        drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35)); /* halo verde = linha grossa */
 
     transition: filter .4s ease;
 }
 
+/* véu mais sutil para não "lavar" as ruas */
+.matrix-day .leaflet-map-pane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 200, 80, .04) 0%,
+            rgba(0, 180, 70, .08) 100%
+        );
+
+    mix-blend-mode: soft-light;
+
+    z-index: 400;
+}
+
+
+
 
 /* ========================================
-   TEMA MATRIX - NOITE
-   Matrix clássico mais escuro
+   TEMA MATRIX — NOITE
+   Verde escuro estilo terminal Matrix
    ======================================== */
 
-.matrix-night .leaflet-tile-pane .leaflet-tile{
-    filter:
-        grayscale(0.65)
-        sepia(0.85)
-        hue-rotate(80deg)
-        saturate(3.6)
-        brightness(.72)
-        contrast(1.35);
+.matrix-night .leaflet-tile-pane .leaflet-tile {
+
+       filter:
+        grayscale(1)          /* 1 → remove qualquer tom quente (fim do brilho âmbar) */
+        sepia(1)              /* 1 → base uniforme; hue-rotate passa a gerar verde puro */
+        hue-rotate(85deg)     /* 72° ainda puxava pro dourado; 85° é verde fechado */
+        saturate(1.55)
+        brightness(0.50)      /* ↓ escurece o conjunto */
+        contrast(1.55)        /* 1.85 esmagava os meios-tons e "queimava" as bordas */
+        drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35)); /* halo verde = linha grossa */
 
     transition: filter .4s ease;
 }
 
-.matrix-day .leaflet-tile-pane,
-.matrix-night .leaflet-tile-pane{
-    filter:
-        drop-shadow(0 0 1px rgba(255,255,255,.18));
-}
-.matrix-day .leaflet-map-pane::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    background:rgba(80,255,150,.12);
+/* véu multiply: escurece SÓ as partes claras, tingindo-as de verde.
+   Branco × verde = verde escuro; preto × verde = preto (nada é "lavado") */
+.matrix-night .leaflet-map-pane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 120, 50, .28) 0%,
+            rgba(0,  85, 40, .40) 100%
+        );
+
+    mix-blend-mode: multiply;   /* era soft-light → quase não fazia efeito */
+
+    z-index: 400;
 }
 
-.matrix-night .leaflet-map-pane::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    background:rgba(0,180,70,.18);
-}
 
     /* ===============
    CSS DA BÚSSOLA
    ================ */
-    .compass-widget {
-        position: absolute; top: 10px; left: 5px; width: 65px; height: 65px;
-        z-index: 999999 !important; transform: translateZ(0); will-change: transform;
-        display: flex; align-items: center; justify-content: center; pointer-events: none;
-        transition: opacity 0.3s ease, top 0.3s cubic-bezier(0.4, 0, 0.2, 1); opacity: 1;
-    }
+   
+   .compass-widget {
+    position: absolute;
+    top: 65px;
+    left: 5px;
+    width: 65px;
+    height: 65px;
+
+    z-index: 999999 !important;
+    transform: translateZ(0);
+    will-change: transform;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.3s ease,
+        top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    opacity: 1;
+}
+  
     .compass-widget.hidden { opacity: 0; pointer-events: none; }
     .compass-widget.busca-ativo { top: 75px; }
-    .compass-base {
+
+
+  .compass-base {
         position: absolute; width: 100%; height: 100%; z-index: 1;
         background-image: url('/imagens_app/ic_compass.png'); background-size: contain;
         background-repeat: no-repeat; background-position: center; opacity: 0.9;
     }
+
+  /* ========================================
+   OCULTAR BÚSSOLA NATIVA DO LEAFLET
+   A bússola personalizada assume a função
+   ======================================== */
+    .leaflet-control-compass {
+    display: none !important;
+}
+  
     .compass-needle { position: absolute; width: 55%; height: 55%; z-index: 2; object-fit: contain; transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
     .leaflet-pane, .leaflet-map-pane, .leaflet-tile-pane, .leaflet-overlay-pane, .leaflet-shadow-pane,
     .leaflet-marker-pane, .leaflet-popup-pane, .leaflet-control-pane, .leaflet-tooltip-pane { z-index: 1 !important; }
@@ -432,31 +1258,132 @@ h1 span {
 
     display:none;
 
-}    
+} 
 
-/* CSS ALERTAS */
-    #alert-container { position: absolute; bottom: 0; left: 0; width: 100%; z-index: 1000; display: none; animation: slideUp 0.3s ease-out; pointer-events: none; }
+/* CSS TARJAS DE ALERTAS DE RADARES*/
+
+    #alert-container { 
+        position: absolute;
+         bottom: 0; 
+         left: 0;
+          width: 100%; 
+          z-index: 1000; 
+          display: none; 
+          animation: slideUp 0.3s ease-out; 
+          pointer-events: none;
+         }
+
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes pulseAlerta { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
-    .alert-bar { color: white; padding: 18px; display: flex; align-items: center; gap: 15px; transition: all 0.2s ease; }
-    .alert-bar-radar, .alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]) { background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555; box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4); }
+    
+     
+   /* ======================================== */
+/* ALERTAS POR TIPO                         */
+/* ======================================== */
+
+/* RADAR (padrão) — exclui explicitamente os outros tipos */
+.alert-bar-radar,
+.alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]):not([class*="-destaque"]):not([class*="-servico"]) {background: linear-gradient(90deg, #cc0000, #990000); border-top: 2px solid #ff5555;box-shadow: 0 -5px 20px rgba(255, 0, 0, 0.4);}
+    
+    
     .alert-bar-risco { background: linear-gradient(90deg, #e6a800, #b38600); border-top: 2px solid #ffcc00; box-shadow: 0 -5px 20px rgba(230, 168, 0, 0.4); }
     .alert-bar-mobilidade { background: linear-gradient(90deg, #00b359, #008040); border-top: 2px solid #00e066; box-shadow: 0 -5px 20px rgba(0, 179, 89, 0.4); }
     .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico { animation: pulseAlerta 0.8s ease-in-out infinite; }
-    .alert-bar img { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); }
-    .alert-info h3 { font-size: 1.2rem; margin-bottom: 3px; text-transform: uppercase; font-weight: 800; }
-    .alert-info p { font-size: 0.95rem; opacity: 0.95; }
-    
- /* CORREÇÃO DO BUG DE CSS (ESPAÇO EXTRA REMOVIDO) */
-.alert-bar-destaque {background: linear-gradient(90deg, #1fc7c7, #109090) !important;border-top: 2px solid #5fecec !important;box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5) !important;}
-.alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
-.alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
-.alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
-.alert-bar img {width: 50px;height: 50px;filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));}
-.alert-info h3 {font-size: 1.2rem;margin-bottom: 3px;text-transform: uppercase;font-weight: 800;}
-.alert-info p {font-size: 0.95rem;opacity: 0.95;}
+    .alert-bar-destaque {background: linear-gradient(90deg, #1fc7c7, #109090) !important;border-top: 2px solid #5fecec !important;box-shadow: 0 -5px 20px rgba(31, 199, 199, 0.5) !important;}
+    .alert-bar-destaque .alert-info h3 {color: #ffffff;text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);}
+    .alert-bar-destaque img {filter: drop-shadow(0 0 6px rgba(31, 199, 199, 0.9));}
+    .alert-bar-critico, .alert-bar-risco-critico, .alert-bar-mobilidade-critico, .alert-bar-destaque-critico, .alert-bar-servico-critico {animation: pulseAlerta 0.8s ease-in-out infinite;}
+   /* SERVIÇO — LILÁS/ROSA */
+   .alert-bar-servico {background: linear-gradient(90deg, #c020ff, #8a00cc);border-top: 2px solid #e080ff;box-shadow: 0 -5px 20px rgba(160, 0, 255, 0.5);}
+
+ .alert-bar { display: flex; align-items: center;  gap: 12px;padding: 6px 70px 6px 20px;}
+
+.alert-bar img {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,.45));
+}
+
+.alert-info {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    padding-right: 0;      /* remove o deslocamento */
+}
+
+.alert-info h3 {
+    margin: 0 0 2px;
+    font-size: .95rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 1.1;
+
+    white-space: nowrap;   /* nunca quebra */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.alert-info p {
+    margin: 0;
+    font-size: .80rem;
+    line-height: 1.2;
+    text-align: center;    /* mais harmonioso que justify */
+}
+ 
+ /* ======================================== */
+/* CRÍTICO (animação + cor intensificada)   */
+/* ======================================== */
+
+.alert-bar-critico,
+.alert-bar-risco-critico,
+.alert-bar-mobilidade-critico,
+.alert-bar-destaque-critico,
+.alert-bar-servico-critico {
+    animation: pulseAlerta 0.8s ease-in-out infinite;
+}
+
+/* Radar crítico */
+.alert-bar-critico {
+    background: linear-gradient(90deg, #ff0000, #cc0000) !important;
+    box-shadow: 0 -5px 25px rgba(255, 0, 0, 0.7) !important;
+}
+
+/* Risco crítico */
+.alert-bar-risco-critico {
+    background: linear-gradient(90deg, #ffcc00, #e6a800) !important;
+    box-shadow: 0 -5px 25px rgba(255, 204, 0, 0.7) !important;
+}
+
+/* Mobilidade crítico */
+.alert-bar-mobilidade-critico {
+    background: linear-gradient(90deg, #00e066, #00b359) !important;
+    box-shadow: 0 -5px 25px rgba(0, 230, 102, 0.7) !important;
+}
+
+/* Destaque crítico */
+.alert-bar-destaque-critico {
+    background: linear-gradient(90deg, #5fecec, #1fc7c7) !important;
+    box-shadow: 0 -5px 25px rgba(95, 236, 236, 0.7) !important;
+}
+
+/* Serviço crítico — lilás intenso */
+.alert-bar-servico-critico {
+    background: linear-gradient(90deg, #d040ff, #a020cc) !important;
+    box-shadow: 0 -5px 25px rgba(180, 60, 255, 0.7) !important;
+}
+
+/* ======================================== */
+/* ANIMAÇÃO                                 */
+/* ======================================== */
+
+@keyframes pulseAlerta {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.02); }
+}
               
-    
+    /* CSS DE NOTIFICAÇÃO */
+
     .toast-notification {
         position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
         background-color: rgba(20, 20, 20, 0.95); color: var(--text-main); padding: 12px 25px;
@@ -626,11 +1553,198 @@ h1 span {
         .gps-status-label { display: none; }
     }
 
-        
+
+/* ========================================
+   PULSO DO ÍCONE DE NAVEGAÇÃO
+   ======================================== */
+
+.nav-pulse-wrap {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.nav-pulse-wrap img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    position: relative;
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.nav-pulse-halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    margin-top: -11px;
+    margin-left: -11px;
+    background: rgba(0, 255, 136, 0.42);
+    border-radius: 50%;
+    z-index: 1;
+    animation: navPulse 2s ease-out infinite;
+}
+
+.nav-pulse-halo.intenso {
+    animation: navPulse 1s ease-out infinite;
+    background: rgba(99, 223, 165, 0.60);
+}
+
+@keyframes navPulse {
+    0% {
+        transform: scale(0.55);
+        opacity: 0.95;
+        box-shadow:
+            0 0 0 0 rgba(0, 255, 136, 0.65),
+            0 0 8px rgba(0, 255, 136, 0.45);
+    }
+
+    45% {
+        transform: scale(1.45);
+        opacity: 0.65;
+        box-shadow:
+            0 0 0 8px rgba(0, 255, 136, 0.22),
+            0 0 14px rgba(0, 255, 136, 0.30);
+    }
+
+    70% {
+        transform: scale(2.25);
+        opacity: 0.20;
+        box-shadow:
+            0 0 0 16px rgba(0, 255, 136, 0.06),
+            0 0 20px rgba(0, 255, 136, 0.12);
+    }
+
+    100% {
+        transform: scale(2.55);
+        opacity: 0;
+        box-shadow:
+            0 0 0 20px rgba(0, 255, 136, 0),
+            0 0 25px rgba(0, 255, 136, 0);
+    }
+}
+
+
+/* ========================================
+   INFORMAÇÕES DA NAVEGAÇÃO
+   ======================================== */
+
+#nav-info {
+    display: none;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999 !important;
+    
+    /* FUNDO ESCURO COM TRANSPARÊNCIA */
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
+    /* BORDA VERDE */
+    border: 1.5px solid rgba(0, 255, 136, 0.35);
+    border-radius: 14px;
+    
+    /* SOMBRA PARA DESTAQUE */
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.7),
+        0 0 20px rgba(0, 255, 136, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    
+    /* PADDING INTERNO */
+    padding: 10px 22px 8px 22px;
+    
+    /* TEXTO BRANCO */
+    color: #ffffff;
+    
+    /* CENTRALIZAÇÃO */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
+    pointer-events: none;
+    white-space: nowrap;
+    
+    /* TRANSIÇÃO SUAVE */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#nav-info.visible {
+    display: flex !important;
+    animation: slideDownNav 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ANIMAÇÃO DE ENTRADA */
+@keyframes slideDownNav {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-15px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+    }
+}
+
+/* Linha do horário de chegada */
+#nav-arrival {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 3px;
+    color: #00ff88;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    letter-spacing: 0.3px;
+}
+
+/* Linha distância + tempo */
+#nav-route {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* Separador */
+.nav-separator {
+    opacity: 0.4;
+    color: #c2bebe;
+    font-size: 16px;
+}
+
+/* Evita que os elementos internos alterem o tamanho do mapa */
+#nav-distance,
+#nav-time {
+    white-space: nowrap;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ÍCONES dentro do nav-info */
+#nav-arrival::before {
+    content: "";
+    font-size: 14px;
+}
+
+#nav-distance::before {
+    content: "";
+    font-size: 14px;
+}
 
 </style>
 <base target="_blank">
 </head>
+
+
 <body>
 
   <div class="loading-fullscreen" id="loading-fullscreen">
@@ -673,28 +1787,50 @@ h1 span {
 
         </div>
 
-<!-- CIDADE ABAIXO DO ÍCONE E TÍTULO -->
-<div id="cidade-atual" class="cidade-label">
-    <span id="nomeCidade">🚩 Local...</span>
-    <span class="separador">|</span>
 
-    <span class="temp-value">
-    🌡️ <span id="temperaturaAtual">Temp. °C</span>
-</span>
+<!-- LINHA DOS DADOS CIDADE E CLIMÁTICOS -->
+    <div class="dados-clima-linha">
 
-    <span class="separador">|</span>
+        <div id="cidade-atual" class="cidade-label">
+            <span id="nomeCidade">📍Belo Horizonte</span>
+        </div>
 
-  <span class="label">💧</span>
-<span id="umidadeAtual">Umidade</span>
-</div>
+        <span class="separador">|</span>
 
-<!-- LABEL DE ALERTA ABAIXO -->
+        <span class="temp-label">
+            🌡️ <span id="temperaturaAtual">Temperatura °C</span>
+        </span>
 
-<div id="alerta-sound-clima" class="alerta-clima-label" style="display: none;"></div>
+        <span class="separador">|</span>
 
+        <span class="umidade-label">
+            💧 <span id="umidadeAtual">Umidade %</span>
+        </span>
+
+        <span class="separador">|</span>
+
+        <span class="qualidade-ar-label">
+            🏭 <span id="poluicaoAtual">IQAir</span>
+        </span>
 
     </div>
 
+
+    <!-- ALERTA DE QUALIDADE -->
+    <div id="alerta-sound-clima"
+         class="alerta-clima-label"
+         style="display: none;">
+    </div>
+
+
+    <!-- ALERTA DE NORMALIDADE -->
+    <div id="alerta-normalidade"
+         class="alerta-normalidade-label"
+         style="display: none;">
+        ✅ Clima normal. Aproveite!
+    </div>
+
+</div>
 
     <!-- MENU SEMPRE NO CANTO DIREITO -->
   <button class="btn-menu-toggle" 
@@ -718,7 +1854,19 @@ h1 span {
   
   <!-- MENU DROPDOWN -->
  
-  <div class="map-wrapper">
+<div class="map-wrapper">
+
+    <!-- NAV-INFO - AGORA DENTRO DO MAP-WRAPPER E VISÍVEL -->
+    <div id="nav-info">
+        <div id="nav-arrival">🏁 Chegada: --:--</div>
+        <div id="nav-route">
+            <span id="nav-distance"> 0,0 km</span>
+            <span class="nav-separator">•</span>
+            <span id="nav-time">0 min</span>
+        </div>
+    </div>
+
+
 
     <div class="search-container" id="search-bar-radares">
       <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
@@ -799,6 +1947,8 @@ h1 span {
       <div style="margin-top:10px; color:#fff;">Processando...</div>
     </div>
 
+    
+
     <!-- BOTÃO + PARA ADICIONAR RADAR -->
     <button class="btn-add-radar" id="btn-add-radar">
       <span class="plus-icon">+</span>
@@ -821,6 +1971,10 @@ h1 span {
               <option value="">Selecione o tipo...</option>
               <option value="Controlador Eletrônico de Velocidade (CEV)">🚗 Radar de Velocidade (CEV)</option>
               <option value="Detector de Avanço de Semáforo (DAS)">🚦 Radar de Semáforo (DAS)</option>
+              <option value="Recarga Carro Elétrico (REC)">🔋Recarga Carro Elétrico (REC)</option>
+              <option value="Recarga Carro Elétrico (REC)">🚾 WC Público Autolimpante (AUT)</option>
+                 <option value="Recarga Carro Elétrico (REC)">🚻 WC Público Comum (COM)</option>
+                <option value="Recarga Carro Elétrico (REC)"> 🚏 Ponto Abrigo Amigo (PAA)</option>
               <option value="Detector de Conversão em Local Proibido (DCP)">🔄 Conversão Proibida (DCP)</option>
               <option value="Detector de Tráfego em Local Proibido (DTLP)">⛔ Tráfego Proibido (DTLP)</option>
               <option value="Detector de Invasão de Faixa Exclusiva (DIFEX)">🚌 Faixa Exclusiva (DIFEX)</option>
@@ -839,7 +1993,7 @@ h1 span {
               <option value="Passagem Sob Túnel Viário (TUV)">🚇 Túnel Viário (TUV)</option>
               <option value="Apenas Trânsito Local (ATL)">🏘️ Trânsito Local (ATL)</option>
               <option value="Área de Escape Caminhões (ARE)">🚛 Área de Escape (ARE)</option>
-              <option value="Radar de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
+              <option value="Alerta de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
               <option value="Zona de Estudo Nuclear (ZEN)">☢️ Zona de Estudo Nuclear (ZEN)</option>
               <option value="Controle de Redução de Velocidade (CRV)">⬇️ Redução de Velocidade (CRV)</option>
          
@@ -927,6 +2081,10 @@ h1 span {
     <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
   </audio>
 
+    <audio id="alerta-sound-servico" preload="auto">
+    <source src="audio_app/alerta_sound_servico.mp3" type="audio/mpeg">
+  </audio>
+
 <script>
 
  // ===================================================================
@@ -938,17 +2096,34 @@ let radarMarkers = [];
 let alertTimeout;
 let userLat = -19.919055;
 let userLng = -43.938641;
-let searchActive = false;
-let routeActive = false;
+
+// CONTROLE DE BARRAS LATERAIS
+let searchActive = false;    // Controla se a barra de RADARES está ativa
+let routeActive = false;     // Controla se a barra de ROTA está ativa
+
+// CONTROLE DE GPS - SEPARADO DAS BARRAS
+let gpsActive = true;        // Controla o funcionamento do GPS (INDEPENDENTE)
+
+//MENU LATERAL FECHADO COM CONTROLES
+let sidebarAberta = false;
+
+var watchId = null;
+var gpsInitialized = false; // GPS INICIALIZADO
+var browserGpsTimeout = null;  // TIME GPS BROWSER
+
 let prevLat = null;
 let prevLng = null;
 let prevTime = null;
 let isFollowing = true;
-let watchId = null;
+
+
 let gpsSource = 'none';
-let gpsInitialized = false;
-let browserGpsTimeout = null;
-let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 17 };
+let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 15 };
+
+
+let coordenadasRotaNavegacao = [];
+let ultimoSegmentoRota = -1;
+let distanciaDaRota = Infinity;
 
 let estaEmNavegacao = false;
 let startRouteMarker = null;
@@ -956,6 +2131,7 @@ let endRouteMarker = null;
 let routingControl = null;
 let destinoAtual = null;
 let userMarker = null;
+var destinoNavegacao = null;
 
 let ultimaAtualizacaoCamera = 0;
 const INTERVALO_CAMERA_MS = 100;
@@ -983,12 +2159,39 @@ const TEMPO_RETORNO_GPS = 8000;
 let refreshDelayTimer = null;
 const TEMPO_REFRESH_DELAY = 5000;
 
-let sidebarAberta = true;
 
 // Precisão do GPS para o status
 let gpsAccuracyAtual = 999;
 let gpsLastUpdateTime = 0;
 
+
+
+// No início do script, junto com as outras variáveis globais
+let iconeCentralizado = false; // Controla se o ícone está no modo centralizado
+// alerta de clima normal
+let alertaNormalidadeMostrado = false;
+
+
+// =============================================
+// CONTROLE DE TEXTOS - SITE vs APP
+// =============================================
+function ajustarTextosClima() {
+    const isMobile = window.innerWidth <= 600;
+    const cidadeLabel = document.getElementById('cidade-atual');
+    
+    if (cidadeLabel) {
+        cidadeLabel.classList.remove('modo-site', 'modo-app');
+        if (isMobile) {
+            cidadeLabel.classList.add('modo-app');
+        } else {
+            cidadeLabel.classList.add('modo-site');
+        }
+    }
+}
+
+// Executa no carregamento e no redimensionamento
+document.addEventListener('DOMContentLoaded', ajustarTextosClima);
+window.addEventListener('resize', ajustarTextosClima);
 
 // ======================
 // CONFIGURAÇÃO DO GITHUB
@@ -1187,6 +2390,38 @@ setInterval(function() {
     }
 }, 5000);
 
+// ===================================================================
+// CRIAR ICONE NAVEGADOR PULSANTE
+// ===================================================================
+
+function criarIconeNavegador(pulsarIntenso) {
+    var haloClass = 'nav-pulse-halo' + (pulsarIntenso ? ' intenso' : '');
+    var htmlStr = 
+        '<div class="nav-pulse-wrap">' +
+            '<div class="' + haloClass + '"></div>' +
+            '<img src="/imagens_app/ic_navigator_map.png"' +
+                 ' onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'"' +
+                 ' style="width:70px;height:70px;">' +
+        '</div>';
+    
+    return L.divIcon({
+        html: htmlStr,
+        className: 'user-gps-marker',
+        iconSize: [50, 50],
+        iconAnchor: [25, 50],
+        popupAnchor: [0, -50]
+    });
+}
+
+function ativarPulsoIntenso() {
+    var halo = document.querySelector('.nav-pulse-halo');
+    if (halo) halo.classList.add('intenso');
+}
+
+function desativarPulsoIntenso() {
+    var halo = document.querySelector('.nav-pulse-halo');
+    if (halo) halo.classList.remove('intenso');
+}
 
 // ===================================================================
 // MAPEAMENTO DE ÍCONES
@@ -1194,8 +2429,11 @@ setInterval(function() {
 const iconMap = {
     'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
     'Controlador Eletrônico de Velocidade (CEV)':'/imagens_app/ic_radar_cev_v2.png',
-    'Controlador Eletrônico Misto (CEM)':'/imagens_app/ic_radar_cev_v2.png',
-    'Controlador Eletrônico Misto':'/imagens_app/ic_radar_cev_v2.png',
+
+    'Controlador Eletrônico Misto (DAS) + (CEV)':'/imagens_app/ic_radar_cem_cev.png',
+    'Controlador Eletrônico Misto (DAS) + (DCP)':'/imagens_app/ic_radar_cem_dcp.png',
+    'Controlador Eletrônico Misto (DAS) + (DIF)':'/imagens_app/ic_radar_cem_move.png',
+
     'Detector de Avanço de Semáforo (DAS)':'/imagens_app/ic_radar_das_v2.png',
     'Detector de Avanço de Semáforo':'/imagens_app/ic_radar_das_v2.png',
     'Detector de Tráfego em Local Proibido':'/imagens_app/ic_radar_dtlp_v2.png',
@@ -1231,7 +2469,7 @@ const iconMap = {
     'Alerta de Alto Índice de Acidente (AIA)':'/imagens_app/ic_radar_acidente_v2.png',
     'Alerta de Alto Índice  de Acidente (AIA)':'/imagens_app/ic_radar_acidente_v2.png',
     'Alerta de Alto Índice de Acidente':'/imagens_app/ic_radar_acidente_v2.png',
-    'Radar de Caminhão na Faixa Esquerda (CFE)':'/imagens_app/ic_radar_truck_v2.png',
+    'Alerta de Caminhão na Faixa Esquerda (CFE)':'/imagens_app/ic_radar_truck_v2.png',
     'Zona de Estudo Nuclear (ZEN)':'/imagens_app/ic_radar_nuclear_v2.png',
     'Área de Escape Caminhões (ARE)':'/imagens_app/ic_area_escape.png',
     'Apenas Trânsito Local (ATL)':'/imagens_app/ic_local_traffic_v2.png',
@@ -1243,49 +2481,58 @@ const iconMap = {
 
 
      //=== ALERTA DE LUGARES EM DESTAQUE (ALE) ===
-    // Variações com hífen "-" (formato do radares.json)
-    'Alerta de Lugares em Destaque (ALE) - Mercado Central - Gastronomia': '/imagens_app/ic_mercado_central.png',
-    'Alerta de Lugares em Destaque (ALE) - Mirante do Mangabeiras - Mirante': '/imagens_app/ic_mirante_mangabeiras.png',
-    'Alerta de Lugares em Destaque (ALE) - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
-    'Alerta de Lugares em Destaque (ALE) - Mercado Novo - Gastronomia': '/imagens_app/ic_mercado_novo.png',
-    'Alerta de Lugares em Destaque (ALE) - Santa Tereza - Gastronomia': '/imagens_app/ic_santa_tereza.png',
-    'Alerta de Lugares em Destaque (ALE) - Rua Sapucaí - Gastronomia': '/imagens_app/ic_rua_sapucai.png',
-    'Alerta de Lugares em Destaque (ALE) - Praça da Liberdade - Cultura': '/imagens_app/ic_praca_liberdade.png',
-    'Alerta de Lugares em Destaque (ALE) - Edifício Maletta - Gastronomia': '/imagens_app/ic_edificio_maletta.png',
-    'Alerta de Lugares em Destaque (ALE) - Praça do Papa - Mirante': '/imagens_app/ic_praca_papa.png',
-    'Alerta de Lugares em Destaque (ALE) - Museu do Futebol - Cultura': '/imagens_app/ic_museu_futebol.png',
-    'Alerta de Lugares em Destaque (ALE) - Igreja da Pampulha - Cultura': '/imagens_app/ic_igreja_pampulha.png',
-    'Alerta de Lugares em Destaque (ALE) - Parque Ecológico da Pampulha - Ecoturismo': '/imagens_app/ic_parque_ecologico_pampulha.png',
-    'Alerta de Lugares em Destaque (ALE) - Parque da Serra do Curral - Ecoturismo': '/imagens_app/ic_parque_serra_curral.png',
-    'Alerta de Lugares em Destaque (ALE) - Feirinha da Afonso Pena - Compras': '/imagens_app/ic_feira_afonso_pena.png',
-    'Alerta de Lugares em Destaque (ALE) - Palácio das Artes - Cultura': '/imagens_app/ic_palacio_artes.png',
-    'Alerta de Lugares em Destaque (ALE) - Parque Municipal - Parque': '/imagens_app/ic_praca_municipal.png',
-    'Alerta de Lugares em Destaque (ALE) - Praça da Savassi - Gastronomia': '/imagens_app/ic_praca_savassi.png',
-    'Alerta de Lugares em Destaque (ALE) - Museu de Artes e Ofícios - História': '/imagens_app/ic_museu_artes_oficios.png',
-    'Alerta de Lugares em Destaque (ALE) - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
-    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato - Nações Unidas - Artesanato': '/imagens_app/ic_polo_artesanato.png',
-    'Alerta de Lugares em Destaque (ALE) - Polo de Artesanato de Nações Unidas': '/imagens_app/ic_polo_artesanato.png',
+    'Lugares em Destaque - Mercado Central - Arte e Gastronomia': '/imagens_app/ic_mercado_central.png',
+    'Lugares em Destaque - Mirante do Mangabeiras - Panorama': '/imagens_app/ic_mirante_mangabeiras.png',
+    'Lugares em Destaque - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
+    'Lugares em Destaque - Mercado Novo - Arte e Gastronomia': '/imagens_app/ic_mercado_novo.png',
+    'Lugares em Destaque - Santa Tereza - Circuito Boêmio': '/imagens_app/ic_santa_tereza.png',
+    'Lugares em Destaque - Rua Sapucaí - Panorama e Gastronomia': '/imagens_app/ic_rua_sapucai.png',
+    'Lugares em Destaque - Praça da Liberdade - Arte e Cultura': '/imagens_app/ic_praca_liberdade.png',
+    'Lugares em Destaque - Edifício Maletta - Arte e Gastronomia': '/imagens_app/ic_edificio_maletta.png',
+    'Lugares em Destaque - Praça do Papa - Panorama': '/imagens_app/ic_praca_papa.png',
+    'Lugares em Destaque - Museu do Futebol - Arte e Cultura': '/imagens_app/ic_museu_futebol.png',
+    'Lugares em Destaque - Igreja da Pampulha - Arte e Cultura': '/imagens_app/ic_igreja_pampulha.png',
+    'Lugares em Destaque - Parque Ecológico da Pampulha - Ecoturismo': '/imagens_app/ic_parque_ecologico_pampulha.png',
+    'Lugares em Destaque - Parque de Diversões Guanabara - Diversão e Lazer': '/imagens_app/ic_parque_guanabara.png',
+    'Lugares em Destaque - Parque da Serra do Curral - Ecoturismo': '/imagens_app/ic_parque_serra_curral.png',
+    'Lugares em Destaque - Feira de Artesanato da Afonso Pena - Compra (Aos domingos)': '/imagens_app/ic_feira_afonso_pena.png',
+    'Lugares em Destaque - Palácio das Artes - Arte e Cultura': '/imagens_app/ic_palacio_artes.png',
+    'Lugares em Destaque - Parque Municipal - Parque e Diversão': '/imagens_app/ic_parque_municipal.png',
+    'Lugares em Destaque - Praça da Savassi - Gastronomia': '/imagens_app/ic_praca_savassi.png',
+    'Lugares em Destaque - Museu de Artes e Ofícios - História': '/imagens_app/ic_museu_artes_oficios.png',
+    'Lugares em Destaque - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
+    'Lugares em Destaque - Polo de Artesanato de Nações Unidas - Arte Mineira': '/imagens_app/ic_polo_artesanato.png',
+    
+     //=== ALERTA DE SERVIÇO ===
+    'Rede de Serviços - Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
+    'Rede de Serviços - WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
+    'Rede de Serviços - WC Público Comum (COM)': '/imagens_app/ic_banheiro.png',
+    'Rede de Serviços - Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_amigo.png',
+
 
     'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
 const TIPOS_ALERTA_RADAR = [
     'Detector de Parada sobre Faixa de Pedestres  (DPFP)',
-    'Radar de Caminhão na Faixa Esquerda (CFE)',
     'Detector de Conversão em Local Proibido (DCP)',
     'Detector de Redução de Velocidade (REV)',
     'Verificador de Cinto de Segurança (VCS)',
     'Detector de Uso de Celular (DUC)',
-    'Controlador Eletrônico Misto (CEV) + (DAS)',
+    
+     //=== ALERTA DE RADARES MISTOS ===
+
+    'Controlador Eletrônico Misto (DAS) + (CEV)',
     'Controlador Eletrônico Misto (DAS) + (DCP)',
-    'Controlador Eletrônico Misto (DAS) + (MOVE)',
+    'Controlador Eletrônico Misto (DAS) + (DIV)',
+
     'Controlador Eletrônico de Velocidade (CEV)',
     'Detector de Avanço de Semáforo (DAS)',
     'Detector de Tráfego em Local Proibido  (DTLP)',
     'Detector de Invasão de Faixa Exclusiva (MOVE)',
     'Detector de Invasão de Faixa Exclusiva (DIFEX)',
-    'Controle Inteligente de Velocidade (CIV)',
-    'Apenas Trânsito Local (ATL)'
+    'Controle Inteligente de Velocidade (CIV)'
+    
 ];
 
 const TIPOS_ALERTA_RISCO = [
@@ -1303,6 +2550,8 @@ const TIPOS_ALERTA_RISCO = [
 const TIPOS_ALERTA_MOBILIDADE = [
     'Detector de Faixa Preferencial de Ônibus (BUS)',
     'Detector de Faixa Preferencial de Ônibus',
+    'Alerta de Caminhão na Faixa Esquerda (CFE)',
+    'Apenas Trânsito Local (ATL)',
     'Faixa Preferencial de Ônibus (BUS)',
     'Faixa Preferencial de Ônibus',
     'Leitor de Reconhecimento Facial (OCR-F)',
@@ -1319,27 +2568,38 @@ const TIPOS_ALERTA_MOBILIDADE = [
 ];
 
 const TIPOS_ALERTA_DESTAQUE = [
-'Mercado Central - Gastronomia', 
-'Mirante do Mangabeiras - Mirante',
+'Mercado Central - Arte e Gastronomia', 
+'Mercado Novo - Arte e Gastronomia', 
+'Mirante do Mangabeiras - Panorama',
 'Parque Mangabeiras - Natureza',
-'Mercado Novo - Gastronomia',
-'Santa Tereza - Gastronomia',
-'Rua Sapucaí - Gastronomia',
-'Praça da Liberdade - Cultura', 
-'Edifício Maletta - Gastronomia', 
-'Praça do Papa - Mirante',
-'Museu do Futebol - Cultura',
-'Igreja da Pampulha - Cultura',
+'Santa Tereza - Circuito Boêmio',
+'Rua Sapucaí - Panorama e Gastronomia',
+'Praça da Liberdade - Arte e Cultura', 
+'Edifício Maletta - Arte e Gastronomia', 
+'Praça do Papa - Panorma',
+'Museu do Futebol - Arte e Cultura',
+'Igreja da Pampulha - Arte e Cultura',
 'Parque Ecológico da Pampulha - Ecoturismo',
 'Parque da Serra do Curral - Ecoturismo',
-'Feira de Artesanato da Afonso Pena - Compra', 
-'Palácio das Artes - Cultura',
-'Parque Municipal  - Parque',
+'Feira de Artesanato da Afonso Pena - Compra (Aos domingos)', 
+'Palácio das Artes - Arte e Cultura',
+'Parque Municipal  - Parque e Diversão',
 'Praça da Savassi - Gastronomia',
-'Museu de Artes e Ofícios - Museu',
+'Museu de Artes e Ofícios - História',
 'Museu Abílio Barreto - História',
-'Polo de Artesanato de Nações Unidas - Artesanato'
+'Polo de Artesanato de Nações Unidas - Arte MIneira'
 ];
+
+const TIPOS_ALERTA_SERVIÇO = [
+
+' Ponto Abrigo Amigo', 
+'WC Público Comum',
+'WC Público Autolimpante',
+'Recarga Carro Elétrico'
+];
+
+
+
 
 
 const TIPOS_SEM_ALERTA = [];
@@ -1347,11 +2607,15 @@ const TIPOS_SEM_ALERTA = [];
 const ajusteNomes = {
     'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
     'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
-    'Controlador Eletrônico Misto (CEV + DAS)': 'Radar Misto Velocidade+Semáforo (CEM)',
+
+//=== ALERTA DE RADARES MISTOS ===
+    'Controlador Eletrônico Misto (DAS + CEV)': 'Radar Misto Velocidade+Semáforo (CEM)',
     'Controlador Eletrônico Misto (DAS + DCP)': 'Radar Misto Semáforo+Conversão (CEM)',
     'Controlador Eletrônico Misto (DAS + DIF)': 'Radar Misto Semáforo+Faixa (CEM)',
+
     'Controlador Eletrônico Misto (CEM)': 'Radar Misto Velocidade+Semáforo (CEM)',
     'Controlador Eletrônico Misto': 'Radar Misto Velocidade+Semáforo (CEM)',
+
     'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
     'Controle de Redução de Velocidade': 'Painel de Redução de Velocidade (PRV)',
     'Detector de Parada sobre Faixa de Pedestres (DPFP)': 'Detector de Parada sobre Faixa de Pedestres (DPFP)',
@@ -1406,6 +2670,35 @@ function getIconUrl(tipo, velocidade) {
     const tipoLimpo = tipo ? tipo.trim() : "";
     if (!tipoLimpo) return iconMap['default'];
 
+
+    // === Matching parcial para SERVIÇOS ===
+    if (tipoLimpo.includes('Recarga') || tipoLimpo.includes('Elétrico') || tipoLimpo.includes('REC')) {
+        return iconMap['Rede de Serviços - Recarga Carro Elétrico (REC)'];
+    }
+    if (tipoLimpo.includes('Autolimpante') || tipoLimpo.includes('AUT')) {
+        return iconMap['Rede de Serviços - WC Público Autolimpante (AUT)'];
+    }
+    if (tipoLimpo.includes('WC Público Comum') || tipoLimpo.includes('COM')) {
+        return iconMap['Rede de Serviços - WC Público Comum (COM)'];
+    }
+    if (tipoLimpo.includes('Abrigo Amigo') || tipoLimpo.includes('PAA') || tipoLimpo.includes('Abrigo Amigo')) {
+        return iconMap['Rede de Serviços - Ponto Abrigo Amigo (PAA)'];
+    }
+
+
+      // === RADARES MISTOS — verificar PRIMEIRO, antes do genérico ===
+    if (tipoLimpo.includes('Misto') && tipoLimpo.includes('CEV')) {
+        return iconMap['Controlador Eletrônico Misto (DAS) + (CEV)'];
+    }
+    if (tipoLimpo.includes('Misto') && tipoLimpo.includes('DCP')) {
+        return iconMap['Controlador Eletrônico Misto (DAS) + (DCP)'];
+    }
+    if (tipoLimpo.includes('Misto') && tipoLimpo.includes('DIF')) {
+        return iconMap['Controlador Eletrônico Misto (DAS) + (DIF)'];
+    }
+
+         // === VERIFICAR DEPOIS RADARES GENÉRICOS ===
+
     if (tipoLimpo.includes('Média') || tipoLimpo.includes('(RIV)') || tipoLimpo.includes('RIV')) {
         return iconMap['Radar Inteligente de Velocidade Média (RIV)'];
     }
@@ -1422,7 +2715,13 @@ function getIconUrl(tipo, velocidade) {
         tipoLimpo === 'Controle de Redução de Velocidade')
         return iconMap['Controle de Redução de Velocidade (CRV)'];
 
-    var isRadarVelocidade = tipoLimpo.includes('Velocidade') || tipoLimpo.includes('CEV') || tipoLimpo.includes('CEM') || tipoLimpo.includes('Controlador Eletrônico');
+    var isRadarVelocidade = (tipoLimpo.includes('Velocidade') || 
+                         tipoLimpo.includes('CEV') || 
+                         tipoLimpo.includes('CEM') || 
+                         tipoLimpo.includes('Controlador Eletrônico')) 
+                         && !tipoLimpo.includes('Misto');
+
+
     if (isRadarVelocidade) {
         var velStr = String(velocidade || '').trim();
         var velNum = parseInt(velStr.replace(/[^0-9]/g, ''), 10);
@@ -1525,6 +2824,135 @@ function calcularCentroMapaComOffset(lat, lng, bearing) {
     };
 }
 
+// ============================================================
+// ENCONTRA O PONTO DA ROTA MAIS PRÓXIMO DO GPS
+// ============================================================
+function encontrarPontoMaisProximoDaRota(lat, lng) {
+
+    if (!coordenadasRotaNavegacao || coordenadasRotaNavegacao.length < 2) {
+        return {
+            lat: lat,
+            lng: lng,
+            distancia: Infinity,
+            segmento: -1,
+            heading: null
+        };
+    }
+
+    let melhor = null;
+    let menorDistancia = Infinity;
+
+    // Escala aproximada para transformar lat/lng em plano local
+    const cosLat = Math.cos(lat * Math.PI / 180);
+
+    const xGPS = lng * cosLat;
+    const yGPS = lat;
+
+    for (let i = 0; i < coordenadasRotaNavegacao.length - 1; i++) {
+
+        const a = coordenadasRotaNavegacao[i];
+        const b = coordenadasRotaNavegacao[i + 1];
+
+        const ax = a.lng * cosLat;
+        const ay = a.lat;
+
+        const bx = b.lng * cosLat;
+        const by = b.lat;
+
+        const dx = bx - ax;
+        const dy = by - ay;
+
+        const comprimento2 = dx * dx + dy * dy;
+
+        let t = 0;
+
+        if (comprimento2 > 0) {
+            t = ((xGPS - ax) * dx + (yGPS - ay) * dy) / comprimento2;
+            t = Math.max(0, Math.min(1, t));
+        }
+
+        const px = ax + t * dx;
+        const py = ay + t * dy;
+
+        const diferencaX = xGPS - px;
+        const diferencaY = yGPS - py;
+
+        const distancia2 =
+            diferencaX * diferencaX +
+            diferencaY * diferencaY;
+
+        if (distancia2 < menorDistancia) {
+
+            menorDistancia = distancia2;
+
+            const pontoLat = py;
+            const pontoLng = px / cosLat;
+
+            melhor = {
+                lat: pontoLat,
+                lng: pontoLng,
+                distancia: calcularDistancia(
+                    lat,
+                    lng,
+                    pontoLat,
+                    pontoLng
+                ),
+                segmento: i,
+                heading: calcularBearing(
+                    a.lat,
+                    a.lng,
+                    b.lat,
+                    b.lng
+                )
+            };
+        }
+    }
+
+    return melhor;
+}
+
+// ============================================================
+// AJUSTA O GPS PARA A LINHA DA ROTA
+// ============================================================
+function ajustarPosicaoNaVia(lat, lng) {
+
+    const resultado = encontrarPontoMaisProximoDaRota(lat, lng);
+
+    if (!resultado) {
+        return {
+            lat: lat,
+            lng: lng
+        };
+    }
+
+    distanciaDaRota = resultado.distancia;
+
+    // Se o GPS estiver muito longe da rota,
+    // NÃO força o marcador para a via.
+    // Isso evita erros em ruas paralelas.
+    const LIMITE_AJUSTE_VIA = 30;
+
+    if (resultado.distancia > LIMITE_AJUSTE_VIA) {
+        return {
+            lat: lat,
+            lng: lng,
+            heading: null,
+            ajustado: false
+        };
+    }
+
+    ultimoSegmentoRota = resultado.segmento;
+
+    return {
+        lat: resultado.lat,
+        lng: resultado.lng,
+        heading: resultado.heading,
+        ajustado: true
+    };
+}
+//===============
+//SUAVIZAR POSIÇÃO
+//================
 function suavizarPosicao(novaLat, novaLng) {
     if (posicaoSuavizada.lat === null) {
         posicaoSuavizada.lat = novaLat;
@@ -1554,7 +2982,40 @@ function calcularTendenciaDistancia(radarId, distanciaAtual) {
     return { estaAproximando: true, estaAfastando: false, diferenca: 0 };
 }
 
+//=========================
+//MOVER MARCADOR SUAVEMENTE
+//=========================
 function moverMarcadorSuavemente(targetLat, targetLng) {
+
+//AJUSTR POSIÇÃO NA VIA
+if (estaEmNavegacao && coordenadasRotaNavegacao.length >= 2) {
+
+    const posicaoCorrigida = ajustarPosicaoNaVia(
+        targetLat,
+        targetLng
+    );
+
+    targetLat = posicaoCorrigida.lat;
+    targetLng = posicaoCorrigida.lng;
+
+    if (
+        posicaoCorrigida.heading !== null &&
+        posicaoCorrigida.heading !== undefined
+    ) {
+
+        headingIconeNavegacao =
+            posicaoCorrigida.heading;
+
+        atualizarIconeNavegacaoVia(
+            headingIconeNavegacao
+        );
+    }
+}
+//==================
+//MWRCADOR PARA MOVER
+//===================
+
+
     var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
     if (!marcadorParaMover) return;
     if (ultimaPosicaoMarcador.lat === null) {
@@ -1610,20 +3071,17 @@ function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, rad
 // =================================
 // TEMA DO MAPA MATRIX (DIA E NOITE)
 // =================================
-
 function aplicarTemaMapa() {
-    if (!map) return;
+    if (typeof map === 'undefined' || !map) return;
 
     var hora = new Date().getHours();
-    var mapContainer = map.getContainer(); // Pega a div que segura o mapa
-
-    // Define se é dia (6h às 18h) ou noite (18h às 6h)
+    var mapContainer = map.getContainer(); 
+    
+    // Define se é dia (6h às 18h) ou noite (19h às 5h)
     var isNight = (hora >= 19 || hora < 6);
 
-    // Troca a URL base do mapa: Voyager (Dia) ou Dark (Noite)
-    var urlTema = isNight 
-        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
-        : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    // CORREÇÃO: Sintaxe correta. Usando OpenStreetMap (100% gratuito, sem API Key)
+    var urlTema = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     // Troca a classe CSS que aplica o filtro Matrix
     if (isNight) {
@@ -1635,16 +3093,19 @@ function aplicarTemaMapa() {
     }
 
     // Atualiza o tile do mapa
-    if (tileLayer) {
+    if (typeof tileLayer !== 'undefined' && tileLayer) {
         tileLayer.setUrl(urlTema);
     } else {
-        tileLayer = L.tileLayer(urlTema, { 
-            attribution: '', 
-            subdomains: 'abcd', 
-            maxZoom: 19 
+        tileLayer = L.tileLayer(urlTema, {
+            attribution: '&copy; OpenStreetMap contributors',
+            maxZoom: 19
         }).addTo(map);
     }
 }
+
+// =================================
+// AJUSTAR POSIÇÃO DO SPEED WIDGET
+// =================================
 
 function ajustarPosicaoSpeedWidget(subir) {
     var speedWidget = document.querySelector('.speed-widget');
@@ -1673,17 +3134,49 @@ function ocultarBussola(ocultar) {
     }
 }
 
+// ========================================
+// CALCULAR HORÁRIO DE CHEGADA
+// ========================================
+
+function atualizarHorarioChegada(minutos) {
+
+    minutos = parseInt(minutos);
+
+    if (isNaN(minutos) || minutos < 0) {
+        $("#nav-arrival").text("🏁 Chegada: --:--");
+        return;
+    }
+
+    const agora = new Date();
+
+    agora.setMinutes(agora.getMinutes() + minutos);
+
+    const horas = String(agora.getHours()).padStart(2, "0");
+    const minutosChegada = String(agora.getMinutes()).padStart(2, "0");
+
+    $("#nav-arrival").text(
+        "🏁 Chegada: " + horas + ":" + minutosChegada
+        
+    );
+}
+
+
 // ===================================================================
 // FUNÇÕES DE NAVEGAÇÃO
 // ===================================================================
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
+  
+ 
+    destinoNavegacao = {lat: destLat, lng: destLng};
+    
+  
     if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
     if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
     if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
     estaEmNavegacao = true;
     ultimaPosicaoMarcador = { lat: null, lng: null };
     var startIcon = L.divIcon({
-        html: '<img id="nav-icon-img" src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;transform-origin:center center;transition:transform 0.3s ease-out;">',
+        html: '<img id="nav-icon-img" src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:70px;height:70px;transform-origin:center center;transition:transform 0.3s ease-out;">',
         className: 'route-start-marker user-navigator-marker',
         iconSize: [50, 50],
         iconAnchor: [25, 25],
@@ -1693,7 +3186,7 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     startRouteMarker.bindTooltip("Navegando para destino", { permanent: false, direction: "top", offset: [0, -30] });
     
     var endIcon = L.divIcon({
-        html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
+        html: '<img src="/imagens_app/ic_icon_chegada.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:45px;height:45px;">',
         className: 'route-end-marker',
         iconSize: [50, 50],
         iconAnchor: [25, 50],
@@ -1703,26 +3196,49 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     endRouteMarker.bindPopup("<b>DESTINO</b><br>Você chegou ao seu destino!", { closeButton: false, autoClose: true, closeOnClick: true });
 }
 
+//==============
+//ATUALIZAR ROTA
+//==============
 function atualizarRota() {
     if (!destinoAtual || !userLat || !userLng || !routingControl) return;
     routingControl.setWaypoints([L.latLng(userLat, userLng), L.latLng(destinoAtual.lat, destinoAtual.lng)]);
     routingControl.route();
 }
 
+//===================================
+//FUNÇÃO DE VERIFICAR CHAGADA DESTINO
+//===================================
+
 function verificarChegadaDestino() {
+
     if (!destinoAtual || !userLat || !userLng) return;
-    var distanciaDestino = calcularDistancia(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
+
+    var distanciaDestino = calcularDistancia(
+        userLat,
+        userLng,
+        destinoAtual.lat,
+        destinoAtual.lng
+    );
+
     if (distanciaDestino <= 30) {
+
         showNotification("Você chegou ao seu destino!");
+
         if (endRouteMarker) endRouteMarker.openPopup();
-        setTimeout(function() { finalizarNavegacao(); }, 4000);
+
+        setTimeout(function() {
+            finalizarNavegacao();
+        }, 4000);
     }
 }
+
+//FUNÇÃO FINALIZAR NAVEGAÇÃO
 
 function finalizarNavegacao() {
     if (!map) return;
     if (routingControl) { map.removeControl(routingControl); routingControl = null; }
     destinoAtual = null;
+    destinoNavegacao = null;  // ⬅️ ADICIONAR ESTA LINHA
     estaEmNavegacao = false;
     estaEmMovimento = false;
     velocidadeAtual = 0;
@@ -1735,9 +3251,9 @@ function finalizarNavegacao() {
     ultimaPosicaoMarcador = { lat: null, lng: null };
     posicaoSuavizadaGPS = { lat: null, lng: null };
     ultimaAtualizacaoCamera = 0;
-    zoomAtualEfetivo = 17;
+    zoomAtualEfetivo = 18;
     centroAtualEfetivo = { lat: null, lng: null };
-    zoomAlvo = 17;
+    zoomAlvo = 18;
     bearingAlvo = 0;
     bearingAtual = 0;
     bearingAlvoAnterior = null;
@@ -1754,15 +3270,10 @@ function finalizarNavegacao() {
     var rb = document.getElementById('btn-rotate-map');
     if (rb) rb.classList.remove('rotated');
     
-    var defaultIcon = L.divIcon({
-        html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-        className: 'user-gps-marker',
-        iconSize: [50, 50],
-        iconAnchor: [25, 50],
-        popupAnchor: [0, -50]
-    });
-    userMarker = L.marker([userLat, userLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
-    userMarker.bindTooltip("Você está aqui", { permanent: false, direction: "top", offset: [0, -25] });
+    // VOLTA PARA O ÍCONE DE NAVEGADOR
+    if (userLat && userLng) {
+        atualizarMarcadorUsuario(userLat, userLng, 'navegador');
+    }
     
     var sidebar = document.getElementById('sidebar-controls');
     var btnMenu = document.getElementById('btn-menu-toggle');
@@ -1777,10 +3288,15 @@ function finalizarNavegacao() {
 
 function removerRota() { finalizarNavegacao(); }
 
+//==================
+//FUNÇÃO CRIAR ROTA
+//==================
+
 function criarRota(destLat, destLng) {
     if (!userLat || !userLng) { showNotification("Aguardando posição GPS..."); return; }
     if (routingControl) { map.removeControl(routingControl); routingControl = null; }
     destinoAtual = { lat: destLat, lng: destLng };
+   
     adicionarMarcadoresRota(userLat, userLng, destLat, destLng);
     routingControl = L.Routing.control({
         waypoints: [L.latLng(userLat, userLng), L.latLng(destLat, destLng)],
@@ -1803,25 +3319,34 @@ function criarRota(destLat, destLng) {
     routingControl.on('routesfound', function(e) {
         let route = e.routes[0];
         if (route.coordinates && route.coordinates.length >= 2) {
+            coordenadasRotaNavegacao = route.coordinates;
             var p1 = route.coordinates[0];
             var p2 = route.coordinates[1];
-            var heading = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
-            headingIconeNavegacao = heading;
-            headingIconeSuavizado = heading;
-            _navAnim.headingAlvo      = heading;
-            _navAnim.headingSuavizado = heading;
-            bearingAlvo = heading;
-            bearingAtual = heading;
+            var headingInicial = calcularBearing(p1.lat, p1.lng, p2.lat, p2.lng);
+            headingIconeNavegacao = headingInicial;
+            headingIconeSuavizado = headingInicial;
+            _navAnim.headingAlvo = headingInicial;
+            _navAnim.headingSuavizado = headingInicial;
+            bearingAlvo = headingInicial;
+            bearingAtual = headingInicial;
+            ultimoSegmentoRota = 0;
         }
+
         let dk = (route.summary.totalDistance / 1000).toFixed(1);
         let tm = Math.round(route.summary.totalTime / 60);
+
+        // ✅ CHAMADA CORRETA AQUI
+        mostrarInfoNavegacao(dk, tm);
+
         $("#loading").hide();
-        showNotification("🚗 " + dk + " km • " + tm + " min");
         iniciarModoNavegacaoSuave();
     });
-    routingControl.on('routingerror', function() { $("#loading").hide(); showNotification("Erro ao traçar rota."); });
-    showNotification("🚀 Navegação iniciada");
 }
+
+
+
+
+//CALCULANDO DE ORIENTAÇÃO 
 
 function calcularBearing(lat1, lng1, lat2, lng2) {
     var dLon = (lng2 - lng1) * Math.PI / 180;
@@ -1861,8 +3386,10 @@ function atualizarCameraNavegacaoSuave() {
     let zoomDesejado = calcularZoomPorVelocidade();
     zoomAlvo = zoomAlvo * 0.85 + zoomDesejado * 0.15;
     let zoomArredondado = Math.round(zoomAlvo * 10) / 10;
+
     let latCam = ultimaPosicaoMarcador.lat || posicaoSuavizada.lat || userLat;
     let lngCam = ultimaPosicaoMarcador.lng || posicaoSuavizada.lng || userLng;
+
     let c = calcularCentroMapaComOffset(latCam, lngCam, bearingAtual);
     let mudancaZoom = Math.abs(zoomArredondado - zoomAtualEfetivo);
     let mudancaPos = 0;
@@ -1894,6 +3421,8 @@ async function buscarCoordenadas(endereco){
     catch(e){console.error("Erro ao buscar coordenadas:",e);
     return null}}
 
+    //FUNÇÃO RESETAR MAPA
+
 function resetarMapa() {
     if (!map) return;
     mapaRotacionado = false;
@@ -1910,6 +3439,25 @@ function resetarMapa() {
     if (rotateBtn) rotateBtn.classList.remove('rotated');
     map.setView([posicaoCentralOriginal.lat, posicaoCentralOriginal.lng], posicaoCentralOriginal.zoom, { animate: true, duration: 0.5 });
     isFollowing = false;
+    
+    // RESETA O ALERTA DE NORMALIDADE
+    alertaNormalidadeMostrado = false;
+    
+    // REMOVE E RECRIA O MARCADOR COM ÍCONE DE NAVEGADOR
+    if (!estaEmNavegacao && userMarker) {
+        var pos = userMarker.getLatLng();
+        map.removeLayer(userMarker);
+        
+       var navIcon = criarIconeNavegador(false); // pulso normal
+        
+        userMarker = L.marker([pos.lat, pos.lng], { 
+            icon: navIcon, 
+            zIndexOffset: 1000 
+        }).addTo(map);
+        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+        iconeCentralizado = false;
+    }
+    
     if (refreshDelayTimer) clearTimeout(refreshDelayTimer);
     refreshDelayTimer = setTimeout(function() {
         var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
@@ -1920,11 +3468,14 @@ function resetarMapa() {
         }
         refreshDelayTimer = null;
     }, TEMPO_REFRESH_DELAY);
+    
     removerRota();
     esconderAlertaVisual();
     showNotification("Mapa resetado");
     historicoDistanciasRadar = {};
 }
+
+// FUNÇÃO EXTRAIR COORDENADAS
 
 function extrairCoordenadas(record, index) {
     if (!record || record.length < 9) return null;
@@ -1970,9 +3521,86 @@ function extrairCoordenadas(record, index) {
     return { lat: lat, lng: lng };
 }
 
+//=================
+// ATUALIZAR BÚSSOLA
+//=================
 function atualizarBussola(headingDegrees) {
-    var needle = document.getElementById('compass-needle-img');
-    if (needle) needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
+
+    // =========================================================
+    // BÚSSOLA = A bússola continua obedecendo ao heading do dispositivo/GPS
+    // =========================================================
+   
+
+    var needle =
+        document.getElementById('compass-needle-img');
+
+    if (
+        needle &&
+        headingDegrees != null &&
+        !isNaN(headingDegrees)
+    ) {
+        needle.style.transform =
+            'rotate(' + headingDegrees + 'deg)';
+    }
+}
+
+
+    // =========================================================
+    // ÍCONE DE NAVEGAÇÃO
+    // NÃO usar headingDegrees aqui.
+    //
+    // O ícone deve seguir a direção da VIA/ROTA.
+    // A função ajustarPosicaoNaVia() fornece essa direção.
+    // =========================================================
+
+    if (
+        estaEmNavegacao &&
+        coordenadasRotaNavegacao &&
+        coordenadasRotaNavegacao.length >= 2 &&
+        userLat != null &&
+        userLng != null
+    ) {
+
+        var posicaoVia = ajustarPosicaoNaVia(
+            userLat,
+            userLng
+        );
+
+        if (
+            posicaoVia &&
+            posicaoVia.heading != null &&
+            !isNaN(posicaoVia.heading)
+        ) {
+
+            headingIconeNavegacao = posicaoVia.heading;
+
+            atualizarIconeNavegacaoVia(
+                headingIconeNavegacao
+            );
+        }
+    }
+//======================================
+// FUNÇÃO ATUALIZAR NAVEGAÇÃO NA VIA
+//=====================================
+    function atualizarIconeNavegacaoVia(headingVia) {
+
+    var navIcon =
+        document.querySelector('.nav-pulse-wrap img');
+
+    if (
+        !navIcon ||
+        headingVia == null ||
+        isNaN(headingVia)
+    ) {
+        return;
+    }
+
+    if (mapaRotacionado) {
+        navIcon.style.transform = 'rotate(0deg)';
+    } else {
+        navIcon.style.transform =
+            'rotate(' + headingVia + 'deg)';
+    }
 }
 
 // =========================
@@ -2049,6 +3677,9 @@ function _iniciarAnimacaoNavegacao(toLat, toLng, novoHeading) {
 //================================
 // FUNÇÃO PROCESSAR NOVA POSIÇÃO
 //================================
+//================================
+// FUNÇÃO PROCESSAR NOVA POSIÇÃO
+//================================
 function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accuracy) {
     if (!map) return;
 
@@ -2105,34 +3736,71 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
     var accReal = (accuracy !== undefined && accuracy !== null && !isNaN(accuracy)) ? accuracy : 999;
     atualizarStatusGPS({ coords: { latitude: newLat, longitude: newLng, accuracy: accReal } });
 
-    if (estaEmNavegacao && startRouteMarker) {
-        _iniciarAnimacaoNavegacao(smoothLat, smoothLng, novoHeading);
+    // =============================================
+    // [CORREÇÃO PRINCIPAL] Atualiza marcador SEMPRE
+    // =============================================
+    if (estaEmNavegacao) {
+        // Se o startRouteMarker não existir, recria ele
+        if (!startRouteMarker) {
+            console.warn("⚠️ startRouteMarker ausente durante navegação. Recriando...");
+            adicionarMarcadoresRota(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
+        }
+        
+        // Agora atualiza a posição (com ou sem animação)
+        if (startRouteMarker) {
+            _iniciarAnimacaoNavegacao(smoothLat, smoothLng, novoHeading);
+        }
 
         if (!gpsInitialized) {
             gpsInitialized = true;
             hideFullscreenLoading();
         }
-    } else if (!estaEmNavegacao) {
+
+    } else {
+        // MODO NORMAL (não está navegando)
         if (!userMarker) {
-            var defaultIcon = L.divIcon({
-                html: '<img src="/imagens_app/ic_gps_marker.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" style="width:50px;height:50px;">',
-                className: 'user-gps-marker',
-                iconSize: [50, 50],
-                iconAnchor: [25, 50],
-                popupAnchor: [0, -50]
-            });
+            var defaultIcon = criarIconeNavegador(true);
             userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
             userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
             ultimaPosicaoMarcador = { lat: smoothLat, lng: smoothLng };
+            iconeCentralizado = false;
+
             if (!gpsInitialized) {
                 gpsInitialized = true;
                 hideFullscreenLoading();
             }
         } else {
+            // Se está em movimento e o ícone está como GPS, volta para NAVEGADOR
+            if (iconeCentralizado && speedKmh > 3) {
+                console.log("🚶 Usuário em movimento - voltando para ícone de navegador");
+                var pos = userMarker.getLatLng();
+                map.removeLayer(userMarker);
+
+                var navIcon = L.divIcon({
+                    html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
+                    className: 'user-gps-marker',
+                    iconSize: [50, 50],
+                    iconAnchor: [25, 50],
+                    popupAnchor: [0, -50]
+                });
+
+                userMarker = L.marker([pos.lat, pos.lng], {
+                    icon: navIcon,
+                    zIndexOffset: 1000
+                }).addTo(map);
+                userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+
+                iconeCentralizado = false;
+                showNotification("🧭 Modo navegação ativado");
+            }
+
             moverMarcadorSuavemente(smoothLat, smoothLng);
         }
     }
 
+    //=========================================
+    // VERIFICAÇÃO DE DESTINO, ROTA E NAVEGAÇÃO
+    //=========================================
     if (destinoAtual && routingControl && estaEmNavegacao) {
         if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
             atualizarRota();
@@ -2146,109 +3814,135 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
         map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.5 });
     }
 
-    if (alertaHabilitado) verificarProximidadeRadares();
-    else fecharAlertaImediatamente();
+    verificarProximidadeRadares();
 
     if (destinoAtual) verificarChegadaDestino();
 }
 
-//================================
-// FUNÇÃO INICIAR NAVEGAÇÃO GPS
-//================================
-
-function startGPSTracking() {
-    if (!navigator.geolocation) { hideFullscreenLoading(); showNotification("GPS não suportado."); return; }
-    if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-    watchId = navigator.geolocation.watchPosition(
-        function(position) {
-            if (gpsSource !== 'appinventor') gpsSource = 'browser';
-            var speedKmh = 0;
-            if (position.coords.speed !== null && position.coords.speed >= 0) speedKmh = Math.round(position.coords.speed * 3.6);
-            processarNovaPosicao(position.coords.latitude, position.coords.longitude, speedKmh, position.coords.heading, position.coords.accuracy);
-        }, showError, { enableHighAccuracy: true, maximumAge: 2000, timeout: 15000 }
-
-        
-    );
-    browserGpsTimeout = setTimeout(function() {
-        if (!gpsInitialized && gpsSource === 'none') { showNotification("Aguardando GPS do app..."); hideFullscreenLoading(); }
-    }, 8000);
-}
-
-//================================
-// FUNÇÃO GPS CIDADE ATUAL 
-//================================
-
+//===========================================
+// FUNÇÃO INICIAR NAVEGAÇÃO GPS E CIDADE ATUAL
+//===========================================
 const cidadeLabel = document.getElementById("cidade-atual");
-
 let ultimaCidade = "";
 
 function startGPSTracking() {
+    
+    // Se for usar o timeout, ele precisa ser iniciado com os parênteses e os parâmetros:
+    browserGpsTimeout = setTimeout(() => {
+        // O código que você quer executar após o tempo passar
+        console.log("Tempo do GPS esgotou!");
+        
+    }, 30000); // 30000 = 30 segundos (ou o tempo que você quiser)
 
-    if (!navigator.geolocation) { 
-        hideFullscreenLoading(); 
-        showNotification("GPS não suportado."); 
-        return; 
+    // Sua verificação do GPS:
+    if (!navigator.geolocation) {
+        hideFullscreenLoading();
+        showNotification("GPS não suportado.");
+        return;
     }
-
+    
+    // Se já existe um watch, para ele primeiro (limpeza segura)
     if (watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
+        watchId = null;
     }
 
+    // Inicia o tracking GPS - ÚNICO watchPosition
+    
     watchId = navigator.geolocation.watchPosition(
-
         function(position) {
-
-            if (gpsSource !== 'appinventor') {
-                gpsSource = 'browser';
-            }
-
+            // Dados da posição
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
             var speedKmh = 0;
-
+            
             if (position.coords.speed !== null && position.coords.speed >= 0) {
                 speedKmh = Math.round(position.coords.speed * 3.6);
             }
 
+            // Verifica chegada ao destino se estiver em navegação
+            // ⬇️ CORREÇÃO: verificarChegadaDestino() não aceita parâmetros, usa variáveis globais
+            if (estaEmNavegacao && destinoNavegacao) {
+                verificarChegadaDestino();
+            }
 
-            // ATUALIZA CIDADE AQUI
-            atualizarCidade(
-                position.coords.latitude,
-                position.coords.longitude
-            );
+            // Define fonte do GPS
+            if (gpsSource !== 'appinventor') {
+                gpsSource = 'browser';
+            }
 
+            // ATUALIZA CIDADE E CLIMA
+            atualizarCidade(lat, lng);
+            atualizarTemperatura();
 
-            processarNovaPosicao(
-                position.coords.latitude,
-                position.coords.longitude,
-                speedKmh,
-                position.coords.heading,
-                position.coords.accuracy
-            );
+            // Processa a nova posição
+            processarNovaPosicao(lat, lng, speedKmh, position.coords.heading, position.coords.accuracy);
 
+            // Marca GPS como inicializado
+            if (!gpsInitialized) {
+                gpsInitialized = true;
+                hideFullscreenLoading();
+            }
 
         }, 
-
-        showError, 
-
+        function(error) {
+            console.error("Erro GPS:", error);
+            showNotification("Erro ao obter localização: " + error.message);
+            if (!gpsInitialized) {
+                hideFullscreenLoading();
+            }
+        }, 
         { 
             enableHighAccuracy: true,
             maximumAge: 1000,
-           timeout: 10000
+            timeout: 30000       // Aumenta o tempo de espera para 30 segundos
         }
-
     );
 
+    console.log("GPS iniciado com watchId:", watchId);
 
+    // Timeout para aguardar GPS
+    if (browserGpsTimeout) {
+        clearTimeout(browserGpsTimeout);
+    }
+    
     browserGpsTimeout = setTimeout(function() {
-
         if (!gpsInitialized && gpsSource === 'none') { 
             showNotification("Aguardando GPS do app..."); 
             hideFullscreenLoading(); 
         }
-
     }, 8000);
-
 }
 
+//===========================================
+// FUNÇÃO PARAR GPS
+//===========================================
+
+function stopGPSTracking() {
+    if (watchId !== null) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        gpsInitialized = false;
+        console.log("GPS parado");
+    }
+    
+    if (browserGpsTimeout) {
+        clearTimeout(browserGpsTimeout);
+        browserGpsTimeout = null;
+    }
+}
+
+//===========================================
+// FUNÇÃO REINICIAR GPS (SE PRECISAR)
+//===========================================
+
+function restartGPSTracking() {
+    stopGPSTracking();
+    // Pequeno delay para reiniciar
+    setTimeout(function() {
+        startGPSTracking();
+    }, 500);
+}
 //=====================================
 // FUNÇÃO ACCURACY DISTANCIA METROS
 //=====================================
@@ -2272,60 +3966,121 @@ function distanciaMetros(lat1, lon1, lat2, lon2){
 // FUNÇÃO INTEGRAÇÃO ACCURACY GPS
 //=====================================
 
-let melhorPrecisao = Infinity;
+//=====================================
+// FUNÇÃO INTEGRAÇÃO ACCURACY GPS
+//=====================================
 
+let melhorPrecisao = Infinity;
 const historico = [];
 
 function sucesso(position){
-
     const acc = position.coords.accuracy;
+    const newLat = position.coords.latitude;
+    const newLng = position.coords.longitude;
 
-    // 1. Ignora leituras ruins
-    if(acc > 15){
-        console.log("GPS ignorado:", acc + " m");
-        return;
-    }
-
-    // 2. Guarda a melhor precisão obtida
+    // 1. Registra a melhor precisão obtida (apenas para estatística)
     if(acc < melhorPrecisao){
         melhorPrecisao = acc;
     }
 
-    // 3. Guarda histórico para suavizar o GPS
-    historico.push({
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-    });
-
+    // 2. Guarda histórico para suavizar (apenas para cálculos de média local, se necessário)
+    historico.push({ lat: newLat, lng: newLng });
     if(historico.length > 5){
         historico.shift();
     }
 
-    // 4. Calcula média
-    userLat = historico.reduce((s,p)=>s+p.lat,0)/historico.length;
-    userLng = historico.reduce((s,p)=>s+p.lng,0)/historico.length;
-
+    // 3. NÃO interrompa o fluxo com 'return' baseado em accuracy.
+    // A lógica de ignorar saltos absurdos já é feita no suavizarPosicao() dentro de processarNovaPosicao.
+    
     console.log(
-        "GPS:",
-        userLat,
-        userLng,
-        "Precisão:",
-        melhorPrecisao.toFixed(1)+" m"
+        "Leitura GPS Recebida - Lat:", newLat, 
+        "Lng:", newLng, 
+        "Precisão:", acc.toFixed(1) + " m",
+        "Melhor:", melhorPrecisao.toFixed(1) + " m"
     );
-
+    
+    // IMPORTANTE: Se você estiver chamando esta função 'sucesso' de algum outro lugar 
+    // além do watchPosition nativo, você deve passar os dados para a função principal:
+    if (typeof processarNovaPosicao === 'function' && gpsSource !== 'browser') {
+        let speedKmh = (position.coords.speed !== null && position.coords.speed >= 0) 
+            ? Math.round(position.coords.speed * 3.6) : 0;
+            
+        processarNovaPosicao(
+            newLat, 
+            newLng, 
+            speedKmh, 
+            position.coords.heading, 
+            acc
+        );
+    }
 }
+
+
+// =============================================
+// CONTROLE RESPONSIVO DO HEADER
+// =============================================
+function ajustarHeaderResponsivo() {
+    const width = window.innerWidth;
+    const gpsLabel = document.getElementById('gps-status-label');
+    const cidadeLabel = document.getElementById('cidade-atual');
+    
+    if (width < 400) {
+        if (gpsLabel) gpsLabel.textContent = '';
+        if (cidadeLabel) {
+            cidadeLabel.classList.add('tela-muito-pequena');
+            cidadeLabel.classList.remove('modo-app', 'modo-site');
+        }
+    } else if (width < 600) {
+        if (gpsLabel) gpsLabel.textContent = 'GPS';
+        if (cidadeLabel) {
+            cidadeLabel.classList.remove('tela-muito-pequena');
+            cidadeLabel.classList.add('modo-app');
+            cidadeLabel.classList.remove('modo-site');
+        }
+    } else {
+        if (gpsLabel) gpsLabel.textContent = 'GPS';
+        if (cidadeLabel) {
+            cidadeLabel.classList.remove('tela-muito-pequena', 'modo-app');
+            cidadeLabel.classList.add('modo-site');
+        }
+    }
+}
+
+
 //=====================================
 // FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
 //=====================================
-async function atualizarCidade(lat, lng){
-
+async function atualizarCidade(lat, lng) {
     try {
 
+        if (
+            lat == null ||
+            lng == null ||
+            isNaN(lat) ||
+            isNaN(lng)
+        ) {
+            console.warn("[Radar X9] Coordenadas inválidas para atualizar cidade:", lat, lng);
+            return;
+        }
+
         const resposta = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
         );
 
+        if (!resposta.ok) {
+            console.warn(
+                "[Radar X9] Nominatim respondeu:",
+                resposta.status
+            );
+            return;
+        }
+
         const dados = await resposta.json();
+
+        if (!dados.address) {
+            console.warn("[Radar X9] Nominatim não retornou endereço:", dados);
+            return;
+        }
 
         const cidade =
             dados.address.city ||
@@ -2333,38 +4088,23 @@ async function atualizarCidade(lat, lng){
             dados.address.municipality ||
             dados.address.village;
 
-
-        if(cidade && cidade !== ultimaCidade){
-
+        if (cidade && cidade !== ultimaCidade) {
 
             ultimaCidade = cidade;
 
-           document.getElementById("nomeCidade").textContent = 
-    "🚩 " + cidade;
+            const nomeEl = document.getElementById("nomeCidade");
 
-            cidadeLabel.style.color =
-                corCidade(cidade);
-
-            cidadeLabel.classList.add("mudou");
-
-            setTimeout(()=>{
-                cidadeLabel.classList.remove("mudou");
-            },400);
-            
-            // Exemplo de como evitar o erro quebrando a página:
-          
-            if (data && data.address && data.address.city) {
-           console.log("Cidade:", data.address.city);
-         } else {
-           console.log("Não foi possível encontrar a cidade.");
-           }
-
+            if (nomeEl) {
+                nomeEl.textContent = "📍" + cidade;
+                nomeEl.style.color = corCidade(cidade);
+            }
         }
 
-    } catch(e){
-        console.log("Erro cidade:",e);
+    } catch (e) {
+        console.log("Erro cidade:", e);
     }
 }
+
 //=========================
 // MUDANÇA DA COR DA CIDADE
 //=========================
@@ -2385,67 +4125,263 @@ function corCidade(nome){
     return `hsl(${hue},100%,68%)`;
 }
 
-navigator.geolocation.getCurrentPosition(async(pos)=>{
+navigator.geolocation.getCurrentPosition(async(pos) => {
 
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
 
-    await atualizarCidade();
-
+    await atualizarCidade(userLat, userLng);''
     await atualizarTemperatura();
 
 });
 
-
-//============================================
-// FUNÇÃO ATUALIZAR TEMPERATURA E UMIDADE LOCAL
-//============================================
-
+// =============================================
+// ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
+// =============================================
 async function atualizarTemperatura() {
-
     if (!userLat || !userLng) return;
 
-    try{
-        // COLOQUE SUA CHAVE DA OPENWEATHERMAP ABAIXO (Substitua o texto)
-        const API_KEY = 'a5c507ef270b147035538e0d6019bce1'; 
+    try {
+        const API_KEY = 'a5c507ef270b147035538e0d6019bce1';
         
-        // units=metric garante que venha em Celsius. lang=pt_br traz as descrições em português.
-        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
-
-        const resposta = await fetch(url);
+        // ==========================================
+        // 1. BUSCA DADOS DE CLIMA
+        // ==========================================
+        const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
+        const respostaClima = await fetch(urlClima);
         
-        // Se a chave estiver errada ou expirada, vai cair no catch
-        if (!resposta.ok) throw new Error('Erro na API de clima: ' + resposta.status);
+        if (!respostaClima.ok) throw new Error('Erro na API de clima: ' + respostaClima.status);
+        const dadosClima = await respostaClima.json();
 
-        const dados = await resposta.json();
+        const temperatura = dadosClima.main.temp;
+        const umidade = dadosClima.main.humidity;
 
-        // A OpenWeatherMap organiza temperatura e umidade dentro de "main"
-        const temperatura = dados.main.temp;
-        const umidade = dados.main.humidity;
-
-        // Atualiza o HTML (Mantive o emoji do termômetro que ajustamos antes)
-        document.getElementById("temperaturaAtual").textContent = temperatura.toFixed(1) + "°C";
+        // ==========================================
+        // DETECTA SE É MOBILE
+        // ==========================================
+        const isMobile = window.innerWidth <= 600;
         
-       
-        // Verifica se a umidade veio da API
-        console.log("Umidade recebida da API:", umidade); // Isso vai mostrar no inspetor o que a API mandou
-
-       if (umidade !== undefined && umidade !== null) {
-    document.getElementById('umidadeAtual').textContent = umidade + '%';
-    
-       } else {
-    document.getElementById('umidadeAtual').textContent = 'N/A';
-    console.warn("A API não retornou o valor de umidade.");
-}
-        posicionarTemperatura(temperatura);
+        // ==========================================
+        // ATUALIZA TEMPERATURA
+        // ==========================================
+        const tempEl = document.getElementById('temperaturaAtual');
+        if (tempEl) {
+            const valorTemp = temperatura.toFixed(1) + '°C';
+            if (isMobile) {
+                // APP: apenas o valor "26.9°C"
+                tempEl.textContent = valorTemp;
+            } else {
+                // SITE: "Temperatura 26.9°C"
+                tempEl.textContent = 'Temperatura ' + valorTemp;
+            }
+            tempEl.style.color = '#ffffff';
+        }
         
-        // Chama a verificação de alerta de clima
-        verificarAlertasClima();
+        // ==========================================
+        // ATUALIZA UMIDADE
+        // ==========================================
+        const umidEl = document.getElementById('umidadeAtual');
+        if (umidEl) {
+            let valorUmid = (umidade !== undefined && umidade !== null) ? umidade + '%' : '--%';
+            if (isMobile) {
+                // APP: apenas o valor "40%"
+                umidEl.textContent = valorUmid;
+            } else {
+                // SITE: "Umidade 40%"
+                umidEl.textContent = 'Umidade ' + valorUmid;
+            }
+            umidEl.style.color = '#ffffff';
+        }
 
-    }catch(e){
+        // ==========================================
+        // 2. BUSCA POLUIÇÃO DO AR
+        // ==========================================
+        try {
+            const urlPoluicao = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${userLat}&lon=${userLng}&appid=${API_KEY}`;
+            const respostaPoluicao = await fetch(urlPoluicao);
+            
+            if (respostaPoluicao.ok) {
+                const dadosPoluicao = await respostaPoluicao.json();
+                const aqi = dadosPoluicao.list[0].main.aqi;
+                
+                const componentes = dadosPoluicao.list[0].components;
+                const pm25 = componentes.pm2_5 ? Math.round(componentes.pm2_5) : null;
+                const pm10 = componentes.pm10 ? Math.round(componentes.pm10) : null;
+                let valorPoluicao = pm25 || pm10 || 0;
+                
+                const mapaAQI = {
+                    1: { texto: 'Bom', cor: '#00cc66' },
+                    2: { texto: 'Moderado', cor: '#ffcc00' },
+                    3: { texto: 'Ruim', cor: '#ff8800' },
+                    4: { texto: 'Péssimo', cor: '#ff4444' },
+                    5: { texto: 'Insalubre', cor: '#cc0000' }
+                };
+                
+                const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
+                const poluEl = document.getElementById('poluicaoAtual');
+                
+                if (poluEl) {
+                    let valorPol =  '';
+                    if (valorPoluicao > 0) {
+                        valorPol = infoPoluicao.texto + ' ' + valorPoluicao;
+                    } else {
+                        valorPol = infoPoluicao.texto;
+                    }
+                    
+                    if (isMobile) {
+                        // APP: apenas o valor "Moderada 6"
+                        poluEl.textContent = valorPol;
+                    } else {
+                        // SITE: "Poluição Moderada 6"
+                        poluEl.textContent = ' Poluição' + valorPol;
+                    }
+                    poluEl.style.color = infoPoluicao.cor;
+                }
+                
+                verificarAlertaPoluicao(aqi);
+            } else {
+                const poluEl = document.getElementById('poluicaoAtual');
+                if (poluEl) {
+                    if (isMobile) {
+                        poluEl.textContent = 'N/A';
+                    } else {
+                        poluEl.textContent = 'Poluição N/A';
+                    }
+                    poluEl.style.color = '#888';
+                }
+            }
+        } catch (e) {
+            console.warn('Erro ao buscar poluição:', e);
+            const poluEl = document.getElementById('poluicaoAtual');
+            if (poluEl) {
+                if (isMobile) {
+                    poluEl.textContent = 'N/A';
+                } else {
+                    poluEl.textContent = 'Poluição N/A';
+                }
+                poluEl.style.color = '#888';
+            }
+        }
+
+        // ==========================================
+        // 3. VERIFICA ALERTAS
+        // ==========================================
+        verificarAlertasClima(temperatura, umidade);
+        verificarClimaNormal(temperatura, umidade);
+
+    } catch(e) {
         console.error("Erro clima:", e);
     }
+}
 
+// =============================================
+// VERIFICAR ALERTA DE POLUIÇÃO
+// =============================================
+function verificarAlertaPoluicao(aqi) {
+    const alertaDiv = document.getElementById('alerta-sound-clima');
+    
+    // Se não tem alerta de clima ativo, pode mostrar o de poluição
+    if (alertaDiv.style.display === 'none' || alertaDiv.style.display === '') {
+        if (aqi >= 4) { // Muito Ruim ou Péssima
+            alertaDiv.style.display = 'flex';
+            alertaDiv.className = 'alerta-clima-label alerta-poluicao';
+            
+            // SEM EMOJIS
+            const textoAlerta = aqi >= 5 ? 'ATENÇÃO: Qualidade do Ar PÉSSIMA!' : 'ATENÇÃO: Qualidade do Ar MUITO RUIM!';
+            alertaDiv.innerHTML = `🌫️ ${textoAlerta}`;
+            alertaDiv.classList.add('alerta-poluicao');
+            
+            // Toca som de alerta
+            if (alertaAtivoAtual !== 'poluicao') {
+                somAlerta.play().catch(e => console.log("Aguardando interação..."));
+                alertaAtivoAtual = 'poluicao';
+            }
+        } else {
+            // Remove alerta de poluição se o AQI melhorou
+            if (alertaAtivoAtual === 'poluicao') {
+                alertaDiv.style.display = 'none';
+                alertaAtivoAtual = '';
+            }
+        }
+    }
+}
+
+
+
+// =============================================
+// VERIFICAR SE O CLIMA ESTÁ NORMAL (ALERTA POSITIVO)
+// =============================================
+function verificarClimaNormal(temp, umid) {
+    const alertaNormalDiv = document.getElementById('alerta-normalidade');
+    const alertaClimaDiv = document.getElementById('alerta-sound-clima');
+    
+    // Verifica se NÃO há alertas ativos
+    const semAlertas = 
+        !(temp >= 40 || temp <= 5 || umid <= 20);
+    
+    // Verifica se a poluição está boa (AQI 1 ou 2) - SEM EMOJIS
+    const poluicaoEl = document.getElementById('poluicaoAtual');
+    const textoPoluicao = poluicaoEl.textContent;
+    const poluicaoBoa = textoPoluicao.includes('Boa') || textoPoluicao.includes('Moderada');
+    
+    // Se o clima está normal E a poluição está boa E NÃO há alertas de clima
+    if (semAlertas && poluicaoBoa && alertaClimaDiv.style.display !== 'flex') {
+        
+        // Só mostra se ainda NÃO foi mostrado nesta sessão
+        if (!alertaNormalidadeMostrado) {
+            alertaNormalDiv.style.display = 'flex';
+            alertaNormalDiv.innerHTML = '✅ Clima normal. Aproveite!';
+            
+            // Toca o beep ao aparecer
+            tocarBeepNormalidade();
+            
+            // Marca como já mostrado
+            alertaNormalidadeMostrado = true;
+            
+            // Mostra por 8 segundos e depois some
+            setTimeout(() => {
+                alertaNormalDiv.style.display = 'none';
+            }, 8000);
+        }
+    } else {
+        // Esconde o alerta de normalidade se houver alertas ativos
+        if (alertaClimaDiv.style.display === 'flex') {
+            alertaNormalDiv.style.display = 'none';
+        }
+    }
+}
+
+// =============================================
+// BEEP DE NORMALIDADE (som suave e agradável)
+// =============================================
+function tocarBeepNormalidade() {
+    try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Toca duas notas suaves (C5 e E5)
+        var notas = [523, 659]; // C5 e E5
+        var duracao = 0.15;
+        
+        notas.forEach(function(freq, index) {
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + (index * 0.2));
+            
+            gain.gain.setValueAtTime(0.15, ctx.currentTime + (index * 0.2));
+            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + (index * 0.2) + duracao);
+            
+            osc.start(ctx.currentTime + (index * 0.2));
+            osc.stop(ctx.currentTime + (index * 0.2) + duracao);
+        });
+        
+        console.log('🔔 Beep de normalidade tocado');
+    } catch(e) {
+        console.warn('Beep de normalidade falhou:', e);
+    }
 }
 //=====================================
 // FUNÇÃO POSIONAR TEMPERATURA LOCAL
@@ -2467,26 +4403,27 @@ function posicionarTemperatura(temp){
 
 }
 
- // =======================================================
+
+
+// =======================================================
 // SISTEMA DE ALERTA DE CLIMA (Umidade e Temperatura)
 // =======================================================
 
-// Configuração do Som (Coloque o caminho do seu arquivo de áudio aqui)
-const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3'); // <-- Troque 'alerta.mp3' pelo som que você quer
+const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3');
 somAlerta.volume = 0.5;
 
-let alertaAtivoAtual = ''; // Evita que o som toque em loop
+let alertaAtivoAtual = '';
 
-function verificarAlertasClima() {
-    // Pega os valores que JÁ ESTÃO na tela (colocados pelo seu código de API)
-    const tempTexto = document.getElementById('temperaturaAtual').textContent;
-    const umidTexto = document.getElementById('umidadeAtual').textContent;
+
+function verificarAlertasClima(temp, umid) {
+    // Se os parâmetros não foram passados, busca do DOM
+    if (temp === undefined || umid === undefined) {
+        const tempTexto = document.getElementById('temperaturaAtual').textContent;
+        const umidTexto = document.getElementById('umidadeAtual').textContent;
+        temp = parseFloat(tempTexto.replace(/[^0-9.-]/g, ''));
+        umid = parseFloat(umidTexto.replace(/[^0-9.-]/g, ''));
+    }
     
-    // Extrai apenas os números (removendo °C, %, emojis, etc)
-    const temp = parseFloat(tempTexto.replace(/[^0-9.-]/g, ''));
-    const umid = parseFloat(umidTexto.replace(/[^0-9.-]/g, ''));
-    
-    // Se não conseguir ler números, sai da função
     if (isNaN(temp) || isNaN(umid)) return;
 
     const alertaDiv = document.getElementById('alerta-sound-clima');
@@ -2495,37 +4432,38 @@ function verificarAlertasClima() {
     // Limpa classes anteriores
     alertaDiv.className = 'alerta-clima-label';
 
-    // Condição 1: Calor Extremo (Acima de 40°C - ajuste o valor como achar melhor)
+    // Condição 1: Calor Extremo (Acima de 40°C)
     if (temp >= 40) {
         novoAlerta = 'quente';
         alertaDiv.innerHTML = '🔥 ALERTA: Temperatura Extrema!';
         alertaDiv.classList.add('alerta-quente');
     } 
-    // Condição 2: Frio Extremo (Abaixo de 5°C - ajuste o valor como achar melhor)
+    // Condição 2: Frio Extremo (Abaixo de 5°C)
     else if (temp <= 5) {
         novoAlerta = 'frio';
         alertaDiv.innerHTML = '❄️ ALERTA: Frio Extremo!';
         alertaDiv.classList.add('alerta-frio');
     } 
-    // Condição 3: Umidade Baixa (Abaixo de 20% - ajuste o valor como achar melhor)
+    // Condição 3: Umidade Baixa (Abaixo de 20%)
     else if (umid <= 20) {
         novoAlerta = 'seco';
         alertaDiv.innerHTML = '🏜️ ATENÇÃO: Umidade do Ar Baixa!';
         alertaDiv.classList.add('alerta-seco');
+    } else {
+        // Se não há alertas, esconde o alerta
+        alertaDiv.style.display = 'none';
+        alertaAtivoAtual = '';
+        return;
     }
 
     // Mostra o alerta e toca o som
     if (novoAlerta !== '') {
         alertaDiv.style.display = 'flex';
         
-        // Toca o som apenas UMA VEZ quando o alerta aparece (não fica tocando sem parar)
         if (novoAlerta !== alertaAtivoAtual) {
-            somAlerta.play().catch(e => console.log("Aguardando interação do usuário para tocar o som."));
+            somAlerta.play().catch(e => console.log("Aguardando interação..."));
             alertaAtivoAtual = novoAlerta;
         }
-    } else {
-        alertaDiv.style.display = 'none';
-        alertaAtivoAtual = ''; // Reseta se o clima estiver normal
     }
 }
 
@@ -2562,6 +4500,9 @@ function normalizarTexto(texto) {
         .trim();
 }
 
+// =============================================
+// CLASSIFICAÇÃO DE AUDIO ALERTAS
+// =============================================
 function classificarAlerta(tipoOriginal) {
     var tipoNorm = normalizarTexto(tipoOriginal);
 
@@ -2577,7 +4518,12 @@ function classificarAlerta(tipoOriginal) {
 
     for (var m = 0; m < TIPOS_ALERTA_MOBILIDADE.length; m++) {
         if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_MOBILIDADE[m]))) return 'mobilidade';
+        
     }
+
+    for (var rr = 0; rr < TIPOS_ALERTA_SERVIÇO.length; rr++) {
+    if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_SERVIÇO[rr]))) return 'servico';
+}
 
     for (var rr = 0; rr < TIPOS_ALERTA_RADAR.length; rr++) {
         if (tipoNorm.includes(normalizarTexto(TIPOS_ALERTA_RADAR[rr]))) return 'radar';
@@ -2610,16 +4556,22 @@ function dispararAlerta(radarData, distancia) {
     var $title = $("#alert-title");
     var $text = $("#alert-text");
 
-    $bar.removeClass('alert-bar-radar alert-bar-risco alert-bar-mobilidade alert-bar-destaque ' +
-                      'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico');
+    $bar.removeClass('alert-bar-radar alert-bar-risco alert-bar-mobilidade alert-bar-destaque alert-bar-servico ' +
+                  'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico alert-bar-servico-critico');
     $bar.addClass('alert-bar-' + tipo);
 
     var tipoExibicao = ajusteNomes[radarData.tipoOriginal] || radarData.tipoOriginal;
     $icon.attr('src', getIconUrl(radarData.tipoOriginal, radarData.velocidade_maxima));
 
-    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO DE MOBILIDADE', destaque: 'DESCUBRA A CIDADE' };
+    var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO MOBILIDADE', destaque: 'DESCUBRA A CIDADE', servico: 'REDE DE SERVIÇOS' };
     $title.text(titulos[tipo] || 'ATENÇÃO!');
-    $text.text(tipoExibicao + ' — ' + Math.round(distancia) + 'm');
+ 
+   /* ── TEXTO ÚNICO: tipo + velocidade + distância ── */
+      var vel = radarData.velocidade_maxima || '';
+    var base = tipoExibicao + (vel ? ' — ' + vel + ' km' : '');
+    $text.data('alert-base', base);               // guarda a base completa
+    $text.text(base + ' - ' + Math.round(distancia) + ' m');
+    /* ─────────────────────────────────────────────── */
 
     if (distancia <= ALERT_CONFIG.DISTANCIA_CRITICA) {
         $bar.addClass('alert-bar-' + tipo + '-critico');
@@ -2639,8 +4591,10 @@ function dispararAlerta(radarData, distancia) {
 // ===================================================================
 function atualizarDistanciaAlerta(distancia) {
     var $text = $("#alert-text");
-    var base = $text.text().split(' — ')[0];
-    $text.text(base + ' — ' + Math.round(distancia) + 'm');
+    /* pega tudo antes do " - " final (preserva "tipo — 60 km") */
+    var base = $text.data('alert-base') || $text.text().split(' - ')[0];
+    $text.text(base + ' - ' + Math.round(distancia) + ' m');
+    
 
     if (alertTimeout) clearTimeout(alertTimeout);
     alertTimeout = setTimeout(function () { esconderAlertaVisual(); }, ALERT_CONFIG.TEMPO_ALERTA);
@@ -2667,7 +4621,7 @@ function esconderAlertaVisual() {
 
     $("#alert-container").fadeOut(200, function () {
         $(this).find(".alert-bar").removeClass(
-            'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico'
+            'alert-bar-critico alert-bar-risco-critico alert-bar-mobilidade-critico alert-bar-destaque-critico alert-bar-servico-critico'
         );
     });
     ajustarPosicaoSpeedWidget(false);
@@ -2683,8 +4637,9 @@ function esconderAlertaVisual() {
 //======================================
 // Nova variável — controla APENAS o som
 //======================================
-var somAlertaHabilitado = true;
 
+
+var somAlertaHabilitado = true;
 //=====================================
 // FUNÇÃO VERIFICAR PROXIMIDADE RADARES (sem depender de alertaHabilitado)
 //=====================================
@@ -2722,6 +4677,7 @@ function inicializarBotaoAlertaToggle() {
 
     alertBtn.addEventListener('click', function () {
         somAlertaHabilitado = !somAlertaHabilitado;
+        alertaHabilitado = somAlertaHabilitado; // Mantém compatibilidade
 
         if (somAlertaHabilitado) {
             alertBtn.classList.remove('alert-off');
@@ -2841,6 +4797,16 @@ function _tocarBeep(ctx, tipoAlerta) {
         gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.3);
+    }
+        else if (tipoAlerta === 'servico') {
+        // Som de silêncio específico para SERVICO (Mais agudo e contínuo)
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(1000, ctx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
 
     } else {
         // Som de silêncio padrão para RADAR
@@ -2898,6 +4864,8 @@ function desbloquearAudioMobile() {
     document.addEventListener(evt, desbloquearAudioMobile, { once: false, passive: true });
 });
 
+
+//===================================
 // ==================================
 // DESBLOQUEIO DOS  AUDIOS DE ALERTA 
 // ==================================
@@ -2905,7 +4873,7 @@ var _alertSoundsDesbloqueados = false;
 
 
 function desbloquearAudiosDeAlerta() {
-    var ids = ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'];
+    var ids = ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque', 'alert-sound-servico'];
     var algumDesbloqueado = false;
 
     ids.forEach(function(id) {
@@ -2947,7 +4915,7 @@ var contagemTocarSom = 0;
 function cancelarSequenciaSom() {
     _sequenciaSomId++;
     _alertaPrincipalEstaTocando = false;
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque', 'alert-sound-servico'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el && _soundListeners[id]) {
             el.removeEventListener('ended', _soundListeners[id]);
@@ -2961,7 +4929,7 @@ function cancelarSequenciaSom() {
 function pararTodosSons() {
     cancelarSequenciaSom();
     _alertaPrincipalEstaTocando = false; // ← ADICIONAR ISSO
-    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque'].forEach(function(id) {
+    ['alert-sound-radar', 'alert-sound-risco', 'alert-sound-aviso', 'alert-sound-destaque', 'alert-sound-servico'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el) {
             el.pause();
@@ -2992,6 +4960,7 @@ function tocarSomAlerta(tipoAlerta) {
     if (tipoAlerta === 'risco')      soundId = 'alert-sound-risco';
     else if (tipoAlerta === 'mobilidade') soundId = 'alert-sound-aviso';
     else if (tipoAlerta === 'destaque') soundId = 'alert-sound-destaque';
+    else if (tipoAlerta === 'servico') soundId = 'alert-sound-servico';
 
     var sound = document.getElementById(soundId)
              || document.getElementById('alert-sound-radar');
@@ -3178,40 +5147,73 @@ async function initMap() {
         showNotification("Erro de conexão. Os mapas não puderam carregar."); 
         return; 
     }
-    
-    map = L.map('map', { center: [userLat, userLng], zoom: 17, zoomControl: false, rotate: true, bearing: 0 });
+
+    // No seu código HTML
+    function updateMap(lat, lon) {
+    // Atualiza o mapa aqui
+    console.log("Nova localização:", lat, lon);
+
+}
+    //=============================
+    // CONFIGURAÇÃO INICIAL DO MAPA
+    //=============================
+    map = L.map('map', {
+     center: [userLat, userLng],
+      zoom: 18,
+       zoomControl: false,
+        rotate: true,
+         bearing: 0 });
     if (typeof map.setBearing !== 'function') console.warn('[Radar X9] AVISO: leaflet-rotate pode não ter carregado.');
     aplicarTemaMapa();
     setInterval(aplicarTemaMapa, 300000);
     inicializarBussolaHardware();
 
-   // ==========================
+// ==========================
 // RECENTRALIZAR MAPA
 // ==========================
 
 let mapaCentralizado = true;
+let recentragemTimeout = null; // timer da recentragem automática
 
 const speedWidget = document.getElementById("speedWidget");
 const speedIcon = document.getElementById("speedIcon");
 
-// Função chamada APENAS quando o usuário arrasta o mapa com o mouse ou dedo
+// Função chamada quando o usuário arrasta o mapa com o mouse ou dedo
 function desativarCentralizacao(){
-    // Se o mapa já não está centralizado, não faz nada (evita processamento à toa)
-    if(!mapaCentralizado) return;
+    if (mapaCentralizado) {
+        console.log("ARRASTOU O MAPA - Desativando centralização");
+        mapaCentralizado = false;
 
-    console.log("ARRASTOU O MAPA - Desativando centralização");
-    mapaCentralizado = false;
+        // Troca o ícone para o botão de recentralizar
+        speedIcon.src = "/imagens_app/ic_recentralizar.png";
 
-    // Troca o ícone para o botão de recentralizar
-    speedIcon.src = "/imagens_app/ic_recentralizar.png";
-    
-    // Adiciona a classe visual (caso tenha animação de pulse no CSS)
-    speedWidget.classList.add("recentralizar");
+        // Adiciona a classe visual (caso tenha animação de pulse no CSS)
+        speedWidget.classList.add("recentralizar");
+    }
+
+    // Toda vez que o usuário arrasta, (re)inicia a contagem dos 5s.
+    // Se ele arrastar de novo antes do tempo acabar, o timer reinicia.
+    agendarRecentragemAutomatica();
 }
 
-// Função chamada quando o usuário clica no botão para voltar para o GPS
+// Agenda a recentralização automática após 5s sem novo arraste
+function agendarRecentragemAutomatica(){
+    if (recentragemTimeout) clearTimeout(recentragemTimeout);
+
+    recentragemTimeout = setTimeout(function () {
+        recentralizarMapa();
+    }, 10000);
+}
+
+// Função chamada quando o usuário clica no botão OU quando o timer de 5s dispara
 function recentralizarMapa(){
-    if(mapaCentralizado) return; // Já está centralizado, não faz nada
+    if (mapaCentralizado) return; // Já está centralizado, não faz nada
+
+    // Cancela qualquer timer pendente (evita chamada dupla se o botão for clicado antes do timeout)
+    if (recentragemTimeout) {
+        clearTimeout(recentragemTimeout);
+        recentragemTimeout = null;
+    }
 
     console.log("RECENTRALIZANDO MAPA");
     mapaCentralizado = true;
@@ -3228,24 +5230,21 @@ function recentralizarMapa(){
 
     // Troca o ícone de volta para o padrão
     speedIcon.src = "/imagens_app/ic_speed_limit.png";
-    
+
     // Remove a classe visual
     speedWidget.classList.remove("recentralizar");
 }
 
 // ==========================================
-// EVENTOS DO LEAFLT (APENAS ARRASTAR)
+// EVENTOS DO LEAFLET (APENAS ARRASTAR)
 // ==========================================
 
 // O usuário ARRASTOU o mapa com mouse ou toque
 map.on("dragstart", desativarCentralizacao);
 
-// (Removido: zoomstart e movestart para o ícone não ficar mudando sem querer)
-// (Removido: Lógica de retorno automático com setTimeout para respeitar o botão)
-
 // Clique no botão de recentralizar
 speedWidget.addEventListener("click", () => {
-    if(!mapaCentralizado){
+    if (!mapaCentralizado) {
         recentralizarMapa();
     }
 });
@@ -3254,27 +5253,134 @@ speedWidget.addEventListener("click", () => {
     // Configurar eventos dos botões
     //==============================
 
-    $("#btn-calc-route").click(async function() {
-        var endereco = $("#route-query").val().trim();
-        if (endereco.length < 5) { showNotification("Digite um endereço válido."); return; }
-        $("#loading").show().html("<div class='loading-spinner'></div><div>Calculando rota...</div>");
-        var coords = await buscarCoordenadas(endereco);
-        if (coords) { esconderAlertaVisual(); criarRota(coords.lat, coords.lng); }
-        else { $("#loading").hide(); showNotification("Endereço não encontrado."); }
-    });
+// ========================================
+// OCULTAR BÚSSOLA NATIVA DO LEAFLET
+// ========================================
 
-    $("#route-query").keypress(function(e) { if (e.which == 13) $("#btn-calc-route").click(); });
+// ========================================
+// OCULTAR BÚSSOLA NATIVA DO LEAFLET
+// ========================================
 
-    function fecharTodasBarras() { 
-        searchActive = false; 
-        routeActive = false; 
-        document.getElementById('search-bar-radares').classList.remove('active'); 
-        document.getElementById('search-bar-rota').classList.remove('active'); 
-        ajustarBussolaParaBusca(false);
+// ========================================
+// OCULTAR BÚSSOLA NATIVA DO LEAFLET
+// ========================================
+
+function ocultarBussolaLeaflet() {
+    $(".leaflet-control-compass").css("display", "none");
+}
+
+// Executa após o carregamento
+setTimeout(ocultarBussolaLeaflet, 100);
+
+// Reforça depois
+setTimeout(ocultarBussolaLeaflet, 500);
+setTimeout(ocultarBussolaLeaflet, 1000);
+
+ocultarBussolaLeaflet();
+
+//============================
+// BOTÃO DE CRIAÇÃO DE ROTA
+//============================
+// Variáveis globais
+var gpsActive = true;        // Controla o GPS
+var routeSearchActive = false; // Controla a barra de pesquisa
+
+//============================
+// BOTÃO DE CRIAÇÃO DE ROTA
+//============================
+
+$("#btn-calc-route").click(async function() {
+
+    var endereco = $("#route-query").val().trim();
+
+    if (endereco.length < 5) {
+        showNotification("Digite um endereço válido.");
+        return;
     }
 
-    $("#btn-search-radar").click(function() { buscarRadares($("#query").val()); });
-    $("#query").keypress(function(e) { if (e.which == 13) buscarRadares($("#query").val()); });
+    $("#loading").show().html(
+        "<div class='loading-spinner'></div><div>Calculando rota...</div>"
+    );
+
+    var coords = await buscarCoordenadas(endereco);
+
+    if (coords) {
+
+        esconderAlertaVisual();
+
+        // Recolhe a barra de pesquisa de rota (NÃO afeta o GPS)
+        routeSearchActive = false;  // ← variável separada
+        $("#search-bar-rota").removeClass("active");
+
+        // Retira o foco do campo
+        $("#route-query").blur();
+
+        // MOSTRA AS INFORMAÇÕES DA ROTA
+        $("#nav-info").css("display", "flex");
+
+        // Cria a rota
+        criarRota(coords.lat, coords.lng);
+
+    } else {
+
+        $("#loading").hide();
+        showNotification("Endereço não encontrado.");
+    }
+});
+
+//============================
+// ENTER = CRIAR ROTA
+//============================
+
+$("#route-query").keypress(function(e) {
+    if (e.which == 13) {
+        // Executa o cálculo da rota
+        $("#btn-calc-route").click();
+    }
+});
+
+
+    //=======================
+    //FECHAR TODAS AS BARRAS
+    //======================
+
+   function fecharTodasBarras() {
+
+    searchActive = false;
+    routeActive = false;
+
+    var barraRadar =
+        document.getElementById('search-bar-radares');
+
+    var barraRota =
+        document.getElementById('search-bar-rota');
+
+    if (barraRadar) {
+        barraRadar.classList.remove('active');
+    }
+
+    if (barraRota) {
+        barraRota.classList.remove('active');
+    }
+
+    ajustarBussolaParaBusca(false);
+}
+
+//==========================
+//BOTÃO DE BUSCA RADAR BARRA
+//==========================
+    $("#btn-search-radar").click(function() { 
+        buscarRadares(            
+            $("#query").val()); 
+            $("#nav-info").css("display", "none");
+        });
+
+    $("#query").keypress(function(e) { 
+        if (e.which == 13) buscarRadares(
+            $("#query").val()); 
+            
+        });
+
 
     $("#btn-search-bar").click(function() {
         if (searchActive) { 
@@ -3290,32 +5396,208 @@ speedWidget.addEventListener("click", () => {
         ajustarBussolaParaBusca(true);
     });
     
+  //====================
+//BOTÃO LATERAL DE ROTA
+//=====================
+
     $("#btn-route-bar").click(function() {
-        if (routeActive) { 
-            fecharTodasBarras(); 
-            return; 
-        }
-        if (searchActive) searchActive = false; 
-        routeActive = true;
-        $("#search-bar-radares").removeClass('active'); 
-        $("#search-bar-rota").addClass('active');
-        if (!sidebarAberta) { sidebarAberta = true; document.getElementById('sidebar-controls').classList.remove('retracted'); document.getElementById('btn-menu-toggle').classList.remove('active'); }
-        setTimeout(function() { $("#route-query").focus(); }, 300);
-        ajustarBussolaParaBusca(true);
+
+    if (routeActive) {
+        fecharTodasBarras();
+        return;
+    }
+
+    if (searchActive) {
+        searchActive = false;
+    }
+
+    routeActive = true;
+
+    $("#search-bar-radares").removeClass("active");
+    $("#search-bar-rota").addClass("active");
+
+    if (!sidebarAberta) {
+        sidebarAberta = true;
+
+        document
+            .getElementById('sidebar-controls')
+            .classList.remove('retracted');
+
+        document
+            .getElementById('btn-menu-toggle')
+            .classList.remove('active');
+    }
+
+    setTimeout(function() {
+        $("#route-query").focus();
+    }, 300);
+
+    ajustarBussolaParaBusca(true);
+});
+
+//===================================================================================
+// BOTÃO CENTRALIZAR = CENTRALIZA + MOSTRA GPS MARKER + DEPOIS MUDA PARA NAVIGATOR MAP
+//====================================================================================
+$("#btn-center").click(function() {
+
+    fecharTodasBarras();
+    isFollowing = true;
+
+    if (!userMarker) {
+        showNotification("Aguardando sinal GPS...");
+        return;
+    }
+    $("#nav-info").css("display", "none");
+    // Centraliza o mapa na posição atual
+    map.flyTo(userMarker.getLatLng(), 18, {
+        duration: 0.5
     });
 
-    $("#btn-center").click(function() {
-        fecharTodasBarras(); isFollowing = true;
-        var marcadorAtivo = estaEmNavegacao ? startRouteMarker : userMarker;
-        if (marcadorAtivo) { map.flyTo(marcadorAtivo.getLatLng(), 17, { duration: 0.5 }); showNotification("Centralizando na sua posição"); }
-        else showNotification("Aguardando sinal GPS...");
-    });
+    showNotification("Centralizando na sua posição");
 
-    $("#btn-refresh").click(function() { resetarMapa(); carregarRadares(); });
+
+    //==============================================================
+    // REMOVE E RECRIA O MARCADOR COM GPS MARKER
+    //==============================================================
+    if (!estaEmNavegacao && userMarker) {
+
+        // Guarda a posição atual
+        var pos = userMarker.getLatLng();
+
+        // Remove marcador atual
+        map.removeLayer(userMarker);
+
+
+        //==========================================================
+        // 1º PASSO — ÍCONE GPS MARKER
+        //==========================================================
+        var gpsIcon = L.divIcon({
+            html: '<img src="/imagens_app/ic_gps_marker.png" ' +
+                  'onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" ' +
+                  'style="width:50px;height:50px;">',
+
+            className: 'user-gps-marker',
+            iconSize: [50, 50],
+            iconAnchor: [25, 50],
+            popupAnchor: [0, -50]
+        });
+
+        userMarker = L.marker(
+            [pos.lat, pos.lng],
+            {
+                icon: gpsIcon,
+                zIndexOffset: 1000
+            }
+        ).addTo(map);
+
+        userMarker.bindTooltip(
+            'Você está aqui',
+            {
+                permanent: false,
+                direction: 'top',
+                offset: [0, -25]
+            }
+        );
+
+        iconeCentralizado = true;
+
+        console.log("📍 GPS MARKER inserido");
+
+
+        //==========================================================
+        // 2º PASSO — APÓS INSERIR O GPS MARKER
+        // MUDA PARA O NAVIGATOR MAP
+        //==========================================================
+        setTimeout(function() {
+
+            // Garante que ainda existe marcador
+            if (!userMarker || estaEmNavegacao) {
+                return;
+            }
+
+            // Guarda novamente a posição
+            var posAtual = userMarker.getLatLng();
+
+            // Remove GPS MARKER
+            map.removeLayer(userMarker);
+
+            // Cria o mesmo ícone usado no REFRESH
+            var navIcon = criarIconeNavegador(false);
+
+            // Cria novamente o marcador
+            userMarker = L.marker(
+                [posAtual.lat, posAtual.lng],
+                {
+                    icon: navIcon,
+                    zIndexOffset: 1000
+                }
+            ).addTo(map);
+
+            userMarker.bindTooltip(
+                'Você está aqui',
+                {
+                    permanent: false,
+                    direction: 'top',
+                    offset: [0, -25]
+                }
+            );
+
+            // Mesmo comportamento do REFRESH
+            iconeCentralizado = false;
+
+            console.log("🧭 GPS MARKER → NAVIGATOR MAP");
+
+        }, 600); // tempo para o GPS MARKER aparecer antes da troca
+    }
+});
+
+     //==============
+    // BOTÃO REFRESH
+    //=============== 
+$("#btn-refresh").click(function() { 
+    resetarMapa(); 
+    carregarRadares(); 
+    $("#nav-info").css("display", "none");
+    
+    // RESETA O ALERTA DE NORMALIDADE PARA APARECER NO REFRESH
+    alertaNormalidadeMostrado = false;
+    
+    // REMOVE E RECRIA O MARCADOR COM ÍCONE DE NAVEGADOR
+    if (!estaEmNavegacao && userMarker) {
+        // Guarda a posição atual
+        var pos = userMarker.getLatLng();
+        
+        // Remove o marcador antigo
+        map.removeLayer(userMarker);
+        
+        //marcador com o ícone de navegador pulsante
+        var navIcon = criarIconeNavegador(false);
+        
+        userMarker = L.marker([pos.lat, pos.lng], { 
+            icon: navIcon, 
+            zIndexOffset: 1000 
+        }).addTo(map);
+        userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+        
+        iconeCentralizado = false;
+        console.log("🔄 Ícone voltou para NAVIGATOR MAP (refresh)");
+    }
+
+    //=====================================================
+    // Força a verificação do clima novamente após o refresh
+    //======================================================
+    setTimeout(() => {
+        atualizarTemperatura();
+    }, 1000);
+});
+    
+    
     $("#btn-zoom-in").click(function() { if (map) map.zoomIn(); });
     $("#btn-zoom-out").click(function() { if (map) map.zoomOut(); });
     
     
+
+
 // ===================================================================
 // INICIALIÇÃO GERAL E CARREGAMENTOS DE FUNÇÕES
 // ===================================================================
@@ -3329,8 +5611,53 @@ speedWidget.addEventListener("click", () => {
     console.log('[Radar X9] ✅ Aplicação inicializada com sucesso!');
 }
 
+
+
+// ============================================================
+// MOSTRAR INFORMAÇÕES DA NAVEGAÇÃO
+// ============================================================
+function mostrarInfoNavegacao(distancia, tempo) {
+    var painel = document.getElementById('nav-info');
+    var distanciaEl = document.getElementById('nav-distance');
+    var tempoEl = document.getElementById('nav-time');
+    var chegadaEl = document.getElementById('nav-arrival');
+
+    if (!painel || !distanciaEl || !tempoEl) {
+        console.error('[Radar X9] Elementos da navegação não encontrados');
+        return;
+    }
+
+    // Formata distância com vírgula
+    distanciaEl.textContent = '🚗 ' + String(distancia).replace('.', ',') + ' km';
+    tempoEl.textContent = tempo + ' min';
+
+    // Calcula horário previsto de chegada
+    if (chegadaEl && tempo > 0) {
+        var chegada = new Date(Date.now() + (tempo * 60 * 1000));
+        var horas = String(chegada.getHours()).padStart(2, '0');
+        var minutos = String(chegada.getMinutes()).padStart(2, '0');
+        chegadaEl.textContent = '🏁 Chegada: ' + horas + ':' + minutos;
+    }
+
+    // Torna visível
+    painel.classList.add('visible');
+    console.log('[Radar X9] Painel navegação atualizado:', distancia, 'km |', tempo, 'min');
+}
+
+// ============================================================
+// OCULTAR INFORMAÇÕES DA NAVEGAÇÃO
+// ============================================================
+function ocultarInfoNavegacao() {
+
+    var painel = document.getElementById('nav-info');
+
+    if (painel) {
+        painel.classList.remove('visible');
+    }
+}
+
 // ===================================================================
-// MODAL ADICIONAR RADAR E CAPTURA DE POSIÇÃO - CORRIGIDO
+// MODAL ADICIONAR RADAR E CAPTURA DE POSIÇÃO 
 // ===================================================================
 function openAddRadarModal() {
     document.getElementById('modal-add-radar').classList.add('active');
@@ -3352,7 +5679,7 @@ function openAddRadarModal() {
 }
 
 // ===================================================================
-// [CORREÇÃO] CAPTURAR POSIÇÃO - AGORA FUNCIONAL
+// CAPTURAR POSIÇÃO 
 // ===================================================================
 function capturarPosicaoRadar() {
     // 1. Mostra as lacunas IMEDIATAMENTE ao clicar
@@ -3704,6 +6031,60 @@ function inicializarBotaoAddRadar() {
             return null;
         }
     }
+
+
+// ===========================
+// RECEBER GPS DO APP INVENTOR
+// ===========================
+function atualizarLocalizacao(lat, lon) {
+    // Valida os dados
+    if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
+        console.warn("⚠️ Coordenadas inválidas recebidas:", lat, lon);
+        return false;
+    }
+    
+    // Evita coordenadas padrão (ex: Belo Horizonte)
+    if (lat === -19.919055 && lon === -43.938641) {
+        console.log("⏳ Coordenadas padrão, aguardando GPS real...");
+        return false;
+    }
+    
+    console.log("📡 GPS Atualizado:", lat, lon);
+    
+    // Atualiza variáveis globais
+    window.userLat = lat;
+    window.userLng = lon;
+    window.gpsInitialized = true;
+    window.ultimaAtualizacao = Date.now();
+    
+    // Atualiza UI se existir
+    const posStatus = document.getElementById('posStatus');
+    if (posStatus) {
+        posStatus.textContent = `✅ GPS: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+        posStatus.style.color = '#00ff00';
+    }
+    
+    // Atualiza campos de entrada
+    const posLat = document.getElementById('posLat');
+    const posLng = document.getElementById('posLng');
+    if (posLat) posLat.value = lat.toFixed(6);
+    if (posLng) posLng.value = lon.toFixed(6);
+    
+    // Chama a função existente
+    if (typeof atualizarPosicaoAtual === 'function') {
+        atualizarPosicaoAtual();
+    }
+    
+    // Chama outras funções se existirem
+    if (typeof obterCidade === 'function') {
+        obterCidade(lat, lon);
+    }
+    if (typeof obterClima === 'function') {
+        obterClima(lat, lon);
+    }
+    
+    return true;
+}
 
 //======================
 //ATUALIZAR POSIÇÃO ATUAL
@@ -4505,59 +6886,52 @@ async function solicitarPermissaoBussolaIOS() {
 var ultimoWebViewString = '';
 
 function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
-    if (typeof AppInventor === 'undefined') return;
+
+    if (typeof AppInventor === 'undefined') {
+        console.warn('[Radar X9] AppInventor não disponível');
+        return false;
+    }
 
     var mapaTextos = {
-        radar: 'ALERTA DE RADAR',
-        risco: 'ALERTA DE RISCO',
-        mobilidade: 'AVISO DE MOBILIDADE',
-        destaque: 'PONTOS TURISTICOS'
+        radar: 'RADAR',
+        risco: 'RISCO',
+        mobilidade: 'MOBILIDADE',
+        destaque: 'DESTAQUE',
+        clima: 'CLIMA'
     };
-    var texto = mapaTextos[tipoAlerta] || 'ALERTA DE RADAR';
+
+    var texto = mapaTextos[tipoAlerta];
+
+    if (!texto) {
+        console.warn('[Radar X9] Tipo de alerta desconhecido:', tipoAlerta);
+        return false;
+    }
 
     try {
+
         AppInventor.setWebViewString(texto);
-        ultimoWebViewString = texto; // [FIX] sincroniza para o poll não reler/apagar isso
-        console.log('[Radar X9] → AppInventor (som nativo):', texto);
+
+        ultimoWebViewString = texto;
+
+        console.log(
+            '[Radar X9] → App Inventor:',
+            texto
+        );
+
+        return true;
+
     } catch (e) {
-        console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
+
+        console.error(
+            '[Radar X9] Erro ao enviar para App Inventor:',
+            e
+        );
+
+        return false;
     }
 }
 
-function enviarParaAppInventor(acao, dados) {
-    if (typeof AppInventor !== 'undefined') {
-        try {
-            var mensagem = acao + '|' + dados.join('|');
-            AppInventor.setWebViewString(mensagem);
-            ultimoWebViewString = mensagem; // [FIX] idem
-            console.log('[Radar X9] → AppInventor:', mensagem);
-            return true;
-        } catch (e) {
-            console.error('[Radar X9] Erro ao enviar para AppInventor:', e);
-            return false;
-        }
-    }
-    return false;
-}
 
-function pollAppInventor() {
-    if (typeof AppInventor !== 'undefined') {
-        try {
-            var current = AppInventor.getWebViewString();
-            if (current && current !== ultimoWebViewString) {
-                ultimoWebViewString = current;
-                receberDadosAppInventor(current);
-
-                // [FIX] só limpa o canal quando for de fato uma mensagem GPS recebida,
-                // nunca um texto de alerta que você mesmo acabou de enviar
-                if (current.indexOf('GPS|') === 0) {
-                    AppInventor.setWebViewString('');
-                    ultimoWebViewString = '';
-                }
-            }
-        } catch (e) {}
-    }
-}
 
 // ====================================
 // FUNÇÃO RECEBER DADOS DO APP INVENTOR
@@ -4586,19 +6960,22 @@ function receberDadosAppInventor(dadosStr) {
 
 
 
-
-
 // ===================================================================
 // INICIALIZAÇÃO
 // ===================================================================
 document.addEventListener('DOMContentLoaded', async function() {
   
+    ajustarTextosClima();
+    ajustarHeaderResponsivo();
     carregarRadaresPendentes(); 
     initMap(); 
     inicializarBussolaHardware(); // nome corrigido, ver bug 2 abaixo
     setTimeout(()=>{ const l=document.getElementById('loading-fullscreen'); if(l){l.classList.add('fade-out');setTimeout(()=>{if(l)l.style.display='none';},600);} }, 1500);
 });
-
+window.addEventListener('resize', function() {
+    ajustarTextosClima();
+    ajustarHeaderResponsivo();
+});
 </script>
 </body>
 </html>
