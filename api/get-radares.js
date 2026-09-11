@@ -1,3 +1,4 @@
+
 // /api/get-radares.js
 
 import path from 'path';
@@ -9,30 +10,28 @@ export default async function handler(req, res) {
   const REPO = process.env.GITHUB_REPO || 'radar-speed-alert-api';
   
   // 1. Função para ler o arquivo LOCAL da pasta /public (Mais rápido e 100% confiável)
-  function lerArquivoLocal() {
+    function lerArquivoLocal() {
     try {
-      // Tenta primeiro na pasta /public (padrão Next.js/Vercel)
-      const publicPath = path.join(process.cwd(), 'public', 'radares.json');
-      if (fs.existsSync(publicPath)) {
-        const fileContents = fs.readFileSync(publicPath, 'utf8');
-        const parsed = JSON.parse(fileContents);
-        console.log('[API] ✅ Arquivo local /public/radares.json lido com sucesso.');
-        return Array.isArray(parsed) ? parsed : (parsed.records || []);
+      // Tenta 3 caminhos possíveis no Vercel
+      const caminhosPossiveis = [
+        path.join(process.cwd(), 'public', 'radares.json'),
+        path.join(process.cwd(), 'radares.json'),
+        path.join(__dirname, '..', 'public', 'radares.json') // Fallback para algumas estruturas Next.js
+      ];
+
+      for (const caminho of caminhosPossiveis) {
+        if (fs.existsSync(caminho)) {
+          const fileContents = fs.readFileSync(caminho, 'utf8');
+          const parsed = JSON.parse(fileContents);
+          console.log(`[API] ✅ Arquivo local encontrado e lido em: ${caminho}`);
+          return Array.isArray(parsed) ? parsed : (parsed.records || []);
+        }
       }
       
-      // Fallback: tenta na raiz do projeto caso tenha movido
-      const rootPath = path.join(process.cwd(), 'radares.json');
-      if (fs.existsSync(rootPath)) {
-        const fileContents = fs.readFileSync(rootPath, 'utf8');
-        const parsed = JSON.parse(fileContents);
-        console.log('[API] ✅ Arquivo local /radares.json (raiz) lido com sucesso.');
-        return Array.isArray(parsed) ? parsed : (parsed.records || []);
-      }
-      
-      console.log('[API] ⚠️ Arquivo radares.json não encontrado localmente.');
+      console.log('[API] ⚠️ Arquivo radares.json NÃO encontrado em nenhum dos caminhos locais.');
       return [];
     } catch (error) {
-      console.warn('[API] Falha ao ler arquivo local radares.json:', error.message);
+      console.error('[API] ❌ Falha crítica ao ler arquivo local radares.json:', error.message);
       return [];
     }
   }
