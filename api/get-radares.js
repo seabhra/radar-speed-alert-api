@@ -1,30 +1,62 @@
 // /api/get-radares.js
 
+import path from 'path';
+import fs from 'fs';
+
 export default async function handler(req, res) {
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const OWNER = process.env.GITHUB_OWNER || 'seabhra';
   const REPO = process.env.GITHUB_REPO || 'radar-speed-alert-api';
   
-  if (!GITHUB_TOKEN) {
-    return res.status(500).json({ error: 'GITHUB_TOKEN não configurado no servidor.' });
+  // 1. Função para ler o arquivo LOCAL da pasta /public (Mais rápido e 100% confiável)
+  function lerArquivoLocal() {
+    try {
+      // Tenta primeiro na pasta /public (padrão Next.js/Vercel)
+      const publicPath = path.join(process.cwd(), 'public', 'radares.json');
+      if (fs.existsSync(publicPath)) {
+        const fileContents = fs.readFileSync(publicPath, 'utf8');
+        const parsed = JSON.parse(fileContents);
+        console.log('[API] ✅ Arquivo local /public/radares.json lido com sucesso.');
+        return Array.isArray(parsed) ? parsed : (parsed.records || []);
+      }
+      
+      // Fallback: tenta na raiz do projeto caso tenha movido
+      const rootPath = path.join(process.cwd(), 'radares.json');
+      if (fs.existsSync(rootPath)) {
+        const fileContents = fs.readFileSync(rootPath, 'utf8');
+        const parsed = JSON.parse(fileContents);
+        console.log('[API] ✅ Arquivo local /radares.json (raiz) lido com sucesso.');
+        return Array.isArray(parsed) ? parsed : (parsed.records || []);
+      }
+      
+      console.log('[API] ⚠️ Arquivo radares.json não encontrado localmente.');
+      return [];
+    } catch (error) {
+      console.warn('[API] Falha ao ler arquivo local radares.json:', error.message);
+      return [];
+    }
   }
 
-  // Função auxiliar para buscar e parsear um arquivo do GitHub
+  // 2. Função auxiliar para buscar o arquivo DINÂMICO do GitHub (radares_app.json)
   async function fetchGitHubFile(filePath) {
+    if (!GITHUB_TOKEN) {
+        console.warn('[API] ⚠️ GITHUB_TOKEN não configurado. Não é possível ler radares_app.json do GitHub.');
+        return [];
+    }
     try {
-      // 1. Pegar metadados (SHA)
       const metaResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${filePath}`, {
         headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
       });
       
       if (!metaResp.ok) {
-        if (metaResp.status === 404) return []; // Arquivo não existe, retorna array vazio
+        if (metaResp.status === 404) {
+            console.warn(`[API] ⚠️ Arquivo ${filePath} não encontrado no GitHub.`);
+            return []; 
+        }
         throw new Error(`Erro ao buscar metadados de ${filePath}: ${metaResp.status}`);
       }
       
       const meta = await metaResp.json();
-      
-      // 2. Pegar conteúdo via Blob (suporta >1MB)
       const blobResp = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/git/blobs/${meta.sha}`, {
         headers: { 'Authorization': `Bearer ${GITHUB_TOKEN}`, 'Accept': 'application/vnd.github.v3+json' }
       });
@@ -35,35 +67,39 @@ export default async function handler(req, res) {
       const content = Buffer.from(blob.content, 'base64').toString('utf-8');
       const parsed = JSON.parse(content);
       
-      // Normaliza para sempre retornar um array (handle { records: [] } ou [])
       return Array.isArray(parsed) ? parsed : (parsed.records || []);
       
     } catch (error) {
-      console.warn(`[API] Falha ao ler ${filePath}:`, error.message);
-      return []; // Retorna vazio em caso de erro, não quebra o app
+      console.warn(`[API] Falha ao ler GitHub ${filePath}:`, error.message);
+      return [];
     }
   }
 
   try {
-    console.log('[API] 🔄 Buscando radares oficiais e dos usuários...');
+    console.log('[API] 🔄 Buscando radares oficiais (local) e dos usuários (GitHub)...');
     
-    // Busca os dois arquivos em paralelo (mais rápido)
-    const [radaresOficiais, radaresApp] = await Promise.all([
-      fetchGitHubFile('radares.json'),
-      fetchGitHubFile('radares_app.json')
-    ]);
+    // Executa as duas leituras
+    const radaresOficiais = lerArquivoLocal();
+    const radaresApp = await fetchGitHubFile('radares_app.json');
 
     // Une os dois arrays. Usamos um Map para evitar duplicatas pelo ID (índice 0 do array)
     const mapaRadares = new Map();
     
-    radaresOficiais.forEach(r => mapaRadares.set(r[0], r));
-    radaresApp.forEach(r => mapaRadares.set(r[0], r)); // Se houver conflito, o do app sobrescreve (ou vice-versa, conforme sua regra de negócio)
+    // Adiciona oficiais primeiro
+    radaresOficiais.forEach(r => {
+        if (r && r[0] !== undefined) mapaRadares.set(r[0], r);
+    });
+    
+    // Adiciona/Atualiza com os dos usuários (se houver conflito de ID, o do usuário prevalece)
+    radaresApp.forEach(r => {
+        if (r && r[0] !== undefined) mapaRadares.set(r[0], r);
+    });
 
     const radaresUnificados = Array.from(mapaRadares.values());
 
-    console.log(`[API] ✅ Sucesso! Oficiais: ${radaresOficiais.length}, App: ${radaresApp.length}, Total Unificado: ${radaresUnificados.length}`);
+    console.log(`[API] ✅ Sucesso! Oficiais (Local): ${radaresOficiais.length}, App (GitHub): ${radaresApp.length}, Total Unificado: ${radaresUnificados.length}`);
 
-    // Cache de 1 minuto
+    // Cache de 1 minuto para economizar recursos do servidor
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
     res.status(200).json(radaresUnificados);
 
