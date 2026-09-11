@@ -6600,33 +6600,27 @@ async function carregarRadares() {
     
     $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas unificados...</div>");
 
-    try {
+            try {
         console.log('[Radar X9] 🔄 Carregando radares unificados da API...');
         
-        // 2. NOVA LÓGICA: Uma única chamada para a nossa API que já busca e une tudo
         const response = await fetch('/api/get-radares?v=' + Date.now(), { 
             headers: { 'Accept': 'application/json' } 
         });
         
-        if (!response.ok) {
-            throw new Error(`Falha na API: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Falha na API: ${response.status}`);
         
         const todosOsRadares = await response.json();
-        console.log(`[Radar X9] 📊 Renderizando ${todosOsRadares.length} radares no total.`);
+        console.log(`[Radar X9] 📊 API retornou ${todosOsRadares.length} radares no total.`);
         
-        // 3. Renderizar o array unificado
         if (todosOsRadares.length > 0) {
-            // Passamos o array completo. O terceiro parâmetro 'true' indica que pode conter dados de usuários
+            // DIAGNÓSTICO: Vamos ver o formato do primeiro radar curado e do primeiro de usuário
+            console.log('[Radar X9] 🔍 Amostra do radar 0:', todosOsRadares[0]);
+            console.log('[Radar X9] 🔍 Amostra do radar 566:', todosOsRadares[566] || 'Não existe');
+
+            // Renderiza tudo. O 'true' garante que o mapa trate como potencialmente do usuário
             renderizarRadaresNoMapa(todosOsRadares, 'API Unificada (Vercel)', true);
             
-            // Salvar no cache local para modo offline futuro
-            try {
-                localStorage.setItem('radarx9_radares_cache', JSON.stringify({ 
-                    recordsCurados: todosOsRadares, 
-                    recordsUsuarios: [] // Agora está tudo unificado no curados para simplificar o cache
-                }));
-            } catch (e) { console.warn('[Radar X9] Falha ao salvar cache:', e); }
+            // ... (mantenha o resto do seu código de cache e radaresAdicionadosNestaSessao aqui)
             
             RADAR_MODO_OFFLINE = false;
         } else {
