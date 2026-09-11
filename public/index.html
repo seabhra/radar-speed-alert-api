@@ -6586,166 +6586,116 @@ function fetchComTimeout(url, opcoes, timeoutMs) {
 // ===============================
 // CARREGAR RADARES GITHUB VIA CDN
 // ===============================
+// ===============================
+// CARREGAR RADARES UNIFICADOS VIA API VERCEL
+// ===============================
 async function carregarRadares() {
     if (!map) return;
-    if (radarMarkers.length > 0) { radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); radarMarkers = []; }
-    $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas...</div>");
-
-    let recordsCurados = [];
-    let recordsUsuarios = [];
-    let fonte = '';
-   
-    //==========================================
-    // ---- 1. Radares curados (radares.json) ----
-    //===========================================
+    
+    // 1. Limpar marcadores antigos
+    if (radarMarkers.length > 0) { 
+        radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); 
+        radarMarkers = []; 
+    }
+    
+    $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas unificados...</div>");
 
     try {
-        const cdnResponse = await fetchComTimeout(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-        if (cdnResponse.ok) {
-            const data = await cdnResponse.json();
-            recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-            if (recordsCurados.length > 0) { fonte = 'GitHub (CDN)'; RADAR_MODO_OFFLINE = false; }
+        console.log('[Radar X9] 🔄 Carregando radares unificados da API...');
+        
+        // 2. NOVA LÓGICA: Uma única chamada para a nossa API que já busca e une tudo
+        const response = await fetch('/api/get-radares?v=' + Date.now(), { 
+            headers: { 'Accept': 'application/json' } 
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Falha na API: ${response.status}`);
         }
-    } catch (e) { console.warn('[Radar X9] CDN curado falhou:', e.message); }
-
-    if (recordsCurados.length === 0) {
-        try {
-            const rawResponse = await fetchComTimeout(GITHUB_CONFIG.rawUrl + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-            if (rawResponse.ok) {
-                const data = await rawResponse.json();
-                recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-                if (recordsCurados.length > 0) { fonte = 'GitHub (Raw)'; RADAR_MODO_OFFLINE = false; }
-            }
-        } catch (e) { console.warn('[Radar X9] Raw curado falhou:', e.message); }
-    }
-
-    if (recordsCurados.length === 0) {
-        try {
-            var response = await fetchComTimeout('radares.json?v=' + Date.now(), {}, 8000);
-            if (response.ok) {
-                var data = await response.json();
-                recordsCurados = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-                if (recordsCurados.length > 0) { fonte = 'Local'; RADAR_MODO_OFFLINE = true; }
-            }
-        } catch (e) { console.warn('[Radar X9] Arquivo local curado falhou:', e.message); }
-    }
-
-    //===========================================================================
-    // ---- 2. Radares enviados por usuários (radares_app.json) ----
-    //===========================================================================
-    // CORREÇÃO: Substituído o código de backend (SHA/Blob/Buffer) por fetch direto via CDN/Raw.
-    // O GitHub serve arquivos JSON publicamente, não há necessidade de API autenticada para LER.
-
-    try {
-        const cdnAppResponse = await fetchComTimeout(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-        if (cdnAppResponse.ok) {
-            const data = await cdnAppResponse.json();
-            recordsUsuarios = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-            if (recordsUsuarios.length > 0) console.log('[Radar X9] ✅ Radares de usuários carregados (CDN App)');
+        
+        const todosOsRadares = await response.json();
+        console.log(`[Radar X9] 📊 Renderizando ${todosOsRadares.length} radares no total.`);
+        
+        // 3. Renderizar o array unificado
+        if (todosOsRadares.length > 0) {
+            // Passamos o array completo. O terceiro parâmetro 'true' indica que pode conter dados de usuários
+            renderizarRadaresNoMapa(todosOsRadares, 'API Unificada (Vercel)', true);
+            
+            // Salvar no cache local para modo offline futuro
+            try {
+                localStorage.setItem('radarx9_radares_cache', JSON.stringify({ 
+                    recordsCurados: todosOsRadares, 
+                    recordsUsuarios: [] // Agora está tudo unificado no curados para simplificar o cache
+                }));
+            } catch (e) { console.warn('[Radar X9] Falha ao salvar cache:', e); }
+            
+            RADAR_MODO_OFFLINE = false;
+        } else {
+            showNotification('⚠️ Nenhum radar encontrado na base de dados.');
+            RADAR_MODO_OFFLINE = true;
         }
-    } catch (e) { console.warn('[Radar X9] CDN App falhou:', e.message); }
 
-    if (recordsUsuarios.length === 0) {
-        try {
-            const rawAppResponse = await fetchComTimeout(GITHUB_CONFIG.rawUrlApp + '?v=' + Date.now(), { headers: { 'Accept': 'application/json' } }, 8000);
-            if (rawAppResponse.ok) {
-                const data = await rawAppResponse.json();
-                recordsUsuarios = (Array.isArray(data)) ? data : (data.result?.records || data.records || []);
-                if (recordsUsuarios.length > 0) console.log('[Radar X9] ✅ Radares de usuários carregados (Raw App)');
-            }
-        } catch (e) { console.warn('[Radar X9] Raw App falhou:', e.message); }
-    }
+        // 4. [MANTIDO] Reinsere radares desta sessão que ainda não voltaram na resposta da API
+        // (Isso é crucial para o usuário ver o radar que acabou de adicionar imediatamente)
+        if (radaresAdicionadosNestaSessao.length > 0) {
+            radaresAdicionadosNestaSessao.forEach(function(item) {
+                var jaExiste = radarMarkers.some(function(m) {
+                    return m.radarData &&
+                           Math.abs(m.radarData.latitude - item.radar.latitude) < 0.00001 &&
+                           Math.abs(m.radarData.longitude - item.radar.longitude) < 0.00001;
+                });
+                
+                if (!jaExiste) {
+                    var markerRecriado = criarRadarNoMapa({
+                        ...item.radar,
+                        id: item.id,
+                        tipoOriginal: item.radar.tipo,
+                        isUsuario: true
+                    });
+                    if (markerRecriado) {
+                        radarMarkers.push(markerRecriado);
+                        console.log('[Radar X9] 🧩 Radar #' + item.id + ' reinserido (ainda não propagado na API)');
+                    }
+                } else {
+                    console.log('[Radar X9] ✅ Radar #' + item.id + ' já veio da API, removendo da lista de sessão');
+                }
+            });
 
-    // Fallback local para radares de usuários
-    if (recordsUsuarios.length === 0) {
-        try {
-            var responseApp = await fetchComTimeout('radares_app.json?v=' + Date.now(), {}, 8000);
-            if (responseApp.ok) {
-                var dataApp = await responseApp.json();
-                recordsUsuarios = (Array.isArray(dataApp)) ? dataApp : (dataApp.result?.records || dataApp.records || []);
-                if (recordsUsuarios.length > 0) console.log('[Radar X9] ✅ Radares de usuários carregados (Local)');
-            }
-        } catch (e) { console.warn('[Radar X9] Arquivo local App falhou:', e.message); }
-    }
+            // Limpa da lista de sessão os que já vieram confirmados
+            radaresAdicionadosNestaSessao = radaresAdicionadosNestaSessao.filter(function(item) {
+                return !radarMarkers.some(function(m) {
+                    return m.radarData && m.radarData.id === item.id && m.radarData.isUsuario;
+                }) || !todosOsRadares.some(function(r) {
+                    var coords = String(r[9] || '').split(',').map(function(s){return parseFloat(s.trim());});
+                    return coords.length === 2 &&
+                           Math.abs(coords[0] - item.radar.latitude) < 0.00001 &&
+                           Math.abs(coords[1] - item.radar.longitude) < 0.00001;
+                });
+            });
+        }
 
-    // ---- 3. Fallback: cache local (mescla ambos, se existirem) ----
-    if (recordsCurados.length === 0 && recordsUsuarios.length === 0) {
+    } catch (err) {
+        console.error('[Radar X9] ❌ Erro ao carregar radares da API:', err);
+        showNotification('⚠️ Erro de conexão. Tentando carregar do cache local...');
+        
+        // 5. Fallback de emergência: Cache Local
         try {
             const cached = localStorage.getItem('radarx9_radares_cache');
             if (cached) {
                 const data = JSON.parse(cached);
-                recordsCurados = data.recordsCurados || [];
-                recordsUsuarios = data.recordsUsuarios || [];
-                fonte = 'Cache Local';
-                RADAR_MODO_OFFLINE = true;
-            }
-        } catch (e) { console.warn('[Radar X9] Cache falhou:', e.message); }
-    }
-
-    // ---- 4. Renderizar: curados normalmente, usuários com origem marcada ----
-    if (recordsCurados.length > 0) {
-        renderizarRadaresNoMapa(recordsCurados, fonte, false);
-    } else {
-        showNotification('⚠️ Base curada (radares.json) não carregou — CDN, raw e local falharam ou expiraram.');
-        console.warn('[Radar X9] Base curada vazia após todas as tentativas.');
-    }
-
-    if (recordsUsuarios.length > 0) {
-        renderizarRadaresNoMapa(recordsUsuarios, 'Compartilhados por usuários', true);
-    }
-    
-
-  if (recordsCurados.length > 0 || recordsUsuarios.length > 0) {
-        try {
-            localStorage.setItem('radarx9_radares_cache', JSON.stringify({ recordsCurados: recordsCurados, recordsUsuarios: recordsUsuarios }));
-        } catch (e) {}
-    } else {
-        RADAR_MODO_OFFLINE = true;
-    }
-
-    // [ADICIONADO] Reinsere radares desta sessão que ainda não voltaram
-    // na resposta do CDN (cache da jsdelivr/raw.githubusercontent costuma
-    // levar mais tempo que o esperado para refletir um commit novo)
-
-    if (radaresAdicionadosNestaSessao.length > 0) {
-        radaresAdicionadosNestaSessao.forEach(function(item) {
-            var jaExiste = radarMarkers.some(function(m) {
-                return m.radarData &&
-                       Math.abs(m.radarData.latitude - item.radar.latitude) < 0.00001 &&
-                       Math.abs(m.radarData.longitude - item.radar.longitude) < 0.00001;
-            });
-            if (!jaExiste) {
-                var markerRecriado = criarRadarNoMapa({
-                    ...item.radar,
-                    id: item.id,
-                    tipoOriginal: item.radar.tipo,
-                    isUsuario: true
-                });
-                if (markerRecriado) {
-                    radarMarkers.push(markerRecriado);
-                    console.log('[Radar X9] 🧩 Radar #' + item.id + ' reinserido (ainda não propagado no CDN)');
+                const recordsCurados = data.recordsCurados || [];
+                if (recordsCurados.length > 0) {
+                    renderizarRadaresNoMapa(recordsCurados, 'Cache Local (Offline)', false);
+                    RADAR_MODO_OFFLINE = true;
                 }
-            } else {
-                console.log('[Radar X9] ✅ Radar #' + item.id + ' já veio do CDN, removendo da lista de sessão');
             }
-        });
-
-        // Limpa da lista de sessão os que já vieram confirmados pelo CDN
-        radaresAdicionadosNestaSessao = radaresAdicionadosNestaSessao.filter(function(item) {
-            return !radarMarkers.some(function(m) {
-                return m.radarData && m.radarData.id === item.id && m.radarData.isUsuario;
-            }) || !recordsUsuarios.some(function(r) {
-                var coords = String(r[9] || '').split(',').map(function(s){return parseFloat(s.trim());});
-                return coords.length === 2 &&
-                       Math.abs(coords[0] - item.radar.latitude) < 0.00001 &&
-                       Math.abs(coords[1] - item.radar.longitude) < 0.00001;
-            });
-        });
+        } catch (e) { 
+            console.warn('[Radar X9] Cache local também falhou:', e.message); 
+        }
+    } finally {
+        // 6. Esconder loading em qualquer cenário (sucesso ou erro)
+        $("#loading").hide();
     }
-
-    $("#loading").hide();
 }
-
 // ==============================
 // RENDERIZAR RADARES APP NO MAPA
 // ==============================
