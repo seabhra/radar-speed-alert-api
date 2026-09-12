@@ -611,9 +611,12 @@
       [563, "1851","Avenida Critovão Colombo, Próx. Rua Getúlio Vargas","Descubra a Cidade - Praça da Savassi - Gastronomia","40","Praça da Liberdade/São Pedro","1001067","KBH5301067","-19.938125, -43.935632"],
       [564, "1852","Rua Sapucaí, Próx. Avenida Assis Chateuabriand","Descubra a Cidade - Mirante da Rua Sapucaí - Panorama e Gastronomia","60","Centro/Floresta","1001068","KBH5301068","-19.917513, -43.932651"],
       [565, "1853","Rua Dores do Indaiá, Próx. Rua Alvinópolis","Descubra a Cidade - Santa Tereza - Circuito Boêmio","60","Floresta/Santa Tereza","1001069","KBH5301069","-19.916055, -43.910846"],
-      [566, "1854","Av. Otacílio Negrão de Lima, 7111, Próx. Rua Benito Masci","Descubra a Cidade - Parque Ecológico da Pampulha - Ecoturismo","60","Mineirão/Toca da Raposa","1001070","KBH5301070","-19.860637, -43.995684"]
+      [566, "1854","Av. Otacílio Negrão de Lima, 7111, Próx. Rua Benito Masci","Descubra a Cidade - Parque Ecológico da Pampulha - Ecoturismo","60","Mineirão/Toca da Raposa","1001070","KBH5301070","-19.860637, -43.995684"],
+      [567, "1855","Av. Niquelina, Próx. Av. Mem de Sá","Semáforo Inteligente (SEI)","60","Paraíso/Santa Efigência","1001071","KBH5301071","-19.918286, -43.910401"],
+      [568, "1856","Av. Niquelina, Próx. Av. Contorno","Semáforo Inteligente (SEI)","60","Paraíso/Santa Efigência","1001072","KBH5301072","-19.923816, -43.919079"],
+      [569, "1857","Av. Niquelina, Próx. Av. Ten. Anastácio de Moura","Semáforo Inteligente (SEI)","60","Paraíso/Santa Efigência","1001073","KBH5301073","-19.922609, -43.916018"],
+      [570, "1858","Av. Niquelina, Próx. Av. Santa Luzia","Semáforo Inteligente (SEI)","60","Paraíso/Santa Efigência","1001074","KBH5301074","-19.920982, -43.914143"]
 
-      
 
     ]
   }
