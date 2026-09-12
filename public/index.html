@@ -6671,10 +6671,8 @@ function formatarTextoTarja(tipoAlerta) {
 // ===================================================================
 // FUNÇÃO QUE ESTÁ FALTANDO: RENDERIZAR RADARES NO MAPA
 // ===================================================================
-
-
 // ===================================================================
-// FUNÇÃO UNIFICADA DE RENDERIZAÇÃO (Versão Super Robusta)
+// FUNÇÃO UNIFICADA DE RENDERIZAÇÃO (Mantenha APENAS ESTA)
 // ===================================================================
 function renderizarRadaresNoMapa(records) {
     if (!map || !records || records.length === 0) {
@@ -6682,96 +6680,95 @@ function renderizarRadaresNoMapa(records) {
         return;
     }
 
-    var contadorTotal = 0;
+    var contador = 0;
     var contadorCurados = 0;
     var contadorUsuarios = 0;
     var contadorErros = 0;
-    var errosDetalhados = [];
+    var errosDetalhados = []; // Armazena detalhes dos erros
 
     for (var i = 0; i < records.length; i++) {
         var record = records[i];
         var isUsuario = record._isUsuario === true;
-
-        // =========================================================
-        // EXTRAÇÃO SUPER ROBUSTA DE COORDENADAS
-        // =========================================================
-        var finalLat = null;
-        var finalLng = null;
-
-        // 1. Tenta formato de Array (GitHub): record[9] = "lat, lng"
-        if (Array.isArray(record) && record[9]) {
-            var parts = String(record[9]).split(',');
-            if (parts.length === 2) {
-                finalLat = parseFloat(parts[0].trim());
-                finalLng = parseFloat(parts[1].trim());
-            }
-        }
         
-        // 2. Tenta formato de Objeto padrão: record.latitude / record.longitude
-        if (finalLat === null) {
-            var latVal = record.latitude || record.lat || record.Latitude;
-            var lngVal = record.longitude || record.lng || record.Longitude || record.lon;
-            if (latVal !== undefined && lngVal !== undefined) {
-                finalLat = parseFloat(String(latVal).trim());
-                finalLng = parseFloat(String(lngVal).trim());
-            }
-        }
-
-        // 3. Tenta formato aninhado: record.latlng = {lat: x, lng: y} ou [x, y]
-        if (finalLat === null && record.latlng) {
-            if (Array.isArray(record.latlng) && record.latlng.length >= 2) {
-                finalLat = parseFloat(record.latlng[0]);
-                finalLng = parseFloat(record.latlng[1]);
-            } else if (typeof record.latlng === 'object' && record.latlng.lat !== undefined) {
-                finalLat = parseFloat(record.latlng.lat);
-                finalLng = parseFloat(record.latlng.lng || record.latlng.lon);
-            }
-        }
-
-        // 4. Último recurso: Varre todas as chaves do objeto procurando "lat" e "lng"
-        if (finalLat === null) {
-            var foundLat = null, foundLng = null;
-            var keys = Object.keys(record);
-            for (var k = 0; k < keys.length; k++) {
-                var lowerKey = keys[k].toLowerCase();
-                if (lowerKey.includes('lat') && foundLat === null) foundLat = parseFloat(record[keys[k]]);
-                if ((lowerKey.includes('lng') || lowerKey.includes('lon')) && foundLng === null) foundLng = parseFloat(record[keys[k]]);
-            }
-            if (foundLat !== null && foundLng !== null && !isNaN(foundLat) && !isNaN(foundLng)) {
-                finalLat = foundLat;
-                finalLng = foundLng;
-            }
-        }
-
-        // =========================================================
-        // VALIDAÇÃO
-        // =========================================================
-        if (finalLat === null || finalLng === null || isNaN(finalLat) || isNaN(finalLng)) {
-            contadorErros++;
-            if (errosDetalhados.length < 5) { // Guarda os primeiros 5 para não poluir o console
-                errosDetalhados.push({ indice: i, isUsuario: isUsuario, dados: record });
-            }
-            continue; // Pula este radar
-        }
-
-        // Valida se está numa faixa geográfica razoável (Brasil)
-        if (finalLat < -34 || finalLat > 6 || finalLng < -74 || finalLng > -34) {
-            contadorErros++;
-            continue;
-        }
-
-        // =========================================================
-        // RENDERIZAÇÃO
-        // =========================================================
         if (isUsuario) {
             contadorUsuarios++;
         } else {
             contadorCurados++;
         }
 
-        var endereco = record[2] || record.endereco || record.Endereco || "Endereço não informado";
-        var tipo = (record[3] || record.tipo || record.Tipo || "Não Identificado").trim();
-        var velocidade = record[4] || record.velocidade || record.Velocidade || "0";
+        // Tenta extrair coordenadas de múltiplos formatos
+        var finalLat = null;
+        var finalLng = null;
+        var erroCoordenada = null;
+
+        // Formato 1: Array do GitHub (record[9] = "lat, lng")
+        if (record[9] && typeof record[9] === 'string') {
+            var coords = record[9].split(',').map(s => parseFloat(s.trim()));
+            if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                finalLat = coords[0];
+                finalLng = coords[1];
+            } else {
+                erroCoordenada = `Formato inválido em record[9]: "${record[9]}"`;
+            }
+        }
+        
+        // Formato 2: Objeto com latitude/longitude
+        if (finalLat === null && (record.latitude || record.lat)) {
+            finalLat = parseFloat(record.latitude || record.lat);
+            finalLng = parseFloat(record.longitude || record.lng);
+            if (isNaN(finalLat) || isNaN(finalLng)) {
+                erroCoordenada = `Lat/Lng não numéricos: ${record.latitude}, ${record.longitude}`;
+                finalLat = null;
+                finalLng = null;
+            }
+        }
+
+        // Formato 3: Campos alternativos
+        if (finalLat === null && record.latlng) {
+            if (Array.isArray(record.latlng) && record.latlng.length === 2) {
+                finalLat = parseFloat(record.latlng[0]);
+                finalLng = parseFloat(record.latlng[1]);
+            } else if (typeof record.latlng === 'string') {
+                var parts = record.latlng.split(',');
+                if (parts.length === 2) {
+                    finalLat = parseFloat(parts[0]);
+                    finalLng = parseFloat(parts[1]);
+                }
+            }
+        }
+
+        // Se ainda não tem coordenadas válidas, registra o erro
+        if (finalLat === null || finalLng === null || isNaN(finalLat) || isNaN(finalLng)) {
+            contadorErros++;
+            if (errosDetalhados.length < 10) { // Guarda apenas os primeiros 10 erros
+                errosDetalhados.push({
+                    indice: i,
+                    isUsuario: isUsuario,
+                    erro: erroCoordenada || 'Coordenadas não encontradas',
+                    record: record
+                });
+            }
+            continue;
+        }
+
+        // Verifica se as coordenadas estão em uma faixa razoável (Brasil)
+        if (finalLat < -33 || finalLat > 5 || finalLng < -74 || finalLng > -35) {
+            contadorErros++;
+            if (errosDetalhados.length < 10) {
+                errosDetalhados.push({
+                    indice: i,
+                    isUsuario: isUsuario,
+                    erro: `Coordenadas fora do Brasil: ${finalLat}, ${finalLng}`,
+                    record: record
+                });
+            }
+            continue;
+        }
+
+        // Extrai dados
+        var endereco = record[2] || record.endereco || "Endereço não informado";
+        var tipo = (record[3] || record.tipo || "Não Identificado").trim();
+        var velocidade = record[4] || record.velocidade || "0";
 
         var iconeUrl = getIconUrl(tipo, velocidade);
         var fallbackUrl = '/imagens_app/ic_radar_cev_v2.png'; 
@@ -6806,26 +6803,28 @@ function renderizarRadaresNoMapa(records) {
             isUsuario: isUsuario
         };
         radarMarkers.push(radarMarker);
-        contadorTotal++;
+        contador++;
     }
 
     $("#loading").hide();
     
-    console.log(`[Radar X9] ✅ Sucesso: ${contadorCurados} curados, ${contadorUsuarios} usuários renderizados.`);
-    console.log(`[Radar X9] ❌ Ignorados por coordenadas inválidas: ${contadorErros}`);
+    // Log detalhado dos erros
+    console.log(`[Radar X9] ✅ Renderização: ${contadorCurados} curados, ${contadorUsuarios} usuários`);
+    console.log(`[Radar X9] ❌ Erros de coordenadas: ${contadorErros}`);
     
     if (errosDetalhados.length > 0) {
-        console.warn('[Radar X9] ⚠️ Amostra dos radares ignorados (clique para expandir):');
+        console.warn('[Radar X9] ⚠️ Primeiros erros encontrados:');
         errosDetalhados.forEach(function(erro, idx) {
-            console.warn(`  #${idx + 1} (Índice ${erro.indice}):`, erro.dados);
+            console.warn(`  ${idx + 1}. Índice ${erro.indice} (${erro.isUsuario ? 'Usuário' : 'Oficial'}): ${erro.erro}`);
+            console.warn('     Dados:', erro.record);
         });
-        showNotification(`⚠️ ${contadorErros} radares ignorados (coordenadas inválidas)`);
+        
+        // Mostra notificação com resumo dos erros
+        showNotification(`⚠️ ${contadorErros} radares com coordenadas inválidas`);
     } else {
         showNotification(`Mapa atualizado: ${contadorCurados} oficiais, ${contadorUsuarios} usuários`);
     }
 }
-
-
 // ==========================================
 // CARREGAR RADARES UNIFICADOS VIA API VERCEL
 // ==========================================
