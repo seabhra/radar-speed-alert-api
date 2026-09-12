@@ -2654,7 +2654,27 @@ const ajusteNomes = {
     'Alerta de Poluição Elevada (APE)': 'Área com Poluição Elevada (APE)'
 };
 
+// ===================================================================
+// FUNÇÕES AUXILIARES DE FORMATAÇÃO
+// ===================================================================
 
+/**
+ * Remove o prefixo "Descubra a Cidade - " do nome para exibição na UI,
+ * mantendo apenas o local e a descrição.
+ */
+function formatarNomeExibicao(nomeOriginal) {
+    if (!nomeOriginal) return "";
+    
+    const prefixo = "Descubra a Cidade - ";
+    
+    // Se começar com o prefixo, remove-o
+    if (nomeOriginal.startsWith(prefixo)) {
+        return nomeOriginal.substring(prefixo.length);
+    }
+    
+    // Retorna original se não tiver o prefixo
+    return nomeOriginal;
+}
 // ===================================================================
 // FUNÇÕES AUXILIARES
 // ===================================================================
@@ -5284,7 +5304,17 @@ speedWidget.addEventListener("click", () => {
     }
 });
 
+    //=============================
+    // Configurar eventos dos botões
+    //==============================
 
+// ========================================
+// OCULTAR BÚSSOLA NATIVA DO LEAFLET
+// ========================================
+
+// ========================================
+// OCULTAR BÚSSOLA NATIVA DO LEAFLET
+// ========================================
 
 // ========================================
 // OCULTAR BÚSSOLA NATIVA DO LEAFLET
@@ -6715,8 +6745,82 @@ async function carregarRadares() {
         $("#loading").hide();
     }
 }
+// ==============================
+// RENDERIZAR RADARES APP NO MAPA
+// ==============================
 
+function renderizarRadaresNoMapa(records, origem, isUsuario) {
+    if (!map) return;
+    var radaresExternos = records || [];
+    var contador = 0;
+    var idOffset = isUsuario ? 100000 : 0;
+    
+    console.log('[Radar X9] 📊 Renderizando ' + radaresExternos.length + ' radares de: ' + origem);
 
+    for (var i = 0; i < radaresExternos.length; i++) {
+        var record = radaresExternos[i];
+        
+        // Log para depuração
+        console.log('[Radar X9] Registro ' + i + ':', record);
+        
+        var coords = extrairCoordenadas(record, i);
+        if (!coords) {
+            console.warn('[Radar X9] ⚠️ Coordenadas não encontradas para registro ' + i + ':', record);
+            continue;
+        }
+
+        console.log('[Radar X9] ✅ Coordenadas extraídas:', coords);
+        
+        var finalLat = coords.lat;
+        var finalLng = coords.lng;
+        var endereco = record[2] || "Endereço não informado";
+        var tipo = (record[3] || "Não Identificado").trim();
+        var velocidade = record[4] || "0";
+
+        var iconeUrl = getIconUrl(tipo, velocidade);
+        var fallbackUrl = 'imagens_app/ic_radar_cev_v2.png'; 
+        var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
+
+        var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
+
+        setTimeout(function(mk, fb) {
+            return function() {
+                var el = mk.getElement();
+                if (el) { var imgEl = el.querySelector('img'); if (imgEl) imgEl.setAttribute('data-fallback', fb); }
+            };
+        }(radarMarker, fallbackUrl), 100);
+
+        var tipoExibicao = ajusteNomes[tipo] || tipo;
+        var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
+
+        //===============================================================
+        // [ADICIONADO] selo visual para radares enviados pela comunidade
+        //===============================================================
+        
+
+        var seloUsuario = isUsuario ? '<div style="color:#66A775;font-size:0.85rem;margin-top:4px;font-weight:bold;">🧩 Compartilhado por usuários</div>' : '';
+        var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
+
+        radarMarker.bindPopup(
+            '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' +
+            tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
+            endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div>' +
+            seloUsuario + '</div>'
+        );
+
+        radarMarker.radarData = {
+            id: idOffset + i, latitude: finalLat, longitude: finalLng,
+            endereco: endereco, velocidade_maxima: velocidade,
+            tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA,
+            isUsuario: !!isUsuario // [ADICIONADO]
+        };
+        radarMarkers.push(radarMarker);
+        contador++;
+    }
+
+    $("#loading").hide();
+    if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
+}
 
 // =======================
 // FUNÇÃO BUSCAR RADARES
