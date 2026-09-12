@@ -6638,12 +6638,103 @@ function fetchComTimeout(url, opcoes, timeoutMs) {
     ]);
 }
 
-// ===============================
-// CARREGAR RADARES GITHUB VIA CDN
-// ===============================
-// ===============================
+// ===================================================================
+// FUNÇÃO PARA LIMPAR O TEXTO DA TARJA (Remove a repetição)
+// ===================================================================
+function formatarTextoTarja(tipoAlerta) {
+    if (!tipoAlerta) return "Alerta";
+    
+    const prefixo = "Descubra a Cidade - ";
+    let textoLimpo = tipoAlerta.trim();
+    
+    // Remove o prefixo se existir para não ficar repetitivo na descrição
+    if (textoLimpo.startsWith(prefixo)) {
+        textoLimpo = textoLimpo.substring(prefixo.length);
+    }
+    
+    return textoLimpo;
+}
+
+// ===================================================================
+// FUNÇÃO QUE ESTÁ FALTANDO: RENDERIZAR RADARES NO MAPA
+// ===================================================================
+function renderizarRadaresNoMapa(listaRadares, fonteDados = 'API') {
+    if (!listaRadares || listaRadares.length === 0) {
+        console.log('[Radar X9] ⚠️ Nenhum radar para renderizar.');
+        $("#loading").hide();
+        return;
+    }
+
+    let contagemCurados = 0;
+    let contagemUsuarios = 0;
+
+    listaRadares.forEach(function(radar) {
+        // 1. Normalizar coordenadas (aceita 'lat'/'lng' ou 'latitude'/'longitude')
+        const lat = parseFloat(radar.latitude || radar.lat);
+        const lng = parseFloat(radar.longitude || radar.lng);
+
+        if (isNaN(lat) || isNaN(lng)) {
+            console.warn('[Radar X9] ⚠️ Coordenadas inválidas para radar:', radar);
+            return; // Pula este radar se não tiver coordenada válida
+        }
+
+        // 2. Identificar se é do usuário ou curado (AJUSTE O CAMPO 'origem' CONFORME SUA API)
+        // Exemplo: sua API pode retornar { origem: 'usuario' } ou { tipo: 'curado' }
+        const ehUsuario = (radar.origem === 'usuario' || radar.enviado_por_usuario === true || radar.fonte === 'app');
+        
+        if (ehUsuario) {
+            contagemUsuarios++;
+        } else {
+            contagemCurados++;
+        }
+
+        // 3. Obter o ícone correto usando a função que já corrigimos
+        const tipoRadar = radar.tipo || radar.tipo_alerta || 'Desconhecido';
+        const velocidade = radar.velocidade || radar.limite_velocidade;
+        const urlIcone = getIconUrl(tipoRadar, velocidade);
+
+        // 4. Criar o ícone do Leaflet
+        const customIcon = L.icon({
+            iconUrl: urlIcone,
+            iconSize: [40, 40], // Ajuste o tamanho conforme seu design
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40],
+            className: 'radar-marker-icon'
+        });
+
+        // 5. Criar o marcador
+        const marker = L.marker([lat, lng], { icon: customIcon });
+
+        // 6. Montar o conteúdo do Popup / Tarja
+        const nomeLimpo = formatarTextoTarja(tipoRadar);
+        const badgeOrigem = ehUsuario 
+            ? '<span style="background:#ff9800; color:#fff; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold;">👤 Usuário</span>' 
+            : '<span style="background:#4caf50; color:#fff; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold;">✅ Oficial</span>';
+
+        const conteudoPopup = `
+            <div style="text-align:center; min-width: 200px;">
+                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">DESCUBRA A CIDADE</h3>
+                <div style="margin-bottom: 8px;">${badgeOrigem}</div>
+                <p style="margin: 0; font-weight: bold; color: #555; font-size: 14px;">${nomeLimpo}</p>
+                ${radar.endereco ? `<p style="margin: 5px 0 0 0; font-size: 12px; color: #777;">📍 ${radar.endereco}</p>` : ''}
+                ${velocidade ? `<p style="margin: 5px 0 0 0; font-size: 12px; color: #d32f2f; font-weight:bold;">⚠️ Velocidade: ${velocidade} km/h</p>` : ''}
+            </div>
+        `;
+
+        marker.bindPopup(conteudoPopup);
+
+        // 7. Adicionar ao mapa e ao array de controle
+        marker.addTo(map);
+        radarMarkers.push(marker);
+    });
+
+    console.log(`[Radar X9] ✅ Renderização concluída: ${contagemCurados} curados, ${contagemUsuarios} de usuários.`);
+    $("#loading").hide();
+}
+
+// ==========================================
 // CARREGAR RADARES UNIFICADOS VIA API VERCEL
-// ===============================
+// ==========================================
 async function carregarRadares() {
     if (!map) return;
     
