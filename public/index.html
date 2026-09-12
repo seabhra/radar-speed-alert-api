@@ -2426,13 +2426,19 @@ function desativarPulsoIntenso() {
 // ===================================================================
 // MAPEAMENTO DE ÍCONES
 // ===================================================================
+// ===================================================================
+// MAPEAMENTO DE ÍCONES
+// ===================================================================
 const iconMap = {
     'Controlador Eletrônico de Velocidade':'/imagens_app/ic_radar_cev_v2.png',
     'Controlador Eletrônico de Velocidade (CEV)':'/imagens_app/ic_radar_cev_v2.png',
 
+    // RADARES MISTOS
     'Controlador Eletrônico Misto (DAS) + (CEV)':'/imagens_app/ic_radar_cem_cev.png',
     'Controlador Eletrônico Misto (DAS) + (DCP)':'/imagens_app/ic_radar_cem_dcp.png',
     'Controlador Eletrônico Misto (DAS) + (DIF)':'/imagens_app/ic_radar_cem_move.png',
+   
+    // RADARES SINGULARES
 
     'Detector de Avanço de Semáforo (DAS)':'/imagens_app/ic_radar_das_v2.png',
     'Detector de Avanço de Semáforo':'/imagens_app/ic_radar_das_v2.png',
@@ -2480,41 +2486,39 @@ const iconMap = {
     'Alerta de Poluição Elevada (APE)':'/imagens_app/ic_radar_poluido_v2.png',
 
 
-     //=== ALERTA DE LUGARES EM DESTAQUE (ALE) ===
-    'Lugares em Destaque - Mercado Central - Arte e Gastronomia': '/imagens_app/ic_mercado_central.png',
-    'Lugares em Destaque - Mirante do Mangabeiras - Panorama': '/imagens_app/ic_mirante_mangabeiras.png',
-    'Lugares em Destaque - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
-    'Lugares em Destaque - Mercado Novo - Arte e Gastronomia': '/imagens_app/ic_mercado_novo.png',
-    'Lugares em Destaque - Santa Tereza - Circuito Boêmio': '/imagens_app/ic_santa_tereza.png',
-    'Lugares em Destaque - Rua Sapucaí - Panorama e Gastronomia': '/imagens_app/ic_rua_sapucai.png',
-    'Lugares em Destaque - Praça da Liberdade - Arte e Cultura': '/imagens_app/ic_praca_liberdade.png',
-    'Lugares em Destaque - Edifício Maletta - Arte e Gastronomia': '/imagens_app/ic_edificio_maletta.png',
-    'Lugares em Destaque - Praça do Papa - Panorama': '/imagens_app/ic_praca_papa.png',
-    'Lugares em Destaque - Museu do Futebol - Arte e Cultura': '/imagens_app/ic_museu_futebol.png',
-    'Lugares em Destaque - Igreja da Pampulha - Arte e Cultura': '/imagens_app/ic_igreja_pampulha.png',
-    'Lugares em Destaque - Parque Ecológico da Pampulha - Ecoturismo': '/imagens_app/ic_parque_ecologico_pampulha.png',
-    'Lugares em Destaque - Parque de Diversões Guanabara - Diversão e Lazer': '/imagens_app/ic_parque_guanabara.png',
-    'Lugares em Destaque - Parque da Serra do Curral - Ecoturismo': '/imagens_app/ic_parque_serra_curral.png',
-    'Lugares em Destaque - Feira de Artesanato da Afonso Pena - Compra (Aos domingos)': '/imagens_app/ic_feira_afonso_pena.png',
-    'Lugares em Destaque - Palácio das Artes - Arte e Cultura': '/imagens_app/ic_palacio_artes.png',
-    'Lugares em Destaque - Parque Municipal - Parque e Diversão': '/imagens_app/ic_parque_municipal.png',
-    'Lugares em Destaque - Praça da Savassi - Gastronomia': '/imagens_app/ic_praca_savassi.png',
-    'Lugares em Destaque - Museu de Artes e Ofícios - História': '/imagens_app/ic_museu_artes_oficios.png',
-    'Lugares em Destaque - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
-    'Lugares em Destaque - Polo de Artesanato de Nações Unidas - Arte Mineira': '/imagens_app/ic_polo_artesanato.png',
+     //=== ALERTA DESCUBRA A CIDADE (ALE) ===
+    'Descubra a Cidade - Mercado Central - Arte e Gastronomia': '/imagens_app/ic_mercado_central.png',
+    'Descubra a Cidade - Mirante do Mangabeiras - Panorama': '/imagens_app/ic_mirante_mangabeiras.png',
+    'Descubra a Cidade - Parque Mangabeiras - Natureza': '/imagens_app/ic_parque_mangabeiras.png',
+    'Descubra a Cidade - Mercado Novo - Arte e Gastronomia': '/imagens_app/ic_mercado_novo.png',
+    'Descubra a Cidade - Santa Tereza - Circuito Boêmio': '/imagens_app/ic_santa_tereza.png',
+    'Descubra a Cidade - Rua Sapucaí - Panorama e Gastronomia': '/imagens_app/ic_rua_sapucai.png',
+    'Descubra a Cidade - Praça da Liberdade - Arte e Cultura': '/imagens_app/ic_praca_liberdade.png',
+    'Descubra a Cidade - Edifício Maletta - Arte e Gastronomia': '/imagens_app/ic_edificio_maletta.png',
+    'Descubra a Cidade - Praça do Papa - Panorama': '/imagens_app/ic_praca_papa.png',
+    'Descubra a Cidade - Museu do Futebol - Arte e Cultura': '/imagens_app/ic_museu_futebol.png',
+    'Descubra a Cidade - Igreja da Pampulha - Arte e Cultura': '/imagens_app/ic_igreja_pampulha.png',
+    'Descubra a Cidade - Parque Ecológico da Pampulha - Ecoturismo': '/imagens_app/ic_parque_ecologico_pampulha.png',
+    'Descubra a Cidade - Parque de Diversões Guanabara - Diversão e Lazer': '/imagens_app/ic_parque_guanabara.png',
+    'Descubra a Cidade - Parque da Serra do Curral - Ecoturismo': '/imagens_app/ic_parque_serra_curral.png',
+    'Descubra a Cidade - Feira de Artesanato da Afonso Pena - Compra (Aos domingos)': '/imagens_app/ic_feira_afonso_pena.png',
+    'Descubra a Cidade - Palácio das Artes - Arte e Cultura': '/imagens_app/ic_palacio_artes.png',
+    'Descubra a Cidade - Parque Municipal - Parque e Diversão': '/imagens_app/ic_parque_municipal.png',
+    'Descubra a Cidade - Praça da Savassi - Gastronomia': '/imagens_app/ic_praca_savassi.png',
+    'Descubra a Cidade - Museu de Artes e Ofícios - História': '/imagens_app/ic_museu_artes_oficios.png',
+    'Descubra a Cidade - Museu Abílio Barreto - História': '/imagens_app/ic_museu_abilio_barreto.png',
+    'Descubra a Cidade - Polo de Artesanato de Nações Unidas - Arte Mineira': '/imagens_app/ic_polo_artesanato.png',
     
      //=== ALERTA DE SERVIÇO ===
     'Rede de Serviços - Recarga Carro Elétrico (REC)': '/imagens_app/ic_recarga.png',
     'Rede de Serviços - WC Público Autolimpante (AUT)': '/imagens_app/ic_autolimpante.png',
     'Rede de Serviços - WC Público Comum (COM)': '/imagens_app/ic_banheiro.png',
     'Rede de Serviços - Ponto Abrigo Amigo (PAA)': '/imagens_app/ic_amigo.png',
-
-
     'default': '/imagens_app/ic_radar_cev_v2.png'
 };
 
 const TIPOS_ALERTA_RADAR = [
-    'Detector de Parada sobre Faixa de Pedestres  (DPFP)',
+    'Detector de Parada sobre Faixa de Pedestres (DPFP)',
     'Detector de Conversão em Local Proibido (DCP)',
     'Detector de Redução de Velocidade (REV)',
     'Verificador de Cinto de Segurança (VCS)',
@@ -2524,11 +2528,11 @@ const TIPOS_ALERTA_RADAR = [
 
     'Controlador Eletrônico Misto (DAS) + (CEV)',
     'Controlador Eletrônico Misto (DAS) + (DCP)',
-    'Controlador Eletrônico Misto (DAS) + (DIV)',
+    'Controlador Eletrônico Misto (DAS) + (DIF)',
 
     'Controlador Eletrônico de Velocidade (CEV)',
     'Detector de Avanço de Semáforo (DAS)',
-    'Detector de Tráfego em Local Proibido  (DTLP)',
+    'Detector de Tráfego em Local Proibido (DTLP)',
     'Detector de Invasão de Faixa Exclusiva (MOVE)',
     'Detector de Invasão de Faixa Exclusiva (DIFEX)',
     'Controle Inteligente de Velocidade (CIV)'
@@ -2538,7 +2542,6 @@ const TIPOS_ALERTA_RADAR = [
 const TIPOS_ALERTA_RISCO = [
     'Zona de Perigo e Violência (ZPV)',
     'Zona de Perigo e Violência',
-    'Alto Índice  de Acidente (AIA)',
     'Alerta de Alto Índice de Acidente (AIA)',
     'Alerta de Alto Índice de Acidente',
     'Zona de Risco de Inundações Recorrentes (ZIR)',
@@ -2568,45 +2571,41 @@ const TIPOS_ALERTA_MOBILIDADE = [
 ];
 
 const TIPOS_ALERTA_DESTAQUE = [
-'Mercado Central - Arte e Gastronomia', 
-'Mercado Novo - Arte e Gastronomia', 
-'Mirante do Mangabeiras - Panorama',
-'Parque Mangabeiras - Natureza',
-'Santa Tereza - Circuito Boêmio',
-'Rua Sapucaí - Panorama e Gastronomia',
-'Praça da Liberdade - Arte e Cultura', 
-'Edifício Maletta - Arte e Gastronomia', 
-'Praça do Papa - Panorma',
-'Museu do Futebol - Arte e Cultura',
-'Igreja da Pampulha - Arte e Cultura',
-'Parque Ecológico da Pampulha - Ecoturismo',
-'Parque da Serra do Curral - Ecoturismo',
-'Feira de Artesanato da Afonso Pena - Compra (Aos domingos)', 
-'Palácio das Artes - Arte e Cultura',
-'Parque Municipal  - Parque e Diversão',
-'Praça da Savassi - Gastronomia',
-'Museu de Artes e Ofícios - História',
-'Museu Abílio Barreto - História',
-'Polo de Artesanato de Nações Unidas - Arte MIneira'
+    'Mercado Central - Arte e Gastronomia', 
+    'Mercado Novo - Arte e Gastronomia', 
+    'Mirante do Mangabeiras - Panorama',
+    'Parque Mangabeiras - Natureza',
+    'Santa Tereza - Circuito Boêmio',
+    'Rua Sapucaí - Panorama e Gastronomia',
+    'Praça da Liberdade - Arte e Cultura', 
+    'Edifício Maletta - Arte e Gastronomia', 
+    'Praça do Papa - Panorama',
+    'Museu do Futebol - Arte e Cultura',
+    'Igreja da Pampulha - Arte e Cultura',
+    'Parque Ecológico da Pampulha - Ecoturismo',
+    'Parque da Serra do Curral - Ecoturismo',
+    'Feira de Artesanato da Afonso Pena - Compra (Aos domingos)', 
+    'Palácio das Artes - Arte e Cultura',
+    'Parque Municipal - Parque e Diversão',
+    'Praça da Savassi - Gastronomia',
+    'Museu de Artes e Ofícios - História',
+    'Museu Abílio Barreto - História',
+    'Polo de Artesanato de Nações Unidas - Arte Mineira'
 ];
+
 
 const TIPOS_ALERTA_SERVIÇO = [
-
-' Ponto Abrigo Amigo', 
-'WC Público Comum',
-'WC Público Autolimpante',
-'Recarga Carro Elétrico'
+    'Ponto Abrigo Amigo', 
+    'WC Público Comum',
+    'WC Público Autolimpante',
+    'Recarga Carro Elétrico'
 ];
-
-
-
 
 
 const TIPOS_SEM_ALERTA = [];
 
 const ajusteNomes = {
-    'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
-    'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
+  
 
 //=== ALERTA DE RADARES MISTOS ===
     'Controlador Eletrônico Misto (DAS + CEV)': 'Radar Misto Velocidade+Semáforo (CEM)',
@@ -2615,6 +2614,11 @@ const ajusteNomes = {
 
     'Controlador Eletrônico Misto (CEM)': 'Radar Misto Velocidade+Semáforo (CEM)',
     'Controlador Eletrônico Misto': 'Radar Misto Velocidade+Semáforo (CEM)',
+
+    //=== ALERTA DE RADARES SINGULARES ===
+
+    'Controlador Eletrônico de Velocidade': 'Radar de Velocidade (CEV)',
+    'Controlador Eletrônico de Velocidade (CEV)': 'Radar de Velocidade (CEV)',
 
     'Controle de Redução de Velocidade (CRV)': 'Painel de Redução de Velocidade (PRV)',
     'Controle de Redução de Velocidade': 'Painel de Redução de Velocidade (PRV)',
@@ -2647,8 +2651,6 @@ const ajusteNomes = {
     'Radar Inteligente de Velocidade Média (RIV)': 'Radar Inteligente de Velocidade Média (RIV)',
     'Radar Inteligente de Velocidade Média': 'Radar Inteligente de Velocidade Média (RIV)',
     'Leitor de Reconhecimento Facial (OCR-F)': 'Reconhecimento Facial (OCR-F)',
-
-
     'Alerta de Poluição Elevada (APE)': 'Área com Poluição Elevada (APE)'
 };
 
@@ -2681,8 +2683,40 @@ function getIconUrl(tipo, velocidade) {
     if (tipoLimpo.includes('WC Público Comum') || tipoLimpo.includes('COM')) {
         return iconMap['Rede de Serviços - WC Público Comum (COM)'];
     }
-    if (tipoLimpo.includes('Abrigo Amigo') || tipoLimpo.includes('PAA') || tipoLimpo.includes('Abrigo Amigo')) {
+    if (tipoLimpo.includes('Abrigo Amigo') || tipoLimpo.includes('PAA')) {
         return iconMap['Rede de Serviços - Ponto Abrigo Amigo (PAA)'];
+    }
+
+
+    // === Matching parcial para DESCUBRA A CIDADE ===
+    var discoverCitySubstrings = [
+        { keys: ['Mercado Central'],        icon: iconMap['Descubra a Cidade - Mercado Central - Arte e Gastronomia'] },
+        { keys: ['Mercado Novo'],           icon: iconMap['Descubra a Cidade - Mercado Novo - Arte e Gastronomia'] },
+        { keys: ['Mirante do Mangabeiras'], icon: iconMap['Descubra a Cidade - Mirante do Mangabeiras - Panorama'] },
+        { keys: ['Parque Mangabeiras'],     icon: iconMap['Descubra a Cidade - Parque Mangabeiras - Natureza'] },
+        { keys: ['Santa Tereza'],           icon: iconMap['Descubra a Cidade - Santa Tereza - Circuito Boêmio'] },
+        { keys: ['Rua Sapucaí'],            icon: iconMap['Descubra a Cidade - Rua Sapucaí - Panorama e Gastronomia'] },
+        { keys: ['Praça da Liberdade'],     icon: iconMap['Descubra a Cidade - Praça da Liberdade - Arte e Cultura'] },
+        { keys: ['Edifício Maletta'],       icon: iconMap['Descubra a Cidade - Edifício Maletta - Arte e Gastronomia'] },
+        { keys: ['Praça do Papa'],          icon: iconMap['Descubra a Cidade - Praça do Papa - Panorama'] },
+        { keys: ['Museu do Futebol'],       icon: iconMap['Descubra a Cidade - Museu do Futebol - Arte e Cultura'] },
+        { keys: ['Igreja da Pampulha'],     icon: iconMap['Descubra a Cidade - Igreja da Pampulha - Arte e Cultura'] },
+        { keys: ['Parque Ecológico da Pampulha'], icon: iconMap['Descubra a Cidade - Parque Ecológico da Pampulha - Ecoturismo'] },
+        { keys: ['Parque de Diversões Guanabara'], icon: iconMap['Descubra a Cidade - Parque de Diversões Guanabara - Diversão e Lazer'] },
+        { keys: ['Parque da Serra do Curral'], icon: iconMap['Descubra a Cidade - Parque da Serra do Curral - Ecoturismo'] },
+        { keys: ['Feira de Artesanato da Afonso Pena'], icon: iconMap['Descubra a Cidade - Feira de Artesanato da Afonso Pena - Compra (Aos domingos)'] },
+        { keys: ['Palácio das Artes'],      icon: iconMap['Descubra a Cidade - Palácio das Artes - Arte e Cultura'] },
+        { keys: ['Parque Municipal'],       icon: iconMap['Descubra a Cidade - Parque Municipal - Parque e Diversão'] },
+        { keys: ['Praça da Savassi'],       icon: iconMap['Descubra a Cidade - Praça da Savassi - Gastronomia'] },
+        { keys: ['Museu de Artes e Ofícios'], icon: iconMap['Descubra a Cidade - Museu de Artes e Ofícios - História'] },
+        { keys: ['Museu Abílio Barreto'],   icon: iconMap['Descubra a Cidade - Museu Abílio Barreto - História'] },
+        { keys: ['Polo de Artesanato'],     icon: iconMap['Descubra a Cidade - Polo de Artesanato de Nações Unidas - Arte Mineira'] }
+    ];
+    for (var d = 0; d < discoverCitySubstrings.length; d++) {
+        var entryD = discoverCitySubstrings[d];
+        for (var kd = 0; kd < entryD.keys.length; kd++) {
+            if (tipoLimpo.includes(entryD.keys[kd])) return entryD.icon;
+        }
     }
 
 
@@ -2740,22 +2774,22 @@ function getIconUrl(tipo, velocidade) {
 
     var substrings = [
         { keys: ['Olho Vivo', 'COV'],               icon: iconMap['Câmera Olho Vivo (COV)'] },
-          { keys: ['Poluição', 'APE'],               icon: iconMap['Alerta de Poluição Elevada (APE)'] },
-        { keys: ['Facial'],                          icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
-        { keys: ['OCR-P', 'Placas'],                 icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
-        { keys: ['Celular', 'DUC'],                  icon: iconMap['Detector de Uso de Celular'] },
-        { keys: ['Cinto', 'VCS'],                    icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
-        { keys: ['Acidente', 'AIA'],                 icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
-        { keys: ['Média', 'RIV'],                    icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
-        { keys: ['Apenas', 'ATL'],                   icon: iconMap['Apenas Trânsito Local (ATL)'] },
-        { keys: ['Perigo', 'ZPV'],                   icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
-        { keys: ['Inundaç', 'ZIR'],                  icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
+        { keys: ['Poluição', 'APE'],                icon: iconMap['Alerta de Poluição Elevada (APE)'] },
+        { keys: ['Facial'],                         icon: iconMap['Leitor de Reconhecimento Facial (OCR-F)'] },
+        { keys: ['OCR-P', 'Placas'],                icon: iconMap['Leitor Inteligente de Placas (OCR-P)'] },
+        { keys: ['Celular', 'DUC'],                 icon: iconMap['Detector de Uso de Celular'] },
+        { keys: ['Cinto', 'VCS'],                   icon: iconMap['Verificador de Cinto de Segurança (VCS)'] },
+        { keys: ['Acidente', 'AIA'],                icon: iconMap['Alerta de Alto Índice de Acidente (AIA)'] },
+        { keys: ['Média', 'RIV'],                   icon: iconMap['Radar Inteligente de Velocidade Média (RIV)'] },
+        { keys: ['Apenas', 'ATL'],                  icon: iconMap['Apenas Trânsito Local (ATL)'] },
+        { keys: ['Perigo', 'ZPV'],                  icon: iconMap['Zona de Perigo e Violência (ZPV)'] },
+        { keys: ['Inundaç', 'ZIR'],                 icon: iconMap['Zona de Risco de Inundações Recorrentes (ZIR)'] },
         { keys: ['Redução', 'Redutor', 'DRV', 'CRV'],icon: iconMap['Controle de Redução de Velocidade (CRV)'] },
-        { keys: ['Conversão'],                       icon: iconMap['Detector de Conversão em Local Proibido'] },
+        { keys: ['Conversão'],                      icon: iconMap['Detector de Conversão em Local Proibido'] },
         { keys: ['Invasão', 'DIFEX', 'Faixa Exclusiva', 'MOVE'], icon: iconMap['Detector de Invasão de Faixa Exclusiva (DIFEX)'] },
         { keys: ['Tráfego Proibido', 'DTLP'],       icon: iconMap['Detector de Tráfego em Local Proibido'] },
-        { keys: ['BUS', 'Faixa Preferencial'],       icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
-        { keys: ['Túnel', 'TUV'],                    icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
+        { keys: ['BUS', 'Faixa Preferencial'],      icon: iconMap['Detector de Faixa Preferencial de Ônibus (BUS)'] },
+        { keys: ['Túnel', 'TUV'],                   icon: iconMap['Passagem Sob Túnel Viário (TUV)'] },
     ];
     for (var s = 0; s < substrings.length; s++) {
         var entry = substrings[s];
