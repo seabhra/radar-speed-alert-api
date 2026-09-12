@@ -37,6 +37,9 @@
   src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"
 ></script>
 
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <!-- Leaflet Routing Machine -->
 <script
   src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"
@@ -54,6 +57,13 @@
 
 <!-- MapLibre GL para Leaflet -->
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 
 <!-- Fontes -->
 <link
@@ -6661,130 +6671,170 @@ function formatarTextoTarja(tipoAlerta) {
 // ===================================================================
 // FUNÇÃO QUE ESTÁ FALTANDO: RENDERIZAR RADARES NO MAPA
 // ===================================================================
-function renderizarRadaresNoMapa(listaRadares, fonteDados = 'API') {
-    if (!listaRadares || listaRadares.length === 0) {
-        console.log('[Radar X9] ⚠️ Nenhum radar para renderizar.');
+// ===================================================================
+// FUNÇÃO UNIFICADA DE RENDERIZAÇÃO (Mantenha APENAS ESTA)
+// ===================================================================
+function renderizarRadaresNoMapa(records) {
+    if (!map || !records || records.length === 0) {
         $("#loading").hide();
         return;
     }
 
-    let contagemCurados = 0;
-    let contagemUsuarios = 0;
+    var contador = 0;
+    var contadorCurados = 0;
+    var contadorUsuarios = 0;
 
-    listaRadares.forEach(function(radar) {
-        // 1. Normalizar coordenadas (aceita 'lat'/'lng' ou 'latitude'/'longitude')
-        const lat = parseFloat(radar.latitude || radar.lat);
-        const lng = parseFloat(radar.longitude || radar.lng);
-
-        if (isNaN(lat) || isNaN(lng)) {
-            console.warn('[Radar X9] ⚠️ Coordenadas inválidas para radar:', radar);
-            return; // Pula este radar se não tiver coordenada válida
-        }
-
-        // 2. Identificar se é do usuário ou curado (AJUSTE O CAMPO 'origem' CONFORME SUA API)
-        // Exemplo: sua API pode retornar { origem: 'usuario' } ou { tipo: 'curado' }
-        const ehUsuario = (radar.origem === 'usuario' || radar.enviado_por_usuario === true || radar.fonte === 'app');
+    for (var i = 0; i < records.length; i++) {
+        var record = records[i];
         
-        if (ehUsuario) {
-            contagemUsuarios++;
+        // Verifica a flag que adicionamos durante o merge dos arquivos
+        var isUsuario = record._isUsuario === true;
+        
+        if (isUsuario) {
+            contadorUsuarios++;
         } else {
-            contagemCurados++;
+            contadorCurados++;
         }
 
-        // 3. Obter o ícone correto usando a função que já corrigimos
-        const tipoRadar = radar.tipo || radar.tipo_alerta || 'Desconhecido';
-        const velocidade = radar.velocidade || radar.limite_velocidade;
-        const urlIcone = getIconUrl(tipoRadar, velocidade);
+        // Extrai coordenadas: prioriza o formato do GitHub (record[9] = "lat, lng") 
+        // ou fallback para formato de objeto (record.latitude)
+        var latStr = record[9] ? record[9].split(',')[0] : (record.latitude || record.lat);
+        var lngStr = record[9] ? record[9].split(',')[1] : (record.longitude || record.lng);
+        
+        var finalLat = parseFloat(latStr);
+        var finalLng = parseFloat(lngStr);
 
-        // 4. Criar o ícone do Leaflet
-        const customIcon = L.icon({
-            iconUrl: urlIcone,
-            iconSize: [40, 40], // Ajuste o tamanho conforme seu design
-            iconAnchor: [20, 40],
-            popupAnchor: [0, -40],
-            className: 'radar-marker-icon'
-        });
+        if (isNaN(finalLat) || isNaN(finalLng)) {
+            console.warn('[Radar X9] ⚠️ Coordenadas inválidas no registro', i, record);
+            continue;
+        }
 
-        // 5. Criar o marcador
-        const marker = L.marker([lat, lng], { icon: customIcon });
+        // Extrai dados priorizando o formato de array do GitHub
+        var endereco = record[2] || record.endereco || "Endereço não informado";
+        var tipo = (record[3] || record.tipo || "Não Identificado").trim();
+        var velocidade = record[4] || record.velocidade || "0";
 
-        // 6. Montar o conteúdo do Popup / Tarja
-        const nomeLimpo = formatarTextoTarja(tipoRadar);
-        const badgeOrigem = ehUsuario 
-            ? '<span style="background:#ff9800; color:#fff; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold;">👤 Usuário</span>' 
-            : '<span style="background:#4caf50; color:#fff; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:bold;">✅ Oficial</span>';
+        var iconeUrl = getIconUrl(tipo, velocidade);
+        var fallbackUrl = '/imagens_app/ic_radar_cev_v2.png'; 
+        var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
 
-        const conteudoPopup = `
-            <div style="text-align:center; min-width: 200px;">
-                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">DESCUBRA A CIDADE</h3>
-                <div style="margin-bottom: 8px;">${badgeOrigem}</div>
-                <p style="margin: 0; font-weight: bold; color: #555; font-size: 14px;">${nomeLimpo}</p>
-                ${radar.endereco ? `<p style="margin: 5px 0 0 0; font-size: 12px; color: #777;">📍 ${radar.endereco}</p>` : ''}
-                ${velocidade ? `<p style="margin: 5px 0 0 0; font-size: 12px; color: #d32f2f; font-weight:bold;">⚠️ Velocidade: ${velocidade} km/h</p>` : ''}
-            </div>
-        `;
+        var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
 
-        marker.bindPopup(conteudoPopup);
+        var tipoExibicao = (typeof ajusteNomes !== 'undefined' && ajusteNomes[tipo]) ? ajusteNomes[tipo] : tipo;
+        
+        // Selo visual dinâmico e limpo (sem "Descubra a Cidade" repetido)
+        var seloUsuario = isUsuario 
+            ? '<div style="color:#ff9800; font-size:0.85rem; margin-top:6px; font-weight:bold;">👤 Compartilhado por Usuário</div>' 
+            : '<div style="color:#4caf50; font-size:0.85rem; margin-top:6px; font-weight:bold;">✅ Oficial / Curado</div>';
 
-        // 7. Adicionar ao mapa e ao array de controle
-        marker.addTo(map);
-        radarMarkers.push(marker);
-    });
+        radarMarker.bindPopup(
+            '<div style="color:#222; font-family:\'Inter\', sans-serif; text-align:center; min-width:200px;">' +
+            '<b style="font-size:1.1rem;">' + tipoExibicao + '</b><br>' +
+            '<hr style="border:0; border-top:1px solid #ddd; margin:8px 0;">' +
+            '<div style="font-size:0.9rem; color:#555;">' + endereco + '</div>' +
+            '<div style="color:#d32f2f; font-weight:bold; margin-top:8px; font-size:1rem;">⚠️ Máx: ' + velocidade + ' km/h</div>' +
+            seloUsuario + 
+            '</div>'
+        );
 
-    console.log(`[Radar X9] ✅ Renderização concluída: ${contagemCurados} curados, ${contagemUsuarios} de usuários.`);
+        radarMarker.radarData = {
+            id: record[0] || record.id || i, 
+            latitude: finalLat, 
+            longitude: finalLng,
+            endereco: endereco, 
+            velocidade_maxima: velocidade,
+            tipoOriginal: tipo, 
+            tipoExibicao: tipoExibicao,
+            isUsuario: isUsuario
+        };
+        radarMarkers.push(radarMarker);
+        contador++;
+    }
+
     $("#loading").hide();
+    console.log(`[Radar X9] ✅ Renderização concluída: ${contadorCurados} curados, ${contadorUsuarios} usuários.`);
+    if (contador > 0) showNotification(`Mapa atualizado: ${contadorCurados} oficiais, ${contadorUsuarios} usuários`);
 }
-
 // ==========================================
 // CARREGAR RADARES UNIFICADOS VIA API VERCEL
 // ==========================================
+// ===================================================================
+// CARREGAR RADARES: Busca AMBOS os arquivos do GitHub em paralelo
+// ===================================================================
 async function carregarRadares() {
     if (!map) return;
     
-    // 1. Limpar marcadores antigos
+    // 1. Limpar marcadores antigos (mantendo temporariamente os da sessão atual)
+    var markersParaManter = [];
     if (radarMarkers.length > 0) { 
-        radarMarkers.forEach(function(marker) { map.removeLayer(marker); }); 
-        radarMarkers = []; 
+        radarMarkers.forEach(function(marker) { 
+            if (marker.radarData && marker.radarData.isUsuario && marker.radarData._isSessao) {
+                markersParaManter.push(marker);
+            } else {
+                map.removeLayer(marker); 
+            }
+        }); 
+        radarMarkers = markersParaManter; 
     }
     
     $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas unificados...</div>");
 
-            try {
-        console.log('[Radar X9] 🔄 Carregando radares unificados da API...');
+    try {
+        console.log('[Radar X9] 🔄 Buscando radares curados e de usuários no GitHub...');
         
-        const response = await fetch('/api/get-radares?v=' + Date.now(), { 
-            headers: { 'Accept': 'application/json' } 
-        });
-        
-        if (!response.ok) throw new Error(`Falha na API: ${response.status}`);
-        
-        const todosOsRadares = await response.json();
-        console.log(`[Radar X9] 📊 API retornou ${todosOsRadares.length} radares no total.`);
-        
-        if (todosOsRadares.length > 0) {
-            // DIAGNÓSTICO: Vamos ver o formato do primeiro radar curado e do primeiro de usuário
-            console.log('[Radar X9] 🔍 Amostra do radar 0:', todosOsRadares[0]);
-            console.log('[Radar X9] 🔍 Amostra do radar 566:', todosOsRadares[566] || 'Não existe');
+        // Busca os dois arquivos EM PARALELO usando as URLs do GITHUB_CONFIG
+        const [responseCurados, responseApp] = await Promise.all([
+            fetch(GITHUB_CONFIG.cdnUrl + '?v=' + Date.now()),
+            fetch(GITHUB_CONFIG.cdnUrlApp + '?v=' + Date.now())
+        ]);
 
-            // Renderiza tudo. O 'true' garante que o mapa trate como potencialmente do usuário
-            renderizarRadaresNoMapa(todosOsRadares, 'API Unificada (Vercel)', true);
-            
-            // ... (mantenha o resto do seu código de cache e radaresAdicionadosNestaSessao aqui)
-            
+        let radaresCurados = [];
+        let radaresApp = [];
+
+        // Processa radares curados (radares.json)
+        if (responseCurados.ok) {
+            const dataCurados = await responseCurados.json();
+            radaresCurados = (dataCurados.records || []).map(r => ({ ...r, _isUsuario: false }));
+            console.log(`[Radar X9] 📊 Radares curados carregados: ${radaresCurados.length}`);
+        } else {
+            console.warn('[Radar X9] ⚠️ Falha ao carregar radares.json (Curados)');
+        }
+
+        // Processa radares de usuários (radares_app.json)
+        if (responseApp.ok) {
+            const dataApp = await responseApp.json();
+            radaresApp = (dataApp.records || []).map(r => ({ ...r, _isUsuario: true }));
+            console.log(`[Radar X9] 📊 Radares de usuários carregados: ${radaresApp.length}`);
+        } else {
+            console.warn('[Radar X9] ⚠️ Falha ao carregar radares_app.json (Usuários)');
+        }
+
+        // Combina os dois arrays em um só
+        const todosOsRadares = [...radaresCurados, ...radaresApp];
+        console.log(`[Radar X9] 📊 Total de radares unificados: ${todosOsRadares.length}`);
+
+        if (todosOsRadares.length > 0) {
+            renderizarRadaresNoMapa(todosOsRadares);
             RADAR_MODO_OFFLINE = false;
+            
+            // Salva no cache local para fallback offline
+            try {
+                localStorage.setItem('radarx9_radares_cache', JSON.stringify({
+                    recordsCurados: radaresCurados,
+                    recordsApp: radaresApp
+                }));
+            } catch(e) {}
+            
         } else {
             showNotification('⚠️ Nenhum radar encontrado na base de dados.');
             RADAR_MODO_OFFLINE = true;
         }
 
-        // 4. [MANTIDO] Reinsere radares desta sessão que ainda não voltaram na resposta da API
-        // (Isso é crucial para o usuário ver o radar que acabou de adicionar imediatamente)
-        if (radaresAdicionadosNestaSessao.length > 0) {
+        // 4. [MANTIDO] Reinsere radares desta sessão que ainda não propagaram no CDN do GitHub
+        if (typeof radaresAdicionadosNestaSessao !== 'undefined' && radaresAdicionadosNestaSessao.length > 0) {
             radaresAdicionadosNestaSessao.forEach(function(item) {
                 var jaExiste = radarMarkers.some(function(m) {
-                    return m.radarData &&
-                           Math.abs(m.radarData.latitude - item.radar.latitude) < 0.00001 &&
-                           Math.abs(m.radarData.longitude - item.radar.longitude) < 0.00001;
+                    return m.radarData && m.radarData.id === item.id;
                 });
                 
                 if (!jaExiste) {
@@ -6792,42 +6842,29 @@ async function carregarRadares() {
                         ...item.radar,
                         id: item.id,
                         tipoOriginal: item.radar.tipo,
-                        isUsuario: true
+                        isUsuario: true,
+                        _isSessao: true // Marca como temporário até o CDN atualizar
                     });
                     if (markerRecriado) {
                         radarMarkers.push(markerRecriado);
-                        console.log('[Radar X9] 🧩 Radar #' + item.id + ' reinserido (ainda não propagado na API)');
+                        console.log('[Radar X9] 🧩 Radar #' + item.id + ' reinserido (ainda não propagado no CDN)');
                     }
-                } else {
-                    console.log('[Radar X9] ✅ Radar #' + item.id + ' já veio da API, removendo da lista de sessão');
                 }
-            });
-
-            // Limpa da lista de sessão os que já vieram confirmados
-            radaresAdicionadosNestaSessao = radaresAdicionadosNestaSessao.filter(function(item) {
-                return !radarMarkers.some(function(m) {
-                    return m.radarData && m.radarData.id === item.id && m.radarData.isUsuario;
-                }) || !todosOsRadares.some(function(r) {
-                    var coords = String(r[9] || '').split(',').map(function(s){return parseFloat(s.trim());});
-                    return coords.length === 2 &&
-                           Math.abs(coords[0] - item.radar.latitude) < 0.00001 &&
-                           Math.abs(coords[1] - item.radar.longitude) < 0.00001;
-                });
             });
         }
 
     } catch (err) {
-        console.error('[Radar X9] ❌ Erro ao carregar radares da API:', err);
+        console.error('[Radar X9] ❌ Erro ao carregar radares:', err);
         showNotification('⚠️ Erro de conexão. Tentando carregar do cache local...');
         
-        // 5. Fallback de emergência: Cache Local
+        // Fallback de emergência: Cache Local
         try {
             const cached = localStorage.getItem('radarx9_radares_cache');
             if (cached) {
                 const data = JSON.parse(cached);
-                const recordsCurados = data.recordsCurados || [];
-                if (recordsCurados.length > 0) {
-                    renderizarRadaresNoMapa(recordsCurados, 'Cache Local (Offline)', false);
+                const todos = [...(data.recordsCurados || []), ...(data.recordsApp || [])];
+                if (todos.length > 0) {
+                    renderizarRadaresNoMapa(todos);
                     RADAR_MODO_OFFLINE = true;
                 }
             }
@@ -6835,88 +6872,10 @@ async function carregarRadares() {
             console.warn('[Radar X9] Cache local também falhou:', e.message); 
         }
     } finally {
-        // 6. Esconder loading em qualquer cenário (sucesso ou erro)
         $("#loading").hide();
     }
 }
 
-
-// ==============================
-// RENDERIZAR RADARES APP NO MAPA
-// ==============================
-
-function renderizarRadaresNoMapa(records, origem, isUsuario) {
-    if (!map) return;
-    var radaresExternos = records || [];
-    var contador = 0;
-    var idOffset = isUsuario ? 100000 : 0;
-    
-    console.log('[Radar X9] 📊 Renderizando ' + radaresExternos.length + ' radares de: ' + origem);
-
-    for (var i = 0; i < radaresExternos.length; i++) {
-        var record = radaresExternos[i];
-        
-        // Log para depuração
-        console.log('[Radar X9] Registro ' + i + ':', record);
-        
-        var coords = extrairCoordenadas(record, i);
-        if (!coords) {
-            console.warn('[Radar X9] ⚠️ Coordenadas não encontradas para registro ' + i + ':', record);
-            continue;
-        }
-
-        console.log('[Radar X9] ✅ Coordenadas extraídas:', coords);
-        
-        var finalLat = coords.lat;
-        var finalLng = coords.lng;
-        var endereco = record[2] || "Endereço não informado";
-        var tipo = (record[3] || "Não Identificado").trim();
-        var velocidade = record[4] || "0";
-
-        var iconeUrl = getIconUrl(tipo, velocidade);
-        var fallbackUrl = 'imagens_app/ic_radar_cev_v2.png'; 
-        var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
-
-        var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
-
-        setTimeout(function(mk, fb) {
-            return function() {
-                var el = mk.getElement();
-                if (el) { var imgEl = el.querySelector('img'); if (imgEl) imgEl.setAttribute('data-fallback', fb); }
-            };
-        }(radarMarker, fallbackUrl), 100);
-
-        var tipoExibicao = ajusteNomes[tipo] || tipo;
-        var isIA = tipoExibicao.includes('OCR') || tipoExibicao.includes('FACIAL');
-
-        //===============================================================
-        // [ADICIONADO] selo visual para radares enviados pela comunidade
-        //===============================================================
-        
-
-        var seloUsuario = isUsuario ? '<div style="color:#66A775;font-size:0.85rem;margin-top:4px;font-weight:bold;">🧩 Compartilhado por usuários</div>' : '';
-        var tituloPopup = isIA ? '<span style="color:#33aaff">' + tipoExibicao + '</span>' : '<b>' + tipoExibicao + '</b>';
-
-        radarMarker.bindPopup(
-            '<div style="color:#222; font-family:\'Inter\'; text-align:center; min-width:200px;">' +
-            tituloPopup + '<br><hr style="border:0; border-top:1px solid #ddd; margin:5px 0;">' +
-            endereco + '<br><div style="color:#d00; font-weight:bold; margin-top:5px;">Máx: ' + velocidade + ' km/h</div>' +
-            seloUsuario + '</div>'
-        );
-
-        radarMarker.radarData = {
-            id: idOffset + i, latitude: finalLat, longitude: finalLng,
-            endereco: endereco, velocidade_maxima: velocidade,
-            tipoOriginal: tipo, tipoExibicao: tipoExibicao, isIA: isIA,
-            isUsuario: !!isUsuario // [ADICIONADO]
-        };
-        radarMarkers.push(radarMarker);
-        contador++;
-    }
-
-    $("#loading").hide();
-    if (contador > 0) showNotification('Base carregada: ' + origem + ' (' + contador + ' radares)');
-}
 
 // =======================
 // FUNÇÃO BUSCAR RADARES
