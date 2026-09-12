@@ -6836,6 +6836,25 @@ async function carregarRadares() {
         $("#loading").hide();
     }
 }
+   //================================
+  // VERIFICAÇÃO CRÍTICA DEBUG DE API
+  //=================================
+if (todosOsRadares.length > 0) {
+    // VERIFICAÇÃO CRÍTICA - veja no console (F12) qual campo indica a origem
+    console.log('=== DIAGNÓSTICO DA ESTRUTURA DOS DADOS ===');
+    console.log('Radar curado (índice 0):', todosOsRadares[0]);
+    console.log('Radar usuário (se existir):', todosOsRadares.find(r => r.origem === 'usuario' || r.enviado_por_usuario));
+    
+    // Conte quantos têm cada tipo de campo
+    const comOrigem = todosOsRadares.filter(r => r.origem).length;
+    const comEnviadoUsuario = todosOsRadares.filter(r => r.enviado_por_usuario !== undefined).length;
+    const comFonte = todosOsRadares.filter(r => r.fonte).length;
+    
+    console.log(`Campos encontrados: ${comOrigem} com 'origem', ${comEnviadoUsuario} com 'enviado_por_usuario', ${comFonte} com 'fonte'`);
+    console.log('=== FIM DIAGNÓSTICO ===');
+
+    renderizarRadaresNoMapa(todosOsRadares, 'API Unificada');
+}
 // ==============================
 // RENDERIZAR RADARES APP NO MAPA
 // ==============================
