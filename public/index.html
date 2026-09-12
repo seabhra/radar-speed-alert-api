@@ -6683,11 +6683,11 @@ function renderizarRadaresNoMapa(records) {
     var contador = 0;
     var contadorCurados = 0;
     var contadorUsuarios = 0;
+    var contadorErros = 0;
+    var errosDetalhados = []; // Armazena detalhes dos erros
 
     for (var i = 0; i < records.length; i++) {
         var record = records[i];
-        
-        // Verifica a flag que adicionamos durante o merge dos arquivos
         var isUsuario = record._isUsuario === true;
         
         if (isUsuario) {
@@ -6696,20 +6696,76 @@ function renderizarRadaresNoMapa(records) {
             contadorCurados++;
         }
 
-        // Extrai coordenadas: prioriza o formato do GitHub (record[9] = "lat, lng") 
-        // ou fallback para formato de objeto (record.latitude)
-        var latStr = record[9] ? record[9].split(',')[0] : (record.latitude || record.lat);
-        var lngStr = record[9] ? record[9].split(',')[1] : (record.longitude || record.lng);
-        
-        var finalLat = parseFloat(latStr);
-        var finalLng = parseFloat(lngStr);
+        // Tenta extrair coordenadas de múltiplos formatos
+        var finalLat = null;
+        var finalLng = null;
+        var erroCoordenada = null;
 
-        if (isNaN(finalLat) || isNaN(finalLng)) {
-            console.warn('[Radar X9] ⚠️ Coordenadas inválidas no registro', i, record);
+        // Formato 1: Array do GitHub (record[9] = "lat, lng")
+        if (record[9] && typeof record[9] === 'string') {
+            var coords = record[9].split(',').map(s => parseFloat(s.trim()));
+            if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+                finalLat = coords[0];
+                finalLng = coords[1];
+            } else {
+                erroCoordenada = `Formato inválido em record[9]: "${record[9]}"`;
+            }
+        }
+        
+        // Formato 2: Objeto com latitude/longitude
+        if (finalLat === null && (record.latitude || record.lat)) {
+            finalLat = parseFloat(record.latitude || record.lat);
+            finalLng = parseFloat(record.longitude || record.lng);
+            if (isNaN(finalLat) || isNaN(finalLng)) {
+                erroCoordenada = `Lat/Lng não numéricos: ${record.latitude}, ${record.longitude}`;
+                finalLat = null;
+                finalLng = null;
+            }
+        }
+
+        // Formato 3: Campos alternativos
+        if (finalLat === null && record.latlng) {
+            if (Array.isArray(record.latlng) && record.latlng.length === 2) {
+                finalLat = parseFloat(record.latlng[0]);
+                finalLng = parseFloat(record.latlng[1]);
+            } else if (typeof record.latlng === 'string') {
+                var parts = record.latlng.split(',');
+                if (parts.length === 2) {
+                    finalLat = parseFloat(parts[0]);
+                    finalLng = parseFloat(parts[1]);
+                }
+            }
+        }
+
+        // Se ainda não tem coordenadas válidas, registra o erro
+        if (finalLat === null || finalLng === null || isNaN(finalLat) || isNaN(finalLng)) {
+            contadorErros++;
+            if (errosDetalhados.length < 10) { // Guarda apenas os primeiros 10 erros
+                errosDetalhados.push({
+                    indice: i,
+                    isUsuario: isUsuario,
+                    erro: erroCoordenada || 'Coordenadas não encontradas',
+                    record: record
+                });
+            }
             continue;
         }
 
-        // Extrai dados priorizando o formato de array do GitHub
+        // Verifica se as coordenadas estão em uma faixa razoável (Brasil)
+        if (finalLat < -33 || finalLat > 5 || finalLng < -74 || finalLng > -35) {
+            contadorErros++;
+            if (errosDetalhados.length < 10) {
+                errosDetalhados.push({
+                    indice: i,
+                    isUsuario: isUsuario,
+                    erro: `Coordenadas fora do Brasil: ${finalLat}, ${finalLng}`,
+                    record: record
+                });
+            }
+            continue;
+        }
+
+        // Extrai dados
         var endereco = record[2] || record.endereco || "Endereço não informado";
         var tipo = (record[3] || record.tipo || "Não Identificado").trim();
         var velocidade = record[4] || record.velocidade || "0";
@@ -6722,7 +6778,6 @@ function renderizarRadaresNoMapa(records) {
 
         var tipoExibicao = (typeof ajusteNomes !== 'undefined' && ajusteNomes[tipo]) ? ajusteNomes[tipo] : tipo;
         
-        // Selo visual dinâmico e limpo (sem "Descubra a Cidade" repetido)
         var seloUsuario = isUsuario 
             ? '<div style="color:#ff9800; font-size:0.85rem; margin-top:6px; font-weight:bold;">👤 Compartilhado por Usuário</div>' 
             : '<div style="color:#4caf50; font-size:0.85rem; margin-top:6px; font-weight:bold;">✅ Oficial / Curado</div>';
@@ -6752,8 +6807,23 @@ function renderizarRadaresNoMapa(records) {
     }
 
     $("#loading").hide();
-    console.log(`[Radar X9] ✅ Renderização concluída: ${contadorCurados} curados, ${contadorUsuarios} usuários.`);
-    if (contador > 0) showNotification(`Mapa atualizado: ${contadorCurados} oficiais, ${contadorUsuarios} usuários`);
+    
+    // Log detalhado dos erros
+    console.log(`[Radar X9] ✅ Renderização: ${contadorCurados} curados, ${contadorUsuarios} usuários`);
+    console.log(`[Radar X9] ❌ Erros de coordenadas: ${contadorErros}`);
+    
+    if (errosDetalhados.length > 0) {
+        console.warn('[Radar X9] ⚠️ Primeiros erros encontrados:');
+        errosDetalhados.forEach(function(erro, idx) {
+            console.warn(`  ${idx + 1}. Índice ${erro.indice} (${erro.isUsuario ? 'Usuário' : 'Oficial'}): ${erro.erro}`);
+            console.warn('     Dados:', erro.record);
+        });
+        
+        // Mostra notificação com resumo dos erros
+        showNotification(`⚠️ ${contadorErros} radares com coordenadas inválidas`);
+    } else {
+        showNotification(`Mapa atualizado: ${contadorCurados} oficiais, ${contadorUsuarios} usuários`);
+    }
 }
 // ==========================================
 // CARREGAR RADARES UNIFICADOS VIA API VERCEL
