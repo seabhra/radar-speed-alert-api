@@ -6669,12 +6669,12 @@ function formatarTextoTarja(tipoAlerta) {
 }
 
 // ===================================================================
-// FUNÇÃO QUE ESTÁ FALTANDO: RENDERIZAR RADARES NO MAPA
+// FUNÇÃO UNIFICADA DE RENDERIZAÇÃO: RENDERIZAR RADARES NO MAPA
 // ===================================================================
-// ===================================================================
-// FUNÇÃO UNIFICADA DE RENDERIZAÇÃO (Mantenha APENAS ESTA)
-// ===================================================================
+
 function renderizarRadaresNoMapa(records) {
+    // Adicione no início da função renderizarRadaresNoMapa, antes do loop:
+console.log('[Radar X9] 🔍 AMOSTRA DE ERROS - Primeiros 20 registros problemáticos:');
     if (!map || !records || records.length === 0) {
         $("#loading").hide();
         return;
@@ -6684,7 +6684,109 @@ function renderizarRadaresNoMapa(records) {
     var contadorCurados = 0;
     var contadorUsuarios = 0;
     var contadorErros = 0;
-    var errosDetalhados = []; // Armazena detalhes dos erros
+    var errosDetalhados = [];
+    var errosPorTipo = {
+        formatoInvalido: 0,
+        foraBrasil: 0,
+        nullUndefined: 0,
+        parseError: 0
+    };
+
+    // Função auxiliar robusta para parsear coordenadas
+    function parsearCoordenada(valor) {
+        if (valor === null || valor === undefined || valor === '') {
+            return { valido: false, motivo: 'null/undefined/vazio' };
+        }
+        
+        var num = parseFloat(valor);
+        
+        if (isNaN(num)) {
+            return { valido: false, motivo: 'NaN após parseFloat', valorOriginal: valor };
+        }
+        
+        // Verifica se é um número razoável para coordenadas
+        if (num < -90 || num > 90) {
+            return { valido: false, motivo: 'Fora da faixa -90 a 90', valor: num };
+        }
+        
+        return { valido: true, valor: num };
+    }
+
+    // Função para extrair coordenadas de forma mais inteligente
+    function extrairCoordenadas(record) {
+        var lat = null, lng = null, erro = null;
+
+        // Estratégia 1: record[9] no formato "lat, lng" ou "lat,lng"
+        if (record[9] !== undefined && record[9] !== null) {
+            var str = String(record[9]).trim();
+            if (str) {
+                var partes = str.split(',').map(s => s.trim());
+                if (partes.length >= 2) {
+                    var parseLat = parsearCoordenada(partes[0]);
+                    var parseLng = parsearCoordenada(partes[1]);
+                    
+                    if (parseLat.valido && parseLng.valido) {
+                        return { lat: parseLat.valor, lng: parseLng.valor, sucesso: true };
+                    } else {
+                        erro = `record[9] inválido: "${str}" (lat:${parseLat.motivo}, lng:${parseLng.motivo})`;
+                    }
+                }
+            }
+        }
+
+        // Estratégia 2: Campos nomeados latitude/longitude
+        if (lat === null) {
+            var camposLat = ['latitude', 'lat', 'Latitude', 'LATITUDE'];
+            var camposLng = ['longitude', 'lng', 'lon', 'Longitude', 'LONGITUDE'];
+            
+            for (var i = 0; i < camposLat.length; i++) {
+                if (record[camposLat[i]] !== undefined) {
+                    var parseLat = parsearCoordenada(record[camposLat[i]]);
+                    if (parseLat.valido) {
+                        lat = parseLat.valor;
+                        break;
+                    }
+                }
+            }
+            
+            for (var i = 0; i < camposLng.length; i++) {
+                if (record[camposLng[i]] !== undefined) {
+                    var parseLng = parsearCoordenada(record[camposLng[i]]);
+                    if (parseLng.valido) {
+                        lng = parseLng.valor;
+                        break;
+                    }
+                }
+            }
+            
+            if (lat !== null && lng !== null) {
+                return { lat: lat, lng: lng, sucesso: true };
+            } else if (lat === null || lng === null) {
+                erro = `Campos lat/lng incompletos (lat:${lat}, lng:${lng})`;
+            }
+        }
+
+        // Estratégia 3: Array latlng
+        if (lat === null && record.latlng) {
+            if (Array.isArray(record.latlng) && record.latlng.length === 2) {
+                var parseLat = parsearCoordenada(record.latlng[0]);
+                var parseLng = parsearCoordenada(record.latlng[1]);
+                
+                if (parseLat.valido && parseLng.valido) {
+                    return { lat: parseLat.valor, lng: parseLng.valor, sucesso: true };
+                }
+            }
+        }
+
+        return { lat: null, lng: null, sucesso: false, erro: erro || 'Coordenadas não encontradas' };
+    }
+
+    // Validação mais flexível para Brasil (inclui fronteiras)
+    function isValidBrasil(lat, lng) {
+        // Brasil: Lat entre -33.75 e 5.25, Lng entre -73.99 e -34.79
+        // Margem de segurança de 0.5 graus
+        return lat >= -34.5 && lat <= 6 && lng >= -74.5 && lng <= -34;
+    }
 
     for (var i = 0; i < records.length; i++) {
         var record = records[i];
@@ -6696,70 +6798,36 @@ function renderizarRadaresNoMapa(records) {
             contadorCurados++;
         }
 
-        // Tenta extrair coordenadas de múltiplos formatos
-        var finalLat = null;
-        var finalLng = null;
-        var erroCoordenada = null;
-
-        // Formato 1: Array do GitHub (record[9] = "lat, lng")
-        if (record[9] && typeof record[9] === 'string') {
-            var coords = record[9].split(',').map(s => parseFloat(s.trim()));
-            if (coords.length === 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-                finalLat = coords[0];
-                finalLng = coords[1];
-            } else {
-                erroCoordenada = `Formato inválido em record[9]: "${record[9]}"`;
-            }
-        }
+        var coords = extrairCoordenadas(record);
         
-        // Formato 2: Objeto com latitude/longitude
-        if (finalLat === null && (record.latitude || record.lat)) {
-            finalLat = parseFloat(record.latitude || record.lat);
-            finalLng = parseFloat(record.longitude || record.lng);
-            if (isNaN(finalLat) || isNaN(finalLng)) {
-                erroCoordenada = `Lat/Lng não numéricos: ${record.latitude}, ${record.longitude}`;
-                finalLat = null;
-                finalLng = null;
-            }
-        }
-
-        // Formato 3: Campos alternativos
-        if (finalLat === null && record.latlng) {
-            if (Array.isArray(record.latlng) && record.latlng.length === 2) {
-                finalLat = parseFloat(record.latlng[0]);
-                finalLng = parseFloat(record.latlng[1]);
-            } else if (typeof record.latlng === 'string') {
-                var parts = record.latlng.split(',');
-                if (parts.length === 2) {
-                    finalLat = parseFloat(parts[0]);
-                    finalLng = parseFloat(parts[1]);
-                }
-            }
-        }
-
-        // Se ainda não tem coordenadas válidas, registra o erro
-        if (finalLat === null || finalLng === null || isNaN(finalLat) || isNaN(finalLng)) {
+        if (!coords.sucesso || coords.lat === null || coords.lng === null) {
             contadorErros++;
-            if (errosDetalhados.length < 10) { // Guarda apenas os primeiros 10 erros
+            errosPorTipo.nullUndefined++;
+            
+            if (errosDetalhados.length < 20) {
                 errosDetalhados.push({
                     indice: i,
                     isUsuario: isUsuario,
-                    erro: erroCoordenada || 'Coordenadas não encontradas',
-                    record: record
+                    erro: coords.erro,
+                    record: record,
+                    tipoErro: 'extração'
                 });
             }
             continue;
         }
 
-        // Verifica se as coordenadas estão em uma faixa razoável (Brasil)
-        if (finalLat < -33 || finalLat > 5 || finalLng < -74 || finalLng > -35) {
+        // Validação geográfica
+        if (!isValidBrasil(coords.lat, coords.lng)) {
             contadorErros++;
-            if (errosDetalhados.length < 10) {
+            errosPorTipo.foraBrasil++;
+            
+            if (errosDetalhados.length < 20) {
                 errosDetalhados.push({
                     indice: i,
                     isUsuario: isUsuario,
-                    erro: `Coordenadas fora do Brasil: ${finalLat}, ${finalLng}`,
-                    record: record
+                    erro: `Fora do Brasil: ${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`,
+                    record: record,
+                    tipoErro: 'localizacao'
                 });
             }
             continue;
@@ -6774,7 +6842,7 @@ function renderizarRadaresNoMapa(records) {
         var fallbackUrl = '/imagens_app/ic_radar_cev_v2.png'; 
         var iconeRadar = criarIconeRadar(iconeUrl, 40, fallbackUrl);
 
-        var radarMarker = L.marker([finalLat, finalLng], { icon: iconeRadar }).addTo(map);
+        var radarMarker = L.marker([coords.lat, coords.lng], { icon: iconeRadar }).addTo(map);
 
         var tipoExibicao = (typeof ajusteNomes !== 'undefined' && ajusteNomes[tipo]) ? ajusteNomes[tipo] : tipo;
         
@@ -6787,15 +6855,15 @@ function renderizarRadaresNoMapa(records) {
             '<b style="font-size:1.1rem;">' + tipoExibicao + '</b><br>' +
             '<hr style="border:0; border-top:1px solid #ddd; margin:8px 0;">' +
             '<div style="font-size:0.9rem; color:#555;">' + endereco + '</div>' +
-            '<div style="color:#d32f2f; font-weight:bold; margin-top:8px; font-size:1rem;">⚠️ Máx: ' + velocidade + ' km/h</div>' +
+            '<div style="color:#d32f2f; font-weight:bold; margin-top:8px; font-size:1rem;">️ Máx: ' + velocidade + ' km/h</div>' +
             seloUsuario + 
             '</div>'
         );
 
         radarMarker.radarData = {
             id: record[0] || record.id || i, 
-            latitude: finalLat, 
-            longitude: finalLng,
+            latitude: coords.lat, 
+            longitude: coords.lng,
             endereco: endereco, 
             velocidade_maxima: velocidade,
             tipoOriginal: tipo, 
@@ -6808,26 +6876,29 @@ function renderizarRadaresNoMapa(records) {
 
     $("#loading").hide();
     
-    // Log detalhado dos erros
+    // Log detalhado
     console.log(`[Radar X9] ✅ Renderização: ${contadorCurados} curados, ${contadorUsuarios} usuários`);
-    console.log(`[Radar X9] ❌ Erros de coordenadas: ${contadorErros}`);
+    console.log(`[Radar X9] ❌ Total erros: ${contadorErros}`);
+    console.log(`[Radar X9] 📊 Resumo erros:`, errosPorTipo);
     
     if (errosDetalhados.length > 0) {
-        console.warn('[Radar X9] ⚠️ Primeiros erros encontrados:');
+        console.warn('[Radar X9] ️ AMOSTRA DE ERROS (primeiros 20):');
         errosDetalhados.forEach(function(erro, idx) {
-            console.warn(`  ${idx + 1}. Índice ${erro.indice} (${erro.isUsuario ? 'Usuário' : 'Oficial'}): ${erro.erro}`);
-            console.warn('     Dados:', erro.record);
+            console.warn(`  ${idx + 1}. #${erro.indice} [${erro.isUsuario ? 'USR' : 'OFF'}] ${erro.tipoErro.toUpperCase()}`);
+            console.warn(`     Erro: ${erro.erro}`);
+            console.warn(`     Dados:`, JSON.stringify(erro.record).substring(0, 200) + '...');
         });
         
-        // Mostra notificação com resumo dos erros
+        // Exporta erros completos para JSON
+        console.log('[Radar X9] 💾 Para ver TODOS os erros, execute:');
+        console.log('console.log(JSON.stringify(errosDetalhados, null, 2))');
+        
         showNotification(`⚠️ ${contadorErros} radares com coordenadas inválidas`);
     } else {
-        showNotification(`Mapa atualizado: ${contadorCurados} oficiais, ${contadorUsuarios} usuários`);
+        showNotification(`✅ Mapa atualizado: ${contadorCurados} oficiais, ${contadorUsuarios} usuários`);
     }
 }
-// ==========================================
-// CARREGAR RADARES UNIFICADOS VIA API VERCEL
-// ==========================================
+
 // ===================================================================
 // CARREGAR RADARES: Busca AMBOS os arquivos do GitHub em paralelo
 // ===================================================================
