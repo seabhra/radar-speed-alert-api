@@ -6716,6 +6716,7 @@ function extrairCoordenadasRobustas(record) {
 // FUNÇÃO UNIFICADA DE RENDERIZAÇÃO (ATUALIZADA)
 // ===================================================================
 function renderizarRadaresNoMapa(records) {
+    console.table(errosDetalhados);
     if (!map || !records || records.length === 0) {
         $("#loading").hide();
         return;
