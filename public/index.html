@@ -4032,9 +4032,6 @@ function distanciaMetros(lat1, lon1, lat2, lon2){
     return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
 }
-//=====================================
-// FUNÇÃO INTEGRAÇÃO ACCURACY GPS
-//=====================================
 
 //=====================================
 // FUNÇÃO INTEGRAÇÃO ACCURACY GPS
@@ -4540,8 +4537,7 @@ function verificarAlertasClima(temp, umid) {
 // =======================================================
 // OBSERVADOR AUTOMÁTICO (A MÁGICA ACONTECE AQUI)
 // =======================================================
-// Fica observando o elemento de temperatura. Quando o SEU código de API
-// atualizar a temperatura na tela, ele roda a função de alerta automaticamente.
+
 
 const observer = new MutationObserver(function() {
     verificarAlertasClima();
@@ -4614,6 +4610,7 @@ function deveAlertaRadar(tipoOriginal) {
 // ===================================================================
 // DISPARAR ALERTA (mostra tarja + som)
 // ===================================================================
+
 function dispararAlerta(radarData, distancia) {
     var tipo = classificarAlerta(radarData.tipoOriginal);
     tipoAlertaAtivo = tipo;
@@ -4633,13 +4630,26 @@ function dispararAlerta(radarData, distancia) {
     var tipoExibicao = ajusteNomes[radarData.tipoOriginal] || radarData.tipoOriginal;
     $icon.attr('src', getIconUrl(radarData.tipoOriginal, radarData.velocidade_maxima));
 
+    // O título já estava correto no seu código original!
     var titulos = { radar: 'ALERTA DE RADAR', risco: 'ALERTA DE RISCO', mobilidade: 'AVISO MOBILIDADE', destaque: 'DESCUBRA A CIDADE', servico: 'REDE DE SERVIÇOS' };
     $title.text(titulos[tipo] || 'ATENÇÃO!');
  
-   /* ── TEXTO ÚNICO: tipo + velocidade + distância ── */
-      var vel = radarData.velocidade_maxima || '';
-    var base = tipoExibicao + (vel ? ' — ' + vel + ' km' : '');
-    $text.data('alert-base', base);               // guarda a base completa
+    /* ── TEXTO ÚNICO: tipo + velocidade + distância ── */
+    var vel = radarData.velocidade_maxima || '';
+    
+    // ============================================================
+    // 🛠️ CORREÇÃO: Limpar a descrição se for "Descubra a Cidade"
+    // ============================================================
+    var textoParaExibir = tipoExibicao;
+    if (tipo === 'destaque' || tipoExibicao.indexOf('Descubra a Cidade') === 0) {
+        // Remove "Descubra a Cidade - " do início da string (ignora espaços extras)
+        textoParaExibir = tipoExibicao.replace(/^Descubra a Cidade\s*-\s*/i, '').trim();
+    }
+    // ============================================================
+
+    var base = textoParaExibir + (vel ? ' — ' + vel + ' km' : '');
+    
+    $text.data('alert-base', base);               // guarda a base completa (agora limpa)
     $text.text(base + ' - ' + Math.round(distancia) + ' m');
     /* ─────────────────────────────────────────────── */
 
