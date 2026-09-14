@@ -2493,7 +2493,7 @@ const iconMap = {
     'Passagem Sob Túnel Viário (TUV)':'/imagens_app/ic_tunel_v2.png',
     'Passagem Sob Túnel Viário':'/imagens_app/ic_tunel_v2.png',
     'Alerta de Poluição Elevada (APE)':'/imagens_app/ic_radar_poluido_v2.png',
-    'Semáforo Inteligente (SEI)': 'imagens_app/semaforo_inteligente',
+    'Semáforo Inteligente (SEI)': '/imagens_app/semaforo_inteligente.png', 
 
 
 
@@ -2776,10 +2776,17 @@ function getIconUrl(tipo, velocidade) {
     }
     if (tipoLimpo.includes('Zona Verde') || tipoLimpo.includes('ZVT') || tipoLimpo.includes('ZVC'))
         return iconMap['Zona Verde de Trânsito (ZVT)'];
+
     if (tipoLimpo.includes('Parada sobre Faixa de Pedestres') || tipoLimpo.includes('DPFP'))
         return iconMap['Detector de Parada sobre Faixa de Pedestres (DPFP)'];
+
+     // ✅ CORREÇÃO: Verifica SEI antes da regra genérica de "Semáforo"
+    if (tipoLimpo.includes('SEI') || tipoLimpo.includes('Semáforo Inteligente')) {
+        return iconMap['Semáforo Inteligente (SEI)'];
+    }
     if (tipoLimpo.includes('Semáforo') || tipoLimpo.includes('(DAS)'))
         return iconMap['Detector de Avanço de Semáforo (DAS)'];
+
     if (tipoLimpo === 'Controle de Redução de Velocidade (CRV)' ||
         tipoLimpo === 'Controle de Redução de Velocidade')
         return iconMap['Controle de Redução de Velocidade (CRV)'];
