@@ -1843,9 +1843,10 @@ h1 span {
 </div>
 
     <!-- MENU SEMPRE NO CANTO DIREITO -->
-  <button class="btn-menu-toggle" 
+     <button class="btn-menu-toggle" 
         id="btn-menu-toggle" 
-        onclick="this.classList.toggle('active')"
+        onclick="this.classList.toggle('active');
+        document.getElementById('sidebar-controls').classList.toggle('retracted');"
         aria-label="Abrir menu de controles">
 
     <div class="menu-hamburger" id="menu-icon">
@@ -1915,7 +1916,8 @@ h1 span {
 </div>
 
     <!-- Sidebar de controles -->
-    <div class="sidebar-controls" id="sidebar-controls">
+    <div class="sidebar-controls retracted" id="sidebar-controls">
+        
       <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
         <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
       </button>
