@@ -3995,6 +3995,19 @@
       "KBH000316",
       "-19.979139, -43.948427",
       "16/09/2026, 09:05:04"
+    ],
+    [
+      317,
+      "000317",
+      "Rua Cruzeiro do Sul, Santa Helena, Barreiro",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Santa Helena",
+      "Único",
+      "M000317",
+      "KBH000317",
+      "-19.990476, -44.011965",
+      "16/09/2026, 09:55:32"
     ]
   ]
 }
