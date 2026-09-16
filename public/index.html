@@ -2374,28 +2374,36 @@ function atualizarStatusGPS(position) {
     }
     
     const acc = position.coords.accuracy || 999;
+
+    // 🔍 ADICIONE ESTES LOGS:
+    console.log('📊 DEBUG GPS:');
+    console.log('  - Precisão (accuracy):', acc, 'metros');
+    console.log('  - Latitude:', position.coords.latitude);
+    console.log('  - Longitude:', position.coords.longitude);
+    console.log('  - Classe aplicada:', acc <= 100 ? 'OK' : acc <= 300 ? 'WARN' : 'ERR');
+    
  // ---> ADICIONE ESTA LINHA PARA DEBUGAR <---
     console.log("📡 PRECISÃO DO GPS RECEBIDA:", acc, "metros | Lat:", position.coords.latitude); 
     
     gpsAccuracyAtual = acc;
     gpsLastUpdateTime = Date.now();
     
-    if (acc <= 80) {
+// 🔧 AJUSTE OS LIMITES PARA O NAVEGADOR:
+    if (acc <= 100) {  // Era 80
         dot.className = 'gps-status-dot ok';
         wrapper.className = 'gps-status-wrapper gps-ok';
         label.textContent = 'GPS OK';
         wrapper.title = 'GPS: Preciso (' + Math.round(acc) + 'm)';
-    } else if (acc <= 150) {
+    } else if (acc <= 300) {  // Era 150
         dot.className = 'gps-status-dot warn';
         wrapper.className = 'gps-status-wrapper gps-warn';
-        label.textContent = 'INSTÁVEL';
-        wrapper.title = 'GPS: Instável (' + Math.round(acc) + 'm)';
+        label.textContent = 'GPS';  // Ou 'INSTÁVEL'
+        wrapper.title = 'GPS: Média precisão (' + Math.round(acc) + 'm)';
     } else {
-        // SE ESTIVER CAINDO AQUI, É PORQUE A PRECISÃO ESTÁ > 150m
         dot.className = 'gps-status-dot err';
         wrapper.className = 'gps-status-wrapper gps-err';
-        label.textContent = 'SEM GPS'; // Você pode mudar para 'GPS FRACO' para testar
-        wrapper.title = 'GPS: Fraco (' + Math.round(acc) + 'm)';
+        label.textContent = 'GPS FRACO';  // Mude de 'SEM GPS' para 'GPS FRACO'
+        wrapper.title = 'GPS: Baixa precisão (' + Math.round(acc) + 'm)';
     }
 }
 
@@ -3758,9 +3766,6 @@ function _iniciarAnimacaoNavegacao(toLat, toLng, novoHeading) {
 //================================
 // FUNÇÃO PROCESSAR NOVA POSIÇÃO
 //================================
-//================================
-// FUNÇÃO PROCESSAR NOVA POSIÇÃO
-//================================
 function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accuracy) {
     if (!map) return;
 
@@ -3934,7 +3939,8 @@ function startGPSTracking() {
     // =================================================================
     // 🟢 AQUI ESTAVA O PROBLEMA: Adicione esta linha para atualizar o UI
     // =================================================================
-            atualizarStatusGPS(position); 
+    
+    atualizarStatusGPS(position); 
         
 
             // Dados da posição
