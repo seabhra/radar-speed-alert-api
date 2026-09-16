@@ -865,7 +865,7 @@ h1 span {
 .gps-status-wrapper {
     position: fixed;
     top: 12px;
-    left: 180px; /* AUMENTADO: agora fica ao lado do título, não sobre ele */
+    left: 120px; /* Posição inicial para desktop */
     display: flex;
     align-items: center;
     gap: 8px;
@@ -881,17 +881,31 @@ h1 span {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Ajuste responsivo para telas menores */
+/* Ajuste para tablets */
 @media (max-width: 768px) {
     .gps-status-wrapper {
-        left: 160px; /* Um pouco menor em tablets */
+        left: 80px;
+        padding: 5px 10px;
+    }
+    .gps-status-label {
+        font-size: 0.7rem; /* Texto um pouco menor em telas médias */
     }
 }
 
+/* Ajuste para celulares pequenos */
 @media (max-width: 480px) {
     .gps-status-wrapper {
-        left: 140px; /* Menor ainda em celulares */
-        padding: 5px 10px;
+        left: 75px;
+        padding: 4px 8px;
+        gap: 6px;
+    }
+    .gps-status-dot {
+        width: 8px;
+        height: 8px;
+    }
+    .gps-status-label {
+        font-size: 0.65rem; /* Texto menor para caber em telas pequenas */
+        letter-spacing: 0.5px;
     }
 }
 
