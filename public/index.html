@@ -848,68 +848,118 @@ h1 span {
 }
 
 /* ======================================== */
-/* GPS STATUS */
+/* VARIÁVEIS GLOBAIS (Fácil de alterar as cores) */
+/* ======================================== */
+:root {
+    --gps-ok: #00ff88;       /* Verde Neon Moderno */
+    --gps-instavel: #ffcc00; /* Amarelo/Laranja */
+    --gps-sem: #ff3333;      /* Vermelho Alerta */
+    --text-muted: #94a3b8;   /* Cinza suave para estado neutro */
+    --bg-glass: rgba(15, 23, 42, 0.85); /* Fundo escuro semi-transparente */
+}
+
+/* ======================================== */
+/* GPS STATUS WRAPPER (Container Principal) */
 /* ======================================== */
 .gps-status-wrapper {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    background: rgba(0,0,0,0.35);
-    border: 1px solid rgba(255,255,255,0.06);
-    cursor: default;
-    user-select: none;
-    transition: border-color 0.4s ease;
-    flex-shrink: 0;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 999px; /* Formato de pílula */
+    background-color: var(--bg-glass);
+    backdrop-filter: blur(8px); /* Efeito de vidro fosco sobre o mapa */
+    -webkit-backdrop-filter: blur(8px); /* Suporte para Safari/iOS */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Borda base sutil */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ======================================== */
+/* PONTO INDICADOR (DOT) */
+/* ======================================== */
 .gps-status-dot {
-    width: 8px;
-    height: 8px;
+    position: relative; /* CRUCIAL: Permite que o ::after (pulso) funcione */
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    background-color: var(--gps-sem);
-    position: relative;
-    flex-shrink: 0;
-    transition: background-color 0.4s ease;
+    background-color: var(--text-muted);
+    flex-shrink: 0; /* Impede que o ponto encolha em telas pequenas */
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
 }
 
+/* Animação de Pulso */
 .gps-status-dot::after {
     content: '';
     position: absolute;
-    inset: -2px;
+    inset: -3px; /* Tamanho do pulso */
     border-radius: 50%;
     background-color: inherit;
-    opacity: 0.5;
+    opacity: 0;
     animation: gpsPulse 2s ease-in-out infinite;
+    z-index: -1;
 }
 
+@keyframes gpsPulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* ======================================== */
+/* TEXTO DO LABEL */
+/* ======================================== */
 .gps-status-label {
-    font-size: 0.5rem;
+    font-size: 0.75rem; /* 12px: Legível no celular, mas compacto */
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
     color: var(--text-muted);
     white-space: nowrap;
     transition: color 0.4s ease;
 }
 
-.gps-status-wrapper.gps-ok   { border-color: rgba(0,255,136,0.25); }
-.gps-status-wrapper.gps-warn { border-color: rgba(255,204,0,0.3); }
-.gps-status-wrapper.gps-err  { border-color: rgba(255,51,51,0.3); }
+/* ======================================== */
+/* ESTADOS DE CORES (Consolidados) */
+/* ======================================== */
 
-.gps-status-dot.ok   { background-color: var(--gps-ok); }
-.gps-status-dot.warn { background-color: var(--gps-instavel); }
-.gps-status-dot.err  { background-color: var(--gps-sem); }
-
-@keyframes gpsPulse {
-    0%, 100% { transform: scale(1);   opacity: 0.5; }
-    50%      { transform: scale(2.2); opacity: 0; }
+/* 🟢 VERDE (OK) */
+.gps-status-wrapper.gps-ok {
+    border-color: rgba(0, 255, 136, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.15);
+}
+.gps-status-wrapper.gps-ok .gps-status-label { color: var(--gps-ok); }
+.gps-status-dot.ok {
+    background-color: var(--gps-ok);
+    box-shadow: 0 0 10px var(--gps-ok);
 }
 
-.gps-status-wrapper.gps-ok   .gps-status-label { color: var(--gps-ok); }
+/* 🟡 AMARELO (IRREGULAR/MÉDIO) */
+.gps-status-wrapper.gps-warn {
+    border-color: rgba(255, 204, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.15);
+}
 .gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
-.gps-status-wrapper.gps-err  .gps-status-label { color: var(--gps-sem); }
+.gps-status-dot.warn {
+    background-color: var(--gps-instavel);
+    box-shadow: 0 0 10px var(--gps-instavel);
+}
+
+/* 🔴 VERMELHO (FRACO/ERRO) */
+.gps-status-wrapper.gps-err {
+    border-color: rgba(255, 51, 51, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 51, 51, 0.15);
+}
+.gps-status-wrapper.gps-err .gps-status-label { color: var(--gps-sem); }
+.gps-status-dot.err {
+    background-color: var(--gps-sem);
+    box-shadow: 0 0 10px var(--gps-sem);
+}
 
 /* ======================================== */
 /* ALERTAS CLIMÁTICOS */
@@ -1781,20 +1831,19 @@ h1 span {
                 <div class="titulo-linha">
                     <h1>RADAR <span>X9</span></h1>
 
+                    <!-- Indicador de Status do GPS -->
+
+     
                     <div class="gps-status-wrapper gps-err" 
                          id="gps-status-wrapper" 
                          title="GPS: Aguardando sinal">
 
                         <div class="gps-status-dot err" id="gps-status-dot"></div>
-                        <span class="gps-status-label" id="gps-status-label">
-                            GPS OFF
-                        </span>
-
+                        <span class="gps-status-label" id="gps-status-label">AGUARDANDO</span>
                     </div>
+
                 </div>
-
             </div>
-
         </div>
 
 
@@ -2364,12 +2413,15 @@ function atualizarStatusGPS(position) {
     const label = document.getElementById('gps-status-label');
     if (!dot || !wrapper || !label) return;
     
+   // Segurança: se os elementos não existirem ainda, sai da função
+    if (!dot || !wrapper || !label) return;
+    
     // Se não tem posição, mostra vermelho
     if (!position || !position.coords) {
         dot.className = 'gps-status-dot err';
         wrapper.className = 'gps-status-wrapper gps-err';
         label.textContent = 'SEM GPS';
-        wrapper.title = 'GPS: Sem sinal';
+        wrapper.title = 'GPS: Sem sinal ou bloqueado';
         return;
     }
     
@@ -2386,10 +2438,9 @@ function atualizarStatusGPS(position) {
     console.log("📡 PRECISÃO DO GPS RECEBIDA:", acc, "metros | Lat:", position.coords.latitude); 
     
     gpsAccuracyAtual = acc;
-    gpsLastUpdateTime = Date.now();
-    
-// 
-    // 🔧 LIMITES AJUSTADOS PARA NAVEGADOR/WEBVIEW
+    gpsLastUpdateTime = Date.now(); // Atualiza o timestamp do último sucesso
+
+ // 🔧 LIMITES AJUSTADOS PARA NAVEGADOR/WEBVIEW
     if (acc <= 150) {
         // 🟢 VERDE: Alta precisão (GPS de hardware ou Wi-Fi muito bom)
         dot.className = 'gps-status-dot ok';
@@ -2400,7 +2451,7 @@ function atualizarStatusGPS(position) {
         // 🟡 AMARELO: Precisão média (Normal para navegadores em áreas urbanas)
         dot.className = 'gps-status-dot warn';
         wrapper.className = 'gps-status-wrapper gps-warn';
-        label.textContent = 'GPS'; // Ou 'MÉDIA'
+        label.textContent = 'GPS IRREGULAR'; 
         wrapper.title = 'GPS: Precisão média (' + Math.round(acc) + 'm)';
     } else {
         // 🔴 VERMELHO: Precisão muito baixa ou erro real
@@ -2411,12 +2462,15 @@ function atualizarStatusGPS(position) {
     }
 }
 
-// Verificar periodicamente se o GPS está atualizando
+// ===================================================================
+// MONITOR DE TIMEOUT (Cai para vermelho se o GPS parar de responder)
+// ===================================================================
 setInterval(function() {
+    // Se passou mais de 15 segundos sem atualizar a posição, força o vermelho
     if (gpsLastUpdateTime > 0 && (Date.now() - gpsLastUpdateTime) > 15000) {
         atualizarStatusGPS(null);
     }
-}, 5000);
+}, 5000); // Verifica a cada 5 segundos
 
 // ===================================================================
 // CRIAR ICONE NAVEGADOR PULSANTE
