@@ -2374,6 +2374,9 @@ function atualizarStatusGPS(position) {
     }
     
     const acc = position.coords.accuracy || 999;
+ // ---> ADICIONE ESTA LINHA PARA DEBUGAR <---
+    console.log("📡 PRECISÃO DO GPS RECEBIDA:", acc, "metros | Lat:", position.coords.latitude); 
+    
     gpsAccuracyAtual = acc;
     gpsLastUpdateTime = Date.now();
     
@@ -2388,9 +2391,10 @@ function atualizarStatusGPS(position) {
         label.textContent = 'INSTÁVEL';
         wrapper.title = 'GPS: Instável (' + Math.round(acc) + 'm)';
     } else {
+        // SE ESTIVER CAINDO AQUI, É PORQUE A PRECISÃO ESTÁ > 150m
         dot.className = 'gps-status-dot err';
         wrapper.className = 'gps-status-wrapper gps-err';
-        label.textContent = 'SEM GPS';
+        label.textContent = 'SEM GPS'; // Você pode mudar para 'GPS FRACO' para testar
         wrapper.title = 'GPS: Fraco (' + Math.round(acc) + 'm)';
     }
 }
@@ -3902,14 +3906,13 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 const cidadeLabel = document.getElementById("cidade-atual");
 let ultimaCidade = "";
 
+
 function startGPSTracking() {
-    
-    // Se for usar o timeout, ele precisa ser iniciado com os parênteses e os parâmetros:
-    browserGpsTimeout = setTimeout(() => {
-        // O código que você quer executar após o tempo passar
-        console.log("Tempo do GPS esgotou!");
-        
-    }, 30000); // 30000 = 30 segundos (ou o tempo que você quiser)
+    // Limpa timeout anterior se existir para evitar conflitos
+    if (browserGpsTimeout) {
+        clearTimeout(browserGpsTimeout);
+        browserGpsTimeout = null;
+    }
 
     // Sua verificação do GPS:
     if (!navigator.geolocation) {
@@ -3925,9 +3928,15 @@ function startGPSTracking() {
     }
 
     // Inicia o tracking GPS - ÚNICO watchPosition
-    
     watchId = navigator.geolocation.watchPosition(
-        function(position) {
+    
+    function(position) {
+    // =================================================================
+    // 🟢 AQUI ESTAVA O PROBLEMA: Adicione esta linha para atualizar o UI
+    // =================================================================
+            atualizarStatusGPS(position); 
+        
+
             // Dados da posição
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
@@ -3938,7 +3947,6 @@ function startGPSTracking() {
             }
 
             // Verifica chegada ao destino se estiver em navegação
-            // ⬇️ CORREÇÃO: verificarChegadaDestino() não aceita parâmetros, usa variáveis globais
             if (estaEmNavegacao && destinoNavegacao) {
                 verificarChegadaDestino();
             }
@@ -3964,6 +3972,8 @@ function startGPSTracking() {
         }, 
         function(error) {
             console.error("Erro GPS:", error);
+            // Garante que o indicador fique vermelho em caso de erro real
+            atualizarStatusGPS(null); 
             showNotification("Erro ao obter localização: " + error.message);
             if (!gpsInitialized) {
                 hideFullscreenLoading();
@@ -3972,20 +3982,16 @@ function startGPSTracking() {
         { 
             enableHighAccuracy: true,
             maximumAge: 1000,
-            timeout: 30000       // Aumenta o tempo de espera para 30 segundos
+            timeout: 30000
         }
     );
 
     console.log("GPS iniciado com watchId:", watchId);
 
-    // Timeout para aguardar GPS
-    if (browserGpsTimeout) {
-        clearTimeout(browserGpsTimeout);
-    }
-    
+    // Timeout de segurança: se após 8 segundos o GPS não inicializar, avisa o usuário
     browserGpsTimeout = setTimeout(function() {
-        if (!gpsInitialized && gpsSource === 'none') { 
-            showNotification("Aguardando GPS do app..."); 
+        if (!gpsInitialized && gpsSource !== 'appinventor') { 
+            showNotification("Aguardando sinal de GPS..."); 
             hideFullscreenLoading(); 
         }
     }, 8000);
@@ -4089,6 +4095,41 @@ function sucesso(position){
     }
 }
 
+//===================================================
+// FUNÇÃO CHAMA QUANDO APP INVENTOR ENVIA LOCALIZAÇÃO
+//===================================================
+
+function receberGPSDoAppInventor(lat, lng, accuracy) {
+    gpsSource = 'appinventor';
+    gpsInitialized = true;
+    hideFullscreenLoading();
+
+    // Cria um objeto "falso" no mesmo formato que o navegador usa, 
+    // para sua função atualizarStatusGPS funcionar perfeitamente!
+    const posicaoSimulada = {
+        coords: {
+            latitude: parseFloat(lat),
+            longitude: parseFloat(lng),
+            accuracy: parseFloat(accuracy) || 50, // Se não vier precisão, assume 50m (verde)
+            speed: null,
+            heading: null
+        }
+    };
+
+    // 1. Atualiza o indicador visual (ficará verde/amarelo/vermelho baseado na accuracy)
+    atualizarStatusGPS(posicaoSimulada);
+
+    // 2. Processa a posição no seu sistema normal
+    processarNovaPosicao(
+        parseFloat(lat), 
+        parseFloat(lng), 
+        0, // Velocidade (pode ser enviada pelo App Inventor também se quiser)
+        null, 
+        parseFloat(accuracy) || 50
+    );
+    
+    console.log("📡 GPS recebido do App Inventor:", lat, lng, "Precisão:", accuracy);
+}
 
 // =============================================
 // CONTROLE RESPONSIVO DO HEADER
