@@ -2388,21 +2388,25 @@ function atualizarStatusGPS(position) {
     gpsAccuracyAtual = acc;
     gpsLastUpdateTime = Date.now();
     
-// 🔧 AJUSTE OS LIMITES PARA O NAVEGADOR:
-    if (acc <= 100) {  // Era 80
+// 
+    // 🔧 LIMITES AJUSTADOS PARA NAVEGADOR/WEBVIEW
+    if (acc <= 150) {
+        // 🟢 VERDE: Alta precisão (GPS de hardware ou Wi-Fi muito bom)
         dot.className = 'gps-status-dot ok';
         wrapper.className = 'gps-status-wrapper gps-ok';
         label.textContent = 'GPS OK';
-        wrapper.title = 'GPS: Preciso (' + Math.round(acc) + 'm)';
-    } else if (acc <= 300) {  // Era 150
+        wrapper.title = 'GPS: Alta precisão (' + Math.round(acc) + 'm)';
+    } else if (acc <= 500) {
+        // 🟡 AMARELO: Precisão média (Normal para navegadores em áreas urbanas)
         dot.className = 'gps-status-dot warn';
         wrapper.className = 'gps-status-wrapper gps-warn';
-        label.textContent = 'GPS';  // Ou 'INSTÁVEL'
-        wrapper.title = 'GPS: Média precisão (' + Math.round(acc) + 'm)';
+        label.textContent = 'GPS'; // Ou 'MÉDIA'
+        wrapper.title = 'GPS: Precisão média (' + Math.round(acc) + 'm)';
     } else {
+        // 🔴 VERMELHO: Precisão muito baixa ou erro real
         dot.className = 'gps-status-dot err';
         wrapper.className = 'gps-status-wrapper gps-err';
-        label.textContent = 'GPS FRACO';  // Mude de 'SEM GPS' para 'GPS FRACO'
+        label.textContent = 'GPS FRACO';
         wrapper.title = 'GPS: Baixa precisão (' + Math.round(acc) + 'm)';
     }
 }
