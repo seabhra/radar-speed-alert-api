@@ -858,27 +858,55 @@ h1 span {
     --bg-glass: rgba(15, 23, 42, 0.85); /* Fundo escuro semi-transparente */
 }
 
+
 /* ======================================== */
 /* GPS STATUS WRAPPER (Container Principal) */
 /* ======================================== */
 .gps-status-wrapper {
     position: fixed;
     top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 90px; /* Posição inicial para desktop */
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    border-radius: 999px; /* Formato de pílula */
+    padding: 6px 12px;
+    border-radius: 999px;
     background-color: var(--bg-glass);
-    backdrop-filter: blur(8px); /* Efeito de vidro fosco sobre o mapa */
-    -webkit-backdrop-filter: blur(8px); /* Suporte para Safari/iOS */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Borda base sutil */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     z-index: 9999;
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ajuste para tablets */
+@media (max-width: 768px) {
+    .gps-status-wrapper {
+        left: 80px;
+        padding: 5px 10px;
+    }
+    .gps-status-label {
+        font-size: 0.7rem; /* Texto um pouco menor em telas médias */
+    }
+}
+
+/* Ajuste para celulares pequenos */
+@media (max-width: 480px) {
+    .gps-status-wrapper {
+        left: 75px;
+        padding: 4px 8px;
+        gap: 6px;
+    }
+    .gps-status-dot {
+        width: 8px;
+        height: 8px;
+    }
+    .gps-status-label {
+        font-size: 0.65rem; /* Texto menor para caber em telas pequenas */
+        letter-spacing: 0.5px;
+    }
 }
 
 /* ======================================== */
