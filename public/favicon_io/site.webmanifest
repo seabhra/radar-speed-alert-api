@@ -1,11 +1,14 @@
 {
   "name": "App X9 Radar",
+  "id": "/radarx9",
   "short_name": "X9 Radar",
   "start_url": "/",
+  "orientation": "any",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
-  "description": "Alerta de Radares e Segurança",
+  "description": "Alerta de Radares e Segurança no Trânsito",
+  "categories": ["navigation", "travel", "utilities","radar", "traffic"],
   "icons": [
     {
       "src": "/favicon_io/android-chrome-192x192.png",
