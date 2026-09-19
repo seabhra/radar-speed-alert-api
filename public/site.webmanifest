@@ -1,54 +1,26 @@
-<<<<<<< HEAD
-
-
-
 {
-  "name": "RadanX9 App",
-  "short_name": "RadanX9",
+  "name": "App X9 Radar",
+  "id": "/radarx9",
+  "short_name": "X9 Radar",
   "start_url": "/",
+  "orientation": "any",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
-  "description": "Aplicativo com GPS nativo",
+  "description": "Alerta de Radares e Segurança no Trânsito",
+  "categories": ["navigation", "travel", "utilities","radar", "traffic"],
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/favicon_io/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/favicon_io/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ]
-=======
-
-
-
-{
-  "name": "RadanX9 App",
-  "short_name": "RadanX9",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
-  "description": "Aplicativo com GPS nativo",
-  "icons": [
-    {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
->>>>>>> b20b90a53c2fa9a3b2b3e286d1c6af89ebda3db3
 }
