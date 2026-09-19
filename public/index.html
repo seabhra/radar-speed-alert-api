@@ -1,13 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <!-- Cache Control -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  <meta charset="UTF-8">
+  
+  <!-- Viewport único e completo (removida a duplicata) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Theme Color para a barra do navegador/PWA -->
+  <meta name="theme-color" content="#000000">
+  
+  <!-- PWA Capabilities -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Manifest (caminho corrigido para a raiz) -->
+  <link rel="manifest" href="/site.webmanifest">
+  
+  <!-- Ícones para iOS e Android -->
+  <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
+
+  
+  <title>App X9 Radar</title>
+</head>
 
   <title>Radar X9 BH - Alerta Inteligente</title>
 
@@ -79,8 +98,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png">
 <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
-<!-- Se o site.webmanifest está dentro da pasta favicon_io: -->
-<link rel="manifest" href="/favicon_io/site.webmanifest">
+
+
 
 
 
@@ -1304,12 +1323,16 @@ h1 span {
     #btn-rotate-map { transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; }
     #btn-rotate-map.rotated { border-color: var(--accent-color); box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1); background-color: rgba(0, 255, 136, 0.08); }
     #btn-rotate-map.rotated img { filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5)); transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease; }
+    
     .user-gps-marker, .user-navigator-marker { background: transparent !important; border: none !important; }
     .user-gps-marker img, .user-navigator-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); transition: none !important; will-change: transform; }
+    
+    
     .route-start-marker { background: transparent !important; border: none !important; }
     .route-start-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); animation: pulseStart 1s ease-in-out infinite; }
     .route-end-marker { background: transparent !important; border: none !important; }
     .route-end-marker img { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); animation: pulseEnd 1.2s ease-in-out infinite; }
+    
     @keyframes pulseStart { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
     @keyframes pulseEnd { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
     .radar-marker-icon { background: transparent !important; border: none !important; }
@@ -5726,83 +5749,89 @@ $("#btn-center").click(function() {
         //==========================================================
         // 1º PASSO — ÍCONE GPS MARKER
         //==========================================================
-        var gpsIcon = L.divIcon({
-            html: '<img src="/imagens_app/ic_gps_marker.png" ' +
-                  'onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\'" ' +
-                  'style="width:50px;height:50px;">',
+     
 
-            className: 'user-gps-marker',
-            iconSize: [50, 50],
-            iconAnchor: [25, 50],
-            popupAnchor: [0, -50]
-        });
+// 1. Verifica se as coordenadas são válidas (NÃO são undefined)
+if (pos.lat === undefined || pos.lng === undefined || isNaN(pos.lat) || isNaN(pos.lng)) {
+    console.error("❌ Coordenadas inválidas para o marcador!", pos);
+    return; // Interrompe a execução para não quebrar o mapa
+}
 
+console.log("✅ Coordenadas válidas recebidas:", pos.lat, pos.lng);
+
+var gpsIcon = L.divIcon({
+    html: '<img src="/imagens_app/ic_gps_marker.png" ' +
+          'onerror="this.onerror=null; this.src=\'https://cdn-icons-png.flaticon.com/512/684/684908.png\';" ' +
+          'style="width:50px; height:50px; display:block;">', // display:block evita espaços fantasmas
+
+    className: 'user-gps-marker',
+    iconSize: [50, 50],
+    iconAnchor: [25, 25],      // ← ALTERADO: Centro exato da imagem 50x50 é mais seguro
+    popupAnchor: [0, -25]      // ← ALTERADO: Ajustado para o novo anchor
+});
+
+// 2. Cria e adiciona o marcador
+userMarker = L.marker(
+    [pos.lat, pos.lng],
+    {
+        icon: gpsIcon,
+        zIndexOffset: 1000
+    }
+).addTo(map);
+
+userMarker.bindTooltip('Você está aqui', {
+    permanent: false,
+    direction: 'top',
+    offset: [0, -25]
+});
+
+iconeCentralizado = true;
+console.log("📍 GPS MARKER inserido no mapa com sucesso!");
+
+
+//==========================================================
+// 2º PASSO — APÓS INSERIR O GPS MARKER, MUDA PARA NAVIGATOR MAP
+//==========================================================
+setTimeout(function() {
+    // Garante que ainda existe marcador e não estamos em modo navegação
+    if (!userMarker || estaEmNavegacao) {
+        console.log("⏭️ Ignorando troca de ícone (sem marcador ou em navegação)");
+        return;
+    }
+
+    try {
+        // Guarda novamente a posição
+        var posAtual = userMarker.getLatLng();
+
+        // Remove GPS MARKER antigo
+        map.removeLayer(userMarker);
+
+        // Cria o ícone do navegador
+        var navIcon = criarIconeNavegador(false);
+
+        // Cria novamente o marcador com o novo ícone
         userMarker = L.marker(
-            [pos.lat, pos.lng],
+            [posAtual.lat, posAtual.lng],
             {
-                icon: gpsIcon,
+                icon: navIcon,
                 zIndexOffset: 1000
             }
         ).addTo(map);
 
-        userMarker.bindTooltip(
-            'Você está aqui',
-            {
-                permanent: false,
-                direction: 'top',
-                offset: [0, -25]
-            }
-        );
+        userMarker.bindTooltip('Você está aqui', {
+            permanent: false,
+            direction: 'top',
+            offset: [0, -25]
+        });
 
-        iconeCentralizado = true;
+        iconeCentralizado = false;
+        console.log("🧭 GPS MARKER → NAVIGATOR MAP (Troca realizada)");
+        
+    } catch (error) {
+        console.error("❌ Erro ao trocar para Navigator Map:", error);
+    }
 
-        console.log("📍 GPS MARKER inserido");
-
-
-        //==========================================================
-        // 2º PASSO — APÓS INSERIR O GPS MARKER
-        // MUDA PARA O NAVIGATOR MAP
-        //==========================================================
-        setTimeout(function() {
-
-            // Garante que ainda existe marcador
-            if (!userMarker || estaEmNavegacao) {
-                return;
-            }
-
-            // Guarda novamente a posição
-            var posAtual = userMarker.getLatLng();
-
-            // Remove GPS MARKER
-            map.removeLayer(userMarker);
-
-            // Cria o mesmo ícone usado no REFRESH
-            var navIcon = criarIconeNavegador(false);
-
-            // Cria novamente o marcador
-            userMarker = L.marker(
-                [posAtual.lat, posAtual.lng],
-                {
-                    icon: navIcon,
-                    zIndexOffset: 1000
-                }
-            ).addTo(map);
-
-            userMarker.bindTooltip(
-                'Você está aqui',
-                {
-                    permanent: false,
-                    direction: 'top',
-                    offset: [0, -25]
-                }
-            );
-
-            // Mesmo comportamento do REFRESH
-            iconeCentralizado = false;
-
-            console.log("🧭 GPS MARKER → NAVIGATOR MAP");
-
-        }, 600); // tempo para o GPS MARKER aparecer antes da troca
+}, 1500); // ← ALTERADO: De 600ms para 1500ms. Dá tempo do ícone aparecer antes de trocar!
     }
 });
 
