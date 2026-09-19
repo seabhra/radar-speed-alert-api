@@ -1,15 +1,14 @@
-const CACHE_NAME = 'radar-cache-v10';
+const CACHE_NAME = 'radar-cache-v11'; // <-- ALTERADO: v11 força a atualização no celular
 
-// Lista de URLs para cache (AJUSTE OS CAMINHOS PARA BATER COM SEUS ARQUIVOS REAIS)
+// Lista de URLs para cache (Mantida exatamente como você enviou)
 const urlsToCache = [
   '/',
   '/index.html',
   '/favicon.ico',
-  '/site.webmanifest', // <-- ALTERADO: Use o nome exato do seu arquivo de manifest
-  '/icon-192.png',     // <-- ALTERADO: Ajuste se estiver na pasta /icons/
-  '/icon-512.png',     // <-- ADICIONADO: Para garantir o cache do ícone grande
+  '/site.webmanifest',
+  '/icon-192.png',
+  '/icon-512.png',
   
-  // Suas imagens (mantenha exatamente como estão no seu servidor)
   '/imagens_app/ic_compass.png', 
   '/imagens_app/ic_area_escape.png', 
   '/imagens_app/ic_cam_video.png',  
@@ -57,29 +56,27 @@ const urlsToCache = [
   '/imagens_app/ic_zoom_out.png',
   '/imagens_app/ic_semaforo_inteligente.png',
   '/imagens_app/ic_radar_poluido_v2.png',
-  '/imagens_app/ic_tunel_v2.png',
-
   '/imagens_app/ic_mercado_central.png',
-'/imagens_app/ic_mirante_mangabeiras.png',
-'/imagens_app/ic_parque_mangabeiras.png',
-'/imagens_app/ic_mercado_novo.png',
-'/imagens_app/ic_santa_tereza.png',
-'/imagens_app/ic_rua_sapucai.png',
-'/imagens_app/ic_praca_liberdade.png',
-'/imagens_app/ic_edificio_maletta.png',
-'/imagens_app/ic_praca_papa.png',
-'/imagens_app/ic_museu_futebol.png',
-'/imagens_app/ic_igreja_pampulha.png',
-'/imagens_app/ic_parque_ecologico_pampulha.png',
-'/imagens_app/ic_parque_guanabara.png',
-'/imagens_app/ic_parque_serra_curral.png',
-'/imagens_app/ic_feira_afonso_pena.png',
-'/imagens_app/ic_palacio_artes.png',
-'/imagens_app/ic_parque_municipal.png',
-'/imagens_app/ic_praca_savassi.png',
-'/imagens_app/ic_museu_artes_oficios.png',
-'/imagens_app/ic_museu_abilio_barreto.png',
-'/imagens_app/ic_polo_artesanato.png',
+  '/imagens_app/ic_mirante_mangabeiras.png',
+  '/imagens_app/ic_parque_mangabeiras.png',
+  '/imagens_app/ic_mercado_novo.png',
+  '/imagens_app/ic_santa_tereza.png',
+  '/imagens_app/ic_rua_sapucai.png',
+  '/imagens_app/ic_praca_liberdade.png',
+  '/imagens_app/ic_edificio_maletta.png',
+  '/imagens_app/ic_praca_papa.png',
+  '/imagens_app/ic_museu_futebol.png',
+  '/imagens_app/ic_igreja_pampulha.png',
+  '/imagens_app/ic_parque_ecologico_pampulha.png',
+  '/imagens_app/ic_parque_guanabara.png',
+  '/imagens_app/ic_parque_serra_curral.png',
+  '/imagens_app/ic_feira_afonso_pena.png',
+  '/imagens_app/ic_palacio_artes.png',
+  '/imagens_app/ic_parque_municipal.png',
+  '/imagens_app/ic_praca_savassi.png',
+  '/imagens_app/ic_museu_artes_oficios.png',
+  '/imagens_app/ic_museu_abilio_barreto.png',
+  '/imagens_app/ic_polo_artesanato.png',
   '/imagens_app/zap.png'
 ];
 
@@ -116,22 +113,32 @@ self.addEventListener('activate', (event) => {
   clients.claim();
 });
 
-// Interceptação de requisições
+// Interceptação de requisições (CORRIGIDO PARA NÃO CACHAR APIS)
 self.addEventListener('fetch', (event) => {
-  // OTIMIZAÇÃO PARA APPS DE MAPA: Ignorar cache dinâmico para requisições externas (ex: tiles de mapa, APIs de GPS)
-  // para não encher o armazenamento do celular com imagens de mapa desnecessárias.
-  if (event.request.url.startsWith('http') && !event.request.url.includes(self.location.hostname)) {
-    return fetch(event.request);
+  const requestUrl = event.request.url;
+
+  // 🚨 REGRA DE OURO: Ignorar cache para APIs externas e recursos de terceiros
+  // Isso garante que o clima (openweathermap), mapas e APIs sempre busquem dados frescos
+  if (
+    requestUrl.includes('openweathermap.org') ||
+    requestUrl.includes('/api/') ||
+    !requestUrl.startsWith(self.location.origin) // Se não for do seu domínio (radarx9.vercel.app)
+  ) {
+    return fetch(event.request); // Vai direto para a internet, sem tocar no cache
   }
 
+  // Estratégia Cache-First para os arquivos do seu próprio app (imagens, HTML, JS)
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
         if (response) {
-          return response;
+          return response; // Retorna do cache se existir (super rápido)
         }
+        
+        // Se não estiver no cache, busca na rede
         return fetch(event.request)
           .then((networkResponse) => {
+            // Se for uma requisição GET válida, salva no cache para o futuro
             if (event.request.method === 'GET' && networkResponse.ok) {
               const responseClone = networkResponse.clone();
               caches.open(CACHE_NAME).then((cache) => {
@@ -141,6 +148,7 @@ self.addEventListener('fetch', (event) => {
             return networkResponse;
           })
           .catch(() => {
+            // Fallback offline para a página principal
             if (event.request.destination === 'document') {
               return caches.match('/index.html');
             }
@@ -161,5 +169,4 @@ self.addEventListener('notificationclick', function(event) {
       return clients.openWindow('/');
     })
   );
-
 });
