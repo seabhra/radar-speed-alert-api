@@ -30,18 +30,12 @@
 
   <title>Radar X9 BH - Alerta Inteligente</title>
 
-    <!-- 1. Bibliotecas Externas (Leaflet, etc.) DEVEM vir primeiro -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+   
     
   <!-- CORRETO: CSS deve ser carregado com link rel="stylesheet" -->
      <link rel="stylesheet" href="style.css">
     
-    <!-- 2. Seu script principal do mapa (onde a variável 'map' é criada) -->
-    <script src="mapa.js"></script> <!-- Ou onde quer que esteja sua lógica do mapa -->
-
-    <!-- 3. O NOVO arquivo de navegação e UI (DEVE ser o último) -->
-    <script src="/app.js"></script>
+ 
 
 <!-- Leaflet -->
 <link
@@ -985,6 +979,15 @@ Cabeçalho Superior (Cidade e Clima)
     <audio id="alerta-sound-servico" preload="auto">
     <source src="audio_app/alerta_sound_servico.mp3" type="audio/mpeg">
   </audio>
+
+   <!-- 1. Bibliotecas Externas -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- 2. SEU SCRIPT PRINCIPAL (Cria o mapa e as variáveis) -->
+    <script src="mapa.js"></script> 
+    
+    <!-- 3. SCRIPT DE INTERFACE (Usa as variáveis do mapa.js) -->
+    <script src="app.js"></script>
 
 </body>
 </html>
