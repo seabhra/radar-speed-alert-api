@@ -121,6 +121,35 @@
 <!-- =====================================
 Cabeçalho Superior (Cidade e Clima) 
 ============================================ -->
+
+<!-- CABEÇALHO DO APP -->
+<header id="app-header" style="
+    position: fixed; top: 0; left: 0; right: 0; height: 60px;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 15px; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+">
+    <!-- Botão Menu -->
+    <button onclick="toggleMenu()" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">☰</button>
+    
+    <!-- Centro: Marca e Informações -->
+    <div style="text-align:center; flex:1; display: flex; flex-direction: column; justify-content: center;">
+        <div style="font-weight:900; font-size:18px; letter-spacing: 1px;">
+            <span style="color: #ff6b35;">X9</span> RADAR
+        </div>
+        <div style="font-size:12px; opacity:0.9; display: flex; justify-content: center; gap: 8px; margin-top: 2px;">
+            <span id="header-cidade">Buscando...</span>
+            <span style="opacity: 0.5;">|</span>
+            <span id="header-clima">--°C</span>
+        </div>
+    </div>
+
+    <!-- Indicador de GPS -->
+    <div id="header-gps-status" style="
+        width: 14px; height: 14px; border-radius: 50%; background: #ff0000; 
+        box-shadow: 0 0 8px #ff0000; transition: all 0.3s ease;
+    " title="Status do GPS"></div></header>
+
 <div id="app-header" style="
     position: fixed;
     top: 0;
@@ -916,7 +945,7 @@ Cabeçalho Superior (Cidade e Clima)
      ============================================ -->
 <button id="btn-fechar-app" onclick="fecharApp()" style="
     position: fixed;
-    bottom: -20px;
+    bottom: 80px;
     right: 20px;
     width: 60px;
     height: 60px;

@@ -1860,9 +1860,14 @@ function startGPSTracking() {
             var lng = position.coords.longitude;
             var accuracy = position.coords.accuracy; // <-- ADICIONADO: Captura a precisão
             var speedKmh = 0;
-            
+                        
             if (position.coords.speed !== null && position.coords.speed >= 0) {
                 speedKmh = Math.round(position.coords.speed * 3.6);
+
+   // 👈 ADICIONE ISSO: Atualiza o header em tempo real com a nova precisão
+    atualizarInterfaceCabecalho({
+        precisaoGPS: precisao
+    });
             }
 
             // =================================================================
@@ -5152,6 +5157,14 @@ window.addEventListener('resize', function() {
     ajustarHeaderResponsivo();
 });
 
+// Dentro de atualizarTemperatura(), após buscar os dados:
+atualizarInterfaceCabecalho({
+    cidade: dadosClima.name || "Local",
+    temp: dadosClima.main.temp,
+    umidade: dadosClima.main.humidity,
+    poluicaoTexto: textoPoluicao, // (a variável que você já criou no seu código)
+    precisaoGPS: typeof ultimaPrecisaoGPS !== 'undefined' ? ultimaPrecisaoGPS : 999
+});
 
 
 // ============================================

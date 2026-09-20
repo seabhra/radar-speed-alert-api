@@ -715,42 +715,6 @@ h1 span {
     }
 
 
-
-/* ======================================== */
-/* HEADER RIGHT (MENU)                      */
-/* ======================================== */
-.header-right {
-    flex-shrink: 0;           /* ⬅️ NOVO: botão MENU nunca encolhe */
-}
-    .btn-menu-toggle {
-        padding: 4px 8px 3px;
-        border-radius: 8px;
-    }
-    
-    .menu-hamburger {
-        width: 14px;
-        gap: 2.5px;
-    }
-    
-    .menu-hamburger span {
-        height: 1.8px;
-    }
-    
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
-        transform: translateY(4px) rotate(45deg);
-    }
-    
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
-        transform: translateY(-4px) rotate(-45deg);
-    }
-}
-    
-    .menu-label {
-        font-size: 0.4rem;
-        letter-spacing: 0.8px;
-    }
-
-
 /* ======================================== */
 /* TELAS MUITO PEQUENAS */
 /* ======================================== */
@@ -848,11 +812,10 @@ h1 span {
 /* ======================================== */
 /* GPS STATUS WRAPPER (Container Principal) */
 /* ======================================== */
-/* ======================================== */
-/* GPS STATUS WRAPPER (Container Principal) */
-/* ======================================== */
 .gps-status-wrapper {
-    position: fixed;
+     position: relative; /* Permite que o Flexbox do header controle a posição */
+    margin-left: auto;  /* Empurra suavemente para a direita, próximo ao menu */
+   
     top: 12px;
     left: 150px; /* AUMENTADO: agora fica ao lado do título, não sobre ele */
     display: flex;
@@ -1024,7 +987,42 @@ h1 span {
 }
 
 /* ======================================== */
-/* BOTÃO MENU TOGGLE */
+/* HEADER RIGHT (BOTÃO DO MENU DO MAPA)                      */
+/* ======================================== */
+.header-right {
+    flex-shrink: 0;           /* ⬅️ NOVO: botão MENU nunca encolhe */
+}
+    .btn-menu-toggle {
+        padding: 4px 8px 3px;
+        border-radius: 8px;
+    }
+    
+    .menu-hamburger {
+        width: 14px;
+        gap: 2.5px;
+    }
+    
+    .menu-hamburger span {
+        height: 1.8px;
+    }
+    
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+        transform: translateY(4px) rotate(45deg);
+    }
+    
+    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+        transform: translateY(-4px) rotate(-45deg);
+    }
+}
+    
+    .menu-label {
+        font-size: 0.4rem;
+        letter-spacing: 0.8px;
+    }
+
+
+/* ======================================== */
+/* BOTÃO MENU TOGGLE DOS BOTÕES DO MAPA */
 /* ======================================== */
 .btn-menu-toggle {
     display: flex;
@@ -1097,7 +1095,7 @@ h1 span {
 
 
 /* ======================================== */
-/* CONTROLES DA BARRA LATERAL  */
+/* CONTROLES DA BARRA LATERAL DO MAPA */
 /* ======================================== */
     .sidebar-controls {
         position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width);

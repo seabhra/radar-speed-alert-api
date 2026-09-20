@@ -111,16 +111,66 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Função para atualizar o cabeçalho (chame isso a partir do mapa.js quando tiver os dados)
-function atualizarCabecalhoApp(cidade, temperatura, gpsOk) {
-    const elCidade = document.getElementById('header-cidade');
-    const elClima = document.getElementById('header-clima');
-    const elGps = document.getElementById('header-gps-status');
+// ==========================================
+// ATUALIZAR INTERFACE DO CABEÇALHO (App.js)
+// ==========================================
+function atualizarInterfaceCabecalho(dados) {
+    // dados = { cidade, temp, umidade, poluicaoTexto, precisaoGPS }
 
-    if (elCidade) elCidade.textContent = cidade || "Localização atual";
-    if (elClima) elClima.textContent = temperatura ? `${temperatura}°C` : "--°C";
-    
-    if (elGps) {
-        elGps.style.background = gpsOk ? '#00ff00' : '#ff0000'; // Verde se OK, Vermelho se ERR
+    // 1. Atualizar Cidade
+    const elCidade = document.getElementById('nomeCidade');
+    if (elCidade && dados.cidade) {
+        elCidade.textContent = dados.cidade; // O emoji 📍 já pode estar no HTML ou adicionado aqui
+    }
+
+    // 2. Atualizar Temperatura
+    const elTemp = document.getElementById('temperaturaAtual');
+    if (elTemp && dados.temp !== undefined) {
+        elTemp.textContent = dados.temp.toFixed(1) + '°C';
+    }
+
+    // 3. Atualizar Umidade
+    const elUmid = document.getElementById('umidadeAtual');
+    if (elUmid && dados.umidade !== undefined) {
+        elUmid.textContent = dados.umidade + '%';
+    }
+
+    // 4. Atualizar Poluição
+    const elPoluicao = document.getElementById('poluicaoAtual');
+    if (elPoluicao && dados.poluicaoTexto) {
+        elPoluicao.textContent = dados.poluicaoTexto;
+    }
+
+    // 5. Atualizar STATUS DO GPS (A mágica das suas classes CSS)
+    const wrapper = document.getElementById('gps-status-wrapper');
+    const dot = document.getElementById('gps-status-dot');
+    const label = document.getElementById('gps-status-label');
+
+    if (wrapper && dot && label) {
+        // Limpa todas as classes de estado anteriores
+        wrapper.classList.remove('gps-ok', 'gps-warn', 'gps-err');
+        dot.classList.remove('ok', 'warn', 'err');
+
+        const precisao = dados.precisaoGPS || 999;
+
+        if (precisao <= 50) {
+            // 🟢 EXCELENTE
+            wrapper.classList.add('gps-ok');
+            dot.classList.add('ok');
+            label.textContent = 'ATIVO';
+            wrapper.title = `GPS Preciso: ${precisao}m`;
+        } else if (precisao <= 150) {
+            // 🟡 INSTÁVEL
+            wrapper.classList.add('gps-warn');
+            dot.classList.add('warn');
+            label.textContent = 'INSTÁVEL';
+            wrapper.title = `GPS Instável: ${precisao}m`;
+        } else {
+            // 🔴 RUIM / AGUARDANDO
+            wrapper.classList.add('gps-err');
+            dot.classList.add('err');
+            label.textContent = 'AGUARDANDO';
+            wrapper.title = `Aguardando sinal: ${precisao}m`;
+        }
     }
 }
