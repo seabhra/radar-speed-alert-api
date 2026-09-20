@@ -110,3 +110,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }, { passive: true });
     }
 });
+
+// Função para atualizar o cabeçalho (chame isso a partir do mapa.js quando tiver os dados)
+function atualizarCabecalhoApp(cidade, temperatura, gpsOk) {
+    const elCidade = document.getElementById('header-cidade');
+    const elClima = document.getElementById('header-clima');
+    const elGps = document.getElementById('header-gps-status');
+
+    if (elCidade) elCidade.textContent = cidade || "Localização atual";
+    if (elClima) elClima.textContent = temperatura ? `${temperatura}°C` : "--°C";
+    
+    if (elGps) {
+        elGps.style.background = gpsOk ? '#00ff00' : '#ff0000'; // Verde se OK, Vermelho se ERR
+    }
+}

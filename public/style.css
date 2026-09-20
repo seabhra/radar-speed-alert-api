@@ -151,6 +151,73 @@ h1 span {
     color: var(--accent-color);
 }
 
+/* ======================================== */
+/* GARANTIR QUE MAPA FIQUE ABAIXO DA HOME                             */
+/* ======================================== */
+
+/* 1. O mapa fica na base */
+#map {
+    position: absolute;
+    top: 60px; /* Altura do cabeçalho */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+/* 2. Todas as páginas (Info, Doar, etc.) ficam ocultas por padrão e por cima do mapa */
+.app-page {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    background-color: #f5f5f5;
+    display: none; /* Oculto por padrão */
+    overflow-y: auto;
+}
+
+/* 3. A página do mapa deve ser a única visível inicialmente */
+#page-mapa {
+    display: block !important;
+    background: transparent;
+}
+
+/* 4. Controles do Leaflet devem ficar acima do mapa, mas abaixo do menu */
+.leaflet-control-container {
+    z-index: 40 !important;
+}
+
+/* 5. Menu lateral e Overlay ficam no topo absoluto */
+#menu-lateral { z-index: 1001; }
+#menu-overlay { z-index: 1000; }
+#splash-screen { z-index: 99999; }
+
+/* Garante que o mapa fique abaixo dos controles */
+
+/* ======================================== */
+/* MAPA FIQUE ABAIXO DA HOME - PARTE VELHA                            */
+/* ======================================== */
+
+/* Controles do mapa devem ficar acima */
+.leaflet-control-container,
+.gps-controls,
+.speed-widget,
+.menu-button {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Splash screen deve ficar acima de tudo */
+#splash-screen {
+  z-index: 99999 !important;
+}
+
+/* Menu lateral */
+#menu-lateral {
+  z-index: 1001;
+}
 
 /* ======================================== */
 /* LINHA DOS DADOS CLIMÁTICOS               */
