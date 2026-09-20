@@ -3960,6 +3960,86 @@
       "KBH000313",
       "-19.921356, -44.049464",
       "17/08/2026, 11:55:54"
+
+    ],
+    [
+      314,
+      "000314",
+      "Rodovia Senador Eliseu Resende, Francelinos, Juatuba",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "60",
+      "Francelinos",
+      "Único",
+      "M000314",
+      "KBH000314",
+      "-19.972649, -44.309937",
+      "14/09/2026, 10:54:48"
+    ],
+    [
+      315,
+      "000315",
+      "Endereço não encontrado",
+      "Radar Inteligente de Velocidade Média (RIV)",
+      "80",
+      "Endereço não encontrado",
+      "Único",
+      "M000315",
+      "KBH000315",
+      "-19.973621, -44.273425",
+      "14/09/2026, 11:06:21"
+    ],
+    [
+      316,
+      "000316",
+      "MGC-356, Vila Olhos d'Água, Olhos d'Água",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "60",
+      "Vila Olhos d'Água",
+      "Único",
+      "M000316",
+      "KBH000316",
+      "-19.979139, -43.948427",
+      "16/09/2026, 09:05:04"
+    ],
+    [
+      317,
+      "000317",
+      "Rua Cruzeiro do Sul, Santa Helena, Barreiro",
+      "Detector de Avanço de Semáforo (DAS)",
+      "60",
+      "Santa Helena",
+      "Único",
+      "M000317",
+      "KBH000317",
+      "-19.990476, -44.011965",
+      "16/09/2026, 09:55:32"
+    ],
+    [
+      318,
+      "000318",
+      "Avenida Babita Camargos, Cidade Industrial Coronel Juventino Dias, Regional Industrial",
+      "Detector de Uso de Celular (DUC)",
+      "60",
+      "Cidade Industrial Coronel Juventino Dias",
+      "Único",
+      "M000318",
+      "KBH000318",
+      "-19.953625, -44.025832",
+      "17/09/2026, 11:39:57"
+    ],
+    [
+      319,
+      "000319",
+      "Avenida Deputado Cristóvão Chiaradia, Buritis, Regional Oeste",
+      "Controlador Eletrônico de Velocidade (CEV)",
+      "30",
+      "Buritis",
+      "Único",
+      "M000319",
+      "KBH000319",
+      "-19.985024, -43.973341",
+      "18/09/2026, 09:32:53"
+
     ]
-    ]
+  ]
 }
