@@ -1,4 +1,4 @@
-const CACHE_NAME = 'radar-cache-v10';
+const CACHE_NAME = 'radar-cache-v12';
 
 // Lista de URLs para cache
 const urlsToCache = [
@@ -6,6 +6,13 @@ const urlsToCache = [
   '/index.html',
   '/favicon.ico',
   '/manifest.json',
+  '/site.webmanifest',
+  
+  // NOVOS ARQUIVOS SEPARADOS (Adicione estas 3 linhas):
+  '/style.css',
+  '/mapa.js',
+  '/app.js',
+
  '/imagens_app/ic_compass.png', 
 '/imagens_app/ic_area_escape.png', 
  '/imagens_app/ic_cam_video.png',  
