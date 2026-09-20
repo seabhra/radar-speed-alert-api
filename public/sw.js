@@ -1,89 +1,40 @@
-const CACHE_NAME = 'radar-cache-v12';
+const CACHE_NAME = 'radar-cache-v13'; // Atualizado para forçar nova instalação
 
-// Lista de URLs para cache
 const urlsToCache = [
   '/',
   '/index.html',
   '/favicon.ico',
-  '/manifest.json',
   '/site.webmanifest',
-  
-  // NOVOS ARQUIVOS SEPARADOS (Adicione estas 3 linhas):
   '/style.css',
   '/mapa.js',
   '/app.js',
-
- '/imagens_app/ic_compass.png', 
-'/imagens_app/ic_area_escape.png', 
- '/imagens_app/ic_cam_video.png',  
-  '/imagens_app/ic_icon_chegada.png', 
-   '/imagens_app/ic_girar_map.png',
-   '/imagens_app/ic_local_traffic.png',
-   '/imagens_app/ic_olho.png',
-     '/imagens_app/ic_radar_cinto_v2.png',
-  
-   '/imagens_app/ic_radar_acidente.png',
-   '/imagens_app/ic_radar_cev_30_v2.png',
-   '/imagens_app/ic_radar_cev_40_v2.png',
-   '/imagens_app/ic_radar_cev_50_v2.png',
-   '/imagens_app/ic_radar_cev_60_v2.png',
-   '/imagens_app/ic_radar_cev_70_v2.png',
-   '/imagens_app/ic_radar_cev_80_v2.png',
-   '/imagens_app/ic_radar_cev_100_v2.png',
-   '/imagens_app/ic_radar_cev_110_v2.png',
-  
-'/imagens_app/ic_compass_active.png',
-'/imagens_app/ic_gps_busca.png', 
-'/imagens_app/ic_gps_marker.png',
-'/imagens_app/ic_icon_app.png',
-'/imagens_app/ic_location_button.png',
-'/imagens_app/ic_location_button_active.png',
-'/imagens_app/ic_navigator_map.png',
-'/imagens_app/ic_radar_busca.png',
-'/imagens_app/ic_radar_cem_v2.png',
-'/imagens_app/ic_radar_cev_v2.png',
-'/imagens_app/ic_radar_das_v2.png',
-'/imagens_app/ic_radar_dife_v2.png',
-'/imagens_app/ic_radar_dfpr_v2.png',
-'/imagens_app/ic_radar_dtlp_v2.png',
-'/imagens_app/ic_radar_duc_v2.png',
-'/imagens_app/ic_radar_ocr_v2.png',
-  
-'/imagens_app/ic_radar_facial_v2.png',
-'/imagens_app/ic_radar_nuclear_v2.png',
-'/imagens_app/ic_radar_truck_v2.png',
-  '/imagens_app/ic_tunel_v2.png',
-  '/imagens_app/ic_zona_inunda_v2.png',
-  
-'/imagens_app/ic_radar_rcp_v2.png',
-'/imagens_app/ic_radar_rev_v2.png',
-'/imagens_app/ic_recentralizar.png',
-'/imagens_app/ic_refresh_button.png',
-'/imagens_app/ic_speed_limit.png',
-'/imagens_app/ic_zoom_in.png',
-'/imagens_app/ic_zoom_out.png',
- '/imagens_app/zap.png',
- '/icons/icon-192.png',
-  // Adicione aqui outros arquivos estáticos que você quer cachear
+  '/imagens_app/ic_compass.png',
+  '/imagens_app/ic_gps_marker.png',
+  '/imagens_app/ic_icon_app.png'
+  // Adicione apenas os arquivos que você TEM CERTEZA que existem
 ];
 
-// Instalação do Service Worker e cache dos arquivos
+// Instalação TOLERANTE A FALHAS
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Instalando...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Service Worker: Cache aberto');
-        return cache.addAll(urlsToCache);
-      })
-      .catch((error) => {
-        console.error('Service Worker: Falha ao cachear arquivos:', error);
+        return Promise.all(
+          urlsToCache.map(url => 
+            cache.add(url).catch(err => {
+              console.warn(`⚠️ Falha ao cachear ${url}:`, err.message);
+              return null;
+            })
+          )
+        );
       })
   );
-  self.skipWaiting(); // Força o Service Worker a se tornar ativo imediatamente
+  self.skipWaiting();
 });
 
-// Ativação do Service Worker e limpeza de caches antigos
+// Ativação
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Ativando...');
   event.waitUntil(
@@ -97,56 +48,70 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  clients.claim(); // Assume o controle de todas as páginas abertas
+  clients.claim();
 });
 
 // Interceptação de requisições
 self.addEventListener('fetch', (event) => {
+  const requestUrl = event.request.url;
+
+  // Ignore requisições de extensões e esquemas não-http
+  if (requestUrl.startsWith('chrome-extension://') || 
+      requestUrl.startsWith('moz-extension://') ||
+      !requestUrl.startsWith('http')) {
+    return;
+  }
+
+  // Ignore APIs externas (clima, mapas, etc.)
+  if (requestUrl.includes('openweathermap.org') || 
+      requestUrl.includes('nominatim.openstreetmap.org') ||
+      requestUrl.includes('cdn.jsdelivr.net') ||
+      !requestUrl.startsWith(self.location.origin)) {
+    return fetch(event.request);
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Retorna a resposta cacheada ou faz a requisição à rede
         if (response) {
-          console.log('Service Worker: Recuperando do cache:', event.request.url);
           return response;
         }
+        
         return fetch(event.request)
           .then((networkResponse) => {
-            // Atualiza o cache com a resposta da rede, se for um GET e não falhar
-            if (event.request.method === 'GET' && networkResponse.ok) {
+            // NÃO cachear respostas parciais (206) ou com erro
+            if (networkResponse.status === 206 || !networkResponse.ok) {
+              return networkResponse;
+            }
+            
+            if (event.request.method === 'GET') {
               const responseClone = networkResponse.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(event.request, responseClone);
+              caches.open(CACHE_NAME).then((cache) => {
+                cache.put(event.request, responseClone).catch(err => {
+                  console.warn('Falha ao salvar no cache:', err);
                 });
+              });
             }
             return networkResponse;
           })
           .catch(() => {
-            // Se a requisição falhar (offline), retorna uma resposta genérica
             if (event.request.destination === 'document') {
-              console.log('Service Worker: Offline, retornando página padrão');
               return caches.match('/index.html');
             }
-            console.log('Service Worker: Offline, recurso não disponível:', event.request.url);
-            return new Response('Offline: Recurso não disponível', { status: 404 });
+            return new Response('Offline', { status: 404 });
           });
       })
   );
 });
 
-// ===================================================================
-// AÇÃO AO CLICAR NA NOTIFICAÇÃO
-// ===================================================================
+// Notificações
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({type: 'window'}).then(function(clientList) {
       if (clientList.length > 0) {
-        // Se o app já estiver aberto em alguma aba, traz para frente
         return clientList[0].focus();
       }
-      // Se não estiver aberto, abre uma nova janela com o app
       return clients.openWindow('/');
     })
   );
