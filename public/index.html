@@ -14,46 +14,84 @@
   <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
   
   <title>Radar X9 BH - Alerta Inteligente</title>
-  
-  <!-- CSS Principal -->
-  <link rel="stylesheet" href="style.css">
-  
-  <!-- Leaflet e MapLibre -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" crossorigin="anonymous"/>
-  <link href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet"/>
-  
-  <!-- Fontes -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  
-  <base target="_blank">
+
+   <base target="_blank">
+ 
 </head>
 
 <body>
     
-
-  <!-- ============================================ -->
-  <!-- SPLASH SCREEN (Apenas a marca)               -->
-  <!-- ============================================ -->
-  <div id="splash-screen">
-    <img src="/imagens_app/icon-sem_fundo.png" 
-         alt="X9 Radar"
-         onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'; this.onerror=null;">
+<!-- SPLASH SCREEN COM TAMANHOS AJUSTADOS -->
+<div id="splash-screen">
     
-    <div class="splash-credits">
-         
-        <h2><span>Powered by</h2>
-            <img src="/imagens_app/image_marca.png" 
-         alt="marca"
-         onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'; this.onerror=null;">
-        <p>por Geraldo A. Seabra</p>
-
-        <p style="font-size: 12px; opacity: 0.7; margin-top: 10px;">versão 1.0</p>
+    <!-- LOGO PRINCIPAL (AUMENTADO) -->
+    <img src="/imagens_app/ic_icon_sem_fundo.png" 
+         alt="X9 Radar"
+         id="splash-logo-principal"
+         style="
+             width: 220px;
+             height: 220px;
+             object-fit: contain;
+             margin-bottom: 20px;
+             filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+             animation: pulseLogo 2s ease-in-out infinite;
+         "
+         onerror="this.style.display='none'; document.getElementById('splash-fallback').style.display='flex';">
+    
+    <!-- Fallback caso imagem falhe -->
+    <div id="splash-fallback" style="
+        display: none;
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        font-size: 80px;
+        color: white;
+        font-weight: bold;
+        box-shadow: 0 8px 32px rgba(255,107,53,0.4);
+        margin-bottom: 20px;
+        animation: pulseLogo 2s ease-in-out infinite;
+    ">X9</div>
+    
+    <!-- MARCA POWERED BY (REDUZIDA) -->
+    <div style="margin-top: 30px; text-align: center;">
+        <p style="color: #ff6b35; font-size: 18px; font-weight: 600; margin-bottom: 10px;">
+            Powered by
+        </p>
+        <img src="/imagens_app/image_marca.png" 
+             alt="Marca"
+             id="splash-marca"
+             style="
+                 width: 100px;
+                 height: 100px;
+                 object-fit: contain;
+                 filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+             "
+             onerror="this.style.display='none';">
     </div>
     
-    <div class="splash-loader"></div>
+    <!-- CRÉDITOS -->
+    <div style="margin-top: 30px; text-align: center; color: rgba(255,255,255,0.8);">
+        <p style="margin: 5px 0; font-size: 14px;">por Geraldo A. Seabra</p>
+        <p style="margin: 5px 0; font-size: 12px; opacity: 0.7;">versão 1.0</p>
+    </div>
+    
+    <!-- LOADER -->
+    <div style="margin-top: 40px;">
+        <div style="
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #ff6b35;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        "></div>
+    </div>
 </div>
+
+
 
   <!-- ============================================ -->
   <!-- HEADER PRINCIPAL (Unificado e Alinhado)      -->
@@ -235,19 +273,35 @@
   <audio id="alerta-sound-clima" preload="auto"><source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg"></audio>
 
   <!-- SCRIPTS -->
-<!-- 1. jQuery primeiro -->
+
+
+<!-- 1. jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 
-<!-- 2. Leaflet e bibliotecas -->
+<!-- 2. Leaflet -->
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
 <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
 <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
 
-<!-- 3. mapa.js PRIMEIRO (define variáveis globais) -->
+ <!-- CSS Principal -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Leaflet e MapLibre -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" crossorigin="anonymous"/>
+  <link href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet"/>
+  
+  <!-- Fontes -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  
+
+<!-- 3. app.js PRIMEIRO (exporta funções) -->
+<script src="app.js"></script>
+
+<!-- 4. mapa.js DEPOIS (usa as funções) -->
 <script src="mapa.js"></script>
 
-<!-- 4. app.js DEPOIS (usa variáveis do mapa.js) -->
-<script src="app.js"></script>
 </body>
 </html>
