@@ -14,8 +14,7 @@
   <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
   
   <title>Radar X9 BH - Alerta Inteligente</title>
-
-   <base target="_blank">
+  
  
 </head>
 
@@ -25,12 +24,12 @@
 <div id="splash-screen">
     
     <!-- LOGO PRINCIPAL (AUMENTADO) -->
-    <img src="/imagens_app/ic_icon_sem_fundo.png" 
+    <img src="/imagens_app/icon-sem_fundo.png" 
          alt="X9 Radar"
          id="splash-logo-principal"
          style="
-             width: 220px;
-             height: 220px;
+             width: 320px;
+             height: 320px;
              object-fit: contain;
              margin-bottom: 20px;
              filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
@@ -64,8 +63,8 @@
              alt="Marca"
              id="splash-marca"
              style="
-                 width: 100px;
-                 height: 100px;
+                 width: 80px;
+                 height: 80px;
                  object-fit: contain;
                  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
              "
@@ -90,7 +89,6 @@
         "></div>
     </div>
 </div>
-
 
 
   <!-- ============================================ -->
@@ -273,12 +271,10 @@
   <audio id="alerta-sound-clima" preload="auto"><source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg"></audio>
 
   <!-- SCRIPTS -->
-
-
-<!-- 1. jQuery -->
+<!-- 1. jQuery primeiro -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 
-<!-- 2. Leaflet -->
+<!-- 2. Leaflet e bibliotecas -->
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
 <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
@@ -296,12 +292,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   
+  <base target="_blank">
 
-<!-- 3. app.js PRIMEIRO (exporta funções) -->
-<script src="app.js"></script>
-
-<!-- 4. mapa.js DEPOIS (usa as funções) -->
+<!-- 3. mapa.js PRIMEIRO (define variáveis globais) -->
 <script src="mapa.js"></script>
 
+<!-- 4. app.js DEPOIS (usa variáveis do mapa.js) -->
+<script src="app.js"></script>
 </body>
 </html>
