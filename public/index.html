@@ -197,51 +197,121 @@
 
       <button class="btn-add-radar" id="btn-add-radar"><span class="plus-icon">+</span></button>
 
-      <!-- MODAL DE INCLUSÃO DE RADAR -->
-      <div class="modal-overlay" id="modal-add-radar">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h2>➕ Adicionar Radar</h2>
+   
+      <!-- MODAL DE ADICIONAR RADAR COMPLETO -->
+<div class="modal-overlay" id="modal-add-radar">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span style="color: #00ff88;">+</span> Adicionar Radar</h2>
             <button class="modal-close" id="modal-close">&times;</button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="radar-type">Tipo de Radar</label>
-              <select id="radar-type" class="form-select">
-                <option value="">Selecione o tipo...</option>
-                <option value="Controlador Eletrônico de Velocidade (CEV)">🚗 Radar de Velocidade (CEV)</option>
-                <option value="Detector de Avanço de Semáforo (DAS)">🚦 Radar de Semáforo (DAS)</option>
-              </select>
-            </div>
-            <div class="form-group" id="speed-group">
-              <label for="radar-speed">Velocidade Máxima (km/h)</label>
-              <div class="speed-buttons-container" id="speed-buttons-container">
-                  <button type="button" class="speed-btn" data-speed="30">30</button>
-                  <button type="button" class="speed-btn" data-speed="40">40</button>
-                  <button type="button" class="speed-btn" data-speed="50">50</button>
-                  <button type="button" class="speed-btn" data-speed="60">60</button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Localização do Radar</label>
-              <button type="button" class="btn-capture-location" id="btn-capture-location">📍 Capturar Posição Atual</button>
-              <div class="coords-inputs-container" id="coords-inputs-container">
-                <div class="coord-field">
-                  <label class="coord-label">Latitude</label>
-                  <input type="text" id="pos-lat" class="coord-input" readonly placeholder="-00.000000">
-                </div>
-                <div class="coord-field">
-                  <label class="coord-label">Longitude</label>
-                  <input type="text" id="pos-lng" class="coord-input" readonly placeholder="-00.000000">
-                </div>
-              </div>
-              <div class="current-position-status" id="pos-status">Clique acima para inserir as coordenadas.</div>
-            </div>
-            <button class="btn-submit-radar" id="btn-submit-radar">✅ Incluir Radar</button>
-          </div>
         </div>
-      </div>
-  </div>
+        
+        <div class="modal-body">
+            <!-- TIPO DE RADAR -->
+            <div class="form-group">
+                <label for="radar-type">
+                    <span class="label-icon">📍</span> TIPO DE RADAR
+                </label>
+                <select id="radar-type" class="form-select">
+                    <option value="">Selecione o tipo...</option>
+                    <option value="CEV"> Radar de Velocidade (CEV)</option>
+                    <option value="DAS"> Radar de Semáforo (DAS)</option>
+                    <option value="DCP"> Conversão Proibida (DCP)</option>
+                    <option value="DTLP"> Tráfego Proibido (DTLP)</option>
+                    <option value="DIFEX">🚌 Faixa Exclusiva (DIFEX)</option>
+                    <option value="DPFP">🚶 Parada em Faixa (DPFP)</option>
+                    <option value="DUC">📱 Uso de Celular (DUC)</option>
+                    <option value="VCS">🔒 Cinto de Segurança (VCS)</option>
+                    <option value="ZIR">🌊 Risco de Inundação (ZIR)</option>
+                    <option value="ZPV">⚠️ Zona de Perigo (ZPV)</option>
+                    <option value="AIA">💥 Alto Índice de Acidentes (AIA)</option>
+                    <option value="REC">🔋 Recarga Carro Elétrico</option>
+                    <option value="WC_AUT">🚾 WC Público Autolimpante</option>
+                    <option value="WC_COM">🚻 WC Público Comum</option>
+                    <option value="PAA">🚏 Ponto Abrigo Amigo</option>
+                </select>
+            </div>
+
+            <!-- VELOCIDADE MÁXIMA -->
+            <div class="form-group" id="speed-group">
+                <label for="radar-speed">
+                    <span class="label-icon">⚡</span> VELOCIDADE MÁXIMA (KM/H)
+                </label>
+                <div class="speed-buttons-container" id="speed-buttons-container">
+                    <button type="button" class="speed-btn" data-speed="30">30</button>
+                    <button type="button" class="speed-btn" data-speed="40">40</button>
+                    <button type="button" class="speed-btn" data-speed="50">50</button>
+                    <button type="button" class="speed-btn" data-speed="60">60</button>
+                    <button type="button" class="speed-btn" data-speed="70">70</button>
+                    <button type="button" class="speed-btn" data-speed="80">80</button>
+                    <button type="button" class="speed-btn" data-speed="100">100</button>
+                    <button type="button" class="speed-btn" data-speed="110">110</button>
+                </div>
+                <input type="hidden" id="radar-speed" value="">
+            </div>
+
+            <!-- LOCALIZAÇÃO DO RADAR -->
+            <div class="form-group">
+                <label>
+                    <span class="label-icon">📍</span> LOCALIZAÇÃO DO RADAR
+                </label>
+                
+                <button type="button" class="btn-capture-location" id="btn-capture-location">
+                    <span class="capture-icon">🎯</span>
+                    <span class="capture-text">Capturar Posição Atual</span>
+                </button>
+                
+                <div class="coords-info" id="coords-info" style="display: none;">
+                    <div class="coord-row">
+                        <span class="coord-label">Latitude:</span>
+                        <span class="coord-value" id="pos-lat">--</span>
+                    </div>
+                    <div class="coord-row">
+                        <span class="coord-label">Longitude:</span>
+                        <span class="coord-value" id="pos-lng">--</span>
+                    </div>
+                    <div class="coord-row">
+                        <span class="coord-label">Precisão:</span>
+                        <span class="coord-value" id="pos-accuracy">--</span>
+                    </div>
+                </div>
+                
+                <p class="form-hint">Clique acima para inserir as coordenadas automaticamente.</p>
+            </div>
+
+            <!-- ENDEREÇO (OPCIONAL) -->
+            <div class="form-group">
+                <label for="radar-address">
+                    <span class="label-icon">🏠</span> ENDEREÇO / REFERÊNCIA <span style="opacity: 0.6;">(Opcional)</span>
+                </label>
+                <input type="text" 
+                       id="radar-address" 
+                       class="form-input" 
+                       placeholder="Ex: Av. Afonso Pena, 1000 - Centro">
+            </div>
+
+            <!-- OBSERVAÇÕES -->
+            <div class="form-group">
+                <label for="radar-obs">
+                    <span class="label-icon">📝</span> OBSERVAÇÕES <span style="opacity: 0.6;">(Opcional)</span>
+                </label>
+                <textarea id="radar-obs" 
+                          class="form-textarea" 
+                          rows="3" 
+                          placeholder="Informações adicionais sobre o radar..."></textarea>
+            </div>
+
+            <!-- BOTÃO INCLUIR -->
+            <button class="btn-submit-radar" id="btn-submit-radar">
+                <span class="btn-icon">✅</span>
+                <span class="btn-text">Incluir Radar</span>
+            </button>
+            
+            <!-- STATUS -->
+            <div class="submit-status" id="submit-status" style="display: none;"></div>
+        </div>
+    </div>
+</div>
 
   <!-- MENU LATERAL (Drawer) -->
   <div id="menu-lateral" style="position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%); z-index: 1001; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.5); overflow-y: auto;">
