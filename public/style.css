@@ -51,9 +51,10 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 99999 !important; /* SEMPRE NO TOPO */
+    z-index: 99999 !important;
     transition: opacity 0.5s ease;
 }
+
 
 #splash-screen img {
     width: 150px;
