@@ -36,10 +36,18 @@
   <!-- SPLASH SCREEN (Apenas a marca)               -->
   <!-- ============================================ -->
   <div id="splash-screen">
-      <img src="/imagens_app/ic_icon_sem_fundo.png" 
-           onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" 
-           alt="X9 Radar">
-  </div>
+    <img src="/imagens_app/ic_icon_sem_fundo.png" 
+         alt="X9 Radar"
+         onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'; this.onerror=null;">
+    
+    <div class="splash-credits">
+        <h2><span>X9</span> RADAR</h2>
+        <p>por Geraldo A. Seabra</p>
+        <p style="font-size: 12px; opacity: 0.7; margin-top: 10px;">versão 1.0</p>
+    </div>
+    
+    <div class="splash-loader"></div>
+</div>
 
   <!-- ============================================ -->
   <!-- HEADER PRINCIPAL (Unificado e Alinhado)      -->
