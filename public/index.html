@@ -229,13 +229,19 @@
   <audio id="alerta-sound-clima" preload="auto"><source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg"></audio>
 
   <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
-  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
-  
-  <script src="mapa.js"></script> 
-  <script src="app.js"></script>
+<!-- 1. jQuery primeiro -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+<!-- 2. Leaflet e bibliotecas -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+<script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
+
+<!-- 3. mapa.js PRIMEIRO (define variáveis globais) -->
+<script src="mapa.js"></script>
+
+<!-- 4. app.js DEPOIS (usa variáveis do mapa.js) -->
+<script src="app.js"></script>
 </body>
 </html>
