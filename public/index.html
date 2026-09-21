@@ -313,13 +313,555 @@
   </div>
   <div id="menu-overlay" onclick="toggleMenu()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none;"></div>
 
-  <!-- PÁGINAS SECUNDÁRIAS -->
-  <div id="page-info" class="app-page" style="position: fixed; top: 64px; left: 0; right: 0; bottom: 0; background: #f5f5f5; display: none; z-index: 100; overflow-y: auto; padding: 20px;">
-      <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-          <h2 style="color: #1e3c72; margin-top: 0;">Sobre o App</h2>
-          <p><strong>X9 Radar</strong> é um aplicativo desenvolvido para alertar motoristas sobre radares de trânsito.</p>
-          <button onclick="showPage('mapa')" style="margin-top: 20px; width: 100%; padding: 15px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">Voltar ao Mapa</button>
-      </div>
+
+  <!-- PÁGINA DE INFORMAÇÕES -->
+<div id="page-info" class="app-page">
+    <div class="page-header">
+        <h1>ℹ️ Informações</h1>
+        <button class="btn-back" onclick="showPage('mapa')">← Voltar</button>
+    </div>
+    
+    <div class="page-content">
+        <!-- SOBRE O APP -->
+        <section class="info-section">
+            <h2>📱 Sobre o X9 Radar</h2>
+            <div class="info-card">
+                <p>O <strong>X9 Radar</strong> é um aplicativo colaborativo desenvolvido para alertar motoristas sobre radares de trânsito, semáforos inteligentes e pontos de interesse nas vias.</p>
+                
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <div>
+                            <h3>Funcionalidades Principais</h3>
+                            <ul>
+                                <li>Alerta sonoro de radares fixos e móveis</li>
+                                <li>GPS em tempo real com alta precisão</li>
+                                <li>Mapa interativo com Leaflet</li>
+                                <li>Funciona offline (PWA)</li>
+                                <li>Notificações de proximidade</li>
+                                <li>Informações meteorológicas</li>
+                                <li>Indicador de velocidade</li>
+                                <li>Contribuição colaborativa</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMO USAR -->
+        <section class="info-section">
+            <h2>📖 Como Usar</h2>
+            <div class="info-card">
+                <div class="step-list">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <h4>Permita o acesso à localização</h4>
+                            <p>Ao abrir o app, conceda permissão de GPS para funcionamento correto.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h4>Aguarde o GPS calibrar</h4>
+                            <p>O ícone de GPS ficará verde quando a precisão for adequada.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h4>Navegue normalmente</h4>
+                            <p>O app alertará automaticamente sobre radares próximos.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <h4>Contribua</h4>
+                            <p>Adicione novos radares usando o botão "+" no mapa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONFIGURAÇÕES RECOMENDADAS -->
+        <section class="info-section">
+            <h2>️ Configurações Recomendadas</h2>
+            <div class="info-card">
+                <ul class="config-list">
+                    <li>
+                        <span class="config-icon"></span>
+                        <div>
+                            <strong>Localização Precisa</strong>
+                            <p>Ative nas configurações do Android/iOS para melhor precisão</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="config-icon">🔋</span>
+                        <div>
+                            <strong>Economia de Bateria</strong>
+                            <p>Desative para o app durante o uso (pode afetar o GPS)</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="config-icon">📡</span>
+                        <div>
+                            <strong>GPS Sempre Ligado</strong>
+                            <p>Mantenha o GPS ativo durante toda a navegação</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="config-icon">🌐</span>
+                        <div>
+                            <strong>Conexão com Internet</strong>
+                            <p>Necessária para atualizar dados meteorológicos e mapas</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CRÉDITOS -->
+        <section class="info-section">
+            <h2>👨‍💻 Créditos</h2>
+            <div class="info-card credits-card">
+                <div class="author-info">
+                    <div class="author-avatar">GS</div>
+                    <div class="author-details">
+                        <h3>Desenvolvido por</h3>
+                        <p class="author-name">Geraldo A. Seabra</p>
+                        <p class="author-role">Desenvolvedor Full Stack</p>
+                    </div>
+                </div>
+                
+                <div class="app-version">
+                    <span>Versão</span>
+                    <strong>1.0</strong>
+                </div>
+                
+                <p class="copyright">© 2024 - Todos os direitos reservados</p>
+                
+                <div class="tech-stack">
+                    <h4>Tecnologias Utilizadas</h4>
+                    <div class="tech-list">
+                        <span class="tech-badge">HTML5</span>
+                        <span class="tech-badge">CSS3</span>
+                        <span class="tech-badge">JavaScript</span>
+                        <span class="tech-badge">Leaflet</span>
+                        <span class="tech-badge">MapLibre</span>
+                        <span class="tech-badge">PWA</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- PÁGINA DE TIPOS DE RADARES -->
+<div id="page-radares" class="app-page">
+    <div class="page-header">
+        <h1>🚦 Tipos de Radares</h1>
+        <button class="btn-back" onclick="showPage('mapa')">← Voltar</button>
+    </div>
+    
+    <div class="page-content">
+        <!-- RADAR DE VELOCIDADE -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <img src="/imagens_app/ic_radar_cev_v2.png" alt="Radar de Velocidade" onerror="this.style.display='none'">
+                <span class="radar-emoji"></span>
+            </div>
+            <div class="radar-info">
+                <h3>Radar de Velocidade (CEV)</h3>
+                <p class="radar-desc">Controlador Eletrônico de Velocidade</p>
+                <div class="radar-details">
+                    <p>Mede a velocidade do veículo e multa quem ultrapassa o limite permitido. Pode ser fixo, móvel ou eletrônico.</p>
+                    <ul class="radar-features">
+                        <li>✅ Fixo em postes</li>
+                        <li>✅ Móvel (carro ou moto)</li>
+                        <li>✅ Eletrônico (lombada)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEMÁFORO INTELIGENTE -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <img src="/imagens_app/ic_semaforo_inteligente.png" alt="Semáforo" onerror="this.style.display='none'">
+                <span class="radar-emoji">🚦</span>
+            </div>
+            <div class="radar-info">
+                <h3>Detector de Avanço de Semáforo (DAS)</h3>
+                <p class="radar-desc">Radar de Semáforo</p>
+                <div class="radar-details">
+                    <p>Controla o fluxo de veículos e pedestres. Multa por avançar o sinal vermelho.</p>
+                    <ul class="radar-features">
+                        <li>✅ Sinal vermelho</li>
+                        <li>✅ Avanço de preferencial</li>
+                        <li>✅ Bloqueio de interseção</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAIXA DE ÔNIBUS -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <img src="/imagens_app/ic_radar_das_v2.png" alt="Faixa de Ônibus" onerror="this.style.display='none'">
+                <span class="radar-emoji">🚌</span>
+            </div>
+            <div class="radar-info">
+                <h3>Faixa Exclusiva de Ônibus (DIFEX)</h3>
+                <p class="radar-desc">Detector de Invasão de Faixa Exclusiva</p>
+                <div class="radar-details">
+                    <p>Fiscaliza o uso indevido da faixa exclusiva de ônibus. Multa para carros particulares.</p>
+                    <ul class="radar-features">
+                        <li>✅ Faixa exclusiva</li>
+                        <li>✅ Horário de funcionamento</li>
+                        <li>✅ Fiscalização eletrônica</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONVERSÃO PROIBIDA -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🔄</span>
+            </div>
+            <div class="radar-info">
+                <h3>Conversão Proibida (DCP)</h3>
+                <p class="radar-desc">Detector de Conversão em Local Proibido</p>
+                <div class="radar-details">
+                    <p>Flagra veículos que fazem conversões proibidas (esquerda/direita) em locais sinalizados.</p>
+                    <ul class="radar-features">
+                        <li>✅ Conversão à esquerda</li>
+                        <li>✅ Conversão à direita</li>
+                        <li>✅ Retorno proibido</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRÁFEGO PROIBIDO -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji"></span>
+            </div>
+            <div class="radar-info">
+                <h3>Tráfego Proibido (DTLP)</h3>
+                <p class="radar-desc">Detector de Tráfego em Local Proibido</p>
+                <div class="radar-details">
+                    <p>Monitora áreas de tráfego restrito como pedestres, ciclovias ou ruas fechadas.</p>
+                    <ul class="radar-features">
+                        <li>✅ Rua pedestre</li>
+                        <li>✅ Área restrita</li>
+                        <li>✅ Sentido proibido</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CELULAR -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">📱</span>
+            </div>
+            <div class="radar-info">
+                <h3>Uso de Celular (DUC)</h3>
+                <p class="radar-desc">Detector de Uso de Celular</p>
+                <div class="radar-details">
+                    <p>Identifica motoristas utilizando celular ao volante sem dispositivo de mãos livres.</p>
+                    <ul class="radar-features">
+                        <li>✅ Uso de smartphone</li>
+                        <li>✅ Mãos livres obrigatório</li>
+                        <li>✅ Infração grave</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CINTO DE SEGURANÇA -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🔒</span>
+            </div>
+            <div class="radar-info">
+                <h3>Cinto de Segurança (VCS)</h3>
+                <p class="radar-desc">Verificador de Cinto de Segurança</p>
+                <div class="radar-details">
+                    <p>Fiscaliza o uso obrigatório do cinto de segurança por todos os ocupantes do veículo.</p>
+                    <ul class="radar-features">
+                        <li>✅ Motorista</li>
+                        <li>✅ Passageiros</li>
+                        <li>✅ Bancos traseiros</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ZONA DE RISCO -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🌊</span>
+            </div>
+            <div class="radar-info">
+                <h3>Risco de Inundação (ZIR)</h3>
+                <p class="radar-desc">Zona de Inundações Recorrentes</p>
+                <div class="radar-details">
+                    <p>Alerta sobre áreas sujeitas a alagamentos e inundações em períodos de chuva.</p>
+                    <ul class="radar-features">
+                        <li>✅ Pontos de alagamento</li>
+                        <li>✅ Alerta preventivo</li>
+                        <li>✅ Rotas alternativas</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ZONA DE PERIGO -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">⚠️</span>
+            </div>
+            <div class="radar-info">
+                <h3>Zona de Perigo (ZPV)</h3>
+                <p class="radar-desc">Zona de Perigo e Violência</p>
+                <div class="radar-details">
+                    <p>Indica áreas com alto índice de criminalidade ou perigo para motoristas.</p>
+                    <ul class="radar-features">
+                        <li>✅ Área de risco</li>
+                        <li>✅ Alerta de segurança</li>
+                        <li>✅ Evitar trajeto</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACIDENTES -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">💥</span>
+            </div>
+            <div class="radar-info">
+                <h3>Alto Índice de Acidentes (AIA)</h3>
+                <p class="radar-desc">Alerta de Acidentes</p>
+                <div class="radar-details">
+                    <p>Sinaliza trechos com grande ocorrência de acidentes de trânsito.</p>
+                    <ul class="radar-features">
+                        <li>✅ Ponto crítico</li>
+                        <li>✅ Reduzir velocidade</li>
+                        <li>✅ Atenção redobrada</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECARGA ELÉTRICA -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🔋</span>
+            </div>
+            <div class="radar-info">
+                <h3>Recarga para Carro Elétrico (REC)</h3>
+                <p class="radar-desc">Ponto de Recarga</p>
+                <div class="radar-details">
+                    <p>Indica locais com pontos de recarga para veículos elétricos.</p>
+                    <ul class="radar-features">
+                        <li>✅ Estacionamento</li>
+                        <li>✅ Tomada disponível</li>
+                        <li>✅ Acesso público</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- WC PÚBLICO -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🚾</span>
+            </div>
+            <div class="radar-info">
+                <h3>WC Público</h3>
+                <p class="radar-desc">Banheiro Público</p>
+                <div class="radar-details">
+                    <p>Localiza banheiros públicos disponíveis na via.</p>
+                    <ul class="radar-features">
+                        <li>✅ Autolimpante</li>
+                        <li>✅ Convencional</li>
+                        <li>✅ Acesso gratuito</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- PÁGINA DE DOAR -->
+<div id="page-doar" class="app-page">
+    <div class="page-header">
+        <h1> Apoiar o Projeto</h1>
+        <button class="btn-back" onclick="showPage('mapa')">← Voltar</button>
+    </div>
+    
+    <div class="page-content">
+        <!-- MENSAGEM INICIAL -->
+        <div class="donate-intro">
+            <div class="donate-icon">
+                <span class="heart-icon">💚</span>
+            </div>
+            <h2>Ajude a manter o X9 Radar gratuito!</h2>
+            <p>Se você gosta do aplicativo e quer contribuir para sua manutenção e melhorias constantes, considere fazer uma doação. Qualquer valor é bem-vindo!</p>
+        </div>
+
+        <!-- PIX -->
+        <section class="donate-section">
+            <h3>📱 Doação via PIX</h3>
+            <div class="donate-card pix-card">
+                <div class="pix-info">
+                    <div class="pix-key-label">Chave PIX (Email)</div>
+                    <div class="pix-key-value" id="pix-key">seabhra@gmail.com</div>
+                    <button class="btn-copy-pix" onclick="copiarChavePix()">
+                        <span class="copy-icon"></span>
+                        Copiar Chave
+                    </button>
+                </div>
+                
+                <div class="pix-qr-placeholder">
+                    <div class="qr-placeholder">
+                        <span class="qr-icon"></span>
+                        <p>QR Code PIX</p>
+                        <small>Em breve</small>
+                    </div>
+                </div>
+                
+                <div class="pix-instructions">
+                    <h4>Como doar:</h4>
+                    <ol>
+                        <li>Abra o app do seu banco</li>
+                        <li>Escolha a opção PIX</li>
+                        <li>Escaneie o QR Code ou cole a chave</li>
+                        <li>Informe o valor da doação</li>
+                        <li>Confirme a transação</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+        <!-- VALORES SUGERIDOS -->
+        <section class="donate-section">
+            <h3> Valores Sugeridos</h3>
+            <div class="donate-amounts">
+                <button class="amount-btn" onclick="selecionarValor(5)">
+                    <span class="amount-value">R$ 5</span>
+                    <span class="amount-desc">Cafézinho</span>
+                </button>
+                
+                <button class="amount-btn" onclick="selecionarValor(10)">
+                    <span class="amount-value">R$ 10</span>
+                    <span class="amount-desc">Lanche</span>
+                </button>
+                
+                <button class="amount-btn" onclick="selecionarValor(20)">
+                    <span class="amount-value">R$ 20</span>
+                    <span class="amount-desc">Almoço</span>
+                </button>
+                
+                <button class="amount-btn" onclick="selecionarValor(50)">
+                    <span class="amount-value">R$ 50</span>
+                    <span class="amount-desc">Super</span>
+                </button>
+                
+                <button class="amount-btn" onclick="selecionarValor(100)">
+                    <span class="amount-value">R$ 100</span>
+                    <span class="amount-desc">Premium</span>
+                </button>
+                
+                <button class="amount-btn custom" onclick="selecionarValorCustom()">
+                    <span class="amount-value">Outro</span>
+                    <span class="amount-desc">Você escolhe</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- BENEFÍCIOS -->
+        <section class="donate-section">
+            <h3> Por que doar?</h3>
+            <div class="donate-card benefits-card">
+                <ul class="benefits-list">
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>App 100% Gratuito</strong>
+                            <p>Sem anúncios ou taxas escondidas</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>Atualizações Constantes</strong>
+                            <p>Novos recursos e melhorias</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>Servidores Ativos</strong>
+                            <p>Manutenção da infraestrutura</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>Base de Dados Atualizada</strong>
+                            <p>Radares sempre atualizados</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>Suporte Técnico</strong>
+                            <p>Atendimento aos usuários</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- AGRADECIMENTO -->
+        <section class="donate-section">
+            <div class="donate-card thanks-card">
+                <h3> Agradecimento</h3>
+                <p>Sua contribuição ajuda a manter o X9 Radar sempre atualizado e melhorando para todos os usuários. Muito obrigado pelo apoio!</p>
+                
+                <div class="developer-info">
+                    <div class="dev-avatar">GS</div>
+                    <div>
+                        <strong>Geraldo A. Seabra</strong>
+                        <p>Desenvolvedor do X9 Radar</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTATO -->
+        <section class="donate-section">
+            <div class="contact-info">
+                <h3>📧 Dúvidas ou Sugestões?</h3>
+                <p>Entre em contato:</p>
+                <a href="mailto:seabhra@gmail.com" class="contact-email">
+                    <span class="email-icon">✉️</span>
+                    seabhra@gmail.com
+                </a>
+            </div>
+        </section>
+    </div>
+</div>
   </div>
 
   <!-- ÁUDIOS DE ALERTA -->
