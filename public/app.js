@@ -1,86 +1,83 @@
 // ==========================================
-// APP.JS - CONTROLE DE INTERFACE 
+// APP.JS - CONTROLE DE INTERFACE (VERSÃO FINAL)
 // ==========================================
 
-// FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
+'use strict';
 
-async function atualizarCidade(lat, lng) {
+// 1. DECLARAÇÃO DE VARIÁVEIS GLOBAIS (Evita erros de referência)
+let ultimaCidade = '';
+let alertaNormalidadeMostrado = false;
+let alertaAtivoAtual = '';
+let userLat = null;
+let userLng = null;
+
+// Inicialização segura do áudio
+let somAlerta;
+try {
+    somAlerta = new Audio('audio_app/alerta_sound_clima.mp3');
+    somAlerta.volume = 0.5;
+} catch (e) {
+    console.warn('⚠️ [APP.JS] Áudio não inicializado:', e);
+    somAlerta = { play: () => Promise.resolve() }; // Fallback seguro
+}
+
+// ==========================================
+// 2. FUNÇÕES PRINCIPAIS (Exportadas para window)
+// ==========================================
+
+window.atualizarCidade = async function(lat, lng) {
+    console.log('📍 [APP.JS] Tentando atualizar cidade:', lat, lng);
+    
+    if (lat == null || lng == null || isNaN(lat) || isNaN(lng)) {
+        console.warn("⚠️ [APP.JS] Coordenadas inválidas para atualizar cidade");
+        return;
+    }
+
     try {
-
-        if (
-            lat == null ||
-            lng == null ||
-            isNaN(lat) ||
-            isNaN(lng)
-        ) {
-            console.warn("[Radar X9] Coordenadas inválidas para atualizar cidade:", lat, lng);
-            return;
-        }
-
-        const resposta = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
-        );
+        const resposta = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`);
 
         if (!resposta.ok) {
-            console.warn(
-                "[Radar X9] Nominatim respondeu:",
-                resposta.status
-            );
+            console.warn("⚠️ [APP.JS] Nominatim respondeu com status:", resposta.status);
             return;
         }
 
         const dados = await resposta.json();
 
         if (!dados.address) {
-            console.warn("[Radar X9] Nominatim não retornou endereço:", dados);
+            console.warn("⚠️ [APP.JS] Nominatim não retornou endereço:", dados);
             return;
         }
 
-        const cidade =
-            dados.address.city ||
-            dados.address.town ||
-            dados.address.municipality ||
-            dados.address.village;
+        const cidade = dados.address.city || dados.address.town || dados.address.municipality || dados.address.village;
 
         if (cidade && cidade !== ultimaCidade) {
-
             ultimaCidade = cidade;
-
             const nomeEl = document.getElementById("nomeCidade");
 
             if (nomeEl) {
-                nomeEl.textContent = "📍" + cidade;
+                nomeEl.textContent = cidade; // Removido o 📍 do texto pois já está no HTML ou pode ser adicionado no CSS
                 nomeEl.style.color = corCidade(cidade);
+                console.log('✅ [APP.JS] Cidade atualizada com sucesso:', cidade);
             }
         }
-
     } catch (e) {
-        console.log("Erro cidade:", e);
+        console.error("❌ [APP.JS] Erro ao buscar cidade:", e);
     }
-}
+};
 
-//=========================
-// MUDANÇA DA COR DA CIDADE
-//=========================
-function corCidade(nome){
-
+function corCidade(nome) {
     let hash = 0;
-
-    for(let i = 0; i < nome.length; i++){
+    for(let i = 0; i < nome.length; i++) {
         hash = nome.charCodeAt(i) + ((hash << 5) - hash);
     }
-
     let hue = Math.abs(hash) % 360;
-
-    // Evita faixas pouco agradáveis
-    if (hue >= 20 && hue <= 40) hue = 45;      // remove marrom
-    if (hue >= 250 && hue <= 295) hue = 210;   // troca roxo por azul
-
+    if (hue >= 20 && hue <= 40) hue = 45;
+    if (hue >= 250 && hue <= 295) hue = 210;
     return `hsl(${hue},100%,68%)`;
 }
 
-// 1. Função para atualizar o cabeçalho (chamada pelo mapa.js)
-function atualizarInterfaceCabecalho(dados) {
+window.atualizarInterfaceCabecalho = function(dados) {
+    console.log('🔄 [APP.JS] atualizarInterfaceCabecalho chamado com:', dados);
     if (!dados) return;
 
     if (dados.cidade) {
@@ -100,7 +97,6 @@ function atualizarInterfaceCabecalho(dados) {
         if (elPoluicao) elPoluicao.textContent = dados.poluicaoTexto;
     }
 
-    // Atualiza o status do GPS
     const wrapper = document.getElementById('gps-status-wrapper');
     const dot = document.getElementById('gps-status-dot');
     const label = document.getElementById('gps-status-label');
@@ -124,23 +120,23 @@ function atualizarInterfaceCabecalho(dados) {
             dot.classList.add('err');
             label.textContent = 'AGUARDANDO';
         }
+        console.log('✅ [APP.JS] Status do GPS atualizado. Precisão:', precisao);
     }
-}
+};
 
-
-// =============================================
-// ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
-// =============================================
-async function atualizarTemperatura() {
-    if (!userLat || !userLng) return;
+window.atualizarTemperatura = async function() {
+    console.log('🌡️ [APP.JS] atualizarTemperatura chamado. userLat:', userLat, 'userLng:', userLng);
+    
+    if (!userLat || !userLng) {
+        console.warn('⚠️ [APP.JS] Coordenadas (userLat/userLng) ainda não definidas. Aguardando...');
+        return;
+    }
 
     try {
         const API_KEY = 'a5c507ef270b147035538e0d6019bce1';
-        
-        // ==========================================
-        // 1. BUSCA DADOS DE CLIMA
-        // ==========================================
         const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
+        
+        console.log('🌐 [APP.JS] Buscando clima em:', urlClima);
         const respostaClima = await fetch(urlClima);
         
         if (!respostaClima.ok) throw new Error('Erro na API de clima: ' + respostaClima.status);
@@ -148,47 +144,25 @@ async function atualizarTemperatura() {
 
         const temperatura = dadosClima.main.temp;
         const umidade = dadosClima.main.humidity;
-
-        // ==========================================
-        // DETECTA SE É MOBILE
-        // ==========================================
         const isMobile = window.innerWidth <= 600;
         
-        // ==========================================
-        // ATUALIZA TEMPERATURA
-        // ==========================================
+        console.log('📊 [APP.JS] Dados climáticos recebidos. Temp:', temperatura, 'Umid:', umidade);
+
         const tempEl = document.getElementById('temperaturaAtual');
         if (tempEl) {
             const valorTemp = temperatura.toFixed(1) + '°C';
-            if (isMobile) {
-                // APP: apenas o valor "26.9°C"
-                tempEl.textContent = valorTemp;
-            } else {
-                // SITE: "Temperatura 26.9°C"
-                tempEl.textContent = 'Temperatura ' + valorTemp;
-            }
+            tempEl.textContent = isMobile ? valorTemp : 'Temperatura ' + valorTemp;
             tempEl.style.color = '#ffffff';
         }
         
-        // ==========================================
-        // ATUALIZA UMIDADE
-        // ==========================================
         const umidEl = document.getElementById('umidadeAtual');
         if (umidEl) {
             let valorUmid = (umidade !== undefined && umidade !== null) ? umidade + '%' : '--%';
-            if (isMobile) {
-                // APP: apenas o valor "40%"
-                umidEl.textContent = valorUmid;
-            } else {
-                // SITE: "Umidade 40%"
-                umidEl.textContent = 'Umidade ' + valorUmid;
-            }
+            umidEl.textContent = isMobile ? valorUmid : 'Umidade ' + valorUmid;
             umidEl.style.color = '#ffffff';
         }
 
-        // ==========================================
-        // 2. BUSCA POLUIÇÃO DO AR
-        // ==========================================
+        // Busca Poluição
         try {
             const urlPoluicao = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${userLat}&lon=${userLng}&appid=${API_KEY}`;
             const respostaPoluicao = await fetch(urlPoluicao);
@@ -196,7 +170,6 @@ async function atualizarTemperatura() {
             if (respostaPoluicao.ok) {
                 const dadosPoluicao = await respostaPoluicao.json();
                 const aqi = dadosPoluicao.list[0].main.aqi;
-                
                 const componentes = dadosPoluicao.list[0].components;
                 const pm25 = componentes.pm2_5 ? Math.round(componentes.pm2_5) : null;
                 const pm10 = componentes.pm10 ? Math.round(componentes.pm10) : null;
@@ -214,83 +187,49 @@ async function atualizarTemperatura() {
                 const poluEl = document.getElementById('poluicaoAtual');
                 
                 if (poluEl) {
-                    let valorPol =  '';
-                    if (valorPoluicao > 0) {
-                        valorPol = infoPoluicao.texto + ' ' + valorPoluicao;
-                    } else {
-                        valorPol = infoPoluicao.texto;
-                    }
-                    
-                    if (isMobile) {
-                        // APP: apenas o valor "Moderada 6"
-                        poluEl.textContent = valorPol;
-                    } else {
-                        // SITE: "Poluição Moderada 6"
-                        poluEl.textContent = '' + valorPol;
-                    }
+                    let valorPol = valorPoluicao > 0 ? infoPoluicao.texto + ' ' + valorPoluicao : infoPoluicao.texto;
+                    poluEl.textContent = isMobile ? valorPol : 'Poluição ' + valorPol;
                     poluEl.style.color = infoPoluicao.cor;
                 }
-                
                 verificarAlertaPoluicao(aqi);
-            } else {
-                const poluEl = document.getElementById('poluicaoAtual');
-                if (poluEl) {
-                    if (isMobile) {
-                        poluEl.textContent = 'N/A';
-                    } else {
-                        poluEl.textContent = 'Poluição N/A';
-                    }
-                    poluEl.style.color = '#888';
-                }
             }
         } catch (e) {
-            console.warn('Erro ao buscar poluição:', e);
+            console.warn('⚠️ [APP.JS] Erro ao buscar poluição:', e);
             const poluEl = document.getElementById('poluicaoAtual');
             if (poluEl) {
-                if (isMobile) {
-                    poluEl.textContent = 'N/A';
-                } else {
-                    poluEl.textContent = 'Poluição N/A';
-                }
+                poluEl.textContent = isMobile ? 'N/A' : 'Poluição N/A';
                 poluEl.style.color = '#888';
             }
         }
 
-        // ==========================================
-        // 3. VERIFICA ALERTAS
-        // ==========================================
         verificarAlertasClima(temperatura, umidade);
         verificarClimaNormal(temperatura, umidade);
 
     } catch(e) {
-        console.error("Erro clima:", e);
+        console.error("❌ [APP.JS] Erro geral no clima:", e);
     }
-}
+};
 
-// =============================================
-// VERIFICAR ALERTA DE POLUIÇÃO
-// =============================================
+// ==========================================
+// 3. FUNÇÕES DE ALERTA E LÓGICA
+// ==========================================
+
 function verificarAlertaPoluicao(aqi) {
     const alertaDiv = document.getElementById('alerta-sound-clima');
+    if (!alertaDiv) return;
     
-    // Se não tem alerta de clima ativo, pode mostrar o de poluição
     if (alertaDiv.style.display === 'none' || alertaDiv.style.display === '') {
-        if (aqi >= 4) { // Muito Ruim ou Péssima
+        if (aqi >= 4) {
             alertaDiv.style.display = 'flex';
             alertaDiv.className = 'alerta-clima-label alerta-poluicao';
-            
-            // SEM EMOJIS
             const textoAlerta = aqi >= 5 ? 'ATENÇÃO: Qualidade do Ar PÉSSIMA!' : 'ATENÇÃO: Qualidade do Ar MUITO RUIM!';
             alertaDiv.innerHTML = `🌫️ ${textoAlerta}`;
-            alertaDiv.classList.add('alerta-poluicao');
             
-            // Toca som de alerta
             if (alertaAtivoAtual !== 'poluicao') {
-                somAlerta.play().catch(e => console.log("Aguardando interação..."));
+                somAlerta.play().catch(e => console.log("Aguardando interação para áudio..."));
                 alertaAtivoAtual = 'poluicao';
             }
         } else {
-            // Remove alerta de poluição se o AQI melhorou
             if (alertaAtivoAtual === 'poluicao') {
                 alertaDiv.style.display = 'none';
                 alertaAtivoAtual = '';
@@ -299,192 +238,107 @@ function verificarAlertaPoluicao(aqi) {
     }
 }
 
-
-
-// =============================================
-// VERIFICAR SE O CLIMA ESTÁ NORMAL (ALERTA POSITIVO)
-// =============================================
 function verificarClimaNormal(temp, umid) {
     const alertaNormalDiv = document.getElementById('alerta-normalidade');
     const alertaClimaDiv = document.getElementById('alerta-sound-clima');
+    if (!alertaNormalDiv || !alertaClimaDiv) return;
     
-    // Verifica se NÃO há alertas ativos
-    const semAlertas = 
-        !(temp >= 40 || temp <= 5 || umid <= 20);
-    
-    // Verifica se a poluição está boa (AQI 1 ou 2) - SEM EMOJIS
+    const semAlertas = !(temp >= 40 || temp <= 5 || umid <= 20);
     const poluicaoEl = document.getElementById('poluicaoAtual');
-    const textoPoluicao = poluicaoEl.textContent;
-    const poluicaoBoa = textoPoluicao.includes('Boa') || textoPoluicao.includes('Moderada');
+    const textoPoluicao = poluicaoEl ? poluicaoEl.textContent : '';
+    const poluicaoBoa = textoPoluicao.includes('Bom') || textoPoluicao.includes('Moderado');
     
-    // Se o clima está normal E a poluição está boa E NÃO há alertas de clima
     if (semAlertas && poluicaoBoa && alertaClimaDiv.style.display !== 'flex') {
-        
-        // Só mostra se ainda NÃO foi mostrado nesta sessão
         if (!alertaNormalidadeMostrado) {
             alertaNormalDiv.style.display = 'flex';
             alertaNormalDiv.innerHTML = '✅ Clima normal. Aproveite!';
-            
-            // Toca o beep ao aparecer
             tocarBeepNormalidade();
-            
-            // Marca como já mostrado
             alertaNormalidadeMostrado = true;
             
-            // Mostra por 8 segundos e depois some
             setTimeout(() => {
                 alertaNormalDiv.style.display = 'none';
             }, 8000);
         }
     } else {
-        // Esconde o alerta de normalidade se houver alertas ativos
         if (alertaClimaDiv.style.display === 'flex') {
             alertaNormalDiv.style.display = 'none';
         }
     }
 }
 
-// =============================================
-// BEEP DE NORMALIDADE (som suave e agradável)
-// =============================================
 function tocarBeepNormalidade() {
     try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Toca duas notas suaves (C5 e E5)
-        var notas = [523, 659]; // C5 e E5
-        var duracao = 0.15;
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const notas = [523, 659];
+        const duracao = 0.15;
         
         notas.forEach(function(freq, index) {
-            var osc = ctx.createOscillator();
-            var gain = ctx.createGain();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
             osc.connect(gain);
             gain.connect(ctx.destination);
-            
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, ctx.currentTime + (index * 0.2));
-            
             gain.gain.setValueAtTime(0.15, ctx.currentTime + (index * 0.2));
             gain.gain.linearRampToValueAtTime(0, ctx.currentTime + (index * 0.2) + duracao);
-            
             osc.start(ctx.currentTime + (index * 0.2));
             osc.stop(ctx.currentTime + (index * 0.2) + duracao);
         });
-        
-        console.log('🔔 Beep de normalidade tocado');
     } catch(e) {
         console.warn('Beep de normalidade falhou:', e);
     }
 }
-//=====================================
-// FUNÇÃO POSIONAR TEMPERATURA LOCAL
-//=====================================
-function posicionarTemperatura(temp){
-
-    const minimo = -20;
-
-    const maximo = 50;
-
-    let porcentagem =
-
-        ((temp-minimo)/(maximo-minimo))*100;
-
-    porcentagem = Math.max(0,Math.min(100,porcentagem));
-
-    document.getElementById("ponteiroTemp").style.left =
-        porcentagem+"%";
-
-}
-
-
-
-// =======================================================
-// SISTEMA DE ALERTA DE CLIMA (Umidade e Temperatura)
-// =======================================================
-
-const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3');
-somAlerta.volume = 0.5;
-
-let alertaAtivoAtual = '';
-
 
 function verificarAlertasClima(temp, umid) {
-    // Se os parâmetros não foram passados, busca do DOM
     if (temp === undefined || umid === undefined) {
-        const tempTexto = document.getElementById('temperaturaAtual').textContent;
-        const umidTexto = document.getElementById('umidadeAtual').textContent;
-        temp = parseFloat(tempTexto.replace(/[^0-9.-]/g, ''));
-        umid = parseFloat(umidTexto.replace(/[^0-9.-]/g, ''));
+        const tempEl = document.getElementById('temperaturaAtual');
+        const umidEl = document.getElementById('umidadeAtual');
+        if (!tempEl || !umidEl) return;
+        
+        temp = parseFloat(tempEl.textContent.replace(/[^0-9.-]/g, ''));
+        umid = parseFloat(umidEl.textContent.replace(/[^0-9.-]/g, ''));
     }
     
     if (isNaN(temp) || isNaN(umid)) return;
 
     const alertaDiv = document.getElementById('alerta-sound-clima');
+    if (!alertaDiv) return;
+    
     let novoAlerta = '';
-
-    // Limpa classes anteriores
     alertaDiv.className = 'alerta-clima-label';
 
-    // Condição 1: Calor Extremo (Acima de 40°C)
     if (temp >= 40) {
         novoAlerta = 'quente';
         alertaDiv.innerHTML = '🔥 ALERTA: Temperatura Extrema!';
         alertaDiv.classList.add('alerta-quente');
-    } 
-    // Condição 2: Frio Extremo (Abaixo de 5°C)
-    else if (temp <= 5) {
+    } else if (temp <= 5) {
         novoAlerta = 'frio';
         alertaDiv.innerHTML = '❄️ ALERTA: Frio Extremo!';
         alertaDiv.classList.add('alerta-frio');
-    } 
-    // Condição 3: Umidade Baixa (Abaixo de 20%)
-    else if (umid <= 20) {
+    } else if (umid <= 20) {
         novoAlerta = 'seco';
         alertaDiv.innerHTML = '🏜️ ATENÇÃO: Umidade do Ar Baixa!';
         alertaDiv.classList.add('alerta-seco');
     } else {
-        // Se não há alertas, esconde o alerta
         alertaDiv.style.display = 'none';
         alertaAtivoAtual = '';
         return;
     }
 
-    // Mostra o alerta e toca o som
     if (novoAlerta !== '') {
         alertaDiv.style.display = 'flex';
-        
         if (novoAlerta !== alertaAtivoAtual) {
-            somAlerta.play().catch(e => console.log("Aguardando interação..."));
+            somAlerta.play().catch(e => console.log("Aguardando interação para áudio..."));
             alertaAtivoAtual = novoAlerta;
         }
     }
 }
 
-// =======================================================
-// OBSERVADOR AUTOMÁTICO (A MÁGICA ACONTECE AQUI)
-// =======================================================
+// ==========================================
+// 4. FUNÇÕES DE INTERFACE (MENU E PÁGINAS)
+// ==========================================
 
-
-const observer = new MutationObserver(function() {
-    verificarAlertasClima();
-});
-
-// Configuração do observador
-const configObserver = { childList: true, subtree: true };
-
-// Inicia a observação no elemento de temperatura e umidade
-const elemTemp = document.getElementById('temperaturaAtual');
-const elemUmid = document.getElementById('umidadeAtual');
-
-if (elemTemp) observer.observe(elemTemp, configObserver);
-if (elemUmid) observer.observe(elemUmid, configObserver);
-
-
-
-//===================================
-// 2. Função para abrir/fechar o menu (FUNCIONA 100% DAS VEZES)
-//===================================
-function toggleMenu() {
+window.toggleMenu = function() {
     const menu = document.getElementById('menu-lateral');
     const overlay = document.getElementById('menu-overlay');
     
@@ -497,22 +351,22 @@ function toggleMenu() {
             overlay.style.display = 'block';
         }
     }
-}
+};
 
-// 3. Função para trocar de página SEM recarregar e SEM sobrepor
-function showPage(pageName) {
-    // Esconde TODAS as páginas primeiro
+// FUNÇÃO showPage UNIFICADA (Removida a duplicata)
+window.showPage = function(pageName) {
+    console.log('📄 [APP.JS] Navegando para:', pageName);
+    
     const pages = document.querySelectorAll('.app-page');
     pages.forEach(page => {
         page.style.display = 'none';
     });
 
-    // Mostra apenas a página clicada
     const targetPage = document.getElementById('page-' + pageName);
     if (targetPage) {
         targetPage.style.display = 'block';
+        targetPage.scrollTop = 0;
         
-        // Se for a página do mapa, força o Leaflet a se redesenhar
         if (pageName === 'mapa' && typeof map !== 'undefined') {
             setTimeout(() => {
                 map.invalidateSize();
@@ -521,160 +375,146 @@ function showPage(pageName) {
     }
 
     // FORÇA o fechamento do menu após clicar
-    toggleMenu();
-}
-
-// 4. Inicialização segura ao carregar a página
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('✅ App X9 Radar: DOM pronto.');
-    
-    // Esconde a splash screen após 3 segundos (tempo suficiente para carregar)
-    setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) {
-            splash.style.opacity = '0';
-            setTimeout(() => { 
-                splash.style.display = 'none'; 
-            }, 500);
-        }
-    }, 3000); // Aumentado de 2.5s para 3s
-});
-
-// ==========================================
-// FUNÇÕES DAS PÁGINAS
-// ==========================================
-
-// Copiar chave PIX
-function copiarChavePix() {
-    const pixKey = document.getElementById('pix-key').textContent;
-    
-    navigator.clipboard.writeText(pixKey).then(() => {
-        // Feedback visual
-        const btn = document.querySelector('.btn-copy-pix');
-        const originalText = btn.innerHTML;
-        
-        btn.innerHTML = '<span class="copy-icon">✅</span> Copiado!';
-        btn.style.background = '#00cc66';
-        
-        setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.style.background = '';
-        }, 2000);
-        
-        // Toast notification
-        showToast('Chave PIX copiada com sucesso!');
-    }).catch(err => {
-        console.error('Erro ao copiar:', err);
-        showToast('Erro ao copiar chave PIX');
-    });
-}
-
-// Selecionar valor de doação
-function selecionarValor(valor) {
-    // Remover seleção anterior
-    document.querySelectorAll('.amount-btn').forEach(btn => {
-        btn.classList.remove('selected');
-    });
-    
-    // Adicionar seleção no botão clicado
-    event.target.closest('.amount-btn').classList.add('selected');
-    
-    // Mostrar mensagem
-    showToast(`Valor selecionado: R$ ${valor},00`);
-    
-    // Aqui você pode redirecionar para pagamento ou mostrar QR Code dinâmico
-    setTimeout(() => {
-        alert(`Para doar R$ ${valor},00, use a chave PIX: seabhra@gmail.com`);
-    }, 500);
-}
-
-// Valor customizado
-function selecionarValorCustom() {
-    const valor = prompt('Digite o valor da doação (R$):');
-    
-    if (valor && !isNaN(valor) && valor > 0) {
-        showToast(`Valor personalizado: R$ ${parseFloat(valor).toFixed(2)}`);
-        
-        setTimeout(() => {
-            alert(`Para doar R$ ${parseFloat(valor).toFixed(2)}, use a chave PIX: seabhra@gmail.com`);
-        }, 500);
-    }
-}
-
-// Toast notification
-function showToast(mensagem) {
-    // Criar toast se não existir
-    let toast = document.getElementById('toast-notification');
-    
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast-notification';
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            z-index: 10000;
-            font-weight: 600;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        `;
-        document.body.appendChild(toast);
-    }
-    
-    toast.textContent = mensagem;
-    toast.style.opacity = '1';
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-    }, 3000);
-}
-
-// Mostrar página
-function showPage(pageName) {
-    console.log('Navegando para:', pageName);
-    
-    // Esconder todas as páginas
-    document.querySelectorAll('.app-page').forEach(page => {
-        page.style.display = 'none';
-    });
-    
-    // Mostrar página selecionada
-    const targetPage = document.getElementById('page-' + pageName);
-    if (targetPage) {
-        targetPage.style.display = 'block';
-        targetPage.scrollTop = 0; // Resetar scroll
-        
-        // Se for mapa, redesenhar
-        if (pageName === 'mapa' && typeof map !== 'undefined') {
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 100);
-        }
-    }
-    
-    // Fechar menu se estiver aberto
     const menu = document.getElementById('menu-lateral');
     const overlay = document.getElementById('menu-overlay');
     if (menu && overlay) {
         menu.style.left = '-300px';
         overlay.style.display = 'none';
     }
-}
+};
 
-// Fechar app
-function fecharApp() {
+window.fecharApp = function() {
     if (confirm('Deseja realmente fechar o aplicativo?')) {
         window.close();
-        // Fallback para mobile
         setTimeout(() => {
             alert('Para fechar completamente, use o botão voltar do seu dispositivo.');
         }, 500);
     }
-}
+};
 
+// ==========================================
+// 5. INICIALIZAÇÃO (DOMContentLoaded)
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ [APP.JS] DOMContentLoaded disparado. Inicializando...');
+    
+    // 5.1 Esconder Splash Screen
+    setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+            console.log('🔄 [APP.JS] Ocultando splash screen...');
+            splash.style.opacity = '0';
+            splash.style.pointerEvents = 'none';
+            setTimeout(() => { 
+                splash.style.display = 'none'; 
+                console.log('✅ [APP.JS] Splash screen removida do DOM.');
+            }, 500);
+        }
+    }, 2500);
+
+    // 5.2 Inicializar MutationObserver (AGORA COM SEGURANÇA)
+    const elemTemp = document.getElementById('temperaturaAtual');
+    const elemUmid = document.getElementById('umidadeAtual');
+    
+    if (elemTemp && elemUmid) {
+        const observer = new MutationObserver(function() {
+            verificarAlertasClima();
+        });
+        const configObserver = { childList: true, subtree: true };
+        observer.observe(elemTemp, configObserver);
+        observer.observe(elemUmid, configObserver);
+        console.log('✅ [APP.JS] MutationObserver iniciado para alertas de clima.');
+    } else {
+        console.warn('⚠️ [APP.JS] Elementos de temperatura/umidade não encontrados para o Observer.');
+    }
+
+    // 5.3 Forçar uma tentativa de atualização após 3 segundos (caso o mapa.js demore)
+    setTimeout(() => {
+        if (userLat && userLng) {
+            console.log('🔄 [APP.JS] Forçando atualização inicial de clima/cidade...');
+            window.atualizarCidade(userLat, userLng);
+            window.atualizarTemperatura();
+        }
+    }, 3000);
+});
+
+// ==========================================
+// 6. FUNÇÕES AUXILIARES (PIX, TOAST, ETC)
+// ==========================================
+
+window.copiarChavePix = function() {
+    const pixKeyElement = document.getElementById('pix-key');
+    if (!pixKeyElement) return;
+    
+    const pixKey = pixKeyElement.textContent;
+    navigator.clipboard.writeText(pixKey).then(() => {
+        const btn = document.querySelector('.btn-copy-pix');
+        if (btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>✅</span> Copiado!';
+            btn.style.background = '#00cc66';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+            }, 2000);
+        }
+        window.showToast('Chave PIX copiada com sucesso!');
+    }).catch(err => {
+        console.error('Erro ao copiar:', err);
+        window.showToast('Erro ao copiar chave PIX');
+    });
+};
+
+window.selecionarValor = function(valor) {
+    document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('selected'));
+    if (event && event.target) {
+        const btn = event.target.closest('.amount-btn');
+        if (btn) btn.classList.add('selected');
+    }
+    window.showToast(`Valor selecionado: R$ ${valor},00`);
+    setTimeout(() => {
+        alert(`Para doar R$ ${valor},00, use a chave PIX: seabhra@gmail.com`);
+    }, 500);
+};
+
+window.selecionarValorCustom = function() {
+    const valor = prompt('Digite o valor da doação (R$):');
+    if (valor && !isNaN(valor) && valor > 0) {
+        window.showToast(`Valor personalizado: R$ ${parseFloat(valor).toFixed(2)}`);
+        setTimeout(() => {
+            alert(`Para doar R$ ${parseFloat(valor).toFixed(2)}, use a chave PIX: seabhra@gmail.com`);
+        }, 500);
+    }
+};
+
+window.showToast = function(mensagem) {
+    let toast = document.getElementById('toast-notification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-notification';
+        toast.style.cssText = `
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9); color: white; padding: 15px 30px;
+            border-radius: 8px; z-index: 10000; font-weight: 600; opacity: 0;
+            transition: opacity 0.3s ease; pointer-events: none;
+        `;
+        document.body.appendChild(toast);
+    }
+    toast.textContent = mensagem;
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+};
+
+// Função para o mapa.js chamar e definir as coordenadas
+window.setUserLocation = function(lat, lng) {
+    console.log('📍 [APP.JS] setUserLocation chamado com:', lat, lng);
+    userLat = lat;
+    userLng = lng;
+    
+    // Dispara as atualizações imediatamente
+    window.atualizarCidade(lat, lng);
+    window.atualizarTemperatura();
+};
+
+console.log('✅ [APP.JS] Carregado e funções exportadas para window com sucesso.');
