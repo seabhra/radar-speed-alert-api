@@ -1,17 +1,16 @@
-
 // ==================
 // ARQUIVO JS MAPA.JS
 // ==================
 
-
 // VARIÁVEIS GLOBAIS
-
 let map;
 let tileLayer;
 let radarMarkers = [];
 let alertTimeout;
-let userLat = -19.919055;
-let userLng = -43.938641;
+
+// ⚠️ CORREÇÃO: Removido o 'let' pois essas variáveis JÁ SÃO DECLARADAS no app.js
+userLat = -19.919055;
+userLng = -43.938641;
 
 // CONTROLE DE BARRAS LATERAIS
 let searchActive = false;    // Controla se a barra de RADARES está ativa
@@ -20,22 +19,20 @@ let routeActive = false;     // Controla se a barra de ROTA está ativa
 // CONTROLE DE GPS - SEPARADO DAS BARRAS
 let gpsActive = true;        // Controla o funcionamento do GPS (INDEPENDENTE)
 
-//MENU LATERAL FECHADO COM CONTROLES
+// MENU LATERAL FECHADO COM CONTROLES
 let sidebarAberta = false;
 
 var watchId = null;
-var gpsInitialized = false; // GPS INICIALIZADO
-var browserGpsTimeout = null;  // TIME GPS BROWSER
+var gpsInitialized = false;  // GPS INICIALIZADO
+var browserGpsTimeout = null; // TIMEOUT GPS BROWSER
 
 let prevLat = null;
 let prevLng = null;
 let prevTime = null;
 let isFollowing = true;
 
-
 let gpsSource = 'none';
 let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 15 };
-
 
 let coordenadasRotaNavegacao = [];
 let ultimoSegmentoRota = -1;
@@ -46,7 +43,7 @@ let startRouteMarker = null;
 let endRouteMarker = null;
 let routingControl = null;
 let destinoAtual = null;
-let userMarker = null;
+
 var destinoNavegacao = null;
 
 let ultimaAtualizacaoCamera = 0;
@@ -75,18 +72,20 @@ const TEMPO_RETORNO_GPS = 8000;
 let refreshDelayTimer = null;
 const TEMPO_REFRESH_DELAY = 5000;
 
-
 // Precisão do GPS para o status
 let gpsAccuracyAtual = 999;
 let gpsLastUpdateTime = 0;
 
-
-
 // No início do script, junto com as outras variáveis globais
 let iconeCentralizado = false; // Controla se o ícone está no modo centralizado
-// alerta de clima normal
-let alertaNormalidadeMostrado = false;
 
+// ⚠️ CORREÇÃO: Removido o 'let' pois JÁ É DECLARADA no app.js
+alertaNormalidadeMostrado = false;
+
+//================================================
+// 1. Declare APENAS UMA VEZ no topo do arquivo 
+//=================================================
+let userMarker = null;
 
 // =============================================
 // CONTROLE DE TEXTOS - SITE vs APP
