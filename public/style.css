@@ -40,18 +40,19 @@
 /* ======================================== */
 /* SPLASH SCREEN - SEMPRE NO TOPO           */
 /* ======================================== */
+   
 #splash-screen {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+     width: 100vw;
+    height: 100vh;
+    z-index: 99999 !important; /* SEMPRE NO TOPO */
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 99999 !important; /* SEMPRE NO TOPO */
     transition: opacity 0.5s ease;
 }
 
