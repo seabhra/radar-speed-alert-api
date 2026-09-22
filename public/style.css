@@ -804,66 +804,60 @@
 /* ======================================== */
 /* CSS SPEED WIDGET - Z-INDEX BLINDADO      */
 /* ======================================== */
-.speed-widget { 
+
+ .speed-widget { 
     position: absolute; 
-    bottom: -15px; 
-    left: -25px; 
-    width: 150px; 
-    height: 150px; 
-    
+    bottom: -15px;
+     left: -25px; 
+    width: 150px; height: 150px;
     /* Z-index abaixo da splash (99999), mas acima do mapa */
     z-index: 500 !important; 
     
     /* Cria um contexto de empilhamento isolado para evitar 
        que elementos filhos "vazem" para cima da splash */
     isolation: isolate; 
+     } 
     
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; 
-}
+ .speed-widget.alerta-ativo { bottom: 75px !important; }
+ 
+ 
+ .speed-bg {
+ position: absolute; 
+inset: 0;
+ width: 100%;
+ height: 100%; 
+object-fit: contain; 
+pointer-events: none; 
 
-.speed-widget.alerta-ativo { 
-    bottom: 75px !important; 
-}
 
-.speed-bg { 
-    position: absolute; 
-    inset: 0; 
-    width: 100%; 
-    height: 100%; 
-    object-fit: contain; 
-    pointer-events: none; 
-    z-index: 1; /* Garante que a imagem de fundo fique atrás do texto */
-}
 
+} 
 .speed-value {
-    position: absolute; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-64%, -60%);
-    font-size: 28px; 
-    font-weight: 700; 
-    font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
-    color: #000; 
-    line-height: 1; 
-    z-index: 2; /* Garante que o número fique na frente do .speed-bg */
-    white-space: nowrap; 
-    text-align: center;
-    font-variant-numeric: tabular-nums; 
-    letter-spacing: -0.5px; 
-    min-width: 3ch;
+ position: absolute; top: 50%; 
+left: 50%; 
+transform: translate(-64%, -60%);
+ font-size: 28px; 
+font-weight: 700;
+ font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif; 
+color: #000;
+ line-height: 1; 
+z-index: 2; /* Garante que o número fique na frente do .speed-bg */
+white-space: nowrap;
+ text-align: center; 
+font-variant-numeric: tabular-nums; 
+letter-spacing: -0.5px; 
+min-width: 3ch;
+  
 }
+  
 
-/* CSS SPEED RECENTRALIZAR */
-.speed-widget.recentralizar {
-    cursor: pointer;
-}
+ /*-----------------------------------------------
+ CSS SPEED RECENTRALIZAR 
+-----------------------------------------------*/
+.speed-widget.recentralizar{ cursor:pointer; } 
+.speed-widget.recentralizar 
+.speed-value{ display:none; }
 
-.speed-widget.recentralizar .speed-value {
-    display: none;
-}
 /* ======================================== */
 /* HEADER - Z-INDEX 1000                    */
 /* ======================================== */
