@@ -39,80 +39,282 @@
     }
     
 
-/* ======================================== */
-/* SPLASH SCREEN - SEMPRE NO TOPO           */
-/* ======================================== */
-   
+/* ========================================
+   SPLASH SCREEN
+   Hierarquia:
+   SPLASH > BÚSSOLA/SPEED > MAPA
+   ======================================== */
+
 #splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-     width: 100vw;
+    position: fixed !important;
+    inset: 0 !important;
+
+    width: 100vw;
     height: 100vh;
-    z-index: 99999 !important; /* SEMPRE NO TOPO */
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+
+    /* SEMPRE acima do mapa e widgets */
+    z-index: 99999 !important;
+
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    transition: opacity 0.5s ease;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    /*
+     * Harmonizado com a identidade escura
+     * do Radar X9
+     */
+    background:
+        radial-gradient(
+            circle at center,
+            #1c2028 0%,
+            #11141a 48%,
+            #0b0d11 100%
+        );
+
+    color: #fff;
+
+    opacity: 1;
+    visibility: visible;
+
+    transition:
+        opacity 0.5s ease,
+        visibility 0.5s ease;
 }
 
-#splash-screen img {
-    width: 150px;
-    height: 150px;
+
+/* ========================================
+   LOGO PRINCIPAL
+   ======================================== */
+
+#splash-logo-principal {
+    display: block;
+
+    width: 250px;
+    height: 250px;
+
     object-fit: contain;
-    margin-bottom: 30px;
-    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+
+    margin: 0 0 18px 0;
+
+    filter:
+        drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55));
+
     animation: pulseLogo 2s ease-in-out infinite;
 }
 
-@keyframes pulseLogo {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.9; }
+
+/* ========================================
+   FALLBACK X9
+   ======================================== */
+
+#splash-fallback {
+    display: none;
+
+    width: 200px;
+    height: 200px;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 18px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff3333 0%,
+            #b90000 100%
+        );
+
+    color: #fff;
+
+    font-size: 80px;
+    font-weight: 700;
+    font-family:
+        'Rajdhani',
+        'Oswald',
+        Arial,
+        sans-serif;
+
+    box-shadow:
+        0 8px 32px rgba(255, 51, 51, 0.35);
+
+    animation: pulseLogo 2s ease-in-out infinite;
 }
+
+
+/* ========================================
+   POWERED BY
+   ======================================== */
+
+.splash-powered {
+    margin-top: 4px;
+
+    text-align: center;
+
+    font-family:
+        'Rajdhani',
+        'Oswald',
+        Arial,
+        sans-serif;
+}
+
+.splash-powered span {
+    color: #ff3333;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* ========================================
+   MARCA
+   ======================================== */
+
+#splash-marca {
+    display: block;
+
+    width: 80px;
+    height: 80px;
+
+    object-fit: contain;
+
+    margin-top: 8px;
+
+    filter:
+        drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+}
+
+
+/* ========================================
+   CRÉDITOS
+   ======================================== */
 
 .splash-credits {
+    margin-top: 14px;
+
     text-align: center;
-    color: rgba(255,255,255,0.9);
-    margin-top: 20px;
-}
 
-.splash-credits h2 {
-    font-size: 32px;
-    margin: 10px 0;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
+    color: rgba(255, 255, 255, 0.82);
 
-.splash-credits h2 span {
-    color: #ff6b35;
+    font-family:
+        'Rajdhani',
+        'Oswald',
+        Arial,
+        sans-serif;
 }
 
 .splash-credits p {
-    margin: 5px 0;
+    margin: 3px 0;
+
     font-size: 14px;
-    opacity: 0.8;
 }
 
-/* Loader da splash */
+.splash-credits .splash-version {
+    font-size: 12px;
+
+    color: rgba(255, 255, 255, 0.48);
+}
+
+
+/* ========================================
+   LOADER
+   ======================================== */
+
 .splash-loader {
-    margin-top: 40px;
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255,255,255,0.3);
-    border-top: 4px solid #fff;
+    width: 42px;
+    height: 42px;
+
+    margin-top: 26px;
+
+    box-sizing: border-box;
+
+    border: 3px solid rgba(255, 255, 255, 0.15);
+
+    border-top-color: #ff3333;
+
+    border-right-color: #00ff88;
+
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+
+    animation: spin 0.9s linear infinite;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+
+/* ========================================
+   ANIMAÇÕES
+   ======================================== */
 
 @keyframes pulseLogo {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.9; }
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.04);
+        opacity: 0.94;
+    }
+}
+
+
+@keyframes spin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* ========================================
+   ESTADO DE SAÍDA DA SPLASH
+   ======================================== */
+
+#splash-screen.splash-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+
+/* ========================================
+   CELULARES MENORES
+   ======================================== */
+
+@media (max-height: 700px) {
+
+    #splash-logo-principal {
+        width: 190px;
+        height: 190px;
+        margin-bottom: 10px;
+    }
+
+    #splash-marca {
+        width: 65px;
+        height: 65px;
+    }
+
+    .splash-credits {
+        margin-top: 8px;
+    }
+
+    .splash-loader {
+        margin-top: 18px;
+    }
 }
 
 /* ========================================== */
