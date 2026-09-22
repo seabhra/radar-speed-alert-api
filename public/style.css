@@ -805,58 +805,78 @@
 /* CSS SPEED WIDGET - Z-INDEX BLINDADO      */
 /* ======================================== */
 
- .speed-widget { 
-    position: absolute; 
+.speed-widget {
+    position: absolute;
     bottom: -15px;
-     left: -25px; 
-    width: 150px; height: 150px;
-    /* Z-index abaixo da splash (99999), mas acima do mapa */
-    z-index: 500 !important; 
-    
-    /* Cria um contexto de empilhamento isolado para evitar 
-       que elementos filhos "vazem" para cima da splash */
-    isolation: isolate; 
-     } 
-    
- .speed-widget.alerta-ativo { bottom: 75px !important; }
- 
- 
- .speed-bg {
- position: absolute; 
-inset: 0;
- width: 100%;
- height: 100%; 
-object-fit: contain; 
-pointer-events: none; 
+    left: -25px;
+    width: 150px;
+    height: 150px;
 
+    /* Acima do mapa, mas SEMPRE abaixo da Splash */
+    z-index: 500 !important;
 
-
-} 
-.speed-value {
- position: absolute; top: 50%; 
-left: 50%; 
-transform: translate(-64%, -60%);
- font-size: 28px; 
-font-weight: 700;
- font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif; 
-color: #000;
- line-height: 1; 
-z-index: 2; /* Garante que o número fique na frente do .speed-bg */
-white-space: nowrap;
- text-align: center; 
-font-variant-numeric: tabular-nums; 
-letter-spacing: -0.5px; 
-min-width: 3ch;
-  
+    /* Impede elementos internos de escapar do contexto */
+    isolation: isolate;
 }
-  
 
- /*-----------------------------------------------
- CSS SPEED RECENTRALIZAR 
------------------------------------------------*/
-.speed-widget.recentralizar{ cursor:pointer; } 
-.speed-widget.recentralizar 
-.speed-value{ display:none; }
+.speed-widget.alerta-ativo {
+    bottom: 75px !important;
+}
+
+/* -----------------------------------------
+   FUNDO DO SPEED
+----------------------------------------- */
+
+.speed-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+
+    z-index: 1;
+}
+
+/* -----------------------------------------
+   VALOR DA VELOCIDADE
+----------------------------------------- */
+
+.speed-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-64%, -60%);
+
+    font-size: 28px;
+    font-weight: 700;
+    font-family: 'Rajdhani', 'Oswald', 'Arial Narrow', sans-serif;
+
+    color: #000;
+    line-height: 1;
+
+    /* Acima do fundo do speed */
+    z-index: 2;
+
+    white-space: nowrap;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    min-width: 3ch;
+}
+
+/* -----------------------------------------
+   RECENTRALIZAR
+----------------------------------------- */
+
+.speed-widget.recentralizar {
+    cursor: pointer;
+}
+
+.speed-widget.recentralizar .speed-value {
+    display: none;
+}
 
 /* ======================================== */
 /* HEADER - Z-INDEX 1000                    */
@@ -2613,6 +2633,7 @@ header {
     }
     .form-select:focus, .form-input:focus { border-color: var(--accent-color); }
     .form-select option { background: #1a1d24; color: #fff; padding: 8px; }
+    
     .speed-buttons-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 4px; }
     .speed-btn {
         padding: 10px 0; border: 2px solid #333; border-radius: 10px; background: #0f1115;
