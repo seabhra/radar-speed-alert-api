@@ -3,11 +3,10 @@
 // ARQUIVO JS MAPA.JS
 // ==================
 
-// =================
-// VARIÁVEIS GLOBAIS
-// =================
-let map;
 
+// VARIÁVEIS GLOBAIS
+
+let map;
 let tileLayer;
 let radarMarkers = [];
 let alertTimeout;
@@ -2034,41 +2033,6 @@ function sucesso(position){
     }
 }
 
-//===================================================
-// FUNÇÃO CHAMA QUANDO APP INVENTOR ENVIA LOCALIZAÇÃO
-//===================================================
-
-function receberGPSDoAppInventor(lat, lng, accuracy) {
-    gpsSource = 'appinventor';
-    gpsInitialized = true;
-    hideFullscreenLoading();
-
-    // Cria um objeto "falso" no mesmo formato que o navegador usa, 
-    // para sua função atualizarStatusGPS funcionar perfeitamente!
-    const posicaoSimulada = {
-        coords: {
-            latitude: parseFloat(lat),
-            longitude: parseFloat(lng),
-            accuracy: parseFloat(accuracy) || 50, // Se não vier precisão, assume 50m (verde)
-            speed: null,
-            heading: null
-        }
-    };
-
-    // 1. Atualiza o indicador visual (ficará verde/amarelo/vermelho baseado na accuracy)
-    atualizarStatusGPS(posicaoSimulada);
-
-    // 2. Processa a posição no seu sistema normal
-    processarNovaPosicao(
-        parseFloat(lat), 
-        parseFloat(lng), 
-        0, // Velocidade (pode ser enviada pelo App Inventor também se quiser)
-        null, 
-        parseFloat(accuracy) || 50
-    );
-    
-    console.log("📡 GPS recebido do App Inventor:", lat, lng, "Precisão:", accuracy);
-}
 
 // =============================================
 // CONTROLE RESPONSIVO DO HEADER
@@ -2908,17 +2872,6 @@ speedWidget.addEventListener("click", () => {
     }
 });
 
-    //=============================
-    // Configurar eventos dos botões
-    //==============================
-
-// ========================================
-// OCULTAR BÚSSOLA NATIVA DO LEAFLET
-// ========================================
-
-// ========================================
-// OCULTAR BÚSSOLA NATIVA DO LEAFLET
-// ========================================
 
 // ========================================
 // OCULTAR BÚSSOLA NATIVA DO LEAFLET
@@ -3698,9 +3651,10 @@ function inicializarBotaoAddRadar() {
     }
 
 
-// ===========================
-// RECEBER GPS DO APP INVENTOR
-// ===========================
+// =====================================
+// RECEBER GPS ATUALIZALIÇÃO LOCALIZAÇÃO
+// =====================================
+
 function atualizarLocalizacao(lat, lon) {
     // Valida os dados
     if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
@@ -4578,84 +4532,6 @@ async function solicitarPermissaoBussolaIOS() {
         } catch (erro) { return false; }
     }
     return false;
-}
-
-// =====================================
-// NOVA FORMA DE INTEGRAÇÃO APP INVENTOR
-// =====================================
-var ultimoWebViewString = '';
-
-function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
-
-    if (typeof AppInventor === 'undefined') {
-        console.warn('[Radar X9] AppInventor não disponível');
-        return false;
-    }
-
-    var mapaTextos = {
-        radar: 'RADAR',
-        risco: 'RISCO',
-        mobilidade: 'MOBILIDADE',
-        destaque: 'DESTAQUE',
-        clima: 'CLIMA'
-    };
-
-    var texto = mapaTextos[tipoAlerta];
-
-    if (!texto) {
-        console.warn('[Radar X9] Tipo de alerta desconhecido:', tipoAlerta);
-        return false;
-    }
-
-    try {
-
-        AppInventor.setWebViewString(texto);
-
-        ultimoWebViewString = texto;
-
-        console.log(
-            '[Radar X9] → App Inventor:',
-            texto
-        );
-
-        return true;
-
-    } catch (e) {
-
-        console.error(
-            '[Radar X9] Erro ao enviar para App Inventor:',
-            e
-        );
-
-        return false;
-    }
-}
-
-
-
-// ====================================
-// FUNÇÃO RECEBER DADOS DO APP INVENTOR
-// ====================================
-
-function receberDadosAppInventor(dadosStr) {
-    if (!dadosStr || typeof dadosStr !== 'string') return;
-    var partes = dadosStr.split('|');
-    var acao = partes[0];
-    if (acao === 'GPS' && partes.length >= 3) {
-        var lat = parseFloat(partes[1]);
-        var lng = parseFloat(partes[2]);
-        var speed = partes[3] ? parseFloat(partes[3]) : 0;
-        var heading = partes[4] ? parseFloat(partes[4]) : null;
-        if (heading === -1 || isNaN(heading)) heading = null;
-       
-        // [CORREÇÃO] Precisão vinda do App Inventor (posição 5); fallback fixo de 50m se ausente
-        var accuracy = (partes[5] !== undefined && partes[5] !== '') ? parseFloat(partes[5]) : 50;
-        if (isNaN(accuracy)) accuracy = 50;
-        if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
-            gpsSource = 'appinventor';
-            processarNovaPosicao(lat, lng, speed, heading, accuracy);
-        }
-    }
 }
 
 
