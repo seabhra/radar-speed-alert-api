@@ -69,11 +69,11 @@
      * do Radar X9
      */
     background:
-        radial-gradient(
+       radial-gradient(
             circle at center,
-            #1c2028 0%,
-            #11141a 48%,
-            #0b0d11 100%
+            #2a5298 0%,
+            #1e3c72 48%,
+            #142b52 100%
         );
 
     color: #fff;
@@ -94,8 +94,8 @@
 #splash-logo-principal {
     display: block;
 
-    width: 250px;
-    height: 250px;
+     width: 280px;
+    height: 280px;
 
     object-fit: contain;
 
@@ -182,8 +182,8 @@
 #splash-marca {
     display: block;
 
-    width: 80px;
-    height: 80px;
+      width: 55px;
+    height: 55px;
 
     object-fit: contain;
 
@@ -266,7 +266,6 @@
         opacity: 0.94;
     }
 }
-
 
 @keyframes spin {
 
