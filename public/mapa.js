@@ -7,7 +7,7 @@
 // VARIÁVEIS GLOBAIS
 // =================
 let map;
-let userMarker;
+
 let tileLayer;
 let radarMarkers = [];
 let alertTimeout;
@@ -1179,7 +1179,9 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   
     if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
     if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
+    
     if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
+   
     estaEmNavegacao = true;
     ultimaPosicaoMarcador = { lat: null, lng: null };
     var startIcon = L.divIcon({
