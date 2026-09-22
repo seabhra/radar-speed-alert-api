@@ -2600,6 +2600,10 @@ header {
     .loading-fullscreen .loading-sub { margin-top: 8px; font-size: 0.8rem; color: #777; animation: pulseText 1.8s ease-in-out infinite; }
     @keyframes pulseText { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
     .leaflet-control-zoom, .leaflet-control-attribution, .leaflet-routing-container { display: none !important; }
+    
+/* ======================================== */
+/* BOTÃO ADCIONAR RADAR                           */
+/* ======================================== */
     .btn-add-radar {
         position: absolute; bottom: 10px; right: 10px !important; width: 60px; height: 60px;
         border-radius: 50%; background: linear-gradient(135deg, #00cc66, #00994d);
@@ -2616,6 +2620,10 @@ header {
         backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center;
         padding: 20px; animation: modalFadeIn 0.3s ease-out;
     }
+
+/* ======================================== */
+/* FORMULÁRIO MODAL OVERLAY ADICIONAR RADAR                                */
+/* ======================================== */
     .modal-overlay.active { display: flex; }
     @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     .modal-content { background: #1a1d24; border: 1px solid #333; border-radius: 20px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8); }
@@ -2698,7 +2706,7 @@ header {
     .coord-input::placeholder { color: #333; }
     .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; font-style: italic; text-align: center; }
  
-     /* BOTÃO INSERIR RADAR */
+     /* BOTÃO INSERIR RADAR FORMULARIO */
 
     .btn-submit-radar {
         width: 100%; padding: 14px; border: none; border-radius: 14px;
@@ -2712,8 +2720,7 @@ header {
     .menu-dropdown { animation: menuSlideIn 0.2s ease-out; }
    
    
-   
-   
+      
     @keyframes menuSlideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     .menu-item:hover { background: rgba(0, 255, 136, 0.1); }
     .config-github-form { display: flex; flex-direction: column; gap: 12px; }
