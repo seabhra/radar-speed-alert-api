@@ -1827,48 +1827,54 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 // FUNÇÃO INICIAR NAVEGAÇÃO GPS E CIDADE ATUAL
 //===========================================
 const cidadeLabel = document.getElementById("cidade-atual");
-let ultimaCidade = "";
 
+// ✅ CORREÇÃO 1: Verifica se a variável já existe no escopo global antes de declarar.
+// Isso evita o "SyntaxError: Identifier has already been declared" no navegador.
+if (typeof window.ultimaCidade === 'undefined') {
+    window.ultimaCidade = "";
+}
 
 function startGPSTracking() {
     // Limpa timeout anterior se existir para evitar conflitos
-    if (browserGpsTimeout) {
+    if (typeof browserGpsTimeout !== 'undefined' && browserGpsTimeout) {
         clearTimeout(browserGpsTimeout);
         browserGpsTimeout = null;
     }
 
-    // Sua verificação do GPS:
+    // Verificação do GPS
     if (!navigator.geolocation) {
-        hideFullscreenLoading();
-        showNotification("GPS não suportado.");
+        if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading();
+        if (typeof showNotification === 'function') showNotification("GPS não suportado.");
         return;
     }
     
     // Se já existe um watch, para ele primeiro (limpeza segura)
-    if (watchId !== null) {
+    if (typeof watchId !== 'undefined' && watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
     }
-}
+
     //=============================================
-    // Inicia o tracking GPS - ÚNICO watchPosition
-   //===============================================    
-     
+    // ✅ CORREÇÃO 2: O watchPosition AGORA está DENTRO da função
+    // No código original, ele estava fora, causando execução imediata e erros.
+    //===============================================    
     watchId = navigator.geolocation.watchPosition(
         function(position) {
             // Dados da posição
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
-            var accuracy = position.coords.accuracy; // <-- ADICIONADO: Captura a precisão
+            var accuracy = position.coords.accuracy; 
             var speedKmh = 0;
                         
             if (position.coords.speed !== null && position.coords.speed >= 0) {
                 speedKmh = Math.round(position.coords.speed * 3.6);
+            }
 
-   // 👈 ADICIONE ISSO: Atualiza o header em tempo real com a nova precisão
-    atualizarInterfaceCabecalho({
-        precisaoGPS: precisao
-    });
+            // ✅ CORREÇÃO 3: A variável era 'accuracy', não 'precisao'
+            if (typeof atualizarInterfaceCabecalho === 'function') {
+                atualizarInterfaceCabecalho({
+                    precisaoGPS: accuracy
+                });
             }
 
             // =================================================================
@@ -1882,11 +1888,11 @@ function startGPSTracking() {
                 console.log(`✅ Sinal de GPS EXCELENTE: ${accuracy}m de margem de erro.`);
             }
 
-            atualizarStatusGPS(position); 
+            if (typeof atualizarStatusGPS === 'function') atualizarStatusGPS(position); 
 
             // Verifica chegada ao destino se estiver em navegação
             if (typeof estaEmNavegacao !== 'undefined' && estaEmNavegacao && typeof destinoNavegacao !== 'undefined' && destinoNavegacao) {
-                verificarChegadaDestino();
+                if (typeof verificarChegadaDestino === 'function') verificarChegadaDestino();
             }
 
             // Define fonte do GPS
@@ -1899,10 +1905,12 @@ function startGPSTracking() {
             if (typeof atualizarTemperatura === 'function') atualizarTemperatura();
 
             // Processa a nova posição
-            processarNovaPosicao(lat, lng, speedKmh, position.coords.heading, accuracy);
+            if (typeof processarNovaPosicao === 'function') {
+                processarNovaPosicao(lat, lng, speedKmh, position.coords.heading, accuracy);
+            }
 
             // Marca GPS como inicializado
-            if (!gpsInitialized) {
+            if (typeof gpsInitialized !== 'undefined' && !gpsInitialized) {
                 gpsInitialized = true;
                 if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading();
             }
@@ -1913,14 +1921,15 @@ function startGPSTracking() {
             // Garante que o indicador fique vermelho em caso de erro real
             if (typeof atualizarStatusGPS === 'function') atualizarStatusGPS(null); 
             if (typeof showNotification === 'function') showNotification("Erro ao obter localização: " + error.message);
-            if (!gpsInitialized) {
+            
+            if (typeof gpsInitialized !== 'undefined' && !gpsInitialized) {
                 if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading();
             }
         }, 
         { 
             enableHighAccuracy: true,
-            maximumAge: 0,          // <-- ALTERADO: 0 força leitura fresca do sensor de hardware
-            timeout: 30000          // <-- Mantido: 30s é ótimo para dar tempo do satélite travar
+            maximumAge: 0,          // Força leitura fresca do sensor de hardware
+            timeout: 30000          // 30s para dar tempo do satélite travar
         }
     );
 
@@ -1928,11 +1937,12 @@ function startGPSTracking() {
 
     // Timeout de segurança
     browserGpsTimeout = setTimeout(function() {
-        if (!gpsInitialized && (typeof gpsSource === 'undefined' || gpsSource !== 'appinventor')) { 
+        if (typeof gpsInitialized !== 'undefined' && !gpsInitialized && (typeof gpsSource === 'undefined' || gpsSource !== 'appinventor')) { 
             if (typeof showNotification === 'function') showNotification("Aguardando sinal de GPS... Verifique se está em local aberto."); 
             if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading(); 
         }
     }, 8000);
+} // ✅ Fim correto da função startGPSTracking
 
 //===========================================
 // FUNÇÃO PARAR GPS
