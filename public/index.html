@@ -87,11 +87,29 @@
           <div class="menu-label">MENU</div>
       </button>
 
-      <div class="header-info-left">
-          <div class="titulo-linha">
-              <img src="/imagens_app/ic_icon_sem_fundo.png" alt="App Icon" class="app-icon" onerror="this.style.display='none'">
-              <h1>RADAR <span>X9</span></h1>
-          </div>
+      <!-- CSS HEADER COM MARCA DA APP E DOT GPS-->
+  
+    <div class="header-content">
+        <div class="header-left">
+            <img src="/imagens_app/icon_sem_fundo.png"
+                 onerror="this.style.display='none'"
+                 alt="App Icon"
+                 class="app-icon">
+            <div class="titulo-app">
+                <div class="titulo-linha">
+                    <h1>RADAR <span>X9</span></h1>
+                    <!-- Indicador de Status do GPS -->     
+                    <div class="gps-status-wrapper gps-err" 
+                         id="gps-status-wrapper" 
+                         title="GPS: Aguardando sinal">
+                        <div class="gps-status-dot err" id="gps-status-dot"></div>
+                        <span class="gps-status-label" id="gps-status-label">AGUARDANDO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
           
           <div class="dados-clima-linha">
               <span id="nomeCidade" class="cidade-label">📍Local</span>
@@ -104,14 +122,10 @@
           </div>
       </div>
 
-      <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="Status do GPS">
-          <div class="gps-status-dot err" id="gps-status-dot"></div>
-          <span class="gps-status-label" id="gps-status-label">AGUARDANDO</span>
-      </div>
   </header>
 
   <!-- ============================================ -->
-  <!-- CONTEÚDO DO MAPA E PÁGINAS -->
+  <!-- CONTEÚDO E CONTROLES DE DO MAPA -->
   <!-- ============================================ -->
   <div class="map-wrapper">
       <div id="nav-info">
@@ -148,17 +162,48 @@
           <div class="speed-value" id="speed-display">0</div>
       </div>
 
-      <div class="sidebar-controls retracted" id="sidebar-controls">
-        <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa"><img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar"></button>
-        <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta"><img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta"></button>
-        <button class="map-btn" id="btn-search-bar" title="Buscar Radares"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca"></button>
-        <button class="map-btn" id="btn-route-bar" title="Navegar / Rota"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
-        <button class="map-btn" id="btn-center" title="Centralizar GPS"><img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro"></button>
-        <button class="map-btn" id="btn-refresh" title="Resetar Mapa"><img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh"></button>
-        <button class="map-btn" id="btn-zoom-in" title="Aumentar Zoom"><img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In"></button>
-        <button class="map-btn" id="btn-zoom-out" title="Diminuir Zoom"><img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out"></button>
-      </div>
+<!-- ============================================ -->
+<!-- CONTROLES DO MENU LATERAL DO MAPA (DIREITA) -->
+<!-- ============================================ -->
+<div class="sidebar-controls retracted" id="sidebar-controls">
+    
+    <button class="map-btn" onclick="rotateMap()" title="Rotacionar Mapa">
+        <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
+    </button>
+    
+    <button class="map-btn alert-toggle-btn" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
+        <img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
+    </button>
+    
+    <button class="map-btn" onclick="toggleSearchBar()" title="Buscar Radares">
+        <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
+    </button>
+    
+    <button class="map-btn" onclick="openRouteBar()" title="Navegar / Rota">
+        <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
+    </button>
+    
+    <button class="map-btn" onclick="centerMapOnUser()" title="Centralizar GPS">
+        <img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
+    </button>
+    
+    <button class="map-btn" onclick="refreshMap()" title="Resetar Mapa">
+        <img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
+    </button>
+    
+    <button class="map-btn" onclick="zoomInMap()" title="Aumentar Zoom">
+        <img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
+    </button>
+    
+    <button class="map-btn" onclick="zoomOutMap()" title="Diminuir Zoom">
+        <img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
+    </button>
+    
+</div>
 
+<!-- ============================================ -->
+  <!-- TARJA DE ALERTA DE RADARES DO MAPA -->
+  <!-- ============================================ -->
       <div id="alert-container">
         <div class="alert-bar">
           <img id="alert-icon" src="/imagens_app/ic_radar_das_v2.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
@@ -169,10 +214,9 @@
         </div>
       </div>
 
-      <button class="btn-add-radar" id="btn-add-radar"><span class="plus-icon">+</span></button>
-
-   
+      
       <!-- MODAL DE ADICIONAR RADAR COMPLETO -->
+      <button class="btn-add-radar" id="btn-add-radar"><span class="plus-icon">+</span></button>
 <div class="modal-overlay" id="modal-add-radar">
     <div class="modal-content">
         <div class="modal-header">
@@ -181,28 +225,42 @@
         </div>
         
         <div class="modal-body">
+          
             <!-- TIPO DE RADAR -->
-            <div class="form-group">
-                <label for="radar-type">
-                    <span class="label-icon">📍</span> TIPO DE RADAR
-                </label>
-                <select id="radar-type" class="form-select">
+            
+          <div class="form-group">
+            <label for="radar-type"> <span class="label-icon"></span>Tipo de Radar</label>
+            <select id="radar-type" class="form-select">
+              <option value="">Selecione o tipo...</option>
                  
-                    <option value="CEV"> Radar de Velocidade (CEV)</option>
-                    <option value="DAS"> Radar de Semáforo (DAS)</option>
-                    <option value="DCP"> Conversão Proibida (DCP)</option>
-                    <option value="DTLP"> Tráfego Proibido (DTLP)</option>
-                    <option value="DIFEX">🚌 Faixa Exclusiva (DIFEX)</option>
-                    <option value="DPFP">🚶 Parada em Faixa (DPFP)</option>
-                    <option value="DUC">📱 Uso de Celular (DUC)</option>
-                    <option value="VCS">🔒 Cinto de Segurança (VCS)</option>
-                    <option value="ZIR">🌊 Risco de Inundação (ZIR)</option>
-                    <option value="ZPV">⚠️ Zona de Perigo (ZPV)</option>
-                    <option value="AIA">💥 Alto Índice de Acidentes (AIA)</option>
-                    <option value="REC">🔋 Recarga Carro Elétrico</option>
-                    <option value="WC_AUT">🚾 WC Público Autolimpante</option>
-                    <option value="WC_COM">🚻 WC Público Comum</option>
-                    <option value="PAA">🚏 Ponto Abrigo Amigo</option>
+              <option value="Controlador Eletrônico de Velocidade (CEV)">🚗 Radar de Velocidade (CEV)</option>
+              <option value="Detector de Avanço de Semáforo (DAS)">🚦 Radar de Semáforo (DAS)</option>
+              <option value="Recarga Carro Elétrico (REC)">🔋Recarga Carro Elétrico (REC)</option>
+              <option value="Recarga Carro Elétrico (REC)">🚾 WC Público Autolimpante (AUT)</option>
+              <option value="Recarga Carro Elétrico (REC)">🚻 WC Público Comum (COM)</option>
+              <option value="Recarga Carro Elétrico (REC)"> 🚏 Ponto Abrigo Amigo (PAA)</option>
+              <option value="Detector de Conversão em Local Proibido (DCP)">🔄 Conversão Proibida (DCP)</option>
+              <option value="Detector de Tráfego em Local Proibido (DTLP)">⛔ Tráfego Proibido (DTLP)</option>
+              <option value="Detector de Invasão de Faixa Exclusiva (DIFEX)">🚌 Faixa Exclusiva (DIFEX)</option>
+              <option value="Detector de Parada sobre Faixa de Pedestres (DPFP)">🚶 Parada em Faixa (DPFP)</option>
+              <option value="Detector de Faixa Preferencial de Ônibus (BUS)">🚍 Faixa Preferencial (BUS)</option>
+              <option value="Zona Verde de Trânsito (ZVT)">🌿 Zona Verde (ZVT)</option>
+              <option value="Zona de Risco de Inundações Recorrentes (ZIR)">🌊 Risco de Inundação (ZIR)</option>
+              <option value="Zona de Perigo e Violência (ZPV)">⚠️ Zona de Perigo (ZPV)</option>
+              <option value="Detector de Uso de Celular (DUC)">📱 Uso de Celular (DUC)</option>
+              <option value="Verificador de Cinto de Segurança (VCS)">🔒 Cinto de Segurança (VCS)</option>
+              <option value="Leitor Inteligente de Placas (OCR-P)">📷 Leitor de Placas (OCR-P)</option>
+              <option value="Leitor de Reconhecimento Facial (OCR-F)">👤 Reconhecimento Facial (OCR-F)</option>
+              <option value="Câmera Olho Vivo (COV)">👁️ Olho Vivo (COV)</option>
+              <option value="Alerta de Alto Índice de Acidente (AIA)">💥 Alto Índice de Acidentes (AIA)</option>
+              <option value="Radar Inteligente de Velocidade Média (RIV)">📊 Velocidade Média (RIV)</option>
+              <option value="Passagem Sob Túnel Viário (TUV)">🚇 Túnel Viário (TUV)</option>
+              <option value="Apenas Trânsito Local (ATL)">🏘️ Trânsito Local (ATL)</option>
+              <option value="Área de Escape Caminhões (ARE)">🚛 Área de Escape (ARE)</option>
+              <option value="Alerta de Caminhão na Faixa Esquerda (CFE)">🚚 Caminhão Faixa Esquerda (CFE)</option>
+              <option value="Zona de Estudo Nuclear (ZEN)">☢️ Zona de Estudo Nuclear (ZEN)</option>
+              <option value="Controle de Redução de Velocidade (CRV)">⬇️ Redução de Velocidade (CRV)</option>
+         
                 </select>
             </div>
 
@@ -267,7 +325,7 @@
     </div>
 </div>
 
-  <!-- MENU LATERAL (Drawer) -->
+  <!-- MENU LATERAL ESQUERDO (Drawer) -->
   <div id="menu-lateral" style="position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%); z-index: 1001; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.5); overflow-y: auto;">
       <div style="padding: 20px; color: white; border-bottom: 1px solid rgba(255,255,255,0.2);">
           <h2 style="margin: 0; font-size: 24px;"><span style="color: #ff6b35;">X9</span> RADAR</h2>
@@ -288,6 +346,13 @@
   <div id="menu-overlay" onclick="toggleMenu()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none;"></div>
 
 
+
+
+
+
+
+
+  
   <!-- PÁGINA DE INFORMAÇÕES -->
 <div id="page-info" class="app-page">
     <div class="page-header">
@@ -834,13 +899,29 @@
                 </a>
             </div>
         </section>
-    </div>
-</div>
-  </div>
+    </div> <!-- Fecha .page-content -->
+</div> <!-- Fecha #page-doar -->
+  
 
-  <!-- ÁUDIOS DE ALERTA -->
-  <audio id="alerta-sound-clima" preload="auto"><source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg"></audio>
-
+ <!-- ÁUDIOS DE ALERTA -->
+  <audio id="alert-sound-radar" preload="auto">
+    <source src="audio_app/alerta_sound_radar.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="alert-sound-risco" preload="auto">
+    <source src="audio_app/alerta_sound_risco.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="alert-sound-aviso" preload="auto">
+    <source src="audio_app/alerta_sound_aviso.mp3" type="audio/mpeg">
+  </audio>
+   <audio id="alert-sound-destaque" preload="auto">
+    <source src="audio_app/alerta_sound_destaque.mp3" type="audio/mpeg">
+  </audio>
+   <audio id="alerta-sound-clima" preload="auto">
+    <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
+  </audio>
+    <audio id="alerta-sound-servico" preload="auto">
+    <source src="audio_app/alerta_sound_servico.mp3" type="audio/mpeg">
+  </audio>
   <!-- ============================================ -->
   <!-- SCRIPTS (ORDEM CORRETA E NO FINAL DO BODY) -->
   <!-- ============================================ -->
