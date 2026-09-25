@@ -4,6 +4,8 @@
 /* ======================== */
 
 
+
+
     :root {
         --bg-color: #0f1115;
         --panel-color: #1a1d24;
@@ -17,9 +19,8 @@
         --gps-ok: #00ff88;       /* Verde Neon Moderno */
         --gps-instavel: #ffcc00; /* Amarelo/Laranja */
         --gps-sem: #ff3333;      /* Vermelho Alerta */
- 
-
-    }
+     }
+     
     * {
         box-sizing: border-box;
         margin: 0;
@@ -1454,29 +1455,147 @@ header {
     color: var(--text-main);
 }
 
+
+
 /* ======================================== */
-/* CORREÇÃO DO GPS STATUS (Remover left:150px) */
+/* GPS STATUS WRAPPER (Container Principal - Layout GWA) */
 /* ======================================== */
 .gps-status-wrapper {
+    /* Layout corrigido para GWA (inline com o título) */
     position: relative !important;
     left: auto !important;
     top: auto !important;
     margin-left: 0 !important;
-    padding: 4px 8px !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex-shrink: 0;
-    background-color: rgba(255, 255, 255, 0.05);
+
+    /* Visual completo preservado */
+    padding: 6px 12px;
+    border-radius: 999px;
+    background-color: var(--bg-glass);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.gps-status-label {
-    font-size: 0.6rem !important;
-}
-
+/* ======================================== */
+/* PONTO INDICADOR (DOT) */
+/* ======================================== */
 .gps-status-dot {
-    width: 8px !important;
-    height: 8px !important;
+    position: relative; /* CRUCIAL: Permite que o ::after (pulso) funcione */
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+    flex-shrink: 0;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* Ajuste para telas muito pequenas */
+/* Animação de Pulso */
+.gps-status-dot::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background-color: inherit;
+    opacity: 0;
+    animation: gpsPulse 2s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes gpsPulse {
+    0%   { transform: scale(1);   opacity: 0.6; }
+    100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* ======================================== */
+/* TEXTO DO LABEL */
+/* ======================================== */
+.gps-status-label {
+    font-size: 0.75rem; /* 12px */
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: color 0.4s ease;
+}
+
+/* ======================================== */
+/* ESTADOS DE CORES */
+/* ======================================== */
+
+/* 🟢 VERDE (OK) */
+.gps-status-wrapper.gps-ok {
+    border-color: rgba(0, 255, 136, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.15);
+}
+.gps-status-wrapper.gps-ok .gps-status-label { color: var(--gps-ok); }
+.gps-status-dot.ok {
+    background-color: var(--gps-ok);
+    box-shadow: 0 0 10px var(--gps-ok);
+}
+
+/* 🟡 AMARELO (IRREGULAR/MÉDIO) */
+.gps-status-wrapper.gps-warn {
+    border-color: rgba(255, 204, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.15);
+}
+.gps-status-wrapper.gps-warn .gps-status-label { color: var(--gps-instavel); }
+.gps-status-dot.warn {
+    background-color: var(--gps-instavel);
+    box-shadow: 0 0 10px var(--gps-instavel);
+}
+
+/* 🔴 VERMELHO (FRACO/ERRO) */
+.gps-status-wrapper.gps-err {
+    border-color: rgba(255, 51, 51, 0.3);
+    box-shadow: 0 4px 15px rgba(255, 51, 51, 0.15);
+}
+.gps-status-wrapper.gps-err .gps-status-label { color: var(--gps-sem); }
+.gps-status-dot.err {
+    background-color: var(--gps-sem);
+    box-shadow: 0 0 10px var(--gps-sem);
+}
+
+/* ======================================== */
+/* RESPONSIVIDADE (Ajustes GWA) */
+/* ======================================== */
+
+/* Telas pequenas (tablets) */
+@media (max-width: 768px) {
+    .gps-status-wrapper {
+        padding: 5px 10px;
+        gap: 6px;
+    }
+    .gps-status-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* Telas muito pequenas (celulares) */
+@media (max-width: 480px) {
+    .gps-status-wrapper {
+        padding: 4px 8px;
+        gap: 5px;
+    }
+    .gps-status-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.5px;
+    }
+    .gps-status-dot {
+        width: 8px;
+        height: 8px;
+    }
+}
+
+/* Telas minúsculas — mantém só a bolinha */
 @media (max-width: 400px) {
     .dados-clima-linha {
         font-size: 0.65rem;
@@ -1490,17 +1609,13 @@ header {
         font-size: 0.85rem;
     }
     .gps-status-label {
-        display: none !important; /* Mantém apenas a bolinha em telas minúsculas */
+        display: none !important;
     }
 }
+
 /* ======================================== */
 /* GARANTIR QUE MAPA FIQUE ABAIXO DA HOME                             */
 /* ======================================== */
-
-
-   
-
-
 
 /* 3. A página do mapa deve ser a única visível inicialmente */
 #page-mapa {
@@ -1759,15 +1874,6 @@ header {
 }
 
 
-/* ======================================== */
-/* HEADER RIGHT / MENU                     */
-/* ======================================== */
-
-.header-right {
-    flex: 0 0 auto;
-
-    flex-shrink: 0;
-}
 
 
 /* ======================================== */
@@ -2037,7 +2143,7 @@ header {
     #poluicaoAtual {
         font-size: 11px;
     }
-
+}
 
 /* ======================================== */
 /* TELAS MUITO PEQUENAS */
@@ -2120,8 +2226,6 @@ header {
         min-width: 45px;
     }
 }
-
-
 
 /* ======================================== */
 /* GPS STATUS WRAPPER (Container Principal) */
@@ -2299,45 +2403,20 @@ header {
     border: 1px solid rgba(255, 68, 68, 0.3);
     animation: piscarAlerta 1.5s infinite;
 }
+/* ======================================== */
+/* ======================================== */
+/* HEADER RIGHT / BOTÃO DO MENU DO MAPA     */
+/* ======================================== */
+/* ======================================== */
 
-/* ======================================== */
-/* HEADER RIGHT (BOTÃO DO MENU DO MAPA)                      */
-/* ======================================== */
 .header-right {
-    flex-shrink: 0;           /* ⬅️ NOVO: botão MENU nunca encolhe */
+    flex-shrink: 0; /* Botão MENU nunca encolhe */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
-    .btn-menu-toggle {
-        padding: 4px 8px 3px;
-        border-radius: 8px;
-    }
-    
-    .menu-hamburger {
-        width: 14px;
-        gap: 2.5px;
-    }
-    
-    .menu-hamburger span {
-        height: 1.8px;
-    }
-    
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
-        transform: translateY(4px) rotate(45deg);
-    }
-    
-    .btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
-        transform: translateY(-4px) rotate(-45deg);
-    }
-}
-    
-    .menu-label {
-        font-size: 0.4rem;
-        letter-spacing: 0.8px;
-    }
 
-
-/* ======================================== */
-/* BOTÃO MENU TOGGLE DOS BOTÕES DO MAPA */
-/* ======================================== */
+/* --- Estilo Base do Botão --- */
 .btn-menu-toggle {
     display: flex;
     flex-direction: column;
@@ -2358,7 +2437,7 @@ header {
 }
 
 .btn-menu-toggle:hover {
-    border-color: var(--accent-color);
+    border-color: var(--accent-color, #00ff88); /* Fallback de cor caso a variável falhe */
     background: rgba(0, 255, 136, 0.06);
 }
 
@@ -2366,6 +2445,7 @@ header {
     transform: scale(0.93);
 }
 
+/* --- Hambúrguer e Animação para "X" --- */
 .menu-hamburger {
     display: flex;
     flex-direction: column;
@@ -2377,12 +2457,13 @@ header {
     display: block;
     height: 2px;
     width: 100%;
-    background-color: var(--accent-color);
+    background-color: var(--accent-color, #00ff88);
     border-radius: 2px;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
 }
 
+/* Estado Ativo (Menu Aberto) */
 .btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
     transform: translateY(5px) rotate(45deg);
 }
@@ -2396,52 +2477,136 @@ header {
     transform: translateY(-5px) rotate(-45deg);
 }
 
+/* --- Texto do Label --- */
 .menu-label {
-    font-size: 0.45rem;
+    font-size: 0.5rem; /* Ajustado de 0.45rem para melhor legibilidade */
     font-weight: 700;
     letter-spacing: 1px;
-    color: var(--accent-color);
+    color: var(--accent-color, #00ff88);
     text-transform: uppercase;
     line-height: 1;
     margin-top: 2px;
 }
 
 
+/* ======================================== */
+/* CONTROLES DA BARRA LATERAL DO MAPA       */
+/* ======================================== */
+
+.sidebar-controls {
+    position: absolute;
+    top: -30px; /* Ajuste fino para alinhar com o header */
+    right: 0;
+    height: 100%;
+    width: var(--sidebar-width, 60px); /* Fallback de 60px se a variável não existir */
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 0;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Estado Recolhido (Escondido) */
+.sidebar-controls.retracted {
+    transform: translateX(calc(var(--sidebar-width, 60px) + 15px));
+    pointer-events: none;
+}
+
+/* Botões dentro da Sidebar */
+.sidebar-controls .map-btn {
+    width: var(--btn-size, 40px);
+    height: var(--btn-size, 40px);
+    opacity: 1;
+    transition: opacity 0.3s ease 0s, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebar-controls.retracted .map-btn {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease 0s, transform 0.2s ease, border-color 0.2s ease;
+}
+
 
 /* ======================================== */
-/* CONTROLES DA BARRA LATERAL DO MAPA */
+/* BARRA DE BUSCA (SEARCH CONTAINER)        */
 /* ======================================== */
-    .sidebar-controls {
-        position: absolute; top: -30px; right: 0; height: 100%; width: var(--sidebar-width);
-        z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 10px; padding: 20px 0; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateX(0); pointer-events: auto;
-    }
-    .sidebar-controls.retracted { transform: translateX(calc(var(--sidebar-width) + 15px)); pointer-events: none; }
-    .sidebar-controls .map-btn { width: var(--btn-size); height: var(--btn-size); opacity: 1; transition: opacity 0.3s ease 0s, transform 0.2s ease, border-color 0.2s ease; }
-    .sidebar-controls.retracted .map-btn { opacity: 0; pointer-events: none; transition: opacity 0.2s ease 0s, transform 0.2s ease, border-color 0.2s ease; }
-    .search-container {
-        position: absolute; top: 0; left: 0; width: 100%; background-color: rgba(26, 29, 36, 0.98);
-        backdrop-filter: blur(8px); display: flex; gap: 12px; z-index: 1000; max-height: 0;
-        overflow: hidden; opacity: 0; padding: 0 15px; border-bottom: 1px solid transparent;
-        transition: all 0.3s ease; align-items: center;
-    }
-    .search-container.active { max-height: 90px; opacity: 1; padding: 15px; border-bottom: 1px solid #333; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
-    .search-container input {
-        flex: 1; padding: 14px 20px; border-radius: 30px; border: 1px solid #444;
-        background-color: #000; color: #fff; font-size: 1rem; outline: none; font-family: 'Inter', sans-serif;
-    }
-    .search-container input:focus { border-color: var(--accent-color); }
-    .btn-search {
-        position: relative; flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%;
-        border: none; cursor: pointer; background: rgba(46, 102, 158, 0.95);
-        box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); transition: all 0.2s ease; overflow: hidden;
-    }
-    .btn-search:active { transform: scale(0.9); }
-    .btn-search img { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; object-fit: contain; display: block; transform: translate(-50%, -50%); }
-    
-  
 
+.search-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(26, 29, 36, 0.98);
+    backdrop-filter: blur(8px);
+    display: flex;
+    gap: 12px;
+    z-index: 1000;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0 15px;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+    align-items: center;
+}
+
+.search-container.active {
+    max-height: 90px;
+    opacity: 1;
+    padding: 15px;
+    border-bottom: 1px solid #333;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.search-container input {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 30px;
+    border: 1px solid #444;
+    background-color: #000;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.search-container input:focus {
+    border-color: var(--accent-color, #00ff88);
+}
+
+.btn-search {
+    position: relative;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: rgba(46, 102, 158, 0.95);
+    box-shadow: 0 3px 8px rgba(203, 240, 15, 0.5); /* Nota: cor de sombra um pouco incomum, mas mantida */
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.btn-search:active {
+    transform: scale(0.9);
+}
+
+.btn-search img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    display: block;
+    transform: translate(-50%, -50%);
+}
     
 /* ========================================
    TEMA MATRIX — DIA
@@ -2478,8 +2643,6 @@ header {
 
     z-index: 400;
 }
-
-
 
 
 /* ========================================
@@ -3119,4 +3282,3 @@ header {
     content: "";
     font-size: 14px;
 }
-
