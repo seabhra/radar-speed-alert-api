@@ -108,8 +108,6 @@
                 </div>
             </div>
         </div>
-
-
           
           <div class="dados-clima-linha">
               <span id="nomeCidade" class="cidade-label">📍Local</span>
@@ -121,6 +119,46 @@
               <span class="qualidade-ar-label">🏭 <span id="poluicaoAtual">N/A</span></span>
           </div>
       </div>
+
+      <!-- ============================================ -->
+<!-- CONTROLES DO MENU LATERAL DO MAPA (DIREITA) -->
+<!-- ============================================ -->
+<div class="sidebar-controls retracted" id="sidebar-controls">
+    
+    <button class="map-btn" onclick="rotateMap()" title="Rotacionar Mapa">
+        <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
+    </button>
+    
+    <button class="map-btn alert-toggle-btn" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
+        <img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
+    </button>
+    
+    <button class="map-btn" onclick="toggleSearchBar()" title="Buscar Radares">
+        <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
+    </button>
+    
+    <button class="map-btn" onclick="openRouteBar()" title="Navegar / Rota">
+        <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
+    </button>
+    
+    <button class="map-btn" onclick="centerMapOnUser()" title="Centralizar GPS">
+        <img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
+    </button>
+    
+    <button class="map-btn" onclick="refreshMap()" title="Resetar Mapa">
+        <img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
+    </button>
+    
+    <button class="map-btn" onclick="zoomInMap()" title="Aumentar Zoom">
+        <img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
+    </button>
+    
+    <button class="map-btn" onclick="zoomOutMap()" title="Diminuir Zoom">
+        <img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
+    </button>
+    
+</div>
+
 
   </header>
 
@@ -162,44 +200,6 @@
           <div class="speed-value" id="speed-display">0</div>
       </div>
 
-<!-- ============================================ -->
-<!-- CONTROLES DO MENU LATERAL DO MAPA (DIREITA) -->
-<!-- ============================================ -->
-<div class="sidebar-controls retracted" id="sidebar-controls">
-    
-    <button class="map-btn" onclick="rotateMap()" title="Rotacionar Mapa">
-        <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
-    </button>
-    
-    <button class="map-btn alert-toggle-btn" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
-        <img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
-    </button>
-    
-    <button class="map-btn" onclick="toggleSearchBar()" title="Buscar Radares">
-        <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
-    </button>
-    
-    <button class="map-btn" onclick="openRouteBar()" title="Navegar / Rota">
-        <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
-    </button>
-    
-    <button class="map-btn" onclick="centerMapOnUser()" title="Centralizar GPS">
-        <img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
-    </button>
-    
-    <button class="map-btn" onclick="refreshMap()" title="Resetar Mapa">
-        <img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
-    </button>
-    
-    <button class="map-btn" onclick="zoomInMap()" title="Aumentar Zoom">
-        <img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
-    </button>
-    
-    <button class="map-btn" onclick="zoomOutMap()" title="Diminuir Zoom">
-        <img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
-    </button>
-    
-</div>
 
 <!-- ============================================ -->
   <!-- TARJA DE ALERTA DE RADARES DO MAPA -->
