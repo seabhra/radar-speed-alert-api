@@ -80,86 +80,104 @@
   <!-- ============================================ -->
   <!-- HEADER PRINCIPAL (LAYOUT ESQUERDA vs DIREITA) -->
   <!-- ============================================ -->
-  <header id="main-header">
-      
-      <!-- GRUPO DA ESQUERDA: Menu + Marca + GPS + Clima -->
-      <div class="header-left-group">
-          
-          <!-- 1. Botão Menu Hamburger -->
-          <button class="btn-menu-toggle" id="btn-menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">
-              <div class="menu-hamburger">
-                  <span></span><span></span><span></span>
-              </div>
-              <div class="menu-label">MENU</div>
-          </button>
+   
+<header id="main-header">
+    <!-- GRUPO DA ESQUERDA -->
+    <div class="header-left-container">
+        <button class="btn-menu-toggle" id="btn-menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">
+            <div class="menu-hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="menu-label">MENU</div>
+        </button>
 
-          <!-- 2. Marca e Indicador GPS -->
-          <div class="header-brand-gps">
-              <img src="imagens_app/icon_sem_fundo.png" 
-                   onerror="this.style.display='none'" 
-                   alt="App Icon" 
-                   class="app-icon">
-              <div class="titulo-app">
-                  <div class="titulo-linha">
-                      <h1>RADAR <span>X9</span></h1>
-                      <!-- Indicador de Status do GPS -->     
-                      <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
-                          <div class="gps-status-dot err" id="gps-status-dot"></div>
-                          <span class="gps-status-label" id="gps-status-label">AGUARDANDO</span>
-                      </div>
-                  </div>
-              </div>
-          </div>
+        <div class="header-brand-section">
+            <img src="imagens_app/icon_sem_fundo.png" 
+                 onerror="this.style.display='none'" 
+                 alt="App Icon" 
+                 class="app-icon">
+            <div class="titulo-app">
+                <div class="titulo-linha">
+                    <h1>RADAR <span>X9</span></h1>
+                    <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
+                        <div class="gps-status-dot err" id="gps-status-dot"></div>
+                        <span class="gps-status-label" id="gps-status-label">AGUARDANDO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-          <!-- 3. Dados de Clima e Cidade -->
-          <div class="dados-clima-linha">
-              <span id="nomeCidade" class="cidade-label">📍Local</span>
-              <span class="separador">|</span>
-              <span class="temp-label">🌡️ <span id="temperaturaAtual">--°C</span></span>
-              <span class="separador">|</span>
-              <span class="umidade-label">💧 <span id="umidadeAtual">--%</span></span>
-              <span class="separador">|</span>
-              <span class="qualidade-ar-label">🏭 <span id="poluicaoAtual">N/A</span></span>
-          </div>
-      </div>
+        <div class="dados-clima-linha">
+            <span id="nomeCidade" class="cidade-label">📍Local</span>
+            <span class="separador">|</span>
+            <span class="temp-label">️ <span id="temperaturaAtual">--°C</span></span>
+            <span class="separador">|</span>
+            <span class="umidade-label">💧 <span id="umidadeAtual">--%</span></span>
+            <span class="separador">|</span>
+            <span class="qualidade-ar-label">🏭 <span id="poluicaoAtual">N/A</span></span>
+        </div>
+    </div>
 
-      <!-- GRUPO DA DIREITA: Controles do Mapa -->
-      <div class="sidebar-controls retracted" id="sidebar-controls">
-          <button class="map-btn" onclick="rotateMap()" title="Rotacionar Mapa">
-              <img id="rotate-btn-icon" src="imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
-          </button>
-          
-          <button class="map-btn alert-toggle-btn" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
-              <img id="alert-toggle-icon" src="imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
-          </button>
-          
-          <button class="map-btn" onclick="toggleSearchBar()" title="Buscar Radares">
-              <img src="imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
-          </button>
-          
-          <button class="map-btn" onclick="openRouteBar()" title="Navegar / Rota">
-              <img src="imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
-          </button>
-          
-          <button class="map-btn" onclick="centerMapOnUser()" title="Centralizar GPS">
-              <img src="imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
-          </button>
-          
-          <button class="map-btn" onclick="refreshMap()" title="Resetar Mapa">
-              <img src="imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
-          </button>
-          
-          <button class="map-btn" onclick="zoomInMap()" title="Aumentar Zoom">
-              <img src="imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
-          </button>
-          
-          <button class="map-btn" onclick="zoomOutMap()" title="Diminuir Zoom">
-              <img src="imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
-          </button>
-      </div>
+    <!-- GRUPO DA DIREITA - BOTÕES NO HEADER (Desktop) -->
+    <div class="header-right-container">
+        <div class="sidebar-controls" id="sidebar-controls">
+            <button class="map-btn" onclick="rotateMap()" title="Rotacionar Mapa">
+                <img id="rotate-btn-icon" src="imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
+            </button>
+            
+            <button class="map-btn alert-toggle-btn" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
+                <img id="alert-toggle-icon" src="imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
+            </button>
+            
+            <button class="map-btn" onclick="toggleSearchBar()" title="Buscar Radares">
+                <img src="imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
+            </button>
+            
+            <button class="map-btn" onclick="openRouteBar()" title="Navegar / Rota">
+                <img src="imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
+            </button>
+            
+            <button class="map-btn" onclick="centerMapOnUser()" title="Centralizar GPS">
+                <img src="imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
+            </button>
+            
+            <button class="map-btn" onclick="refreshMap()" title="Resetar Mapa">
+                <img src="imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
+            </button>
+            
+            <button class="map-btn" onclick="zoomInMap()" title="Aumentar Zoom">
+                <img src="imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
+            </button>
+            
+            <button class="map-btn" onclick="zoomOutMap()" title="Diminuir Zoom">
+                <img src="imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
+            </button>
+        </div>
+    </div>
+</header>
 
-  </header>
-
+<!-- BARRA DE CONTROLES MOBILE (aparece apenas em telas pequenas) -->
+<div class="mobile-controls-bar">
+    <button class="map-btn" onclick="rotateMap()" title="Rotacionar">
+        <img src="imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
+    </button>
+    
+    <button class="map-btn" onclick="toggleSearchBar()" title="Buscar">
+        <img src="imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
+    </button>
+    
+    <button class="map-btn" onclick="centerMapOnUser()" title="GPS">
+        <img src="imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
+    </button>
+    
+    <button class="map-btn" onclick="zoomInMap()" title="Zoom +">
+        <img src="imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
+    </button>
+    
+    <button class="map-btn" onclick="zoomOutMap()" title="Zoom -">
+        <img src="imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
+    </button>
+</div>
 
 <!-- ============================================ -->
   <!-- CONTEÚDO E CONTROLES DE DO MAPA -->
@@ -324,30 +342,29 @@
     </div>
 </div>
 
-  <!-- MENU LATERAL ESQUERDO (Drawer) -->
-  <div id="menu-lateral" style="position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%); z-index: 1001; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.5); overflow-y: auto;">
-      <div style="padding: 20px; color: white; border-bottom: 1px solid rgba(255,255,255,0.2);">
-          <h2 style="margin: 0; font-size: 24px;"><span style="color: #ff6b35;">X9</span> RADAR</h2>
-          <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 14px;">por Geraldo A. Seabra</p>
-      </div>
-      <nav style="padding: 10px 0;">
-          <a href="javascript:void(0)" onclick="showPage('mapa'); toggleMenu();" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-              <span style="font-size: 24px; margin-right: 15px;">🗺️</span><span>Mapa</span>
-          </a>
-          <a href="javascript:void(0)" onclick="showPage('info'); toggleMenu();" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-              <span style="font-size: 24px; margin-right: 15px;">ℹ️</span><span>Informações</span>
-          </a>
-          <a href="javascript:void(0)" onclick="fecharApp(); return false;" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; background: rgba(255,0,0,0.2);">
-              <span style="font-size: 24px; margin-right: 15px;">🚪</span><span>Fechar App</span>
-          </a>
-      </nav>
-  </div>
-  <div id="menu-overlay" onclick="toggleMenu()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none;"></div>
-
-
-
-
-
+ 
+ <!-- MENU LATERAL ESQUERDO (Drawer) -->
+<div id="menu-lateral" style="position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%); z-index: 1001; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.5); overflow-y: auto;">
+    <div style="padding: 20px; color: white; border-bottom: 1px solid rgba(255,255,255,0.2);">
+        <h2 style="margin: 0; font-size: 24px;"><span style="color: #ff6b35;">X9</span> RADAR</h2>
+        <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 14px;">por Geraldo A. Seabra</p>
+    </div>
+    <nav style="padding: 10px 0;">
+        <a href="javascript:void(0)" onclick="showPage('mapa'); toggleMenu();" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 24px; margin-right: 15px;">🗺️</span><span>Mapa</span>
+        </a>
+        <a href="javascript:void(0)" onclick="showPage('info'); toggleMenu();" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 24px; margin-right: 15px;">ℹ️</span><span>Informações</span>
+        </a>
+        <a href="javascript:void(0)" onclick="showPage('doar'); toggleMenu();" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 24px; margin-right: 15px;">💚</span><span>Apoiar Projeto</span>
+        </a>
+        <a href="javascript:void(0)" onclick="fecharApp(); return false;" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; background: rgba(255,0,0,0.2);">
+            <span style="font-size: 24px; margin-right: 15px;"></span><span>Fechar App</span>
+        </a>
+    </nav>
+</div>
+<div id="menu-overlay" onclick="toggleMenu()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none;"></div>
 
 
 
