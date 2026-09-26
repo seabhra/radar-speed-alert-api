@@ -1856,11 +1856,10 @@ function startGPSTracking() {
 
     //=============================================
     // ✅ CORREÇÃO 2: O watchPosition AGORA está DENTRO da função
-    // No código original, ele estava fora, causando execução imediata e erros.
     //===============================================    
     watchId = navigator.geolocation.watchPosition(
         function(position) {
-            // Dados da posição
+            // 1. Dados da posição
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
             var accuracy = position.coords.accuracy; 
@@ -1870,79 +1869,81 @@ function startGPSTracking() {
                 speedKmh = Math.round(position.coords.speed * 3.6);
             }
 
-            // ✅ CORREÇÃO 3: A variável era 'accuracy', não 'precisao'
-            if (typeof atualizarInterfaceCabecalho === 'function') {
-                atualizarInterfaceCabecalho({
-                    precisaoGPS: accuracy
-                });
+            // 2. Atualiza o indicador visual de precisão no cabeçalho (app.js)
+            if (typeof window.atualizarInterfaceCabecalho === 'function') {
+                window.atualizarInterfaceCabecalho({ precisaoGPS: accuracy });
             }
 
             // =================================================================
-            // MONITORAMENTO DE PRECISÃO (Para você entender o "ERR")
+            // MONITORAMENTO DE PRECISÃO
             // =================================================================
             if (accuracy > 100) {
-                console.warn(`⚠️ Sinal de GPS FRACO: ${accuracy}m de margem de erro. Classe ERR aplicada corretamente.`);
+                console.warn(`⚠️ Sinal de GPS FRACO: ${accuracy}m de margem de erro.`);
             } else if (accuracy > 50) {
                 console.log(`⚠️ Sinal de GPS ACEITÁVEL: ${accuracy}m de margem de erro.`);
             } else {
                 console.log(`✅ Sinal de GPS EXCELENTE: ${accuracy}m de margem de erro.`);
             }
 
-            if (typeof atualizarStatusGPS === 'function') atualizarStatusGPS(position); 
-
-            // Verifica chegada ao destino se estiver em navegação
-            if (typeof estaEmNavegacao !== 'undefined' && estaEmNavegacao && typeof destinoNavegacao !== 'undefined' && destinoNavegacao) {
-                if (typeof verificarChegadaDestino === 'function') verificarChegadaDestino();
+            // 3. 🚨 A PONTE MÁGICA: Atualiza as variáveis globais do app.js E dispara clima/cidade
+            if (typeof window.setUserLocation === 'function') {
+                window.setUserLocation(lat, lng);
             }
 
-            // Define fonte do GPS
-            if (typeof gpsSource !== 'undefined' && gpsSource !== 'appinventor') {
-                gpsSource = 'browser';
+            // 4. Atualiza o velocímetro na tela (Bônus)
+            const speedDisplay = document.getElementById('speed-display');
+            if (speedDisplay) {
+                speedDisplay.textContent = speedKmh;
             }
 
-            // ATUALIZA CIDADE E CLIMA
-            if (typeof atualizarCidade === 'function') atualizarCidade(lat, lng);
-            if (typeof atualizarTemperatura === 'function') atualizarTemperatura();
+            // 5. Funções adicionais de navegação (Protegidas para não quebrar se não existirem)
+            if (typeof window.atualizarStatusGPS === 'function') window.atualizarStatusGPS(position); 
 
-            // Processa a nova posição
-            if (typeof processarNovaPosicao === 'function') {
-                processarNovaPosicao(lat, lng, speedKmh, position.coords.heading, accuracy);
+            if (typeof window.estaEmNavegacao !== 'undefined' && window.estaEmNavegacao && typeof window.verificarChegadaDestino === 'function') {
+                window.verificarChegadaDestino();
             }
 
-            // Marca GPS como inicializado
-            if (typeof gpsInitialized !== 'undefined' && !gpsInitialized) {
-                gpsInitialized = true;
-                if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading();
+            if (typeof window.processarNovaPosicao === 'function') {
+                window.processarNovaPosicao(lat, lng, speedKmh, position.coords.heading, accuracy);
+            }
+
+            // 6. Marca GPS como inicializado (com segurança)
+            if (typeof window.gpsInitialized !== 'undefined' && !window.gpsInitialized) {
+                window.gpsInitialized = true;
+                if (typeof window.hideFullscreenLoading === 'function') window.hideFullscreenLoading();
             }
 
         }, 
         function(error) {
             console.error("❌ Erro GPS:", error.message, "(Código:", error.code, ")");
-            // Garante que o indicador fique vermelho em caso de erro real
-            if (typeof atualizarStatusGPS === 'function') atualizarStatusGPS(null); 
-            if (typeof showNotification === 'function') showNotification("Erro ao obter localização: " + error.message);
             
-            if (typeof gpsInitialized !== 'undefined' && !gpsInitialized) {
-                if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading();
+            if (typeof window.atualizarInterfaceCabecalho === 'function') {
+                window.atualizarInterfaceCabecalho({ precisaoGPS: 999 }); // Força status "AGUARDANDO"
+            }
+            if (typeof window.atualizarStatusGPS === 'function') window.atualizarStatusGPS(null); 
+            if (typeof window.showNotification === 'function') window.showNotification("Erro ao obter localização: " + error.message);
+            
+            if (typeof window.gpsInitialized !== 'undefined' && !window.gpsInitialized) {
+                if (typeof window.hideFullscreenLoading === 'function') window.hideFullscreenLoading(); 
             }
         }, 
         { 
             enableHighAccuracy: true,
-            maximumAge: 0,          // Força leitura fresca do sensor de hardware
-            timeout: 30000          // 30s para dar tempo do satélite travar
+            maximumAge: 0,          
+            timeout: 30000          
         }
     );
 
     console.log("✅ GPS iniciado com watchId:", watchId);
 
     // Timeout de segurança
-    browserGpsTimeout = setTimeout(function() {
-        if (typeof gpsInitialized !== 'undefined' && !gpsInitialized && (typeof gpsSource === 'undefined' || gpsSource !== 'appinventor')) { 
-            if (typeof showNotification === 'function') showNotification("Aguardando sinal de GPS... Verifique se está em local aberto."); 
-            if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading(); 
+    window.browserGpsTimeout = setTimeout(function() {
+        if (typeof window.gpsInitialized !== 'undefined' && !window.gpsInitialized) { 
+            if (typeof window.showNotification === 'function') window.showNotification("Aguardando sinal de GPS... Verifique se está em local aberto."); 
+            if (typeof window.hideFullscreenLoading === 'function') window.hideFullscreenLoading(); 
         }
     }, 8000);
-} // ✅ Fim correto da função startGPSTracking
+}
 
 //===========================================
 // FUNÇÃO PARAR GPS
