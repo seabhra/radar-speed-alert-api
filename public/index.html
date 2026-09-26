@@ -76,39 +76,42 @@
 
 </div>
 
+
   <!-- ============================================ -->
-  <!-- HEADER PRINCIPAL -->
+  <!-- HEADER PRINCIPAL (LAYOUT ESQUERDA vs DIREITA) -->
   <!-- ============================================ -->
   <header id="main-header">
-      <button class="btn-menu-toggle" id="btn-menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">
-          <div class="menu-hamburger">
-              <span></span><span></span><span></span>
-          </div>
-          <div class="menu-label">MENU</div>
-      </button>
-
-      <!-- CSS HEADER COM MARCA DA APP E DOT GPS-->
-  
-    <div class="header-content">
-        <div class="header-left">
-            <img src="/imagens_app/icon_sem_fundo.png"
-                 onerror="this.style.display='none'"
-                 alt="App Icon"
-                 class="app-icon">
-            <div class="titulo-app">
-                <div class="titulo-linha">
-                    <h1>RADAR <span>X9</span></h1>
-                    <!-- Indicador de Status do GPS -->     
-                    <div class="gps-status-wrapper gps-err" 
-                         id="gps-status-wrapper" 
-                         title="GPS: Aguardando sinal">
-                        <div class="gps-status-dot err" id="gps-status-dot"></div>
-                        <span class="gps-status-label" id="gps-status-label">AGUARDANDO</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+      
+      <!-- GRUPO DA ESQUERDA: Menu + Marca + GPS + Clima -->
+      <div class="header-left-group">
           
+          <!-- 1. Botão Menu Hamburger -->
+          <button class="btn-menu-toggle" id="btn-menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">
+              <div class="menu-hamburger">
+                  <span></span><span></span><span></span>
+              </div>
+              <div class="menu-label">MENU</div>
+          </button>
+
+          <!-- 2. Marca e Indicador GPS -->
+          <div class="header-brand-gps">
+              <img src="imagens_app/icon_sem_fundo.png" 
+                   onerror="this.style.display='none'" 
+                   alt="App Icon" 
+                   class="app-icon">
+              <div class="titulo-app">
+                  <div class="titulo-linha">
+                      <h1>RADAR <span>X9</span></h1>
+                      <!-- Indicador de Status do GPS -->     
+                      <div class="gps-status-wrapper gps-err" id="gps-status-wrapper" title="GPS: Aguardando sinal">
+                          <div class="gps-status-dot err" id="gps-status-dot"></div>
+                          <span class="gps-status-label" id="gps-status-label">AGUARDANDO</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- 3. Dados de Clima e Cidade -->
           <div class="dados-clima-linha">
               <span id="nomeCidade" class="cidade-label">📍Local</span>
               <span class="separador">|</span>
@@ -120,49 +123,45 @@
           </div>
       </div>
 
-      <!-- ============================================ -->
-<!-- CONTROLES DO MENU LATERAL DO MAPA (DIREITA) -->
-<!-- ============================================ -->
-<div class="sidebar-controls retracted" id="sidebar-controls">
-    
-    <button class="map-btn" onclick="rotateMap()" title="Rotacionar Mapa">
-        <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
-    </button>
-    
-    <button class="map-btn alert-toggle-btn" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
-        <img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
-    </button>
-    
-    <button class="map-btn" onclick="toggleSearchBar()" title="Buscar Radares">
-        <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
-    </button>
-    
-    <button class="map-btn" onclick="openRouteBar()" title="Navegar / Rota">
-        <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
-    </button>
-    
-    <button class="map-btn" onclick="centerMapOnUser()" title="Centralizar GPS">
-        <img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
-    </button>
-    
-    <button class="map-btn" onclick="refreshMap()" title="Resetar Mapa">
-        <img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
-    </button>
-    
-    <button class="map-btn" onclick="zoomInMap()" title="Aumentar Zoom">
-        <img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
-    </button>
-    
-    <button class="map-btn" onclick="zoomOutMap()" title="Diminuir Zoom">
-        <img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
-    </button>
-    
-</div>
-
+      <!-- GRUPO DA DIREITA: Controles do Mapa -->
+      <div class="sidebar-controls retracted" id="sidebar-controls">
+          <button class="map-btn" onclick="rotateMap()" title="Rotacionar Mapa">
+              <img id="rotate-btn-icon" src="imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
+          </button>
+          
+          <button class="map-btn alert-toggle-btn" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
+              <img id="alert-toggle-icon" src="imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
+          </button>
+          
+          <button class="map-btn" onclick="toggleSearchBar()" title="Buscar Radares">
+              <img src="imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
+          </button>
+          
+          <button class="map-btn" onclick="openRouteBar()" title="Navegar / Rota">
+              <img src="imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
+          </button>
+          
+          <button class="map-btn" onclick="centerMapOnUser()" title="Centralizar GPS">
+              <img src="imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
+          </button>
+          
+          <button class="map-btn" onclick="refreshMap()" title="Resetar Mapa">
+              <img src="imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
+          </button>
+          
+          <button class="map-btn" onclick="zoomInMap()" title="Aumentar Zoom">
+              <img src="imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
+          </button>
+          
+          <button class="map-btn" onclick="zoomOutMap()" title="Diminuir Zoom">
+              <img src="imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
+          </button>
+      </div>
 
   </header>
 
-  <!-- ============================================ -->
+
+<!-- ============================================ -->
   <!-- CONTEÚDO E CONTROLES DE DO MAPA -->
   <!-- ============================================ -->
   <div class="map-wrapper">
