@@ -11,6 +11,7 @@ let alertaAtivoAtual = '';
 let userLat = null;
 let userLng = null;
 
+
 // Inicialização segura do áudio
 let somAlerta;
 try {
@@ -325,13 +326,17 @@ function verificarAlertasClima(temp, umid) {
         return;
     }
 
-    if (novoAlerta !== '') {
-        alertaDiv.style.display = 'flex';
-        if (novoAlerta !== alertaAtivoAtual) {
+   // Exemplo dentro de verificarAlertasClima:
+if (novoAlerta !== '') {
+    alertaDiv.style.display = 'flex';
+    if (novoAlerta !== alertaAtivoAtual) {
+        // ✅ ADICIONE ESTA VERIFICAÇÃO AQUI:
+        if (window.somAlertaAtivo) {
             somAlerta.play().catch(e => console.log("Aguardando interação para áudio..."));
-            alertaAtivoAtual = novoAlerta;
         }
+        alertaAtivoAtual = novoAlerta;
     }
+}
 }
 
 // ==========================================
@@ -390,6 +395,107 @@ window.fecharApp = function() {
             alert('Para fechar completamente, use o botão voltar do seu dispositivo.');
         }, 500);
     }
+};
+
+
+// =================================================
+// 4.1 FUNÇÕES DE CONTROLE DO MAPA (SIDEBAR DIREITA)
+// ================================================
+
+// Alterna a visibilidade da barra de controles do mapa e anima o botão hambúrguer
+window.toggleMapSidebar = function() {
+    const sidebar = document.getElementById('sidebar-controls');
+    const btn = document.getElementById('btn-menu-toggle');
+    
+    if (sidebar) {
+        sidebar.classList.toggle('retracted');
+    }
+    if (btn) {
+        btn.classList.toggle('active'); // Faz o hambúrguer virar "X"
+    }
+};
+
+// Alterna a barra de busca (search container)
+window.toggleSearchBar = function() {
+    const searchContainer = document.querySelector('.search-container');
+    if (searchContainer) {
+        searchContainer.classList.toggle('active');
+        // Foca no input automaticamente ao abrir
+        if (searchContainer.classList.contains('active')) {
+            setTimeout(() => {
+                const input = searchContainer.querySelector('input');
+                if (input) input.focus();
+            }, 300);
+        }
+    }
+};
+
+// Centraliza o mapa na localização do usuário
+window.centerMapOnUser = function() {
+    if (typeof map !== 'undefined' && userLat && userLng) {
+        map.setView([userLat, userLng], 16); // 16 é um zoom ideal para nível de rua
+        window.showToast('📍 Mapa centralizado na sua localização');
+    } else {
+        window.showToast('⚠️ Aguardando sinal de GPS...');
+    }
+};
+
+// Aumentar Zoom
+window.zoomInMap = function() {
+    if (typeof map !== 'undefined') {
+        map.zoomIn();
+    }
+};
+
+// Diminuir Zoom
+window.zoomOutMap = function() {
+    if (typeof map !== 'undefined') {
+        map.zoomOut();
+    }
+};
+
+// Resetar / Atualizar visualização do mapa
+window.refreshMap = function() {
+    if (typeof map !== 'undefined') {
+        map.invalidateSize(); // Corrige renderização se a tela mudou de tamanho
+        window.showToast('🔄 Mapa atualizado');
+    }
+};
+
+// Variável global para controlar o estado do som
+window.somAlertaAtivo = true; 
+
+// Ligar/Desligar Alerta Sonoro
+window.toggleAlertSound = function() {
+    window.somAlertaAtivo = !window.somAlertaAtivo;
+    const icon = document.getElementById('alert-toggle-icon');
+    
+    if (icon) {
+        if (window.somAlertaAtivo) {
+            // Ícone de som ligado (mantém o original ou fallback)
+            icon.src = '/imagens_app/ic_sound_on.png';
+            icon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
+            window.showToast('🔊 Alertas sonoros ATIVADOS');
+        } else {
+            // Ícone de som desligado (você pode criar este arquivo ou usar um genérico)
+            icon.src = '/imagens_app/ic_sound_off.png'; 
+            icon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3820/3820143.png'; };
+            window.showToast('🔇 Alertas sonoros DESATIVADOS');
+        }
+    }
+};
+
+// Abrir funcionalidade de Rota (Placeholder para integração futura)
+window.openRouteBar = function() {
+    window.showToast('🗺️ Funcionalidade de Rota em desenvolvimento');
+    // Aqui você chamaria a lógica do seu plugin de rotas (ex: Leaflet Routing Machine)
+};
+
+// Rotacionar Mapa (Placeholder)
+window.rotateMap = function() {
+    window.showToast('🔄 Rotação do mapa acionada');
+    // Se usar MapLibre: map.setBearing(map.getBearing() + 45);
+    // Se usar Leaflet puro: requer plugin de rotação
 };
 
 // ==========================================
