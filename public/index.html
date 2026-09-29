@@ -1,404 +1,332 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
   <meta charset="UTF-8">
-  
-  <!-- Viewport único e completo (removida a duplicata) -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  
-  <!-- Theme Color para a barra do navegador/PWA -->
-  <meta name="theme-color" content="#000000">
-  
-  <!-- PWA Capabilities -->
+  <meta name="theme-color" content="#0f1115">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
-  <!-- Manifest (caminho corrigido para a raiz) -->
-  <link rel="manifest" href="/site.webmanifest">
-  
-  <!-- Ícones para iOS e Android -->
-  <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png">
-  <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
-
-  
-  <title>App X9 Radar</title>
-</head>
-
   <title>Radar X9 BH - Alerta Inteligente</title>
-
-   
-    
-  <!-- CORRETO: CSS deve ser carregado com link rel="stylesheet" -->
-     <link rel="stylesheet" href="style.css">
-    
- 
-
-<!-- Leaflet -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
-  crossorigin="anonymous"/>
-
-<!-- Leaflet Routing Machine -->
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
-  crossorigin="anonymous"/>
-
-<!-- MapLibre GL -->
-<link
-  href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css"  rel="stylesheet"/>
-
-<!-- jQuery -->
-<script
-  src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" crossorigin="anonymous"
-></script>
-
-<!-- Leaflet -->
-<script
-  src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"
-></script>
-
- 
-<!-- Leaflet Routing Machine -->
-<script
-  src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"
-  crossorigin="anonymous"
-></script>
-
-<!-- Leaflet Rotate -->
-<script
-  src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"
-  crossorigin="anonymous"
-></script>
-
-<!-- MapLibre GL -->
-<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
-
-<!-- MapLibre GL para Leaflet -->
-<script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-<!-- Fontes -->
-<link
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-  rel="stylesheet">
-
-<link
-  href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap"
-  rel="stylesheet">
-
-
-<!-- Favicons -->
-<link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png">
-<link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
-
   
-<base target="_blank">
-</head>
+  <!-- 1. FAVICONS E MANIFEST -->
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/favicon_io/apple-touch-icon.png">
 
+  <!-- 2. TODOS OS ARQUIVOS CSS DEVEM VIR NO HEAD -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" crossorigin="anonymous"/>
+  <link href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css" rel="stylesheet"/>
+  
+  <!-- 3. FONTES -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- 4. TAG BASE DEVE ESTAR NO HEAD, NUNCA NO BODY -->
+  <base target="_blank">
+</head>
 
 <body>
-
     
-<!-- =====================================
-Cabeçalho Superior (Cidade e Clima) 
-============================================ -->
+<!-- ============================================ -->
+<!-- SPLASH SCREEN -->
+<!-- ============================================ -->
 
-<!-- CABEÇALHO DO APP -->
-<header id="app-header" style="
-    position: fixed; top: 0; left: 0; right: 0; height: 60px;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: white; display: flex; align-items: center; justify-content: space-between;
-    padding: 0 15px; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-">
-    <!-- Botão Menu -->
-    <button onclick="toggleMenu()" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">☰</button>
-    
-    <!-- Centro: Marca e Informações -->
-    <div style="text-align:center; flex:1; display: flex; flex-direction: column; justify-content: center;">
-        <div style="font-weight:900; font-size:18px; letter-spacing: 1px;">
-            <span style="color: #ff6b35;">X9</span> RADAR
-        </div>
-        <div style="font-size:12px; opacity:0.9; display: flex; justify-content: center; gap: 8px; margin-top: 2px;">
-            <span id="header-cidade">Buscando...</span>
-            <span style="opacity: 0.5;">|</span>
-            <span id="header-clima">--°C</span>
-        </div>
+<div id="splash-screen">
+
+    <!-- LOGO PRINCIPAL -->
+    <img
+        src="/imagens_app/icon-sem_fundo.png"
+        alt="X9 Radar"
+        id="splash-logo-principal"
+        onerror="
+            this.style.display='none';
+            document.getElementById('splash-fallback').style.display='flex';
+        "
+    >
+
+    <!-- FALLBACK -->
+    <div id="splash-fallback">X9</div>
+
+    <!-- POWERED BY -->
+    <div class="splash-powered">
+        <span>Powered by</span>
     </div>
 
-    <!-- Indicador de GPS -->
-    <div id="header-gps-status" style="
-        width: 14px; height: 14px; border-radius: 50%; background: #ff0000; 
-        box-shadow: 0 0 8px #ff0000; transition: all 0.3s ease;
-    " title="Status do GPS"></div></header>
+    <!-- MARCA -->
+    <img
+        src="/imagens_app/image_marca.png"
+        alt="NewsGames"
+        id="splash-marca"
+        onerror="this.style.display='none';"
+    >
 
-<div id="app-header" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
-    z-index: 100;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-">
-    <button onclick="toggleMenu()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">☰</button>
-    
-    <div style="text-align:center; flex:1;">
-        <div id="header-cidade" style="font-weight:bold; font-size:16px;">Carregando...</div>
-        <div id="header-clima" style="font-size:12px; opacity:0.9;">--°C</div>
+    <!-- CRÉDITOS -->
+    <div class="splash-credits">
+        <p>por Geraldo A. Seabra</p>
+        <p class="splash-version">versão 1.0</p>
     </div>
 
-    <div id="header-gps-status" style="width:24px; height:24px; border-radius:50%; background:red;" title="Status do GPS"></div>
+    <!-- LOADER -->
+    <div class="splash-loader"></div>
+
 </div>
 
 
-  <div class="loading-fullscreen" id="loading-fullscreen">
-    <div class="spinner-ring"></div>
-    <div class="loading-text">Iniciando <span>Radar X9</span></div>
-    <div class="loading-sub">Sincronizando satélites...</div>
-    
-   
-  </div>
-  <!-- CSS HEADER COM MARCA DA APP -->
+  <!-- ============================================ -->
+  <!-- HEADER PRINCIPAL (LAYOUT ESQUERDA------------->
+  <!-- ============================================ -->
+   <header id="main-header">
 
-  <header>
-    <div class="header-content">
+    <div class="header-left-container">
 
-        <div class="header-left">
+        <!-- MENU — ocupa as duas linhas -->
+        <button class="btn-menu-toggle"
+                id="btn-menu-toggle"
+                onclick="toggleMenu()"
+                aria-label="Abrir menu">
 
-            <img src="/imagens_app/ic_icon_sem_fundo.png"
-                 onerror="this.style.display='none'"
-                 alt="App Icon"
-                 class="app-icon">
+            <div class="menu-hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
 
-            <div class="titulo-app">
+            <div class="menu-label">MENU</div>
+        </button>
 
-                <div class="titulo-linha">
-                    <h1>RADAR <span>X9</span></h1>
 
-                    <!-- Indicador de Status do GPS -->
+        <!-- INFORMAÇÕES DO CABEÇALHO -->
+        <div class="header-info-container">
 
-     
-                    <div class="gps-status-wrapper gps-err" 
-                         id="gps-status-wrapper" 
-                         title="GPS: Aguardando sinal">
+            <!-- LINHA 1: NOME DO APP + GPS -->
+            <div class="header-brand-section">
 
-                        <div class="gps-status-dot err" id="gps-status-dot"></div>
-                        <span class="gps-status-label" id="gps-status-label">AGUARDANDO</span>
+                <img src="imagens_app/icon_sem_fundo.png"
+                     onerror="this.style.display='none'"
+                     alt="App Icon"
+                     class="app-icon">
+
+                <div class="titulo-app">
+
+                    <div class="titulo-linha">
+
+                        <h1>RADAR <span>X9</span></h1>
+
+                        <div class="gps-status-wrapper gps-err"
+                             id="gps-status-wrapper"
+                             title="GPS: Aguardando sinal">
+
+                            <div class="gps-status-dot err"
+                                 id="gps-status-dot"></div>
+
+                            <span class="gps-status-label"
+                                  id="gps-status-label">
+                                AGUARDANDO
+                            </span>
+
+                        </div>
+
                     </div>
 
                 </div>
+
             </div>
+
+
+            <!-- LINHA 2: LOCAL + CLIMA -->
+            <div class="dados-clima-linha">
+
+                <span id="nomeCidade" class="cidade-label">
+                    📍Local
+                </span>
+
+                <span class="separador">|</span>
+
+                <span class="temp-label">
+                    🌡️ <span id="temperaturaAtual">--°C</span>
+                </span>
+
+                <span class="separador">|</span>
+
+                <span class="umidade-label">
+                    💧 <span id="umidadeAtual">--%</span>
+                </span>
+
+                <span class="separador">|</span>
+
+                <span class="qualidade-ar-label">
+                    🏭 <span id="poluicaoAtual">N/A</span>
+                </span>
+
+            </div>
+
         </div>
 
-
-<!-- LINHA DOS DADOS CIDADE E CLIMÁTICOS -->
-    <div class="dados-clima-linha">
-
-        <div id="cidade-atual" class="cidade-label">
-            <span id="nomeCidade">📍Local</span>
-        </div>
-
-        <span class="separador">|</span>
-
-        <span class="temp-label">
-            🌡️ <span id="temperaturaAtual">Temperatura °C</span>
-        </span>
-
-        <span class="separador">|</span>
-
-        <span class="umidade-label">
-            💧 <span id="umidadeAtual">Umidade %</span>
-        </span>
-
-        <span class="separador">|</span>
-
-        <span class="qualidade-ar-label">
-            🏭 <span id="poluicaoAtual">IQAir</span>
-        </span>
-
     </div>
-
-
-    <!-- ALERTA DE QUALIDADE -->
-    <div id="alerta-sound-clima"
-         class="alerta-clima-label"
-         style="display: none;">
-    </div>
-
-
-    <!-- ALERTA DE NORMALIDADE -->
-    <div id="alerta-normalidade"
-         class="alerta-normalidade-label"
-         style="display: none;">
-        ✅ Clima normal. Aproveite!
-    </div>
-
-</div>
-
-    <!-- MENU SEMPRE NO CANTO DIREITO -->
-     <button class="btn-menu-toggle" 
-        id="btn-menu-toggle" 
-        onclick="this.classList.toggle('active');
-        document.getElementById('sidebar-controls').classList.toggle('retracted');"
-        aria-label="Abrir menu de controles">
-
-    <div class="menu-hamburger" id="menu-icon">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-
-    <div class="menu-label">
-        MENU
-    </div>
-</button>
 
 </header>
 
-  
-  <!-- MENU DROPDOWN -->
- 
-<div class="map-wrapper">
+ <!--------------------------------
+MENU LATERAL ESQUERDO (Drawer) 
+  --------------------------------->
+<div id="menu-lateral" style="position: fixed; top: 0; left: -300px; width: 280px; height: 100%; background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%); z-index: 1001; transition: left 0.3s ease; box-shadow: 2px 0 10px rgba(0,0,0,0.5); overflow-y: auto;">
+    <div style="padding: 20px; color: white; border-bottom: 1px solid rgba(255,255,255,0.2);">
+        <h2 style="margin: 0; font-size: 24px;"><span style="color: #ff6b35;">X9</span> RADAR</h2>
+        <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 14px;">por Geraldo A. Seabra</p>
+    </div>
+    <nav style="padding: 10px 0;">
+        <a href="javascript:void(0)" onclick="showPage('mapa'); toggleMenu();" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 24px; margin-right: 15px;">🗺️</span><span>Mapa</span>
+        </a>
+        <a href="javascript:void(0)" onclick="showPage('info'); toggleMenu();" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 24px; margin-right: 15px;">ℹ️</span><span>Informações</span>
+        </a>
+        <a href="javascript:void(0)" onclick="showPage('doar'); toggleMenu();" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <span style="font-size: 24px; margin-right: 15px;">💚</span><span>Apoiar Projeto</span>
+        </a>
+        <a href="javascript:void(0)" onclick="fecharApp(); return false;" style="display: flex; align-items: center; padding: 15px 20px; color: white; text-decoration: none; background: rgba(255,0,0,0.2);">
+            <span style="font-size: 24px; margin-right: 15px;"></span><span>Fechar App</span>
+        </a>
+    </nav>
+</div>
+<div id="menu-overlay" onclick="toggleMenu()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none;"></div>
+   
 
-    <!-- NAV-INFO - AGORA DENTRO DO MAP-WRAPPER E VISÍVEL -->
+<!-- ============================================ -->
+<!-- CONTEÚDO E CONTROLES DO MAPA -->
+<!-- ============================================ -->
+<div class="map-wrapper">
+    <div id="map"></div> 
+    
+    <!-- Painel de navegação (só aparece durante rota) -->
     <div id="nav-info">
         <div id="nav-arrival">🏁 Chegada: --:--</div>
         <div id="nav-route">
-            <span id="nav-distance"> 0,0 km</span>
+            <span id="nav-distance">0,0 km</span>
             <span class="nav-separator">•</span>
             <span id="nav-time">0 min</span>
         </div>
+   
+
+    <!-- ✅ CONTROLES DO MAPA - FORA da nav-info, direto na map-wrapper -->
+    <div class="header-right-container" id="header-right-container">
+        <div class="sidebar-controls" id="sidebar-controls">
+
+            <button class="map-btn" id="btn-rotate-map" onclick="rotateMap()" title="Rotacionar Mapa">
+                <img id="rotate-btn-icon" src="imagens_app/ic_girar_map.png" alt="Rotacionar">
+            </button>
+
+            <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
+                <img id="alert-toggle-icon" src="imagens_app/ic_sound_on.png" alt="Alerta">
+            </button>
+
+            <button class="map-btn" id="btn-search-bar" onclick="toggleSearchBar()" title="Buscar Radares">
+                <img src="imagens_app/ic_radar_busca.png" alt="Busca">
+            </button>
+
+            <button class="map-btn" id="btn-route-bar" onclick="openRouteBar()" title="Navegar / Rota">
+                <img src="imagens_app/ic_gps_busca.png" alt="Rota">
+            </button>
+
+            <button class="map-btn" id="btn-center" onclick="centerMapOnUser()" title="Centralizar GPS">
+                <img src="imagens_app/ic_location_button.png" alt="Centro">
+            </button>
+
+            <button class="map-btn" id="btn-refresh" onclick="refreshMap()" title="Resetar Mapa">
+                <img src="imagens_app/ic_refresh_button.png" alt="Refresh">
+            </button>
+
+            <button class="map-btn" id="btn-zoom-in" onclick="zoomInMap()" title="Aumentar Zoom">
+                <img src="imagens_app/ic_zoom_in.png" alt="Zoom In">
+            </button>
+
+            <button class="map-btn" id="btn-zoom-out" onclick="zoomOutMap()" title="Diminuir Zoom">
+                <img src="imagens_app/ic_zoom_out.png" alt="Zoom Out">
+            </button>
+
+        </div>
+         <!-- ✅ BOTÃO ADICIONAR RADAR - também direto na map-wrapper -->
+     <button class="btn-add-radar" id="btn-add-radar" title="Adicionar Radar" 
+        style="position: fixed; bottom: 20px; right: 80px; z-index: 1000;">
+    <span class="plus-icon">+</span>
+</button>
+
     </div>
-
-
-
-    <div class="search-container" id="search-bar-radares">
-      <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
-      <button class="btn-search" id="btn-search-radar" title="Buscar"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca"></button>
-    </div>
-
-    <div class="search-container" id="search-bar-rota">
-      <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
-      <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
-    </div>
-
-    <div id="app-container" style="position: relative; width: 100%; height: 100%;">
-      <div id="map"></div>
-      <div class="toast-notification" id="toast-msg"></div>
-      
-      <div class="compass-widget" id="compass-widget">
-        <div class="compass-base" id="compass-base-img"></div>
-        <img src="/imagens_app/ic_compass_ponteira.png" class="compass-needle" id="compass-needle-img">
-      </div>
-    </div>
-
-
-   <!-- Speed e Recentralizar Mapa -->
-
-<div class="speed-widget" id="speedWidget">
-
-    <img
-        id="speedIcon"
-        src="/imagens_app/ic_speed_limit.png"
-        onerror="this.style.opacity='0.5'"
-        alt="Velocidade"
-        class="speed-bg">
-
-    <div class="speed-value" id="speed-display">0</div>
 
 </div>
+    
+      
 
-    <!-- Sidebar de controles -->
-    <div class="sidebar-controls retracted" id="sidebar-controls">
+      <div class="search-container" id="search-bar-radares">
+        <input type="text" id="query" placeholder="Buscar radar (tipo, endereço)...">
+        <button class="btn-search" id="btn-search-radar" title="Buscar"><img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="Busca"></button>
+      </div>
+
+      <div class="search-container" id="search-bar-rota">
+        <input type="text" id="route-query" placeholder="Digite um endereço para navegar...">
+        <button class="btn-search" id="btn-calc-route" title="Traçar Rota" style="background-color: #ff8c00;"><img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota"></button>
+      </div>
+
+      <div id="app-container" style="position: relative; width: 100%; height: 100%;">
+        <div id="map"></div>
+        <div class="toast-notification" id="toast-msg"></div>
         
-      <button class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa (Norte para Cima)">
-        <img id="rotate-btn-icon" src="/imagens_app/ic_girar_map.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/10313/10313225.png'" alt="Rotacionar">
-      </button>
-      <button class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta de Radar">
-        <img id="alert-toggle-icon" src="/imagens_app/ic_sound_on.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/727/727245.png'" alt="Alerta">
-      </button>
-      <button class="map-btn" id="btn-search-bar" title="Buscar Radares">
-        <img src="/imagens_app/ic_radar_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/646/646094.png'" alt="busca">
-      </button>
-      <button class="map-btn" id="btn-route-bar" title="Navegar / Rota">
-        <img src="/imagens_app/ic_gps_busca.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7892/7892059.png'" alt="Rota">
-      </button>
-      <button class="map-btn" id="btn-center" title="Centralizar GPS">
-        <img src="/imagens_app/ic_location_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" alt="Centro">
-      </button>
-      <button class="map-btn" id="btn-refresh" title="Resetar Mapa">
-        <img src="/imagens_app/ic_refresh_button.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2409/2409305.png'" alt="Refresh">
-      </button>
-      <button class="map-btn" id="btn-zoom-in" title="Aumentar Zoom">
-        <img src="/imagens_app/ic_zoom_in.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709493.png'" alt="Zoom In">
-      </button>
-      <button class="map-btn" id="btn-zoom-out" title="Diminuir Zoom">
-        <img src="/imagens_app/ic_zoom_out.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/709/709506.png'" alt="Zoom Out">
-      </button>
-    </div>
-
-    <div id="alert-container">
-      <div class="alert-bar">
-        <img id="alert-icon" src="/imagens_app/ic_radar_das_v2.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
-        <div class="alert-info">
-          <h3 id="alert-title">ATENÇÃO!</h3>
-          <p id="alert-text">Radar Próximo</p>
+        <div class="compass-widget" id="compass-widget">
+          <div class="compass-base" id="compass-base-img"></div>
+          <img src="/imagens_app/ic_compass_ponteira.png" class="compass-needle" id="compass-needle-img">
         </div>
       </div>
-    </div>
 
-    <div class="loading-overlay" id="loading" style="display:none;">
-      <div class="loading-spinner"></div>
-      <div style="margin-top:10px; color:#fff;">Processando...</div>
-    </div>
+      <div class="speed-widget" id="speedWidget">
+          <img id="speedIcon" src="/imagens_app/ic_speed_limit.png" onerror="this.style.opacity='0.5'" alt="Velocidade" class="speed-bg">
+          <div class="speed-value" id="speed-display">0</div>
+      </div>
+      </div>
 
-    
-
-    <!-- BOTÃO + PARA ADICIONAR RADAR -->
-    <button class="btn-add-radar" id="btn-add-radar">
-      <span class="plus-icon">+</span>
-  </button>
-
-
-    <!-- MODAL DE INCLUSÃO DE RADAR -->
-    <div class="modal-overlay" id="modal-add-radar">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>➕ Adicionar Radar</h2>
-          <button class="modal-close" id="modal-close">&times;</button>
+ 
+<!-- ============================================ -->
+  <!-- TARJA DE ALERTA DE RADARES DO MAPA -->
+  <!-- ============================================ -->
+      <div id="alert-container">
+        <div class="alert-bar">
+          <img id="alert-icon" src="/imagens_app/ic_radar_das_v2.png" alt="Radar" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7764/7764406.png'">
+          <div class="alert-info">
+            <h3 id="alert-title">ATENÇÃO!</h3>
+            <p id="alert-text">Radar Próximo</p>
+          </div>
         </div>
-        
+      </div>
+
+      
+      <!-- MODAL DE ADICIONAR RADAR COMPLETO -->
+     
+        <div class="modal-overlay" id="modal-add-radar">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><span style="color: #00ff88;">+</span> Adicionar Radar</h2>
+            <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+
         <div class="modal-body">
-          <!-- Seletor de Tipo com Ícones -->
+          
+            <!-- TIPO DE RADAR -->
+            
           <div class="form-group">
-            <label for="radar-type">Tipo de Radar</label>
+            <label for="radar-type"> <span class="label-icon"></span>Tipo de Radar</label>
             <select id="radar-type" class="form-select">
               <option value="">Selecione o tipo...</option>
+                 
               <option value="Controlador Eletrônico de Velocidade (CEV)">🚗 Radar de Velocidade (CEV)</option>
               <option value="Detector de Avanço de Semáforo (DAS)">🚦 Radar de Semáforo (DAS)</option>
               <option value="Recarga Carro Elétrico (REC)">🔋Recarga Carro Elétrico (REC)</option>
               <option value="Recarga Carro Elétrico (REC)">🚾 WC Público Autolimpante (AUT)</option>
-                 <option value="Recarga Carro Elétrico (REC)">🚻 WC Público Comum (COM)</option>
-                <option value="Recarga Carro Elétrico (REC)"> 🚏 Ponto Abrigo Amigo (PAA)</option>
+              <option value="Recarga Carro Elétrico (REC)">🚻 WC Público Comum (COM)</option>
+              <option value="Recarga Carro Elétrico (REC)"> 🚏 Ponto Abrigo Amigo (PAA)</option>
               <option value="Detector de Conversão em Local Proibido (DCP)">🔄 Conversão Proibida (DCP)</option>
               <option value="Detector de Tráfego em Local Proibido (DTLP)">⛔ Tráfego Proibido (DTLP)</option>
               <option value="Detector de Invasão de Faixa Exclusiva (DIFEX)">🚌 Faixa Exclusiva (DIFEX)</option>
@@ -421,545 +349,624 @@ Cabeçalho Superior (Cidade e Clima)
               <option value="Zona de Estudo Nuclear (ZEN)">☢️ Zona de Estudo Nuclear (ZEN)</option>
               <option value="Controle de Redução de Velocidade (CRV)">⬇️ Redução de Velocidade (CRV)</option>
          
-            </select>
-          </div>
+                </select>
+            </div>
+
+            <!-- VELOCIDADE MÁXIMA -->
+            <div class="form-group" id="speed-group">
+                <label for="radar-speed">
+                    <span class="label-icon">⚡</span> VELOCIDADE MÁXIMA (KM/H)
+                </label>
+                <div class="speed-buttons-container" id="speed-buttons-container">
+                    <button type="button" class="speed-btn" data-speed="30">30</button>
+                    <button type="button" class="speed-btn" data-speed="40">40</button>
+                    <button type="button" class="speed-btn" data-speed="50">50</button>
+                    <button type="button" class="speed-btn" data-speed="60">60</button>
+                    <button type="button" class="speed-btn" data-speed="70">70</button>
+                    <button type="button" class="speed-btn" data-speed="80">80</button>
+                    <button type="button" class="speed-btn" data-speed="100">100</button>
+                    <button type="button" class="speed-btn" data-speed="110">110</button>
+                </div>
+                <input type="hidden" id="radar-speed" value="">
+            </div>
+
+            <!-- LOCALIZAÇÃO DO RADAR -->
+            <div class="form-group">
+                <label>
+                    <span class="label-icon">📍</span> LOCALIZAÇÃO DO RADAR
+                </label>
+                
+                <button type="button" class="btn-capture-location" id="btn-capture-location">
+                    <span class="capture-icon">🎯</span>
+                    <span class="capture-text">Capturar Posição Atual</span>
+                </button>
+                
+                <div class="coords-info" id="coords-info" style="display: none;">
+                    <div class="coord-row">
+                        <span class="coord-label">Latitude:</span>
+                        <span class="coord-value" id="pos-lat">--</span>
+                    </div>
+                    <div class="coord-row">
+                        <span class="coord-label">Longitude:</span>
+                        <span class="coord-value" id="pos-lng">--</span>
+                    </div>
+                    <div class="coord-row">
+                        <span class="coord-label">Precisão:</span>
+                        <span class="coord-value" id="pos-accuracy">--</span>
+                    </div>
+                </div>
+                
+                <p class="form-hint">Clique acima para inserir as coordenadas automaticamente.</p>
+            </div>
 
             
 
-       <!-- Velocidade Máxima -->
-<div class="form-group" id="speed-group">
-  <label for="radar-speed">Velocidade Máxima (km/h)</label>
-  <div class="speed-buttons-container" id="speed-buttons-container">
-      <button type="button" class="speed-btn" data-speed="30">30</button>
-      <button type="button" class="speed-btn" data-speed="40">40</button>
-      <button type="button" class="speed-btn" data-speed="50">50</button>
-      <button type="button" class="speed-btn" data-speed="60">60</button>
-      <button type="button" class="speed-btn" data-speed="70">70</button>
-      <button type="button" class="speed-btn" data-speed="80">80</button>
-      <button type="button" class="speed-btn" data-speed="100">100</button>
-      <button type="button" class="speed-btn" data-speed="110">110</button>
-  </div>
-</div>
-
-          <!-- Preview do Ícone do Radar Selecionado -->
-          <div class="form-group" id="icon-preview-group" style="display:none;">
-            <label>Ícone do Radar</label>
-            <div class="icon-preview">
-              <img id="icon-preview-img" src="" alt="Ícone do Radar">
-              <span id="icon-preview-name" style="color:var(--text-muted);margin-left:12px;"></span>
-            </div>
-          </div>
-
-          <!-- Endereço -->
-          <div class="form-group">
-            <label for="radar-address">Endereço / Localização</label>
-            <input type="text" id="radar-address" class="form-input" placeholder="Buscando endereço automaticamente...">
-          </div>
-
-               <!-- BOTÃO DE CAPTURA DE POSIÇÃO -->
-          <div class="form-group">
-            <label>Localização do Radar</label>
-            <button type="button" class="btn-capture-location" id="btn-capture-location">
-              📍 Capturar Posição Atual
+            <!-- BOTÃO INCLUIR -->
+            <button class="btn-submit-radar" id="btn-submit-radar">
+                <span class="btn-icon">✅</span>
+                <span class="btn-text">Incluir Radar</span>
             </button>
             
-            <!-- Lacunas de Latitude e Longitude -->
-            <div class="coords-inputs-container" id="coords-inputs-container">
-              <div class="coord-field">
-                <label class="coord-label">Latitude</label>
-                <input type="text" id="pos-lat" class="coord-input" readonly placeholder="-00.000000">
-              </div>
-              <div class="coord-field">
-                <label class="coord-label">Longitude</label>
-                <input type="text" id="pos-lng" class="coord-input" readonly placeholder="-00.000000">
-              </div>
+            <!-- STATUS -->
+            <div class="submit-status" id="submit-status" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+ 
+
+  
+  <!-- PÁGINA DE INFORMAÇÕES -->
+<div id="page-info" class="app-page">
+    <div class="page-header">
+        <h1>ℹ️ Informações</h1>
+        <button class="btn-back" onclick="showPage('mapa')">← Voltar</button>
+    </div>
+    
+    <div class="page-content">
+        <!-- SOBRE O APP -->
+        <section class="info-section">
+            <h2>📱 Sobre o X9 Radar</h2>
+            <div class="info-card">
+                <p>O <strong>X9 Radar</strong> é um aplicativo colaborativo desenvolvido para alertar motoristas sobre radares de trânsito, semáforos inteligentes e pontos de interesse nas vias.</p>
+                
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <div>
+                            <h3>Funcionalidades Principais</h3>
+                            <ul>
+                                <li>Alerta sonoro de radares fixos e móveis</li>
+                                <li>GPS em tempo real com alta precisão</li>
+                                <li>Mapa interativo com Leaflet</li>
+                                <li>Funciona offline (PWA)</li>
+                                <li>Notificações de proximidade</li>
+                                <li>Informações meteorológicas</li>
+                                <li>Indicador de velocidade</li>
+                                <li>Contribuição colaborativa</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="current-position-status" id="pos-status">Clique acima para inserir as coordenadas.</div>
-          </div>
-        
+        </section>
 
-          <!-- Botão de Inclusão - AÇÃO DIRETA, SEM CONFIRMAÇÃO ADICIONAL -->
-          <button class="btn-submit-radar" id="btn-submit-radar">
-            ✅ Incluir Radar
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-<!-- ============================================
-     SPLASH SCREEN (Tela de Abertura)
-     ============================================ -->
-<div id="splash-screen" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999;
-    transition: opacity 0.5s ease;
-">
-    <img src="/imagens_app/ic_icon_app.png" 
-         onerror="this.src='https://cdn-icons-png.flaticon.com/512/684/684908.png'" 
-         style="width: 120px; height: 120px; margin-bottom: 20px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">
-    
-    <div style="text-align: center;">
-        <h1 style="color: #fff; font-size: 48px; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
-            <span style="color: #ff6b35;">X9</span>
-            <span style="color: #fff;">RADAR</span>
-        </h1>
-    </div>
-    
-    <div style="margin-top: 40px; text-align: center; color: rgba(255,255,255,0.8);">
-        <p style="margin: 5px 0; font-size: 14px;">powered by</p>
-        <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Geraldo A. Seabra</p>
-        <p style="margin: 5px 0; font-size: 14px;">versão 1.0</p>
-    </div>
-    
-    <div style="margin-top: 30px;">
-        <div style="width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid #fff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-    </div>
-</div>
-
-<style>
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-</style>
-
-<!-- ============================================
-     MENU SUPERIOR (Hambúrguer)
-     ============================================ -->
-<div id="menu-superior" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    padding: 10px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-">
-    <button onclick="toggleMenu()" style="
-        background: none;
-        border: none;
-        color: white;
-        font-size: 24px;
-        cursor: pointer;
-        padding: 5px;
-    ">☰</button>
-    
-    <div style="color: white; font-weight: bold; font-size: 18px;">
-        <span style="color: #ff6b35;">X9</span> RADAR
-    </div>
-    
-    <div style="width: 40px;"></div> <!-- Espaçador para centralizar -->
-</div>
-
-<!-- ============================================
-     MENU LATERAL (Drawer)
-     ============================================ -->
-<div id="menu-lateral" style="
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 280px;
-    height: 100%;
-    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
-    z-index: 1001;
-    transition: left 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-    overflow-y: auto;
-">
-    <div style="padding: 20px; color: white; border-bottom: 1px solid rgba(255,255,255,0.2);">
-        <h2 style="margin: 0; font-size: 24px;">
-            <span style="color: #ff6b35;">X9</span> RADAR
-        </h2>
-        <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 14px;">por Geraldo A. Seabra</p>
-    </div>
-    
-    <nav style="padding: 10px 0;">
-        <a href="javascript:void(0)" onclick="showPage('mapa'); toggleMenu();" style="
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: white;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            transition: background 0.3s;
-        " onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-            <span style="font-size: 24px; margin-right: 15px;">🗺️</span>
-            <span>Mapa</span>
-        </a>
-        
-        <a href="javascript:void(0)" onclick="showPage('info'); toggleMenu();" style="
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: white;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            transition: background 0.3s;
-        " onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-            <span style="font-size: 24px; margin-right: 15px;">ℹ️</span>
-            <span>Informações</span>
-        </a>
-        
-        <a href="javascript:void(0)" onclick="showPage('radares'); toggleMenu();" style="
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: white;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            transition: background 0.3s;
-        " onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-            <span style="font-size: 24px; margin-right: 15px;">🚦</span>
-            <span>Tipos de Radares</span>
-        </a>
-        
-        <a href="javascript:void(0)" onclick="showPage('doar'); toggleMenu();" style="
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: white;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            transition: background 0.3s;
-        " onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
-            <span style="font-size: 24px; margin-right: 15px;">💝</span>
-            <span>Doar</span>
-        </a>
-        
-        <a href="javascript:void(0)" onclick="fecharApp(); return false;" style="
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: white;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            transition: background 0.3s;
-            background: rgba(255,0,0,0.2);
-        " onmouseover="this.style.background='rgba(255,0,0,0.4)'" onmouseout="this.style.background='rgba(255,0,0,0.2)'">
-            <span style="font-size: 24px; margin-right: 15px;"></span>
-            <span>Fechar App</span>
-        </a>
-    </nav>
-</div>
-
-<!-- Overlay escuro quando menu está aberto -->
-<div id="menu-overlay" onclick="toggleMenu()" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    display: none;
-"></div>
-
-<!-- ============================================
-     PÁGINA: MAPA (Principal)
-     ============================================ -->
-<div id="page-mapa" class="app-page" style="
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #f0f0f0;
-    display: block;
-    z-index: 100;
-">
-    <!-- Seu mapa Leaflet vai aqui -->
-    <div id="map" style="width: 100%; height: 100%;"></div>
-    
-    <!-- Seus controles de radar existentes -->
-    <!-- ... mantenha todo o seu código atual do mapa ... -->
-</div>
-
-<!-- ============================================
-     PÁGINA: INFORMAÇÕES
-     ============================================ -->
-<div id="page-info" class="app-page" style="
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #f5f5f5;
-    display: none;
-    z-index: 100;
-    overflow-y: auto;
-    padding: 20px;
-">
-    <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h2 style="color: #1e3c72; margin-top: 0; font-size: 28px; border-bottom: 3px solid #ff6b35; padding-bottom: 10px;">
-            Sobre o App
-        </h2>
-        
-        <div style="margin: 20px 0; line-height: 1.6; color: #333;">
-            <p><strong>X9 Radar</strong> é um aplicativo desenvolvido para alertar motoristas sobre radares de trânsito, semáforos inteligentes e pontos de interesse.</p>
-            
-            <h3 style="color: #2a5298; margin-top: 25px;">🎯 Funcionalidades:</h3>
-            <ul style="padding-left: 20px;">
-                <li>Alerta sonoro de radares fixos e móveis</li>
-                <li>GPS em tempo real com alta precisão</li>
-                <li>Mapa interativo com Leaflet</li>
-                <li>Funciona offline (PWA)</li>
-                <li>Notificações de proximidade</li>
-                <li>Informações meteorológicas</li>
-            </ul>
-            
-            <h3 style="color: #2a5298; margin-top: 25px;"> Como Usar:</h3>
-            <ol style="padding-left: 20px;">
-                <li>Permita o acesso à localização</li>
-                <li>Aguarde o GPS calibrar (ícone verde)</li>
-                <li>Navegue normalmente - o app alerta automaticamente</li>
-                <li>Toque nos ícones do mapa para mais informações</li>
-            </ol>
-            
-            <h3 style="color: #2a5298; margin-top: 25px;">⚙️ Configurações Recomendadas:</h3>
-            <ul style="padding-left: 20px;">
-                <li>Ative "Localização Precisa" nas configurações do Android</li>
-                <li>Mantenha o GPS ligado durante o uso</li>
-                <li>Use em local aberto para melhor precisão</li>
-            </ul>
-        </div>
-        
-        <div style="
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 30px;
-        ">
-            <p style="margin: 5px 0;"><strong>Desenvolvido por:</strong> Geraldo A. Seabra</p>
-            <p style="margin: 5px 0;"><strong>Versão:</strong> 1.0</p>
-            <p style="margin: 5px 0; opacity: 0.9; font-size: 14px;">© 2024 - Todos os direitos reservados</p>
-        </div>
-        
-        <button onclick="showPage('mapa')" style="
-            margin-top: 20px;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        ">Voltar ao Mapa</button>
-    </div>
-</div>
-
-<!-- ============================================
-     PÁGINA: TIPOS DE RADARES
-     ============================================ -->
-<div id="page-radares" class="app-page" style="
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #f5f5f5;
-    display: none;
-    z-index: 100;
-    overflow-y: auto;
-    padding: 20px;
-">
-    <div style="max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1e3c72; margin-top: 0; font-size: 28px; border-bottom: 3px solid #ff6b35; padding-bottom: 10px; text-align: center;">
-            Tipos de Radares
-        </h2>
-        
-        <!-- Radar de Velocidade -->
-        <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <img src="/imagens_app/ic_radar_cev_v2.png" onerror="this.style.display='none'" style="width: 50px; height: 50px; margin-right: 15px;">
-                <h3 style="margin: 0; color: #d32f2f;">🚗 Radar de Velocidade</h3>
+        <!-- COMO USAR -->
+        <section class="info-section">
+            <h2>📖 Como Usar</h2>
+            <div class="info-card">
+                <div class="step-list">
+                    <div class="step-item">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <h4>Permita o acesso à localização</h4>
+                            <p>Ao abrir o app, conceda permissão de GPS para funcionamento correto.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <h4>Aguarde o GPS calibrar</h4>
+                            <p>O ícone de GPS ficará verde quando a precisão for adequada.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <h4>Navegue normalmente</h4>
+                            <p>O app alertará automaticamente sobre radares próximos.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step-item">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <h4>Contribua</h4>
+                            <p>Adicione novos radares usando o botão "+" no mapa.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <p style="color: #666; line-height: 1.5;">
-                Mede a velocidade do veículo e multa quem ultrapassa o limite permitido. 
-                Pode ser fixo, móvel ou eletrônico.
-            </p>
-        </div>
-        
-        <!-- Semáforo Inteligente -->
-        <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <img src="/imagens_app/ic_semaforo_inteligente.png" onerror="this.style.display='none'" style="width: 50px; height: 50px; margin-right: 15px;">
-                <h3 style="margin: 0; color: #f57c00;">🚦 Semáforo Inteligente</h3>
+        </section>
+
+        <!-- CONFIGURAÇÕES RECOMENDADAS -->
+        <section class="info-section">
+            <h2>️ Configurações Recomendadas</h2>
+            <div class="info-card">
+                <ul class="config-list">
+                    <li>
+                        <span class="config-icon"></span>
+                        <div>
+                            <strong>Localização Precisa</strong>
+                            <p>Ative nas configurações do Android/iOS para melhor precisão</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="config-icon">🔋</span>
+                        <div>
+                            <strong>Economia de Bateria</strong>
+                            <p>Desative para o app durante o uso (pode afetar o GPS)</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="config-icon">📡</span>
+                        <div>
+                            <strong>GPS Sempre Ligado</strong>
+                            <p>Mantenha o GPS ativo durante toda a navegação</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="config-icon">🌐</span>
+                        <div>
+                            <strong>Conexão com Internet</strong>
+                            <p>Necessária para atualizar dados meteorológicos e mapas</p>
+                        </div>
+                    </li>
+                </ul>
             </div>
-            <p style="color: #666; line-height: 1.5;">
-                Controla o fluxo de veículos e pedestres. Multa por avançar o sinal vermelho.
-            </p>
-        </div>
-        
-        <!-- Radar de Ônibus -->
-        <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <img src="/imagens_app/ic_radar_das_v2.png" onerror="this.style.display='none'" style="width: 50px; height: 50px; margin-right: 15px;">
-                <h3 style="margin: 0; color: #1976d2;">🚌 Faixa de Ônibus</h3>
+        </section>
+
+        <!-- CRÉDITOS -->
+        <section class="info-section">
+            <h2>👨‍💻 Créditos</h2>
+            <div class="info-card credits-card">
+                <div class="author-info">
+                    <div class="author-avatar">GS</div>
+                    <div class="author-details">
+                        <h3>Desenvolvido por</h3>
+                        <p class="author-name">Geraldo A. Seabra</p>
+                        <p class="author-role">Desenvolvedor Full Stack</p>
+                    </div>
+                </div>
+                
+                <div class="app-version">
+                    <span>Versão</span>
+                    <strong>1.0</strong>
+                </div>
+                
+                <p class="copyright">© 2024 - Todos os direitos reservados</p>
+                
+                <div class="tech-stack">
+                    <h4>Tecnologias Utilizadas</h4>
+                    <div class="tech-list">
+                        <span class="tech-badge">HTML5</span>
+                        <span class="tech-badge">CSS3</span>
+                        <span class="tech-badge">JavaScript</span>
+                        <span class="tech-badge">Leaflet</span>
+                        <span class="tech-badge">MapLibre</span>
+                        <span class="tech-badge">PWA</span>
+                    </div>
+                </div>
             </div>
-            <p style="color: #666; line-height: 1.5;">
-                Fiscaliza o uso indevido da faixa exclusiva de ônibus. Multa para carros particulares.
-            </p>
-        </div>
-        
-        <!-- Radar de Poluição -->
-        <div style="background: white; padding: 20px; margin: 15px 0; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                <img src="/imagens_app/ic_radar_poluido_v2.png" onerror="this.style.display='none'" style="width: 50px; height: 50px; margin-right: 15px;">
-                <h3 style="margin: 0; color: #388e3c;">🌫️ Controle de Poluição</h3>
-            </div>
-            <p style="color: #666; line-height: 1.5;">
-                Verifica se o veículo está dentro dos limites de emissão de poluentes.
-            </p>
-        </div>
-        
-        <button onclick="showPage('mapa')" style="
-            margin-top: 20px;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        ">Voltar ao Mapa</button>
+        </section>
     </div>
 </div>
 
-<!-- ============================================
-     PÁGINA: DOAR
-     ============================================ -->
-<div id="page-doar" class="app-page" style="
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #f5f5f5;
-    display: none;
-    z-index: 100;
-    overflow-y: auto;
-    padding: 20px;
-">
-    <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h2 style="color: #1e3c72; margin-top: 0; font-size: 28px; text-align: center;">
-            💝 Apoie o Projeto
-        </h2>
-        
-        <div style="text-align: center; margin: 30px 0;">
-            <img src="/imagens_app/zap.png" onerror="this.style.display='none'" style="width: 80px; height: 80px; margin-bottom: 20px;">
-            
-            <p style="color: #333; line-height: 1.6; font-size: 16px;">
-                Se você gosta do <strong>X9 Radar</strong> e quer ajudar a manter o app sempre atualizado e melhorando, considere fazer uma doação!
-            </p>
-        </div>
-        
-        <div style="
-            background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px 0;
-        ">
-            <h3 style="margin: 0 0 15px 0; font-size: 22px;">📱 Doação via PIX</h3>
-            <p style="margin: 10px 0; font-size: 16px;">Chave PIX (Email):</p>
-            <p style="
-                background: rgba(255,255,255,0.2);
-                padding: 15px;
-                border-radius: 8px;
-                font-size: 18px;
-                font-weight: bold;
-                word-break: break-all;
-                margin: 10px 0;
-            ">seabhra@gmail.com</p>
-            <p style="margin: 15px 0 5px 0; font-size: 14px; opacity: 0.9;">Ou escaneie o QR Code:</p>
-            <!-- Aqui você pode adicionar uma imagem do QR Code do PIX -->
-            <div style="background: white; padding: 15px; border-radius: 8px; display: inline-block; margin-top: 10px;">
-           
-    <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; margin-top: 10px;">
-  <p style="color: #333; margin: 0;">QR Code PIX</p>
-  <p style="color: #666; font-size: 12px; margin: 5px 0;">Em breve</p>
-</div>
-             
+<!-- PÁGINA DE TIPOS DE RADARES -->
+<div id="page-radares" class="app-page">
+    <div class="page-header">
+        <h1>🚦 Tipos de Radares</h1>
+        <button class="btn-back" onclick="showPage('mapa')">← Voltar</button>
+    </div>
+    
+    <div class="page-content">
+        <!-- RADAR DE VELOCIDADE -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <img src="/imagens_app/ic_radar_cev_v2.png" alt="Radar de Velocidade" onerror="this.style.display='none'">
+                <span class="radar-emoji"></span>
             </div>
-        </div>
-        
-        <div style="
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-        ">
-            <p style="margin: 0; color: #856404;">
-                <strong>💡 Dica:</strong> Qualquer valor ajuda! O app é gratuito e será sempre mantido com atualizações constantes.
-            </p>
-        </div>
-        
-        <button onclick="showPage('mapa')" style="
-            margin-top: 20px;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        ">Voltar ao Mapa</button>
+            <div class="radar-info">
+                <h3>Radar de Velocidade (CEV)</h3>
+                <p class="radar-desc">Controlador Eletrônico de Velocidade</p>
+                <div class="radar-details">
+                    <p>Mede a velocidade do veículo e multa quem ultrapassa o limite permitido. Pode ser fixo, móvel ou eletrônico.</p>
+                    <ul class="radar-features">
+                        <li>✅ Fixo em postes</li>
+                        <li>✅ Móvel (carro ou moto)</li>
+                        <li>✅ Eletrônico (lombada)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEMÁFORO INTELIGENTE -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <img src="/imagens_app/ic_semaforo_inteligente.png" alt="Semáforo" onerror="this.style.display='none'">
+                <span class="radar-emoji">🚦</span>
+            </div>
+            <div class="radar-info">
+                <h3>Detector de Avanço de Semáforo (DAS)</h3>
+                <p class="radar-desc">Radar de Semáforo</p>
+                <div class="radar-details">
+                    <p>Controla o fluxo de veículos e pedestres. Multa por avançar o sinal vermelho.</p>
+                    <ul class="radar-features">
+                        <li>✅ Sinal vermelho</li>
+                        <li>✅ Avanço de preferencial</li>
+                        <li>✅ Bloqueio de interseção</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAIXA DE ÔNIBUS -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <img src="/imagens_app/ic_radar_das_v2.png" alt="Faixa de Ônibus" onerror="this.style.display='none'">
+                <span class="radar-emoji">🚌</span>
+            </div>
+            <div class="radar-info">
+                <h3>Faixa Exclusiva de Ônibus (DIFEX)</h3>
+                <p class="radar-desc">Detector de Invasão de Faixa Exclusiva</p>
+                <div class="radar-details">
+                    <p>Fiscaliza o uso indevido da faixa exclusiva de ônibus. Multa para carros particulares.</p>
+                    <ul class="radar-features">
+                        <li>✅ Faixa exclusiva</li>
+                        <li>✅ Horário de funcionamento</li>
+                        <li>✅ Fiscalização eletrônica</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONVERSÃO PROIBIDA -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🔄</span>
+            </div>
+            <div class="radar-info">
+                <h3>Conversão Proibida (DCP)</h3>
+                <p class="radar-desc">Detector de Conversão em Local Proibido</p>
+                <div class="radar-details">
+                    <p>Flagra veículos que fazem conversões proibidas (esquerda/direita) em locais sinalizados.</p>
+                    <ul class="radar-features">
+                        <li>✅ Conversão à esquerda</li>
+                        <li>✅ Conversão à direita</li>
+                        <li>✅ Retorno proibido</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRÁFEGO PROIBIDO -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji"></span>
+            </div>
+            <div class="radar-info">
+                <h3>Tráfego Proibido (DTLP)</h3>
+                <p class="radar-desc">Detector de Tráfego em Local Proibido</p>
+                <div class="radar-details">
+                    <p>Monitora áreas de tráfego restrito como pedestres, ciclovias ou ruas fechadas.</p>
+                    <ul class="radar-features">
+                        <li>✅ Rua pedestre</li>
+                        <li>✅ Área restrita</li>
+                        <li>✅ Sentido proibido</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CELULAR -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">📱</span>
+            </div>
+            <div class="radar-info">
+                <h3>Uso de Celular (DUC)</h3>
+                <p class="radar-desc">Detector de Uso de Celular</p>
+                <div class="radar-details">
+                    <p>Identifica motoristas utilizando celular ao volante sem dispositivo de mãos livres.</p>
+                    <ul class="radar-features">
+                        <li>✅ Uso de smartphone</li>
+                        <li>✅ Mãos livres obrigatório</li>
+                        <li>✅ Infração grave</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- CINTO DE SEGURANÇA -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🔒</span>
+            </div>
+            <div class="radar-info">
+                <h3>Cinto de Segurança (VCS)</h3>
+                <p class="radar-desc">Verificador de Cinto de Segurança</p>
+                <div class="radar-details">
+                    <p>Fiscaliza o uso obrigatório do cinto de segurança por todos os ocupantes do veículo.</p>
+                    <ul class="radar-features">
+                        <li>✅ Motorista</li>
+                        <li>✅ Passageiros</li>
+                        <li>✅ Bancos traseiros</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ZONA DE RISCO -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🌊</span>
+            </div>
+            <div class="radar-info">
+                <h3>Risco de Inundação (ZIR)</h3>
+                <p class="radar-desc">Zona de Inundações Recorrentes</p>
+                <div class="radar-details">
+                    <p>Alerta sobre áreas sujeitas a alagamentos e inundações em períodos de chuva.</p>
+                    <ul class="radar-features">
+                        <li>✅ Pontos de alagamento</li>
+                        <li>✅ Alerta preventivo</li>
+                        <li>✅ Rotas alternativas</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ZONA DE PERIGO -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">⚠️</span>
+            </div>
+            <div class="radar-info">
+                <h3>Zona de Perigo (ZPV)</h3>
+                <p class="radar-desc">Zona de Perigo e Violência</p>
+                <div class="radar-details">
+                    <p>Indica áreas com alto índice de criminalidade ou perigo para motoristas.</p>
+                    <ul class="radar-features">
+                        <li>✅ Área de risco</li>
+                        <li>✅ Alerta de segurança</li>
+                        <li>✅ Evitar trajeto</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACIDENTES -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">💥</span>
+            </div>
+            <div class="radar-info">
+                <h3>Alto Índice de Acidentes (AIA)</h3>
+                <p class="radar-desc">Alerta de Acidentes</p>
+                <div class="radar-details">
+                    <p>Sinaliza trechos com grande ocorrência de acidentes de trânsito.</p>
+                    <ul class="radar-features">
+                        <li>✅ Ponto crítico</li>
+                        <li>✅ Reduzir velocidade</li>
+                        <li>✅ Atenção redobrada</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECARGA ELÉTRICA -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🔋</span>
+            </div>
+            <div class="radar-info">
+                <h3>Recarga para Carro Elétrico (REC)</h3>
+                <p class="radar-desc">Ponto de Recarga</p>
+                <div class="radar-details">
+                    <p>Indica locais com pontos de recarga para veículos elétricos.</p>
+                    <ul class="radar-features">
+                        <li>✅ Estacionamento</li>
+                        <li>✅ Tomada disponível</li>
+                        <li>✅ Acesso público</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- WC PÚBLICO -->
+        <section class="radar-type-card">
+            <div class="radar-icon">
+                <span class="radar-emoji">🚾</span>
+            </div>
+            <div class="radar-info">
+                <h3>WC Público</h3>
+                <p class="radar-desc">Banheiro Público</p>
+                <div class="radar-details">
+                    <p>Localiza banheiros públicos disponíveis na via.</p>
+                    <ul class="radar-features">
+                        <li>✅ Autolimpante</li>
+                        <li>✅ Convencional</li>
+                        <li>✅ Acesso gratuito</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
     </div>
 </div>
+<!-- PÁGINA DE DOAR -->
+<div id="page-doar" class="app-page">
+    <div class="page-header">
+        <h1> Apoiar o Projeto</h1>
+        <button class="btn-back" onclick="showPage('mapa')">← Voltar</button>
+    </div>
+    
+    <div class="page-content">
+        <!-- MENSAGEM INICIAL -->
+        <div class="donate-intro">
+            <div class="donate-icon">
+                <span class="heart-icon">💚</span>
+            </div>
+            <h2>Ajude a manter o X9 Radar gratuito!</h2>
+            <p>Se você gosta do aplicativo e quer contribuir para sua manutenção e melhorias constantes, considere fazer uma doação. Qualquer valor é bem-vindo!</p>
+        </div>
 
-<!-- ============================================
-     BOTÃO FECHAR APP (Flutuante)
-     ============================================ -->
-<button id="btn-fechar-app" onclick="fecharApp()" style="
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    font-size: 28px;
-    cursor: pointer;
-    z-index: 999;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s;
-" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-    ❌
-</button>
+        <!-- PIX -->
+        <section class="donate-section">
+            <h3>📱 Doação via PIX</h3>
+            <div class="donate-card pix-card">
+                <div class="pix-info">
+                    <div class="pix-key-label">Chave PIX (Email)</div>
+                    <div class="pix-key-value" id="pix-key">seabhra@gmail.com</div>
+                    <button class="btn-copy-pix" onclick="copiarChavePix()">
+                        <span class="copy-icon"></span>
+                        Copiar Chave
+                    </button>
+                </div>
+                
+                <div class="pix-qr-placeholder">
+                    <div class="qr-placeholder">
+                        <span class="qr-icon"></span>
+                        <p>QR Code PIX</p>
+                        <small>Em breve</small>
+                    </div>
+                </div>
+                
+                <div class="pix-instructions">
+                    <h4>Como doar:</h4>
+                    <ol>
+                        <li>Abra o app do seu banco</li>
+                        <li>Escolha a opção PIX</li>
+                        <li>Escaneie o QR Code ou cole a chave</li>
+                        <li>Informe o valor da doação</li>
+                        <li>Confirme a transação</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
 
-  <!-- ÁUDIOS DE ALERTA -->
+        <!-- VALORES SUGERIDOS -->
+        <section class="donate-section">
+            <h3> Valores Sugeridos</h3>
+            <div class="donate-amounts">
+                <button class="amount-btn" onclick="selecionarValor(5)">
+                    <span class="amount-value">R$ 5</span>
+                    <span class="amount-desc">Cafézinho</span>
+                </button>
+                
+                <button class="amount-btn" onclick="selecionarValor(10)">
+                    <span class="amount-value">R$ 10</span>
+                    <span class="amount-desc">Lanche</span>
+                </button>
+                
+                <button class="amount-btn" onclick="selecionarValor(20)">
+                    <span class="amount-value">R$ 20</span>
+                    <span class="amount-desc">Almoço</span>
+                </button>
+                
+                <button class="amount-btn" onclick="selecionarValor(50)">
+                    <span class="amount-value">R$ 50</span>
+                    <span class="amount-desc">Super</span>
+                </button>
+                
+                <button class="amount-btn" onclick="selecionarValor(100)">
+                    <span class="amount-value">R$ 100</span>
+                    <span class="amount-desc">Premium</span>
+                </button>
+                
+                <button class="amount-btn custom" onclick="selecionarValorCustom()">
+                    <span class="amount-value">Outro</span>
+                    <span class="amount-desc">Você escolhe</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- BENEFÍCIOS -->
+        <section class="donate-section">
+            <h3> Por que doar?</h3>
+            <div class="donate-card benefits-card">
+                <ul class="benefits-list">
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>App 100% Gratuito</strong>
+                            <p>Sem anúncios ou taxas escondidas</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>Atualizações Constantes</strong>
+                            <p>Novos recursos e melhorias</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>Servidores Ativos</strong>
+                            <p>Manutenção da infraestrutura</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>Base de Dados Atualizada</strong>
+                            <p>Radares sempre atualizados</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="benefit-icon">✅</span>
+                        <div>
+                            <strong>Suporte Técnico</strong>
+                            <p>Atendimento aos usuários</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- AGRADECIMENTO -->
+        <section class="donate-section">
+            <div class="donate-card thanks-card">
+                <h3> Agradecimento</h3>
+                <p>Sua contribuição ajuda a manter o X9 Radar sempre atualizado e melhorando para todos os usuários. Muito obrigado pelo apoio!</p>
+                
+                <div class="developer-info">
+                    <div class="dev-avatar">GS</div>
+                    <div>
+                        <strong>Geraldo A. Seabra</strong>
+                        <p>Desenvolvedor do X9 Radar</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTATO -->
+        <section class="donate-section">
+            <div class="contact-info">
+                <h3>📧 Dúvidas ou Sugestões?</h3>
+                <p>Entre em contato:</p>
+                <a href="mailto:seabhra@gmail.com" class="contact-email">
+                    <span class="email-icon">✉️</span>
+                    seabhra@gmail.com
+                </a>
+            </div>
+        </section>
+    </div> <!-- Fecha .page-content -->
+</div> <!-- Fecha #page-doar -->
+  
+
+ <!-- ÁUDIOS DE ALERTA -->
   <audio id="alert-sound-radar" preload="auto">
     <source src="audio_app/alerta_sound_radar.mp3" type="audio/mpeg">
   </audio>
@@ -975,19 +982,39 @@ Cabeçalho Superior (Cidade e Clima)
    <audio id="alerta-sound-clima" preload="auto">
     <source src="audio_app/alerta_sound_clima.mp3" type="audio/mpeg">
   </audio>
-
     <audio id="alerta-sound-servico" preload="auto">
     <source src="audio_app/alerta_sound_servico.mp3" type="audio/mpeg">
   </audio>
+  <!-- ============================================ -->
+  <!-- SCRIPTS (ORDEM CORRETA E NO FINAL DO BODY) -->
+  <!-- ============================================ -->
+  
+  <!-- 1. Bibliotecas Externas -->
+   <!-- 1. CSS do Leaflet (DEVE vir antes dos scripts) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-   <!-- 1. Bibliotecas Externas -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- 2. SEU SCRIPT PRINCIPAL (Cria o mapa e as variáveis) -->
-    <script src="mapa.js"></script> 
-    
-    <!-- 3. SCRIPT DE INTERFACE (Usa as variáveis do mapa.js) -->
-    <script src="app.js"></script>
+  <!-- 2. jQuery -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+  <!-- 3. Leaflet JS (Apenas UMA vez) -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- 4. Leaflet Rotate (Extensão para rotação do mapa) -->
+  <script src="https://unpkg.com/leaflet-rotate@0.1.0/dist/leaflet-rotate.js"></script>
+
+  <!-- 5. Leaflet Routing Machine (Para cálculo de rotas) -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+
+  <!-- 6. MapLibre GL e seu plugin para Leaflet (Opcional, mas mantido pois você usa) -->
+  <script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js"></script>
+
+  <!-- 2. app.js PRIMEIRO (Define as funções globais com segurança via IIFE) -->
+  <script src="app.js"></script>
+
+  <!-- 3. mapa.js DEPOIS (Pode chamar as funções que o app.js já expôs) -->
+  <script src="mapa.js"></script>
 
 </body>
 </html>
+
