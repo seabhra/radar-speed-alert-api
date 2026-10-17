@@ -3,22 +3,24 @@
 // ==================
 'use strict';
 
-// =========================================================================
-// 1. VARIÁVEIS GLOBAIS DO MAPA
-// ATENÇÃO: NÃO declarar com 'let', 'const' ou 'var' as variáveis que já 
-// existem no app.js: userLat, userLng, alertaNormalidadeMostrado, 
-// ultimaCidade, alertaAtivoAtual, somAlerta.
-// =========================================================================
-
+// ==========================================
+// 1. VARIÁVEIS GLOBAIS
+// ==========================================
 let map;
 let tileLayer;
 let radarMarkers = [];
 let alertTimeout;
+let mapaJaFoiCentralizadoInicialmente = false; // ✅ NOVO: Controla a centralização inicial
 
-// Atribuição segura às variáveis globais do app.js (sem 'let' ou 'var')
-if (typeof userLat === 'undefined' || userLat === null) userLat = -19.919055;
-if (typeof userLng === 'undefined' || userLng === null) userLng = -43.938641;
+// ✅ CORREÇÃO DE SEGURANÇA: Atualiza as variáveis globais do app.js sem causar erro de referência
+if (typeof window.userLat === 'undefined' || window.userLat === null) window.userLat = -19.919055;
+if (typeof window.userLng === 'undefined' || window.userLng === null) window.userLng = -43.938641;
 
+// Alias locais para facilitar o uso neste arquivo
+let userLat = window.userLat;
+let userLng = window.userLng;
+
+// CONTROLE DE BARRAS LATERAIS
 let searchActive = false;
 let routeActive = false;
 let gpsActive = true;
@@ -32,13 +34,11 @@ let prevLng = null;
 let prevTime = null;
 let isFollowing = true;
 let gpsSource = 'none';
-
 let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 15 };
 let coordenadasRotaNavegacao = [];
 let ultimoSegmentoRota = -1;
 let distanciaDaRota = Infinity;
 let estaEmNavegacao = false;
-
 let startRouteMarker = null;
 let endRouteMarker = null;
 let routingControl = null;
@@ -73,14 +73,18 @@ let gpsAccuracyAtual = 999;
 let gpsLastUpdateTime = 0;
 let iconeCentralizado = false;
 
+if (typeof window.alertaNormalidadeMostrado === 'undefined') {
+    window.alertaNormalidadeMostrado = false;
+}
+
 let userMarker = null;
 
-// =============================================
+// ==========================================
 // 2. CONTROLE DE TEXTOS - SITE vs APP
-// =============================================
+// ==========================================
 function ajustarTextosClima() {
     const isMobile = window.innerWidth <= 600;
-    const cidadeLabel = document.getElementById('nomeCidade') || document.getElementById('cidade-atual');
+    const cidadeLabel = document.getElementById('cidade-atual') || document.getElementById('nomeCidade');
     if (cidadeLabel) {
         cidadeLabel.classList.remove('modo-site', 'modo-app');
         if (isMobile) {
@@ -93,9 +97,9 @@ function ajustarTextosClima() {
 document.addEventListener('DOMContentLoaded', ajustarTextosClima);
 window.addEventListener('resize', ajustarTextosClima);
 
-// ======================
+// ==========================================
 // 3. CONFIGURAÇÃO DO GITHUB
-// ======================
+// ==========================================
 let GITHUB_CONFIG = {
     owner: 'seabhra',
     repo: 'radar-speed-alert-api',
@@ -175,9 +179,9 @@ async function obterBranchPadrao() {
     return GITHUB_CONFIG._branchCache;
 }
 
-// ===================================================================
+// ==========================================
 // 4. CONFIGURAÇÃO DE ALERTAS
-// ===================================================================
+// ==========================================
 const ALERT_CONFIG = {
     DISTANCIA_MAXIMA: 180,
     DISTANCIA_CRITICA: 100,
@@ -201,9 +205,9 @@ let ultimaPosicaoMarcador = { lat: null, lng: null };
 let animacaoMarcadorAtiva = false;
 let tipoAlertaAtivo = null;
 
-// ===================================================================
+// ==========================================
 // 5. GPS STATUS INDICATOR
-// ===================================================================
+// ==========================================
 function atualizarStatusGPS(position) {
     const dot = document.getElementById('gps-status-dot');
     const wrapper = document.getElementById('gps-status-wrapper');
@@ -242,9 +246,9 @@ setInterval(function() {
     }
 }, 5000);
 
-// ===================================================================
+// ==========================================
 // 6. MARCADORES E ÍCONES
-// ===================================================================
+// ==========================================
 function criarIconeNavegador(pulsarIntenso) {
     var haloClass = 'nav-pulse-halo' + (pulsarIntenso ? ' intenso' : '');
     var htmlStr = '<div class="nav-pulse-wrap"><div class="' + haloClass + '"></div>' +
@@ -304,9 +308,9 @@ function criarIconeRadar(iconUrl, tamanho, fallbackUrl) {
     });
 }
 
-// ===================================================================
+// ==========================================
 // 7. FUNÇÕES AUXILIARES
-// ===================================================================
+// ==========================================
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     var R = 6371e3;
     var p1 = lat1 * Math.PI / 180;
@@ -349,9 +353,9 @@ function mostrarInfoNavegacao(distancia, tempo) {
     painel.classList.add('visible');
 }
 
-// ===================================================================
+// ==========================================
 // 8. NAVEGAÇÃO E ROTA
-// ===================================================================
+// ==========================================
 function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
     destinoNavegacao = {lat: destLat, lng: destLng};
     if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
@@ -416,9 +420,9 @@ function finalizarNavegacao() {
     showNotification("Navegação encerrada");
 }
 
-// ===================================================================
+// ==========================================
 // 9. GPS TRACKING
-// ===================================================================
+// ==========================================
 function startGPSTracking() {
     if (typeof browserGpsTimeout !== 'undefined' && browserGpsTimeout) {
         clearTimeout(browserGpsTimeout);
@@ -441,7 +445,6 @@ function startGPSTracking() {
             var accuracy = position.coords.accuracy;
             var speedKmh = position.coords.speed !== null ? Math.round(position.coords.speed * 3.6) : 0;
             
-            // Ponte com o app.js
             if (typeof window.setUserLocation === 'function') {
                 window.setUserLocation(lat, lng);
             }
@@ -468,9 +471,129 @@ function startGPSTracking() {
     console.log("✅ GPS iniciado com watchId:", watchId);
 }
 
-// ===================================================================
-// 10. INICIALIZAÇÃO DO MAPA
-// ===================================================================
+// ==========================================
+// 10. PROCESSAR NOVA POSIÇÃO (COM CENTRALIZAÇÃO AUTOMÁTICA)
+// ==========================================
+function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accuracy) {
+    if (!map) return;
+    
+    // Atualiza variáveis globais e locais
+    window.userLat = newLat; window.userLng = newLng;
+    userLat = newLat; userLng = newLng;
+
+    var currentTime = Date.now();
+    var dist = 0;
+    adicionarAoHistorico(newLat, newLng, currentTime);
+    var posSuave = suavizarPosicao(newLat, newLng);
+    var smoothLat = posSuave.lat;
+    var smoothLng = posSuave.lng;
+
+    if (prevLat !== null) {
+        dist = calcularDistancia(prevLat, prevLng, newLat, newLng);
+        if (speedKmh === 0 && prevTime !== null) {
+            var time = (currentTime - prevTime) / 1000;
+            if (time > 0) speedKmh = Math.round((dist / time) * 3.6);
+        }
+    }
+    if (speedKmh > 250) speedKmh = 0;
+    velocidadeAtual = speedKmh;
+    $('#speed-display').text(speedKmh);
+    estaEmMovimento = speedKmh > 3 || dist > 2;
+
+    var novoHeading = null;
+    if (hardwareHeading !== null && !isNaN(hardwareHeading) && hardwareHeading >= 0) {
+        if (!bussolaHardwareDisponivel) { currentHeading = hardwareHeading; bussolaHardwareDisponivel = true; }
+        novoHeading = hardwareHeading;
+    } else if (!bussolaHardwareDisponivel && dist > 3 && prevLat !== null) {
+        var dy = newLat - prevLat;
+        var dx = (newLng - prevLng) * Math.cos(newLat * Math.PI / 180);
+        if (Math.abs(dx) > 0.0000001 || Math.abs(dy) > 0.0000001) {
+            var calcHeading = (Math.atan2(dx, dy) * 180 / Math.PI + 360) % 360;
+            currentHeading = calcHeading;
+            novoHeading = calcHeading;
+        }
+    }
+
+    if (novoHeading !== null && estaEmMovimento) {
+        bearingAlvo = novoHeading;
+        headingIconeNavegacao = novoHeading;
+    }
+    if (currentHeading !== null) atualizarBussola(currentHeading);
+
+    prevLat = newLat; prevLng = newLng; prevTime = currentTime;
+
+    var accReal = (accuracy !== undefined && accuracy !== null && !isNaN(accuracy)) ? accuracy : 999;
+    atualizarStatusGPS({ coords: { latitude: newLat, longitude: newLng, accuracy: accReal } });
+
+    // ✅ CORREÇÃO PRINCIPAL: Centralizar o mapa na primeira posição GPS válida (precisão < 100m)
+    if (!mapaJaFoiCentralizadoInicialmente && accReal < 100 && !estaEmNavegacao) {
+        map.flyTo([newLat, newLng], 17, { duration: 1.2 });
+        mapaJaFoiCentralizadoInicialmente = true;
+        console.log("🗺️ [MAPA.JS] Mapa centralizado automaticamente no primeiro GPS válido.");
+    }
+
+    if (estaEmNavegacao) {
+        if (!startRouteMarker) {
+            console.warn("⚠️ startRouteMarker ausente durante navegação. Recriando...");
+            adicionarMarcadoresRota(userLat, userLng, destinoAtual.lat, destinoAtual.lng);
+        }
+        if (startRouteMarker) {
+            _iniciarAnimacaoNavegacao(smoothLat, smoothLng, novoHeading);
+        }
+        if (!gpsInitialized) {
+            gpsInitialized = true;
+            hideFullscreenLoading();
+        }
+    } else {
+        if (!userMarker) {
+            var defaultIcon = criarIconeNavegador(true);
+            userMarker = L.marker([smoothLat, smoothLng], { icon: defaultIcon, zIndexOffset: 1000 }).addTo(map);
+            userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+            ultimaPosicaoMarcador = { lat: smoothLat, lng: smoothLng };
+            iconeCentralizado = false;
+            if (!gpsInitialized) {
+                gpsInitialized = true;
+                hideFullscreenLoading();
+            }
+        } else {
+            if (iconeCentralizado && speedKmh > 3) {
+                var pos = userMarker.getLatLng();
+                map.removeLayer(userMarker);
+                var navIcon = L.divIcon({
+                    html: '<img src="/imagens_app/ic_navigator_map.png" onerror="this.src=\'https://cdn-icons-png.flaticon.com/512/7892/7892059.png\'" style="width:50px;height:50px;">',
+                    className: 'user-gps-marker',
+                    iconSize: [50, 50],
+                    iconAnchor: [25, 50],
+                    popupAnchor: [0, -50]
+                });
+                userMarker = L.marker([pos.lat, pos.lng], { icon: navIcon, zIndexOffset: 1000 }).addTo(map);
+                userMarker.bindTooltip('Você está aqui', { permanent: false, direction: 'top', offset: [0, -25] });
+                iconeCentralizado = false;
+                showNotification("🧭 Modo navegação ativado");
+            }
+            moverMarcadorSuavemente(smoothLat, smoothLng);
+        }
+    }
+
+    if (destinoAtual && routingControl && estaEmNavegacao) {
+        if (!window.ultimaAtualizacaoRota || (currentTime - window.ultimaAtualizacaoRota > 5000)) {
+            atualizarRota();
+            window.ultimaAtualizacaoRota = currentTime;
+        }
+    }
+    if (estaEmNavegacao && isFollowing) {
+        atualizarCameraNavegacaoSuave();
+    } else if (isFollowing && !estaEmNavegacao) {
+        map.setView([smoothLat, smoothLng], map.getZoom(), { animate: true, duration: 0.5 });
+    }
+    
+    verificarProximidadeRadares();
+    if (destinoAtual) verificarChegadaDestino();
+}
+
+// ==========================================
+// 11. INICIALIZAÇÃO DO MAPA E CONTROLES
+// ==========================================
 async function initMap() {
     console.log('[Radar X9] 🚀 Inicializando aplicação...');
     const mapElement = document.getElementById('map');
@@ -483,6 +606,7 @@ async function initMap() {
     carregarRadaresPendentes();
     
     if (typeof L === 'undefined') {
+        hideFullscreenLoading();
         showNotification("Erro de conexão. Os mapas não puderam carregar.");
         return;
     }
@@ -505,16 +629,88 @@ async function initMap() {
         maxZoom: 19
     }).addTo(map);
     
-    // Inicia o rastreamento GPS
+    // ✅ GARANTIR QUE A BARRA LATERAL DE CONTROLES ESTEJA VISÍVEL
+    const sidebarControls = document.getElementById('sidebar-controls');
+    if (sidebarControls) {
+        sidebarControls.classList.remove('retracted');
+    }
+    
+    aplicarTemaMapa();
+    setInterval(aplicarTemaMapa, 300000);
+    inicializarBussolaHardware();
+    
+    // ==========================================
+    // RECENTRALIZAR MAPA (BOTÃO DO SPEED WIDGET)
+    // ==========================================
+    let mapaCentralizado = true;
+    let recentragemTimeout = null;
+    const speedWidget = document.getElementById("speedWidget");
+    const speedIcon = document.getElementById("speedIcon");
+
+    function desativarCentralizacao(){
+        if (mapaCentralizado) {
+            console.log("ARRASTOU O MAPA - Desativando centralização");
+            mapaCentralizado = false;
+            if (speedIcon) speedIcon.src = "/imagens_app/ic_recentralizar.png";
+            if (speedWidget) speedWidget.classList.add("recentralizar");
+        }
+        agendarRecentragemAutomatica();
+    }
+
+    function agendarRecentragemAutomatica(){
+        if (recentragemTimeout) clearTimeout(recentragemTimeout);
+        recentragemTimeout = setTimeout(function () {
+            recentralizarMapa();
+        }, 8000); // 8 segundos sem arrastar para recentralizar
+    }
+
+    function recentralizarMapa(){
+        if (mapaCentralizado) return;
+        if (recentragemTimeout) {
+            clearTimeout(recentragemTimeout);
+            recentragemTimeout = null;
+        }
+        console.log("RECENTRALIZANDO MAPA");
+        mapaCentralizado = true;
+        if (userLat && userLng && map) {
+            map.flyTo([userLat, userLng], map.getZoom(), { animate: true, duration: 0.6 });
+        }
+        if (speedIcon) speedIcon.src = "/imagens_app/ic_speed_limit.png";
+        if (speedWidget) speedWidget.classList.remove("recentralizar");
+    }
+
+    map.on("dragstart", desativarCentralizacao);
+
+    if (speedWidget) {
+        speedWidget.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (!mapaCentralizado) {
+                recentralizarMapa();
+            } else {
+                if (map) map.zoomIn(); // Se já estiver centralizado, dá zoom
+            }
+        });
+    }
+    
+    // Ocultar bússola nativa do Leaflet
+    function ocultarBussolaLeaflet() {
+        $(".leaflet-control-compass").css("display", "none");
+    }
+    setTimeout(ocultarBussolaLeaflet, 100);
+    setTimeout(ocultarBussolaLeaflet, 500);
+    setTimeout(ocultarBussolaLeaflet, 1000);
+    ocultarBussolaLeaflet();
+
+    // Inicia o rastreamento GPS e carrega os radares
     startGPSTracking();
     carregarRadares();
     
     console.log('[Radar X9] ✅ Aplicação inicializada com sucesso!');
 }
 
-// ===================================================================
-// 11. CARREGAMENTO DE RADARES
-// ===================================================================
+// ==========================================
+// 12. CARREGAMENTO DE RADARES
+// ==========================================
 async function carregarRadares() {
     if (!map) return;
     $("#loading").show().html("<div class='loading-spinner'></div><div>Carregando alertas...</div>");
@@ -552,7 +748,6 @@ function renderizarRadaresNoMapa(records) {
     if (!map || !records || records.length === 0) return;
     
     records.forEach(function(record) {
-        // Extração simplificada de coordenadas
         let lat = null, lng = null;
         const campos = [record[8], record[9], record.lat, record.latitude];
         for (let campo of campos) {
@@ -598,33 +793,9 @@ function renderizarRadaresNoMapa(records) {
     showNotification(`✅ Mapa atualizado: ${radarMarkers.length} radares`);
 }
 
-// ===================================================================
-// 12. INICIALIZAÇÃO GERAL
-// ===================================================================
-document.addEventListener('DOMContentLoaded', async function() {
-    ajustarTextosClima();
-    carregarRadaresPendentes();
-    initMap();
-    
-    setTimeout(() => {
-        const l = document.getElementById('loading-fullscreen');
-        if (l) {
-            l.classList.add('fade-out');
-            setTimeout(() => { if (l) l.style.display = 'none'; }, 600);
-        }
-    }, 1500);
-});
-
-// Service Worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('SW registrado:', reg.scope))
-            .catch(err => console.error('Falha no SW:', err));
-    });
-}
-
-// Funções placeholder para compatibilidade (caso não estejam no app.js)
+// ==========================================
+// 13. FUNÇÕES AUXILIARES DE SUPORTE
+// ==========================================
 function showNotification(msg) {
     if (typeof window.showToast === 'function') {
         window.showToast(msg);
@@ -632,13 +803,142 @@ function showNotification(msg) {
         console.log("NOTIFICAÇÃO:", msg);
     }
 }
+
 function hideFullscreenLoading() {
     const el = document.getElementById('loading-fullscreen');
     if (el) { el.classList.add('fade-out'); setTimeout(() => el.style.display = 'none', 600); }
 }
+
 function carregarRadaresPendentes() {
     try {
         const pendentes = localStorage.getItem('radarx9_pendentes');
         if (pendentes) RADAR_PENDENTES_SINCRONIZAR = JSON.parse(pendentes);
     } catch (e) {}
+}
+
+function suavizarPosicao(novaLat, novaLng) {
+    if (posicaoSuavizada.lat === null) {
+        posicaoSuavizada.lat = novaLat;
+        posicaoSuavizada.lng = novaLng;
+        return { lat: novaLat, lng: novaLng };
+    }
+    var fator = ALERT_CONFIG.SUAVIZACAO_FATOR;
+    posicaoSuavizada.lat += (novaLat - posicaoSuavizada.lat) * fator;
+    posicaoSuavizada.lng += (novaLng - posicaoSuavizada.lng) * fator;
+    return { lat: posicaoSuavizada.lat, lng: posicaoSuavizada.lng };
+}
+
+function adicionarAoHistorico(lat, lng, timestamp) {
+    historicoPosicoes.push({ lat: lat, lng: lng, time: timestamp });
+    if (historicoPosicoes.length > ALERT_CONFIG.HISTORICO_TAMANHO) historicoPosicoes.shift();
+}
+
+function moverMarcadorSuavemente(targetLat, targetLng) {
+    var marcadorParaMover = estaEmNavegacao ? startRouteMarker : userMarker;
+    if (!marcadorParaMover) return;
+    if (ultimaPosicaoMarcador.lat === null) {
+        ultimaPosicaoMarcador = { lat: targetLat, lng: targetLng };
+        marcadorParaMover.setLatLng([targetLat, targetLng]);
+        return;
+    }
+    var distancia = calcularDistancia(ultimaPosicaoMarcador.lat, ultimaPosicaoMarcador.lng, targetLat, targetLng);
+    if (distancia < ALERT_CONFIG.DISTANCIA_MINIMA_MOVIMENTO) return;
+    
+    var inicioLat = ultimaPosicaoMarcador.lat;
+    var inicioLng = ultimaPosicaoMarcador.lng;
+    var duracao = 300;
+    var inicioTempo = performance.now();
+    if (animacaoMarcadorAtiva) return;
+    animacaoMarcadorAtiva = true;
+    
+    function animarFrame(tempoAtual) {
+        var progresso = Math.min((tempoAtual - inicioTempo) / duracao, 1);
+        var easing = 1 - Math.pow(1 - progresso, 3);
+        var latAtual = inicioLat + (targetLat - inicioLat) * easing;
+        var lngAtual = inicioLng + (targetLng - inicioLng) * easing;
+        marcadorParaMover.setLatLng([latAtual, lngAtual]);
+        if (progresso < 1) {
+            requestAnimationFrame(animarFrame);
+        } else {
+            ultimaPosicaoMarcador = { lat: targetLat, lng: targetLng };
+            animacaoMarcadorAtiva = false;
+        }
+    }
+    requestAnimationFrame(animarFrame);
+}
+
+function verificarProximidadeRadares() {
+    // Lógica simplificada para evitar erros se as funções de alerta não estiverem prontas
+    if (typeof window.verificarProximidadeRadares === 'function') {
+        window.verificarProximidadeRadares();
+    }
+}
+
+function verificarChegadaDestino() {
+    if (typeof window.verificarChegadaDestino === 'function') {
+        window.verificarChegadaDestino();
+    }
+}
+
+function atualizarRota() {
+    if (typeof window.atualizarRota === 'function') {
+        window.atualizarRota();
+    }
+}
+
+function _iniciarAnimacaoNavegacao(toLat, toLng, novoHeading) {
+    // Placeholder para animação fluida
+}
+
+function atualizarBussola(headingDegrees) {
+    var needle = document.getElementById('compass-needle-img');
+    if (needle && headingDegrees != null && !isNaN(headingDegrees)) {
+        needle.style.transform = 'rotate(' + headingDegrees + 'deg)';
+    }
+}
+
+function aplicarTemaMapa() {
+    if (typeof map === 'undefined' || !map) return;
+    var mapContainer = map.getContainer();
+    var hora = new Date().getHours();
+    var isNight = (hora >= 18 || hora < 6);
+    mapContainer.classList.toggle('matrix-night', isNight);
+    mapContainer.classList.toggle('matrix-day', !isNight);
+}
+
+function inicializarBussolaHardware() {
+    if (typeof DeviceOrientationEvent !== 'undefined') {
+        window.addEventListener('deviceorientation', function(event) {
+            if (event.webkitCompassHeading !== undefined && event.webkitCompassHeading !== null) { 
+                currentHeading = event.webkitCompassHeading; 
+                bussolaHardwareDisponivel = true; 
+            }
+        }, true);
+    }
+}
+
+// ==========================================
+// 14. INICIALIZAÇÃO GERAL
+// ==========================================
+document.addEventListener('DOMContentLoaded', async function() {
+    ajustarTextosClima();
+    aplicarTemaMapa();
+    carregarRadaresPendentes();
+    initMap();
+    
+    setTimeout(() => { 
+        const l = document.getElementById('loading-fullscreen'); 
+        if (l) {
+            l.classList.add('fade-out');
+            setTimeout(() => { if (l) l.style.display = 'none'; }, 600);
+        } 
+    }, 1500);
+});
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('SW registrado:', reg.scope))
+            .catch(err => console.error('Falha no SW:', err));
+    });
 }
