@@ -340,9 +340,9 @@ if (novoAlerta !== '') {
 }
 }
 
-// ================================================
-// 4. FUNÇÕES DE INTERFACE (MENU ESQUERDO E PÁGINAS)
-// ================================================
+// ==========================================
+// 4. FUNÇÕES DE INTERFACE (MENU E PÁGINAS)
+// ==========================================
 
 window.toggleMenu = function() {
     const menu = document.getElementById('menu-lateral');
@@ -379,9 +379,8 @@ window.showPage = function(pageName) {
             }, 100);
         }
     }
-    //==================================================
-    // FORÇA o fechamento do MENU ESQUERDO após clicar
-    //================================================
+
+    // FORÇA o fechamento do menu após clicar
     const menu = document.getElementById('menu-lateral');
     const overlay = document.getElementById('menu-overlay');
     if (menu && overlay) {
