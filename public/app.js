@@ -1,16 +1,17 @@
 // ==========================================
-// APP.JS - CONTROLE DE INTERFACE v.1.0
+// APP.JS - CONTROLE DE INTERFACE E LÓGICA
 // ==========================================
 
 'use strict';
 
-// 1. DECLARAÇÃO DE VARIÁVEIS GLOBAIS (Evita erros de referência)
+// ==========================================
+// 1. DECLARAÇÃO DE VARIÁVEIS GLOBAIS
+// ==========================================
 let ultimaCidade = '';
 let alertaNormalidadeMostrado = false;
 let alertaAtivoAtual = '';
 let userLat = null;
 let userLng = null;
-
 
 // Inicialização segura do áudio
 let somAlerta;
@@ -56,7 +57,7 @@ window.atualizarCidade = async function(lat, lng) {
             const nomeEl = document.getElementById("nomeCidade");
 
             if (nomeEl) {
-                nomeEl.textContent = cidade; // Removido o 📍 do texto pois já está no HTML ou pode ser adicionado no CSS
+                nomeEl.textContent = cidade;
                 nomeEl.style.color = corCidade(cidade);
                 console.log('✅ [APP.JS] Cidade atualizada com sucesso:', cidade);
             }
@@ -74,54 +75,36 @@ function corCidade(nome) {
     let hue = Math.abs(hash) % 360;
     if (hue >= 20 && hue <= 40) hue = 45;
     if (hue >= 250 && hue <= 295) hue = 210;
-    return `hsl(${hue},100%,68%)`;
+    return `hsl(${hue}, 100%, 68%)`;
 }
 
 window.atualizarInterfaceCabecalho = function(dados) {
     console.log('🔄 [APP.JS] atualizarInterfaceCabecalho chamado com:', dados);
-
     if (!dados) return;
 
-    // CIDADE
     if (dados.cidade) {
         const elCidade = document.getElementById('nomeCidade');
-        if (elCidade) {
-            elCidade.textContent = dados.cidade;
-        }
+        if (elCidade) elCidade.textContent = dados.cidade;
     }
-
-    // TEMPERATURA
     if (dados.temp !== undefined) {
         const elTemp = document.getElementById('temperaturaAtual');
-        if (elTemp) {
-            elTemp.textContent = dados.temp.toFixed(1) + '°C';
-        }
+        if (elTemp) elTemp.textContent = dados.temp.toFixed(1) + '°C';
     }
-
-    // UMIDADE
     if (dados.umidade !== undefined) {
         const elUmid = document.getElementById('umidadeAtual');
-        if (elUmid) {
-            elUmid.textContent = dados.umidade + '%';
-        }
+        if (elUmid) elUmid.textContent = dados.umidade + '%';
     }
-
-    // POLUIÇÃO
     if (dados.poluicaoTexto) {
         const elPoluicao = document.getElementById('poluicaoAtual');
-        if (elPoluicao) {
-            elPoluicao.textContent = dados.poluicaoTexto;
-        }
+        if (elPoluicao) elPoluicao.textContent = dados.poluicaoTexto;
     }
-
-    // O STATUS DO GPS É CONTROLADO PELO mapa.js
 };
 
 window.atualizarTemperatura = async function() {
     console.log('🌡️ [APP.JS] atualizarTemperatura chamado. userLat:', userLat, 'userLng:', userLng);
     
     if (!userLat || !userLng) {
-        console.warn('⚠️ [APP.JS] Coordenadas (userLat/userLng) ainda não definidas. Aguardando...');
+        console.warn('⚠️ [APP.JS] Coordenadas ainda não definidas. Aguardando...');
         return;
     }
 
@@ -129,26 +112,22 @@ window.atualizarTemperatura = async function() {
         const API_KEY = 'a5c507ef270b147035538e0d6019bce1';
         const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
         
-    const respostaClima = await fetch(urlClima);
+        const respostaClima = await fetch(urlClima);
+        if (!respostaClima.ok) throw new Error('Erro na API de clima: ' + respostaClima.status);
 
-if (!respostaClima.ok) {
-    throw new Error('Erro na API de clima: ' + respostaClima.status);
-}
-
-const dadosClima = await respostaClima.json();
-
-window.atualizarInterfaceCabecalho({
-    cidade: dadosClima.name || "Local",
-    temp: dadosClima.main.temp,
-    umidade: dadosClima.main.humidity,
-    poluicaoTexto: ''
-});
-
-const temperatura = dadosClima.main.temp;
-const umidade = dadosClima.main.humidity;
-const isMobile = window.innerWidth <= 600;
+        const dadosClima = await respostaClima.json();
+        const temperatura = dadosClima.main.temp;
+        const umidade = dadosClima.main.humidity;
+        const isMobile = window.innerWidth <= 600;
         
         console.log('📊 [APP.JS] Dados climáticos recebidos. Temp:', temperatura, 'Umid:', umidade);
+
+        window.atualizarInterfaceCabecalho({
+            cidade: dadosClima.name || "Local",
+            temp: temperatura,
+            umidade: umidade,
+            poluicaoTexto: ''
+        });
 
         const tempEl = document.getElementById('temperaturaAtual');
         if (tempEl) {
@@ -228,7 +207,7 @@ function verificarAlertaPoluicao(aqi) {
             alertaDiv.innerHTML = `🌫️ ${textoAlerta}`;
             
             if (alertaAtivoAtual !== 'poluicao') {
-                somAlerta.play().catch(e => console.log("Aguardando interação para áudio..."));
+                somAlerta.play().catch(() => console.log("Aguardando interação para áudio..."));
                 alertaAtivoAtual = 'poluicao';
             }
         } else {
@@ -327,39 +306,40 @@ function verificarAlertasClima(temp, umid) {
         return;
     }
 
-   // Exemplo dentro de verificarAlertasClima:
-if (novoAlerta !== '') {
-    alertaDiv.style.display = 'flex';
-    if (novoAlerta !== alertaAtivoAtual) {
-        // ✅ ADICIONE ESTA VERIFICAÇÃO AQUI:
-        if (window.somAlertaAtivo) {
-            somAlerta.play().catch(e => console.log("Aguardando interação para áudio..."));
+    if (novoAlerta !== '') {
+        alertaDiv.style.display = 'flex';
+        if (novoAlerta !== alertaAtivoAtual) {
+            if (window.somAlertaAtivo) {
+                somAlerta.play().catch(() => console.log("Aguardando interação para áudio..."));
+            }
+            alertaAtivoAtual = novoAlerta;
         }
-        alertaAtivoAtual = novoAlerta;
     }
 }
-}
 
-// ================================================
-// 4. FUNÇÕES DE INTERFACE (MENU ESQUERDO E PÁGINAS)
-// ================================================
+// ==========================================
+// 4. FUNÇÕES DE INTERFACE (MENU E PÁGINAS)
+// ==========================================
 
 window.toggleMenu = function() {
     const menu = document.getElementById('menu-lateral');
     const overlay = document.getElementById('menu-overlay');
     
     if (menu && overlay) {
-        if (menu.style.left === '0px' || menu.style.left === '') {
+        if (menu.classList.contains('active') || menu.style.left === '0px') {
+            menu.classList.remove('active');
             menu.style.left = '-300px';
             overlay.style.display = 'none';
+            overlay.classList.remove('active');
         } else {
+            menu.classList.add('active');
             menu.style.left = '0px';
             overlay.style.display = 'block';
+            overlay.classList.add('active');
         }
     }
 };
 
-// FUNÇÃO showPage UNIFICADA (Removida a duplicata)
 window.showPage = function(pageName) {
     console.log('📄 [APP.JS] Navegando para:', pageName);
     
@@ -373,20 +353,22 @@ window.showPage = function(pageName) {
         targetPage.style.display = 'block';
         targetPage.scrollTop = 0;
         
-        if (pageName === 'mapa' && typeof map !== 'undefined') {
+        // Força o Leaflet a recalcular o tamanho ao voltar para o mapa
+        if (pageName === 'mapa' && typeof window.map !== 'undefined' && window.map) {
             setTimeout(() => {
-                map.invalidateSize();
+                window.map.invalidateSize();
             }, 100);
         }
     }
-    //==================================================
-    // FORÇA o fechamento do MENU ESQUERDO após clicar
-    //================================================
+    
+    // Força o fechamento do menu lateral após clicar
     const menu = document.getElementById('menu-lateral');
     const overlay = document.getElementById('menu-overlay');
     if (menu && overlay) {
+        menu.classList.remove('active');
         menu.style.left = '-300px';
         overlay.style.display = 'none';
+        overlay.classList.remove('active');
     }
 };
 
@@ -399,30 +381,26 @@ window.fecharApp = function() {
     }
 };
 
+// ==========================================
+// 4.1 FUNÇÕES DE CONTROLE DO MAPA (SIDEBAR)
+// ==========================================
 
-// =================================================
-// 4.1 FUNÇÕES DE CONTROLE DO MAPA DIREITO (SIDEBAR)
-// ================================================
-
-// Alterna a visibilidade da barra de controles do mapa e anima o botão hambúrguer
 window.toggleMapSidebar = function() {
     const sidebar = document.getElementById('sidebar-controls');
-    const btn = document.getElementById('btn-menu-toggle');
+    const btn = document.getElementById('btn-menu-toggle'); // Botão do header esquerdo
     
     if (sidebar) {
         sidebar.classList.toggle('retracted');
     }
     if (btn) {
-        btn.classList.toggle('active'); // Faz o hambúrguer virar "X"
+        btn.classList.toggle('active');
     }
 };
 
-// Alterna a barra de busca (search container)
 window.toggleSearchBar = function() {
     const searchContainer = document.querySelector('.search-container');
     if (searchContainer) {
         searchContainer.classList.toggle('active');
-        // Foca no input automaticamente ao abrir
         if (searchContainer.classList.contains('active')) {
             setTimeout(() => {
                 const input = searchContainer.querySelector('input');
@@ -432,54 +410,75 @@ window.toggleSearchBar = function() {
     }
 };
 
-// Centraliza o mapa na localização do usuário
+// ✅ FUNÇÃO CORRIGIDA E À PROVA DE FALHAS
 window.centerMapOnUser = function() {
-    if (typeof map !== 'undefined' && userLat && userLng) {
-        map.setView([userLat, userLng], 16); // 16 é um zoom ideal para nível de rua
+    console.log('🎯 [APP.JS] Tentando centralizar no usuário...');
+    
+    // 1. Verificação de segurança: o mapa existe e tem a função setView?
+    if (typeof window.map === 'undefined' || !window.map || typeof window.map.setView !== 'function') {
+        console.warn('⚠️ [APP.JS] Mapa ainda não está pronto. Tentando novamente em 1s...');
+        window.showToast('⏳ Carregando mapa...');
+        setTimeout(window.centerMapOnUser, 1000);
+        return;
+    }
+
+    // 2. Verifica se temos as coordenadas
+    if (userLat && userLng) {
+        window.map.setView([userLat, userLng], 16);
         window.showToast('📍 Mapa centralizado na sua localização');
+        console.log('✅ [APP.JS] Mapa centralizado em:', userLat, userLng);
     } else {
         window.showToast('⚠️ Aguardando sinal de GPS...');
+        console.warn('⚠️ [APP.JS] userLat ou userLng ainda não definidos.');
+        
+        // Tenta forçar a obtenção do GPS novamente
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    userLat = pos.coords.latitude;
+                    userLng = pos.coords.longitude;
+                    window.map.setView([userLat, userLng], 16);
+                    window.showToast('📍 Localização obtida e mapa centralizado!');
+                },
+                () => {
+                    window.showToast('❌ Não foi possível obter a localização.');
+                }
+            );
+        }
     }
 };
 
-// Aumentar Zoom
 window.zoomInMap = function() {
-    if (typeof map !== 'undefined') {
-        map.zoomIn();
+    if (typeof window.map !== 'undefined' && window.map) {
+        window.map.zoomIn();
     }
 };
 
-// Diminuir Zoom
 window.zoomOutMap = function() {
-    if (typeof map !== 'undefined') {
-        map.zoomOut();
+    if (typeof window.map !== 'undefined' && window.map) {
+        window.map.zoomOut();
     }
 };
 
-// Resetar / Atualizar visualização do mapa
 window.refreshMap = function() {
-    if (typeof map !== 'undefined') {
-        map.invalidateSize(); // Corrige renderização se a tela mudou de tamanho
+    if (typeof window.map !== 'undefined' && window.map) {
+        window.map.invalidateSize();
         window.showToast('🔄 Mapa atualizado');
     }
 };
 
-// Variável global para controlar o estado do som
 window.somAlertaAtivo = true; 
 
-// Ligar/Desligar Alerta Sonoro
 window.toggleAlertSound = function() {
     window.somAlertaAtivo = !window.somAlertaAtivo;
     const icon = document.getElementById('alert-toggle-icon');
     
     if (icon) {
         if (window.somAlertaAtivo) {
-            // Ícone de som ligado (mantém o original ou fallback)
             icon.src = '/imagens_app/ic_sound_on.png';
             icon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/727/727245.png'; };
             window.showToast('🔊 Alertas sonoros ATIVADOS');
         } else {
-            // Ícone de som desligado (você pode criar este arquivo ou usar um genérico)
             icon.src = '/imagens_app/ic_sound_off.png'; 
             icon.onerror = function() { this.src = 'https://cdn-icons-png.flaticon.com/512/3820/3820143.png'; };
             window.showToast('🔇 Alertas sonoros DESATIVADOS');
@@ -487,17 +486,12 @@ window.toggleAlertSound = function() {
     }
 };
 
-// Abrir funcionalidade de Rota (Placeholder para integração futura)
 window.openRouteBar = function() {
     window.showToast('🗺️ Funcionalidade de Rota em desenvolvimento');
-    // Aqui você chamaria a lógica do seu plugin de rotas (ex: Leaflet Routing Machine)
 };
 
-// Rotacionar Mapa (Placeholder)
 window.rotateMap = function() {
     window.showToast('🔄 Rotação do mapa acionada');
-    // Se usar MapLibre: map.setBearing(map.getBearing() + 45);
-    // Se usar Leaflet puro: requer plugin de rotação
 };
 
 // ==========================================
@@ -507,9 +501,7 @@ window.rotateMap = function() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('✅ [APP.JS] DOMContentLoaded disparado. Inicializando...');
 
-    // ==========================================
     // 5.1 Esconder Splash Screen
-    // ==========================================
     setTimeout(() => {
         const splash = document.getElementById('splash-screen');
         if (splash) {
@@ -524,9 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 2500);
 
-    // ==========================================
     // 5.2 Inicializar MutationObserver (Clima)
-    // ==========================================
     const elemTemp = document.getElementById('temperaturaAtual');
     const elemUmid = document.getElementById('umidadeAtual');
 
@@ -544,9 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('⚠️ [APP.JS] Elementos de temperatura/umidade não encontrados.');
     }
 
-    // ==========================================
-    // 5.3 SOLICITAR GPS E CENTRALIZAR MAPA (NOVO)
-    // ==========================================
+    // 5.3 SOLICITAR GPS E CENTRALIZAR MAPA
     function inicializarGPS() {
         if (!navigator.geolocation) {
             console.error('❌ [APP.JS] Geolocalização não suportada pelo navegador.');
@@ -555,7 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         console.log('📍 [APP.JS] Solicitando permissão de GPS...');
-        atualizarStatusGPSVisual('warn'); // Mostra "BUSCANDO" (amarelo)
+        atualizarStatusGPSVisual('warn');
 
         navigator.geolocation.getCurrentPosition(
             // SUCESSO
@@ -564,25 +552,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 userLng = position.coords.longitude;
                 console.log('✅ [APP.JS] GPS obtido com sucesso:', userLat, userLng);
 
-                // 1. Atualiza cidade e clima usando sua função existente
                 if (typeof window.setUserLocation === 'function') {
                     window.setUserLocation(userLat, userLng);
                 }
 
-                // 2. CENTRALIZAR O MAPA NA POSIÇÃO DO USUÁRIO
-                if (typeof map !== 'undefined' && map.setView) {
-                    map.setView([userLat, userLng], 16); // Zoom 16 é ideal para nível de rua
+                // Centraliza o mapa se ele já estiver pronto
+                if (typeof window.map !== 'undefined' && window.map && typeof window.map.setView === 'function') {
+                    window.map.setView([userLat, userLng], 16);
                     console.log('🗺️ [APP.JS] Mapa centralizado na localização do usuário.');
                 }
 
-                atualizarStatusGPSVisual('ok'); // Mostra "ATIVO" (verde)
+                atualizarStatusGPSVisual('ok');
             },
-            // ERRO (Negado, Timeout, etc.)
+            // ERRO
             (error) => {
                 console.error('❌ [APP.JS] Erro ao obter GPS:', error.message);
-                atualizarStatusGPSVisual('err'); // Mostra "INATIVO" (vermelho)
+                atualizarStatusGPSVisual('err');
 
-                // FALLBACK: Centraliza em Belo Horizonte (Praça da Liberdade) se o GPS falhar
+                // FALLBACK: Centraliza em Belo Horizonte se o GPS falhar
                 const fallbackLat = -19.9335; 
                 const fallbackLng = -43.9345;
                 userLat = fallbackLat;
@@ -594,20 +581,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.setUserLocation(userLat, userLng);
                 }
 
-                if (typeof map !== 'undefined' && map.setView) {
-                    map.setView([fallbackLat, fallbackLng], 13);
+                if (typeof window.map !== 'undefined' && window.map && typeof window.map.setView === 'function') {
+                    window.map.setView([fallbackLat, fallbackLng], 13);
                 }
             },
-            // OPÇÕES DE PRECISÃO
+            // OPÇÕES
             {
-                enableHighAccuracy: true, // Tenta usar GPS do celular, não só Wi-Fi
-                timeout: 10000,           // Aguarda no máximo 10 segundos
-                maximumAge: 0             // Não usa cache de localização antiga
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
             }
         );
     }
 
-    // Função auxiliar para atualizar o ícone/texto do GPS no header
     function atualizarStatusGPSVisual(status) {
         const wrapper = document.getElementById('gps-status-wrapper');
         const dot = document.getElementById('gps-status-dot');
@@ -615,11 +601,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!wrapper || !dot || !label) return;
 
-        // Limpa classes anteriores
         wrapper.classList.remove('gps-ok', 'gps-warn', 'gps-err');
         dot.classList.remove('ok', 'warn', 'err');
 
-        // Aplica novas classes baseado no status
         if (status === 'ok') {
             wrapper.classList.add('gps-ok');
             dot.classList.add('ok');
@@ -635,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Dispara a busca do GPS 2.5 segundos após o carregamento (logo após o splash sumir)
+    // Dispara a busca do GPS 2.5 segundos após o carregamento
     setTimeout(inicializarGPS, 2500);
 });
 
@@ -706,13 +690,11 @@ window.showToast = function(mensagem) {
     setTimeout(() => { toast.style.opacity = '0'; }, 3000);
 };
 
-// Função para o mapa.js chamar e definir as coordenadas
 window.setUserLocation = function(lat, lng) {
     console.log('📍 [APP.JS] setUserLocation chamado com:', lat, lng);
     userLat = lat;
     userLng = lng;
     
-    // Dispara as atualizações imediatamente
     window.atualizarCidade(lat, lng);
     window.atualizarTemperatura();
 };
