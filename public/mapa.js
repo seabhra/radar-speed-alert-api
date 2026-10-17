@@ -1,17 +1,16 @@
-
 // ==================
 // ARQUIVO JS MAPA.JS
 // ==================
 
-// =================
 // VARIÁVEIS GLOBAIS
-// =================
 let map;
 let tileLayer;
 let radarMarkers = [];
 let alertTimeout;
-let userLat = -19.919055;
-let userLng = -43.938641;
+
+// ⚠️ CORREÇÃO: Removido o 'let' pois essas variáveis JÁ SÃO DECLARADAS no app.js
+userLat = -19.919055;
+userLng = -43.938641;
 
 // CONTROLE DE BARRAS LATERAIS
 let searchActive = false;    // Controla se a barra de RADARES está ativa
@@ -20,22 +19,20 @@ let routeActive = false;     // Controla se a barra de ROTA está ativa
 // CONTROLE DE GPS - SEPARADO DAS BARRAS
 let gpsActive = true;        // Controla o funcionamento do GPS (INDEPENDENTE)
 
-//MENU LATERAL FECHADO COM CONTROLES
+// MENU LATERAL FECHADO COM CONTROLES
 let sidebarAberta = false;
 
 var watchId = null;
-var gpsInitialized = false; // GPS INICIALIZADO
-var browserGpsTimeout = null;  // TIME GPS BROWSER
+var gpsInitialized = false;  // GPS INICIALIZADO
+var browserGpsTimeout = null; // TIMEOUT GPS BROWSER
 
 let prevLat = null;
 let prevLng = null;
 let prevTime = null;
 let isFollowing = true;
 
-
 let gpsSource = 'none';
 let posicaoCentralOriginal = { lat: -19.919055, lng: -43.938641, zoom: 15 };
-
 
 let coordenadasRotaNavegacao = [];
 let ultimoSegmentoRota = -1;
@@ -46,7 +43,7 @@ let startRouteMarker = null;
 let endRouteMarker = null;
 let routingControl = null;
 let destinoAtual = null;
-let userMarker = null;
+
 var destinoNavegacao = null;
 
 let ultimaAtualizacaoCamera = 0;
@@ -75,18 +72,20 @@ const TEMPO_RETORNO_GPS = 8000;
 let refreshDelayTimer = null;
 const TEMPO_REFRESH_DELAY = 5000;
 
-
 // Precisão do GPS para o status
 let gpsAccuracyAtual = 999;
 let gpsLastUpdateTime = 0;
 
-
-
 // No início do script, junto com as outras variáveis globais
 let iconeCentralizado = false; // Controla se o ícone está no modo centralizado
-// alerta de clima normal
-let alertaNormalidadeMostrado = false;
 
+// ⚠️ CORREÇÃO: Removido o 'let' pois JÁ É DECLARADA no app.js
+alertaNormalidadeMostrado = false;
+
+//================================================
+// 1. Declare APENAS UMA VEZ no topo do arquivo 
+//=================================================
+let userMarker = null;
 
 // =============================================
 // CONTROLE DE TEXTOS - SITE vs APP
@@ -1080,32 +1079,35 @@ function verificarDirecaoMelhorada(uLat, uLng, uHeading, radarLat, radarLng, rad
 function aplicarTemaMapa() {
     if (typeof map === 'undefined' || !map) return;
 
-    var hora = new Date().getHours();
-    var mapContainer = map.getContainer(); 
-    
-    // Define se é dia (6h às 18h) ou noite (19h às 5h)
-    var isNight = (hora >= 19 || hora < 6);
+    var mapContainer = map.getContainer();
 
-    // CORREÇÃO: Sintaxe correta. Usando OpenStreetMap (100% gratuito, sem API Key)
+// =================================
+// DEFINE DIA OU NOITE
+// =================================
+var hora = new Date().getHours();
+
+// Dia: 06h às 17h | Noite: 18h às 05h
+var isNight = (hora >= 18 || hora < 6);
+
+    // OpenStreetMap — gratuito, sem API Key
     var urlTema = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-    // Troca a classe CSS que aplica o filtro Matrix
-    if (isNight) {
-        mapContainer.classList.remove('matrix-day');
-        mapContainer.classList.add('matrix-night');
-    } else {
-        mapContainer.classList.remove('matrix-night');
-        mapContainer.classList.add('matrix-day');
-    }
+    // =================================
+    // APLICA O TEMA MATRIX
+    // =================================
+    mapContainer.classList.toggle('matrix-night', isNight);
+    mapContainer.classList.toggle('matrix-day', !isNight);
 
-    // Atualiza o tile do mapa
-    if (typeof tileLayer !== 'undefined' && tileLayer) {
-        tileLayer.setUrl(urlTema);
-    } else {
+    // =================================
+    // CRIA O TILE SOMENTE UMA VEZ
+    // =================================
+    if (typeof tileLayer === 'undefined' || !tileLayer) {
+
         tileLayer = L.tileLayer(urlTema, {
             attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 19
         }).addTo(map);
+
     }
 }
 
@@ -1178,7 +1180,9 @@ function adicionarMarcadoresRota(originLat, originLng, destLat, destLng) {
   
     if (startRouteMarker) { map.removeLayer(startRouteMarker); startRouteMarker = null; }
     if (endRouteMarker) { map.removeLayer(endRouteMarker); endRouteMarker = null; }
+    
     if (userMarker) { map.removeLayer(userMarker); userMarker = null; }
+   
     estaEmNavegacao = true;
     ultimaPosicaoMarcador = { lat: null, lng: null };
     var startIcon = L.divIcon({
@@ -1826,112 +1830,123 @@ function processarNovaPosicao(newLat, newLng, speedKmh, hardwareHeading, accurac
 // FUNÇÃO INICIAR NAVEGAÇÃO GPS E CIDADE ATUAL
 //===========================================
 const cidadeLabel = document.getElementById("cidade-atual");
-let ultimaCidade = "";
 
+// ✅ CORREÇÃO 1: Verifica se a variável já existe no escopo global antes de declarar.
+// Isso evita o "SyntaxError: Identifier has already been declared" no navegador.
+if (typeof window.ultimaCidade === 'undefined') {
+    window.ultimaCidade = "";
+}
 
 function startGPSTracking() {
     // Limpa timeout anterior se existir para evitar conflitos
-    if (browserGpsTimeout) {
+    if (typeof browserGpsTimeout !== 'undefined' && browserGpsTimeout) {
         clearTimeout(browserGpsTimeout);
         browserGpsTimeout = null;
     }
 
-    // Sua verificação do GPS:
+    // Verificação do GPS
     if (!navigator.geolocation) {
-        hideFullscreenLoading();
-        showNotification("GPS não suportado.");
+        if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading();
+        if (typeof showNotification === 'function') showNotification("GPS não suportado.");
         return;
     }
     
     // Se já existe um watch, para ele primeiro (limpeza segura)
-    if (watchId !== null) {
+    if (typeof watchId !== 'undefined' && watchId !== null) {
         navigator.geolocation.clearWatch(watchId);
         watchId = null;
     }
-}
+
     //=============================================
-    // Inicia o tracking GPS - ÚNICO watchPosition
-   //===============================================    
-     
+    // ✅ CORREÇÃO 2: O watchPosition AGORA está DENTRO da função
+    //===============================================    
     watchId = navigator.geolocation.watchPosition(
         function(position) {
-            // Dados da posição
+            // 1. Dados da posição
             var lat = position.coords.latitude;
             var lng = position.coords.longitude;
-            var accuracy = position.coords.accuracy; // <-- ADICIONADO: Captura a precisão
+            var accuracy = position.coords.accuracy; 
             var speedKmh = 0;
                         
             if (position.coords.speed !== null && position.coords.speed >= 0) {
                 speedKmh = Math.round(position.coords.speed * 3.6);
+            }
 
-   // 👈 ADICIONE ISSO: Atualiza o header em tempo real com a nova precisão
-    atualizarInterfaceCabecalho({
-        precisaoGPS: precisao
-    });
+            // 2. Atualiza o indicador visual de precisão no cabeçalho (app.js)
+            if (typeof window.atualizarInterfaceCabecalho === 'function') {
+                window.atualizarInterfaceCabecalho({ precisaoGPS: accuracy });
             }
 
             // =================================================================
-            // MONITORAMENTO DE PRECISÃO (Para você entender o "ERR")
+            // MONITORAMENTO DE PRECISÃO
             // =================================================================
             if (accuracy > 100) {
-                console.warn(`⚠️ Sinal de GPS FRACO: ${accuracy}m de margem de erro. Classe ERR aplicada corretamente.`);
+                console.warn(`⚠️ Sinal de GPS FRACO: ${accuracy}m de margem de erro.`);
             } else if (accuracy > 50) {
                 console.log(`⚠️ Sinal de GPS ACEITÁVEL: ${accuracy}m de margem de erro.`);
             } else {
                 console.log(`✅ Sinal de GPS EXCELENTE: ${accuracy}m de margem de erro.`);
             }
 
-            atualizarStatusGPS(position); 
-
-            // Verifica chegada ao destino se estiver em navegação
-            if (typeof estaEmNavegacao !== 'undefined' && estaEmNavegacao && typeof destinoNavegacao !== 'undefined' && destinoNavegacao) {
-                verificarChegadaDestino();
+            // 3. 🚨 A PONTE MÁGICA: Atualiza as variáveis globais do app.js E dispara clima/cidade
+            if (typeof window.setUserLocation === 'function') {
+                window.setUserLocation(lat, lng);
             }
 
-            // Define fonte do GPS
-            if (typeof gpsSource !== 'undefined' && gpsSource !== 'appinventor') {
-                gpsSource = 'browser';
+            // 4. Atualiza o velocímetro na tela (Bônus)
+            const speedDisplay = document.getElementById('speed-display');
+            if (speedDisplay) {
+                speedDisplay.textContent = speedKmh;
             }
 
-            // ATUALIZA CIDADE E CLIMA
-            if (typeof atualizarCidade === 'function') atualizarCidade(lat, lng);
-            if (typeof atualizarTemperatura === 'function') atualizarTemperatura();
+            // 5. Funções adicionais de navegação (Protegidas para não quebrar se não existirem)
+            if (typeof window.atualizarStatusGPS === 'function') window.atualizarStatusGPS(position); 
 
-            // Processa a nova posição
-            processarNovaPosicao(lat, lng, speedKmh, position.coords.heading, accuracy);
+            if (typeof window.estaEmNavegacao !== 'undefined' && window.estaEmNavegacao && typeof window.verificarChegadaDestino === 'function') {
+                window.verificarChegadaDestino();
+            }
 
-            // Marca GPS como inicializado
-            if (!gpsInitialized) {
-                gpsInitialized = true;
-                if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading();
+            if (typeof window.processarNovaPosicao === 'function') {
+                window.processarNovaPosicao(lat, lng, speedKmh, position.coords.heading, accuracy);
+            }
+
+            // 6. Marca GPS como inicializado (com segurança)
+            if (typeof window.gpsInitialized !== 'undefined' && !window.gpsInitialized) {
+                window.gpsInitialized = true;
+                if (typeof window.hideFullscreenLoading === 'function') window.hideFullscreenLoading();
             }
 
         }, 
         function(error) {
             console.error("❌ Erro GPS:", error.message, "(Código:", error.code, ")");
-            // Garante que o indicador fique vermelho em caso de erro real
-            if (typeof atualizarStatusGPS === 'function') atualizarStatusGPS(null); 
-            if (typeof showNotification === 'function') showNotification("Erro ao obter localização: " + error.message);
-            if (!gpsInitialized) {
-                if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading();
+            
+            if (typeof window.atualizarInterfaceCabecalho === 'function') {
+                window.atualizarInterfaceCabecalho({ precisaoGPS: 999 }); // Força status "AGUARDANDO"
+            }
+            if (typeof window.atualizarStatusGPS === 'function') window.atualizarStatusGPS(null); 
+            if (typeof window.showNotification === 'function') window.showNotification("Erro ao obter localização: " + error.message);
+            
+            if (typeof window.gpsInitialized !== 'undefined' && !window.gpsInitialized) {
+                if (typeof window.hideFullscreenLoading === 'function') window.hideFullscreenLoading(); 
             }
         }, 
         { 
             enableHighAccuracy: true,
-            maximumAge: 0,          // <-- ALTERADO: 0 força leitura fresca do sensor de hardware
-            timeout: 30000          // <-- Mantido: 30s é ótimo para dar tempo do satélite travar
+            maximumAge: 0,          
+            timeout: 30000          
         }
     );
 
     console.log("✅ GPS iniciado com watchId:", watchId);
 
     // Timeout de segurança
-    browserGpsTimeout = setTimeout(function() {
-        if (!gpsInitialized && (typeof gpsSource === 'undefined' || gpsSource !== 'appinventor')) { 
-            if (typeof showNotification === 'function') showNotification("Aguardando sinal de GPS... Verifique se está em local aberto."); 
-            if (typeof hideFullscreenLoading === 'function') hideFullscreenLoading(); 
+    window.browserGpsTimeout = setTimeout(function() {
+        if (typeof window.gpsInitialized !== 'undefined' && !window.gpsInitialized) { 
+            if (typeof window.showNotification === 'function') window.showNotification("Aguardando sinal de GPS... Verifique se está em local aberto."); 
+            if (typeof window.hideFullscreenLoading === 'function') window.hideFullscreenLoading(); 
         }
     }, 8000);
+}
 
 //===========================================
 // FUNÇÃO PARAR GPS
@@ -2031,41 +2046,6 @@ function sucesso(position){
     }
 }
 
-//===================================================
-// FUNÇÃO CHAMA QUANDO APP INVENTOR ENVIA LOCALIZAÇÃO
-//===================================================
-
-function receberGPSDoAppInventor(lat, lng, accuracy) {
-    gpsSource = 'appinventor';
-    gpsInitialized = true;
-    hideFullscreenLoading();
-
-    // Cria um objeto "falso" no mesmo formato que o navegador usa, 
-    // para sua função atualizarStatusGPS funcionar perfeitamente!
-    const posicaoSimulada = {
-        coords: {
-            latitude: parseFloat(lat),
-            longitude: parseFloat(lng),
-            accuracy: parseFloat(accuracy) || 50, // Se não vier precisão, assume 50m (verde)
-            speed: null,
-            heading: null
-        }
-    };
-
-    // 1. Atualiza o indicador visual (ficará verde/amarelo/vermelho baseado na accuracy)
-    atualizarStatusGPS(posicaoSimulada);
-
-    // 2. Processa a posição no seu sistema normal
-    processarNovaPosicao(
-        parseFloat(lat), 
-        parseFloat(lng), 
-        0, // Velocidade (pode ser enviada pelo App Inventor também se quiser)
-        null, 
-        parseFloat(accuracy) || 50
-    );
-    
-    console.log("📡 GPS recebido do App Inventor:", lat, lng, "Precisão:", accuracy);
-}
 
 // =============================================
 // CONTROLE RESPONSIVO DO HEADER
@@ -2098,479 +2078,35 @@ function ajustarHeaderResponsivo() {
 }
 
 
-//=====================================
-// FUNÇÃO ATUALIZAR NOME DA CIDADE LOCAL
-//=====================================
-async function atualizarCidade(lat, lng) {
-    try {
 
-        if (
-            lat == null ||
-            lng == null ||
-            isNaN(lat) ||
-            isNaN(lng)
-        ) {
-            console.warn("[Radar X9] Coordenadas inválidas para atualizar cidade:", lat, lng);
-            return;
-        }
-
-        const resposta = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
-        );
-
-        if (!resposta.ok) {
-            console.warn(
-                "[Radar X9] Nominatim respondeu:",
-                resposta.status
-            );
-            return;
-        }
-
-        const dados = await resposta.json();
-
-        if (!dados.address) {
-            console.warn("[Radar X9] Nominatim não retornou endereço:", dados);
-            return;
-        }
-
-        const cidade =
-            dados.address.city ||
-            dados.address.town ||
-            dados.address.municipality ||
-            dados.address.village;
-
-        if (cidade && cidade !== ultimaCidade) {
-
-            ultimaCidade = cidade;
-
-            const nomeEl = document.getElementById("nomeCidade");
-
-            if (nomeEl) {
-                nomeEl.textContent = "📍" + cidade;
-                nomeEl.style.color = corCidade(cidade);
-            }
-        }
-
-    } catch (e) {
-        console.log("Erro cidade:", e);
-    }
-}
-
-//=========================
-// MUDANÇA DA COR DA CIDADE
-//=========================
-function corCidade(nome){
-
-    let hash = 0;
-
-    for(let i = 0; i < nome.length; i++){
-        hash = nome.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    let hue = Math.abs(hash) % 360;
-
-    // Evita faixas pouco agradáveis
-    if (hue >= 20 && hue <= 40) hue = 45;      // remove marrom
-    if (hue >= 250 && hue <= 295) hue = 210;   // troca roxo por azul
-
-    return `hsl(${hue},100%,68%)`;
-}
 
 //=============================
-// PRECISÃO ATUALIZAÇÃO DO GPS 
+// PRECISÃO ATUALIZAÇÃO DO GPS DENTRO DO MAPA.JS, NA FUNÇÃO DE SUCESSO DO GPS
 //=============================
+
 navigator.geolocation.getCurrentPosition(
-  // 1. FUNÇÃO DE SUCESSO (Sua lógica original mantida)
-  async (pos) => {
-    userLat = pos.coords.latitude;
-    userLng = pos.coords.longitude;
-    
-    console.log(`✅ GPS obtido com sucesso: ${userLat}, ${userLng}`);
-    
-    try {
-      await atualizarCidade(userLat, userLng);
-      await atualizarTemperatura();
-    } catch (err) {
-      console.error("Erro ao atualizar dados da cidade/temperatura:", err);
-    }
-  },
+    function(position) {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
+
+        console.log('✅ [MAPA.JS] GPS obtido com sucesso:', lat, lng);
+
+        if (typeof window.setUserLocation === 'function') {
+            window.setUserLocation(lat, lng);
+        }
+    },
 
   // 2. FUNÇÃO DE ERRO (CRUCIAL para mobile/PWA)
-  (error) => {
-    console.error("❌ Erro ao obter localização:", error.code, error.message);
-    
-    let mensagem = "Não foi possível obter sua localização.";
-    if (error.code === 1) {
-      mensagem = "Permissão de localização negada. Por favor, ative nas configurações do app.";
-    } else if (error.code === 2) {
-      mensagem = "Localização indisponível. Verifique se o GPS do celular está ligado.";
-    } else if (error.code === 3) {
-      mensagem = "Tempo esgotado ao buscar localização. Tente novamente em um local aberto.";
-    }
-    
-    // Dica: Em vez de alert(), você pode mostrar essa mensagem em um elemento HTML da sua UI
-    alert(mensagem); 
-  },
-
-  // 3. OPÇÕES DE CONFIGURAÇÃO (O segredo para o GPS nativo funcionar bem)
-  {
-    enableHighAccuracy: true, // Força o uso do GPS real (satélite), não apenas triangulação de Wi-Fi/Célula
-    timeout: 15000,           // 15 segundos (GPS às vezes demora um pouco para dar o "fix" inicial no celular)
-    maximumAge: 0             // Força uma leitura nova do sensor, ignora posições salvas em cache
-  }
+      function(error) {
+        console.error('❌ [MAPA.JS] Erro no GPS:', error);
+        // Fallback para Belo Horizonte se o GPS falhar
+        if (typeof window.setUserLocation === 'function') {
+            window.setUserLocation(-19.9167, -43.9345);
+        }
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
 );
-
-// =============================================
-// ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
-// =============================================
-async function atualizarTemperatura() {
-    if (!userLat || !userLng) return;
-
-    try {
-        const API_KEY = 'a5c507ef270b147035538e0d6019bce1';
-        
-        // ==========================================
-        // 1. BUSCA DADOS DE CLIMA
-        // ==========================================
-        const urlClima = `https://api.openweathermap.org/data/2.5/weather?lat=${userLat}&lon=${userLng}&appid=${API_KEY}&units=metric&lang=pt_br`;
-        const respostaClima = await fetch(urlClima);
-        
-        if (!respostaClima.ok) throw new Error('Erro na API de clima: ' + respostaClima.status);
-        const dadosClima = await respostaClima.json();
-
-        const temperatura = dadosClima.main.temp;
-        const umidade = dadosClima.main.humidity;
-
-        // ==========================================
-        // DETECTA SE É MOBILE
-        // ==========================================
-        const isMobile = window.innerWidth <= 600;
-        
-        // ==========================================
-        // ATUALIZA TEMPERATURA
-        // ==========================================
-        const tempEl = document.getElementById('temperaturaAtual');
-        if (tempEl) {
-            const valorTemp = temperatura.toFixed(1) + '°C';
-            if (isMobile) {
-                // APP: apenas o valor "26.9°C"
-                tempEl.textContent = valorTemp;
-            } else {
-                // SITE: "Temperatura 26.9°C"
-                tempEl.textContent = 'Temperatura ' + valorTemp;
-            }
-            tempEl.style.color = '#ffffff';
-        }
-        
-        // ==========================================
-        // ATUALIZA UMIDADE
-        // ==========================================
-        const umidEl = document.getElementById('umidadeAtual');
-        if (umidEl) {
-            let valorUmid = (umidade !== undefined && umidade !== null) ? umidade + '%' : '--%';
-            if (isMobile) {
-                // APP: apenas o valor "40%"
-                umidEl.textContent = valorUmid;
-            } else {
-                // SITE: "Umidade 40%"
-                umidEl.textContent = 'Umidade ' + valorUmid;
-            }
-            umidEl.style.color = '#ffffff';
-        }
-
-        // ==========================================
-        // 2. BUSCA POLUIÇÃO DO AR
-        // ==========================================
-        try {
-            const urlPoluicao = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${userLat}&lon=${userLng}&appid=${API_KEY}`;
-            const respostaPoluicao = await fetch(urlPoluicao);
-            
-            if (respostaPoluicao.ok) {
-                const dadosPoluicao = await respostaPoluicao.json();
-                const aqi = dadosPoluicao.list[0].main.aqi;
-                
-                const componentes = dadosPoluicao.list[0].components;
-                const pm25 = componentes.pm2_5 ? Math.round(componentes.pm2_5) : null;
-                const pm10 = componentes.pm10 ? Math.round(componentes.pm10) : null;
-                let valorPoluicao = pm25 || pm10 || 0;
-                
-                const mapaAQI = {
-                    1: { texto: 'Bom', cor: '#00cc66' },
-                    2: { texto: 'Moderado', cor: '#ffcc00' },
-                    3: { texto: 'Ruim', cor: '#ff8800' },
-                    4: { texto: 'Péssimo', cor: '#ff4444' },
-                    5: { texto: 'Insalubre', cor: '#cc0000' }
-                };
-                
-                const infoPoluicao = mapaAQI[aqi] || { texto: 'N/A', cor: '#888' };
-                const poluEl = document.getElementById('poluicaoAtual');
-                
-                if (poluEl) {
-                    let valorPol =  '';
-                    if (valorPoluicao > 0) {
-                        valorPol = infoPoluicao.texto + ' ' + valorPoluicao;
-                    } else {
-                        valorPol = infoPoluicao.texto;
-                    }
-                    
-                    if (isMobile) {
-                        // APP: apenas o valor "Moderada 6"
-                        poluEl.textContent = valorPol;
-                    } else {
-                        // SITE: "Poluição Moderada 6"
-                        poluEl.textContent = '' + valorPol;
-                    }
-                    poluEl.style.color = infoPoluicao.cor;
-                }
-                
-                verificarAlertaPoluicao(aqi);
-            } else {
-                const poluEl = document.getElementById('poluicaoAtual');
-                if (poluEl) {
-                    if (isMobile) {
-                        poluEl.textContent = 'N/A';
-                    } else {
-                        poluEl.textContent = 'Poluição N/A';
-                    }
-                    poluEl.style.color = '#888';
-                }
-            }
-        } catch (e) {
-            console.warn('Erro ao buscar poluição:', e);
-            const poluEl = document.getElementById('poluicaoAtual');
-            if (poluEl) {
-                if (isMobile) {
-                    poluEl.textContent = 'N/A';
-                } else {
-                    poluEl.textContent = 'Poluição N/A';
-                }
-                poluEl.style.color = '#888';
-            }
-        }
-
-        // ==========================================
-        // 3. VERIFICA ALERTAS
-        // ==========================================
-        verificarAlertasClima(temperatura, umidade);
-        verificarClimaNormal(temperatura, umidade);
-
-    } catch(e) {
-        console.error("Erro clima:", e);
-    }
-}
-
-// =============================================
-// VERIFICAR ALERTA DE POLUIÇÃO
-// =============================================
-function verificarAlertaPoluicao(aqi) {
-    const alertaDiv = document.getElementById('alerta-sound-clima');
-    
-    // Se não tem alerta de clima ativo, pode mostrar o de poluição
-    if (alertaDiv.style.display === 'none' || alertaDiv.style.display === '') {
-        if (aqi >= 4) { // Muito Ruim ou Péssima
-            alertaDiv.style.display = 'flex';
-            alertaDiv.className = 'alerta-clima-label alerta-poluicao';
-            
-            // SEM EMOJIS
-            const textoAlerta = aqi >= 5 ? 'ATENÇÃO: Qualidade do Ar PÉSSIMA!' : 'ATENÇÃO: Qualidade do Ar MUITO RUIM!';
-            alertaDiv.innerHTML = `🌫️ ${textoAlerta}`;
-            alertaDiv.classList.add('alerta-poluicao');
-            
-            // Toca som de alerta
-            if (alertaAtivoAtual !== 'poluicao') {
-                somAlerta.play().catch(e => console.log("Aguardando interação..."));
-                alertaAtivoAtual = 'poluicao';
-            }
-        } else {
-            // Remove alerta de poluição se o AQI melhorou
-            if (alertaAtivoAtual === 'poluicao') {
-                alertaDiv.style.display = 'none';
-                alertaAtivoAtual = '';
-            }
-        }
-    }
-}
-
-
-
-// =============================================
-// VERIFICAR SE O CLIMA ESTÁ NORMAL (ALERTA POSITIVO)
-// =============================================
-function verificarClimaNormal(temp, umid) {
-    const alertaNormalDiv = document.getElementById('alerta-normalidade');
-    const alertaClimaDiv = document.getElementById('alerta-sound-clima');
-    
-    // Verifica se NÃO há alertas ativos
-    const semAlertas = 
-        !(temp >= 40 || temp <= 5 || umid <= 20);
-    
-    // Verifica se a poluição está boa (AQI 1 ou 2) - SEM EMOJIS
-    const poluicaoEl = document.getElementById('poluicaoAtual');
-    const textoPoluicao = poluicaoEl.textContent;
-    const poluicaoBoa = textoPoluicao.includes('Boa') || textoPoluicao.includes('Moderada');
-    
-    // Se o clima está normal E a poluição está boa E NÃO há alertas de clima
-    if (semAlertas && poluicaoBoa && alertaClimaDiv.style.display !== 'flex') {
-        
-        // Só mostra se ainda NÃO foi mostrado nesta sessão
-        if (!alertaNormalidadeMostrado) {
-            alertaNormalDiv.style.display = 'flex';
-            alertaNormalDiv.innerHTML = '✅ Clima normal. Aproveite!';
-            
-            // Toca o beep ao aparecer
-            tocarBeepNormalidade();
-            
-            // Marca como já mostrado
-            alertaNormalidadeMostrado = true;
-            
-            // Mostra por 8 segundos e depois some
-            setTimeout(() => {
-                alertaNormalDiv.style.display = 'none';
-            }, 8000);
-        }
-    } else {
-        // Esconde o alerta de normalidade se houver alertas ativos
-        if (alertaClimaDiv.style.display === 'flex') {
-            alertaNormalDiv.style.display = 'none';
-        }
-    }
-}
-
-// =============================================
-// BEEP DE NORMALIDADE (som suave e agradável)
-// =============================================
-function tocarBeepNormalidade() {
-    try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Toca duas notas suaves (C5 e E5)
-        var notas = [523, 659]; // C5 e E5
-        var duracao = 0.15;
-        
-        notas.forEach(function(freq, index) {
-            var osc = ctx.createOscillator();
-            var gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(freq, ctx.currentTime + (index * 0.2));
-            
-            gain.gain.setValueAtTime(0.15, ctx.currentTime + (index * 0.2));
-            gain.gain.linearRampToValueAtTime(0, ctx.currentTime + (index * 0.2) + duracao);
-            
-            osc.start(ctx.currentTime + (index * 0.2));
-            osc.stop(ctx.currentTime + (index * 0.2) + duracao);
-        });
-        
-        console.log('🔔 Beep de normalidade tocado');
-    } catch(e) {
-        console.warn('Beep de normalidade falhou:', e);
-    }
-}
-//=====================================
-// FUNÇÃO POSIONAR TEMPERATURA LOCAL
-//=====================================
-function posicionarTemperatura(temp){
-
-    const minimo = -20;
-
-    const maximo = 50;
-
-    let porcentagem =
-
-        ((temp-minimo)/(maximo-minimo))*100;
-
-    porcentagem = Math.max(0,Math.min(100,porcentagem));
-
-    document.getElementById("ponteiroTemp").style.left =
-        porcentagem+"%";
-
-}
-
-
-
-// =======================================================
-// SISTEMA DE ALERTA DE CLIMA (Umidade e Temperatura)
-// =======================================================
-
-const somAlerta = new Audio('audio_app/alerta_sound_clima.mp3');
-somAlerta.volume = 0.5;
-
-let alertaAtivoAtual = '';
-
-
-function verificarAlertasClima(temp, umid) {
-    // Se os parâmetros não foram passados, busca do DOM
-    if (temp === undefined || umid === undefined) {
-        const tempTexto = document.getElementById('temperaturaAtual').textContent;
-        const umidTexto = document.getElementById('umidadeAtual').textContent;
-        temp = parseFloat(tempTexto.replace(/[^0-9.-]/g, ''));
-        umid = parseFloat(umidTexto.replace(/[^0-9.-]/g, ''));
-    }
-    
-    if (isNaN(temp) || isNaN(umid)) return;
-
-    const alertaDiv = document.getElementById('alerta-sound-clima');
-    let novoAlerta = '';
-
-    // Limpa classes anteriores
-    alertaDiv.className = 'alerta-clima-label';
-
-    // Condição 1: Calor Extremo (Acima de 40°C)
-    if (temp >= 40) {
-        novoAlerta = 'quente';
-        alertaDiv.innerHTML = '🔥 ALERTA: Temperatura Extrema!';
-        alertaDiv.classList.add('alerta-quente');
-    } 
-    // Condição 2: Frio Extremo (Abaixo de 5°C)
-    else if (temp <= 5) {
-        novoAlerta = 'frio';
-        alertaDiv.innerHTML = '❄️ ALERTA: Frio Extremo!';
-        alertaDiv.classList.add('alerta-frio');
-    } 
-    // Condição 3: Umidade Baixa (Abaixo de 20%)
-    else if (umid <= 20) {
-        novoAlerta = 'seco';
-        alertaDiv.innerHTML = '🏜️ ATENÇÃO: Umidade do Ar Baixa!';
-        alertaDiv.classList.add('alerta-seco');
-    } else {
-        // Se não há alertas, esconde o alerta
-        alertaDiv.style.display = 'none';
-        alertaAtivoAtual = '';
-        return;
-    }
-
-    // Mostra o alerta e toca o som
-    if (novoAlerta !== '') {
-        alertaDiv.style.display = 'flex';
-        
-        if (novoAlerta !== alertaAtivoAtual) {
-            somAlerta.play().catch(e => console.log("Aguardando interação..."));
-            alertaAtivoAtual = novoAlerta;
-        }
-    }
-}
-
-// =======================================================
-// OBSERVADOR AUTOMÁTICO (A MÁGICA ACONTECE AQUI)
-// =======================================================
-
-
-const observer = new MutationObserver(function() {
-    verificarAlertasClima();
-});
-
-// Configuração do observador
-const configObserver = { childList: true, subtree: true };
-
-// Inicia a observação no elemento de temperatura e umidade
-const elemTemp = document.getElementById('temperaturaAtual');
-const elemUmid = document.getElementById('umidadeAtual');
-
-if (elemTemp) observer.observe(elemTemp, configObserver);
-if (elemUmid) observer.observe(elemUmid, configObserver);
-
 
 // =============================================
 // NORMALIZAÇÃO E CLASSIFICAÇÃO DE AUDIO ALERTAS
@@ -3182,6 +2718,7 @@ function criarRadarNoMapa(radarData) {
     }
 
     console.log('[Radar X9] 📍 Criando radar no mapa:', radarData);
+    
 
     const iconeUrl = getIconUrl(radarData.tipo, radarData.velocidade);
     const fallbackUrl = '/imagens_app/ic_radar_cev_v2.png';
@@ -3232,11 +2769,28 @@ function criarRadarNoMapa(radarData) {
 // INICIALIZAÇÃO DO MAPA E CONTROLES
 // ===================================================================
 async function initMap() {
+
     console.log('[Radar X9] 🚀 Inicializando aplicação...');
+    
+    // ADICIONE ESTE LOG:
+    const mapElement = document.getElementById('map');
+    if (!mapElement) {
+        console.error('[Radar X9] ❌ ERRO: Elemento #map NÃO EXISTE no HTML!');
+        return;
+    }
+
+    
+    console.log('[Radar X9] ✅ Elemento #map encontrado:', mapElement);
+    console.log('[Radar X9] 📏 Dimensões do #map:', mapElement.offsetWidth, 'x', mapElement.offsetHeight);
+    
+    if (mapElement.offsetHeight === 0) {
+        console.error('[Radar X9] ❌ ERRO: #map tem altura 0! Verifique o CSS.');
+    }
     
     // Carregar configuração do GitHub
     await carregarConfigGitHub();
     console.log("CONFIG:", GITHUB_CONFIG);
+    
     // Carregar pendentes salvos localmente (se existirem)
     carregarRadaresPendentes();
     
@@ -3252,19 +2806,43 @@ async function initMap() {
     console.log("Nova localização:", lat, lon);
 
 }
-    //=============================
-    // CONFIGURAÇÃO INICIAL DO MAPA
-    //=============================
+
+ // Antes de criar o mapa:
+    console.log('[Radar X9] 🗺️ Criando mapa Leaflet...');
+    console.log('[Radar X9] 📍 Centro inicial:', userLat, userLng);
+    
+    if (typeof L === 'undefined') {
+        console.error('[Radar X9] ❌ ERRO: Leaflet (L) não está definido!');
+        hideFullscreenLoading();
+        showNotification("Erro de conexão. Os mapas não puderam carregar.");
+        return;
+    }
+    
+//=============================
+// CONFIGURAÇÃO INICIAL DO MAPA
+//=============================
+
+    
     map = L.map('map', {
-     center: [userLat, userLng],
-      zoom: 18,
-       zoomControl: false,
+        center: [userLat, userLng],
+        zoom: 18,
+        zoomControl: false,
         rotate: true,
-         bearing: 0 });
-    if (typeof map.setBearing !== 'function') console.warn('[Radar X9] AVISO: leaflet-rotate pode não ter carregado.');
-    aplicarTemaMapa();
-    setInterval(aplicarTemaMapa, 300000);
-    inicializarBussolaHardware();
+        bearing: 0
+    });
+    
+    console.log('[Radar X9] ✅ Mapa criado com sucesso:', map);
+
+if (typeof map.setBearing !== 'function') {
+    console.warn('[Radar X9] AVISO: leaflet-rotate pode não ter carregado.');
+}
+
+aplicarTemaMapa();
+
+setInterval(aplicarTemaMapa, 300000);
+
+inicializarBussolaHardware();
+
 
 // ==========================
 // RECENTRALIZAR MAPA
@@ -3347,17 +2925,6 @@ speedWidget.addEventListener("click", () => {
     }
 });
 
-    //=============================
-    // Configurar eventos dos botões
-    //==============================
-
-// ========================================
-// OCULTAR BÚSSOLA NATIVA DO LEAFLET
-// ========================================
-
-// ========================================
-// OCULTAR BÚSSOLA NATIVA DO LEAFLET
-// ========================================
 
 // ========================================
 // OCULTAR BÚSSOLA NATIVA DO LEAFLET
@@ -4137,9 +3704,10 @@ function inicializarBotaoAddRadar() {
     }
 
 
-// ===========================
-// RECEBER GPS DO APP INVENTOR
-// ===========================
+// =====================================
+// RECEBER GPS ATUALIZALIÇÃO LOCALIZAÇÃO
+// =====================================
+
 function atualizarLocalizacao(lat, lon) {
     // Valida os dados
     if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
@@ -5019,84 +4587,6 @@ async function solicitarPermissaoBussolaIOS() {
     return false;
 }
 
-// =====================================
-// NOVA FORMA DE INTEGRAÇÃO APP INVENTOR
-// =====================================
-var ultimoWebViewString = '';
-
-function enviarAlertaSonoroParaAppInventor(tipoAlerta) {
-
-    if (typeof AppInventor === 'undefined') {
-        console.warn('[Radar X9] AppInventor não disponível');
-        return false;
-    }
-
-    var mapaTextos = {
-        radar: 'RADAR',
-        risco: 'RISCO',
-        mobilidade: 'MOBILIDADE',
-        destaque: 'DESTAQUE',
-        clima: 'CLIMA'
-    };
-
-    var texto = mapaTextos[tipoAlerta];
-
-    if (!texto) {
-        console.warn('[Radar X9] Tipo de alerta desconhecido:', tipoAlerta);
-        return false;
-    }
-
-    try {
-
-        AppInventor.setWebViewString(texto);
-
-        ultimoWebViewString = texto;
-
-        console.log(
-            '[Radar X9] → App Inventor:',
-            texto
-        );
-
-        return true;
-
-    } catch (e) {
-
-        console.error(
-            '[Radar X9] Erro ao enviar para App Inventor:',
-            e
-        );
-
-        return false;
-    }
-}
-
-
-
-// ====================================
-// FUNÇÃO RECEBER DADOS DO APP INVENTOR
-// ====================================
-
-function receberDadosAppInventor(dadosStr) {
-    if (!dadosStr || typeof dadosStr !== 'string') return;
-    var partes = dadosStr.split('|');
-    var acao = partes[0];
-    if (acao === 'GPS' && partes.length >= 3) {
-        var lat = parseFloat(partes[1]);
-        var lng = parseFloat(partes[2]);
-        var speed = partes[3] ? parseFloat(partes[3]) : 0;
-        var heading = partes[4] ? parseFloat(partes[4]) : null;
-        if (heading === -1 || isNaN(heading)) heading = null;
-       
-        // [CORREÇÃO] Precisão vinda do App Inventor (posição 5); fallback fixo de 50m se ausente
-        var accuracy = (partes[5] !== undefined && partes[5] !== '') ? parseFloat(partes[5]) : 50;
-        if (isNaN(accuracy)) accuracy = 50;
-        if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
-            gpsSource = 'appinventor';
-            processarNovaPosicao(lat, lng, speed, heading, accuracy);
-        }
-    }
-}
-
 
 
 // ===================================================================
@@ -5104,52 +4594,13 @@ function receberDadosAppInventor(dadosStr) {
 // ===================================================================
 document.addEventListener('DOMContentLoaded', async function() {
 
-// ==========================================
-// PONTE DE COMUNICAÇÃO: OUVIR O APP INVENTOR
-// ==========================================
-function iniciarPonteAppInventor() {
-    // Verifica se está rodando dentro do App Inventor
-    if (typeof window.AppInventor !== 'undefined') {
-        console.log("📱 Ambiente App Inventor detectado. Iniciando leitura de GPS...");
-        
-        // Verifica a cada 1 segundo se há novos dados
-        setInterval(() => {
-            try {
-                // Lê a string que o App Inventor enviou
-                let dadosRecebidos = window.AppInventor.getWebViewString();
-                
-                // Se houver dados e começar com 'GPS|', processa
-                if (dadosRecebidos && dadosRecebidos.startsWith('GPS|')) {
-                    console.log("📡 Dados brutos recebidos:", dadosRecebidos);
-                    
-                    // Chama a SUA função que já está pronta
-                    receberDadosAppInventor(dadosRecebidos);
-                    
-                    // Limpa a string para não processar a mesma leitura duas vezes
-                    window.AppInventor.setWebViewString("");
-                }
-            } catch (erro) {
-                console.warn("Erro ao ler WebViewString:", erro);
-            }
-        }, 1000); // 1000ms = 1 segundo
-    } else {
-        console.log("💻 Rodando no navegador normal. Usando GPS do navegador...");
-        // Aqui você pode manter sua lógica original de navigator.geolocation se quiser
-    }
-}
-
-// Inicia a ponte assim que a página carregar
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', iniciarPonteAppInventor);
-} else {
-    iniciarPonteAppInventor();
-}
   
     ajustarTextosClima();
+    aplicarTemaMapa();
     ajustarHeaderResponsivo();
     carregarRadaresPendentes(); 
     initMap(); 
-    inicializarBussolaHardware(); // nome corrigido, ver bug 2 abaixo
+  
     setTimeout(()=>{ const l=document.getElementById('loading-fullscreen'); if(l){l.classList.add('fade-out');setTimeout(()=>{if(l)l.style.display='none';},600);} }, 1500);
 });
 window.addEventListener('resize', function() {
@@ -5157,14 +4608,7 @@ window.addEventListener('resize', function() {
     ajustarHeaderResponsivo();
 });
 
-// Dentro de atualizarTemperatura(), após buscar os dados:
-atualizarInterfaceCabecalho({
-    cidade: dadosClima.name || "Local",
-    temp: dadosClima.main.temp,
-    umidade: dadosClima.main.humidity,
-    poluicaoTexto: textoPoluicao, // (a variável que você já criou no seu código)
-    precisaoGPS: typeof ultimaPrecisaoGPS !== 'undefined' ? ultimaPrecisaoGPS : 999
-});
+
 
 
 // ============================================
