@@ -1697,18 +1697,6 @@ body {
 
  /* CORES DAS VELOCIDADES */
 
-.speed-btn:hover {
-     border-color: var(--accent-color); 
-     color: var(--text-main); 
-     background: rgba(0, 255, 136, 0.05);
-     }
-
-.speed-btn.selected {
-     border-color: var(--accent-color);
-      background: rgba(0, 255, 136, 0.15); 
-      color: var(--accent-color);
-       box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
-     }
 
     .speed-btn.selected-30 { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
     .speed-btn.selected-40 { border-color: #ffa94d; color: #ffa94d; background: rgba(255, 169, 77, 0.1); }
@@ -1767,7 +1755,7 @@ body {
 }
 
  /* LACUNAS DAS COORDENADAS */
- 
+
     .coords-inputs-container {
         display: none; /* Escondido até capturar */
         flex-direction: row;
