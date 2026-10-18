@@ -696,19 +696,17 @@ body {
 /* ============================================================
    SIDEBAR CONTROLS - BOTÕES DO MAPA (VERTICAL)
    ============================================================ */
-/* ===== SIDEBAR RECOLHÍVEL ===== */
+
 .sidebar-controls {
     position: relative !important;
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Recolhida: sai da tela, em qualquer largura */
-.sidebar-controls.retracted {
+.sidebar-controls.controls-hidden {
     transform: translateX(calc(100% + 15px)) !important;
 }
 
-/* Alça colada na borda esquerda da sidebar (fica visível mesmo recolhida) */
-.sidebar-toggle {
+.controls-handle {
     position: absolute !important;
     top: 0 !important;
     left: -26px !important;
@@ -728,9 +726,8 @@ body {
     z-index: 1002 !important;
 }
 
-.sidebar-toggle .arrow { transition: transform 0.35s ease; }
-.sidebar-controls.retracted .sidebar-toggle .arrow { transform: rotate(180deg); }
-
+.controls-handle .arrow { transition: transform 0.35s ease; }
+.sidebar-controls.controls-hidden .controls-handle .arrow { transform: rotate(180deg); }
 
 
 /* ============================================================
