@@ -1695,28 +1695,33 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+ /* CORES DAS VELOCIDADES */
+
 .speed-btn:hover {
-    border-color: var(--accent-color);
-    color: var(--text-main);
-    background: rgba(0, 255, 136, 0.05);
-}
+     border-color: var(--accent-color); 
+     color: var(--text-main); 
+     background: rgba(0, 255, 136, 0.05);
+     }
 
 .speed-btn.selected {
-    border-color: var(--accent-color);
-    background: rgba(0, 255, 136, 0.15);
-    color: var(--accent-color);
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
-}
+     border-color: var(--accent-color);
+      background: rgba(0, 255, 136, 0.15); 
+      color: var(--accent-color);
+       box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+     }
 
-.speed-btn { --rgb: 0, 255, 136; }
-.speed-btn[data-speed="30"]  { --rgb: 0, 220, 100; }
-.speed-btn[data-speed="40"]  { --rgb: 140, 220, 0; }
-.speed-btn[data-speed="50"]  { --rgb: 255, 204, 0; }
-.speed-btn[data-speed="60"]  { --rgb: 255, 140, 0; }
-.speed-btn[data-speed="70"]  { --rgb: 255, 90, 40; }
-.speed-btn[data-speed="80"]  { --rgb: 255, 51, 51; }
-.speed-btn[data-speed="100"] { --rgb: 220, 40, 160; }
-.speed-btn[data-speed="110"] { --rgb: 160, 70, 255; }
+    .speed-btn.selected-30 { border-color: #ff6b6b; color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+    .speed-btn.selected-40 { border-color: #ffa94d; color: #ffa94d; background: rgba(255, 169, 77, 0.1); }
+    .speed-btn.selected-50 { border-color: #ffd93d; color: #ffd93d; background: rgba(255, 217, 61, 0.1); }
+    .speed-btn.selected-60 { border-color: #6bcb77; color: #6bcb77; background: rgba(107, 203, 119, 0.1); }
+    .speed-btn.selected-70 { border-color: #4d96ff; color: #4d96ff; background: rgba(77, 150, 255, 0.1); }
+    .speed-btn.selected-80 { border-color: #9b59b6; color: #9b59b6; background: rgba(155, 89, 182, 0.1); }
+    .speed-btn.selected-100 { border-color: #ff6b9d; color: #ff6b9d; background: rgba(255, 107, 157, 0.1); }
+    .speed-btn.selected-110 { border-color: #ff4757; color: #ff4757; background: rgba(255, 71, 87, 0.1); }
+
+    .icon-preview { display: flex; align-items: center; background: #0f1115; padding: 12px 16px; border-radius: 12px; border: 1px solid #333; }
+    .icon-preview img { width: 40px; height: 40px; object-fit: contain; }
+    .icon-preview span { font-size: 0.95rem; color: var(--text-main); }
 
 .speed-btn:hover {
     border-color: rgb(var(--rgb));
@@ -1761,15 +1766,31 @@ body {
     color: var(--text-main);
 }
 
-.coords-info { display: none; margin: 10px 0 6px; padding: 10px 14px; border-radius: 12px;
-    background: rgba(0,255,136,.06); border: 1px solid rgba(0,255,136,.25); }
-.coords-info.show,
-.coords-info.visible,
-.coords-info.active { display: block; }
-
-.coord-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: .9rem; }
-.coord-label { color: var(--text-muted); font-weight: 600; }
-.coord-value { color: var(--accent-color); font-family: 'Courier New', monospace; font-weight: 700; }
+ /* LACUNAS DAS COORDENADAS */
+ 
+    .coords-inputs-container {
+        display: none; /* Escondido até capturar */
+        flex-direction: row;
+        gap: 10px;
+        margin-top: 8px;
+    }
+    .coord-field {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .coord-label {
+        font-size: 0.7rem; font-weight: 600; color: var(--text-muted); 
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .coord-input {
+        width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #333;
+        background: #0a0c10; color: var(--accent-color); font-family: 'Courier New', monospace;
+        font-size: 0.9rem; font-weight: 700; outline: none;
+    }
+    .coord-input::placeholder { color: #333; }
+    .current-position-status { font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; font-style: italic; text-align: center; }
 
 
 .btn-submit-radar {
