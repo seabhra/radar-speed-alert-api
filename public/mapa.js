@@ -2512,11 +2512,10 @@ function fecharTodasBarras() {
 
 function abrirSidebar() {
     var sidebar = document.getElementById('sidebar-controls');
-    var btnMenu = document.getElementById('btn-menu-toggle');
     if (!sidebar) return;
     sidebarAberta = true;
     sidebar.classList.remove('retracted');
-    if (btnMenu) btnMenu.classList.remove('active');
+    // removido: if (btnMenu) btnMenu.classList.remove('active');
 }
 
 function inicializarSidebarToggle() {
@@ -2524,7 +2523,10 @@ function inicializarSidebarToggle() {
     var btnToggle = document.getElementById('btn-sidebar-toggle');
     if (!sidebar || !btnToggle) return;
 
-    btnToggle.addEventListener('click', function () {
+    btnToggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();   // não deixa o clique chegar ao handler do menu esquerdo
+
         sidebar.classList.toggle('retracted');
         sidebarAberta = !sidebar.classList.contains('retracted');
     });
