@@ -2903,3 +2903,71 @@ body {
     }
 }
 
+/* ===================================
+ MODAL ADICIONAR RADAR
+====================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    height: auto;
+}
+.modal-content {
+    max-height: calc(100dvh - 40px);
+}
+
+.label-icon,
+.capture-icon,
+.btn-icon {
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.btn-submit-radar {
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.coords-info {
+    margin: 10px 0 6px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(0, 255, 136, 0.06);
+    border: 1px solid rgba(0, 255, 136, 0.25);
+}
+.coord-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    font-size: 0.9rem;
+}
+.coord-label { color: var(--text-muted); font-weight: 600; }
+.coord-value { color: var(--accent-color); font-family: 'Courier New', monospace; font-weight: 700; }
+
+.form-hint {
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.submit-status {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+}
+.submit-status.success { background: rgba(0,255,136,.12); color: #00ff88; border: 1px solid rgba(0,255,136,.3); }
+.submit-status.error   { background: rgba(255,51,51,.12); color: #ff6666; border: 1px solid rgba(255,51,51,.3); }
+
+.form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2300ff88' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+}
