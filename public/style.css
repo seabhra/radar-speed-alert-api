@@ -1708,6 +1708,27 @@ body {
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
 }
 
+.speed-btn { --rgb: 0, 255, 136; }
+.speed-btn[data-speed="30"]  { --rgb: 0, 220, 100; }
+.speed-btn[data-speed="40"]  { --rgb: 140, 220, 0; }
+.speed-btn[data-speed="50"]  { --rgb: 255, 204, 0; }
+.speed-btn[data-speed="60"]  { --rgb: 255, 140, 0; }
+.speed-btn[data-speed="70"]  { --rgb: 255, 90, 40; }
+.speed-btn[data-speed="80"]  { --rgb: 255, 51, 51; }
+.speed-btn[data-speed="100"] { --rgb: 220, 40, 160; }
+.speed-btn[data-speed="110"] { --rgb: 160, 70, 255; }
+
+.speed-btn:hover {
+    border-color: rgb(var(--rgb));
+    background: rgba(var(--rgb), 0.08);
+}
+.speed-btn.selected {
+    border-color: rgb(var(--rgb));
+    background: rgba(var(--rgb), 0.18);
+    color: rgb(var(--rgb));
+    box-shadow: 0 0 20px rgba(var(--rgb), 0.25);
+}
+
 .btn-capture-location {
     width: 100%;
     padding: 14px 16px;
@@ -1739,6 +1760,17 @@ body {
     background: rgba(0, 255, 136, 0.12);
     color: var(--text-main);
 }
+
+.coords-info { display: none; margin: 10px 0 6px; padding: 10px 14px; border-radius: 12px;
+    background: rgba(0,255,136,.06); border: 1px solid rgba(0,255,136,.25); }
+.coords-info.show,
+.coords-info.visible,
+.coords-info.active { display: block; }
+
+.coord-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: .9rem; }
+.coord-label { color: var(--text-muted); font-weight: 600; }
+.coord-value { color: var(--accent-color); font-family: 'Courier New', monospace; font-weight: 700; }
+
 
 .btn-submit-radar {
     width: 100%;
