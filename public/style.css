@@ -1,26 +1,13 @@
 /* ============================================================
-   RADAR X9 - CSS CONSOLIDADO
-   Versão: 2.2 (Responsivo Desktop + Mobile + WebView)
-   ============================================================
-   ESCALA DE Z-INDEX (única fonte de verdade)
-     1      mapa
-     500    widgets (bússola, velocímetro)
-     1000   header, barras de busca, tarja de alerta
-     1001   botões laterais do mapa
-     1100   botão "+" e painel de navegação
-     1500   páginas (info, doar, radares)
-     1999   overlay do menu
-     2000   menu lateral
-     2100   modal
-     3000   toast
-     9999   loading
-     99999  splash
+   RADAR X9 - CSS COMPLETO HARMONIZADO
+   Versão: 2.0 (Responsivo Desktop + Mobile)
    ============================================================ */
 
 /* ============================================================
-   1. VARIÁVEIS GLOBAIS
+   1. VARIÁVEIS GLOBAIS (ROOT)
    ============================================================ */
 :root {
+    /* Cores principais */
     --bg-color: #0f1115;
     --panel-color: #1a1d24;
     --accent-color: #00ff88;
@@ -28,30 +15,27 @@
     --text-main: #ffffff;
     --text-muted: #94a3b8;
 
+    /* Glassmorphism */
     --bg-glass: rgba(15, 23, 42, 0.85);
 
+    /* GPS Status */
     --gps-ok: #00ff88;
     --gps-instavel: #ffcc00;
     --gps-sem: #ff3333;
 
     /* Layout */
+    --sidebar-width: 68px;
+    --btn-size: 50px;
     --header-height: 64px;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --header-total: calc(var(--header-height) + var(--safe-top));
 
-    /* Z-index */
+    /* Z-Index hierarchy */
     --z-map: 1;
+    --z-leaflet: 40;
     --z-widgets: 500;
     --z-alerts: 1000;
     --z-header: 1000;
-    --z-controls: 1001;
-    --z-floating: 1100;
-    --z-pages: 1500;
-    --z-menu-overlay: 1999;
-    --z-menu: 2000;
-    --z-modal: 2100;
-    --z-toast: 3000;
+    --z-menu-overlay: 1000;
+    --z-menu-lateral: 1001;
     --z-loading: 9999;
     --z-splash: 99999;
 }
@@ -66,50 +50,50 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-html {
-    height: 100%;
-    -webkit-text-size-adjust: 100%;
-}
-
 body {
-    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-main);
-    height: 100vh;   /* fallback para WebViews antigos */
-    height: 100dvh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    overscroll-behavior: none;
 }
-
-button {
-    font-family: inherit;
-}
-
 /* ============================================================
    3. SPLASH SCREEN
    ============================================================ */
+
 #splash-screen {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: var(--z-splash);
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw;
+    height: 100vh;
+    z-index: var(--z-splash) !important;
 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     overflow: hidden;
 
-    background: radial-gradient(circle at center, #2a5298 0%, #1e3c72 48%, #142b52 100%);
+    background:
+        radial-gradient(
+            circle at center,
+            #2a5298 0%,
+            #1e3c72 48%,
+            #142b52 100%
+        );
+
     color: #fff;
 
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
+
+    transition:
+        opacity 0.5s ease,
+        visibility 0.5s ease;
 }
 
 #splash-screen.splash-hidden {
@@ -118,62 +102,125 @@ button {
     pointer-events: none !important;
 }
 
+/* ============================================================
+   LOGO PRINCIPAL
+   ============================================================ */
+
 #splash-logo-principal {
     display: block;
     width: 280px;
     height: 280px;
-    max-width: 70vw;
-    max-height: 70vw;
+
     object-fit: contain;
+
     margin: 0 0 14px 0;
-    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55));
+
+    filter:
+        drop-shadow(0 8px 24px rgba(0, 0, 0, 0.55));
+
     animation: pulseLogo 2s ease-in-out infinite;
 }
+
+/* ============================================================
+   FALLBACK
+   ============================================================ */
 
 #splash-fallback {
     display: none;
+
     width: 200px;
     height: 200px;
+
     align-items: center;
     justify-content: center;
+
     margin-bottom: 14px;
+
     border-radius: 50%;
-    background: linear-gradient(135deg, #ff3333 0%, #b90000 100%);
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff3333 0%,
+            #b90000 100%
+        );
+
     color: #fff;
+
     font-size: 80px;
     font-weight: 700;
-    font-family: 'Rajdhani', 'Oswald', Arial, sans-serif;
-    box-shadow: 0 8px 32px rgba(255, 51, 51, 0.35);
+
+    font-family:
+        'Rajdhani',
+        'Oswald',
+        Arial,
+        sans-serif;
+
+    box-shadow:
+        0 8px 32px rgba(255, 51, 51, 0.35);
+
     animation: pulseLogo 2s ease-in-out infinite;
 }
 
+/* ============================================================
+   POWERED BY
+   ============================================================ */
+
 .splash-powered {
     margin-top: 2px;
+
     text-align: center;
-    font-family: 'Rajdhani', 'Oswald', Arial, sans-serif;
+
+    font-family:
+        'Rajdhani',
+        'Oswald',
+        Arial,
+        sans-serif;
 }
 
 .splash-powered span {
     color: #ff3333;
+
     font-size: 18px;
     font-weight: 600;
+
     letter-spacing: 0.5px;
 }
 
+/* ============================================================
+   MARCA NEWSGAMES
+   ============================================================ */
+
 #splash-marca {
     display: block;
+
     width: 50px;
     height: 50px;
+
     object-fit: contain;
+
     margin-top: 6px;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+
+    filter:
+        drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
 }
+
+/* ============================================================
+   CRÉDITOS
+   ============================================================ */
 
 .splash-credits {
     margin-top: 10px;
+
     text-align: center;
+
     color: rgba(255, 255, 255, 0.82);
-    font-family: 'Rajdhani', 'Oswald', Arial, sans-serif;
+
+    font-family:
+        'Rajdhani',
+        'Oswald',
+        Arial,
+        sans-serif;
 }
 
 .splash-credits p {
@@ -186,218 +233,279 @@ button {
     color: rgba(255, 255, 255, 0.48);
 }
 
+/* ============================================================
+   LOADER
+   ============================================================ */
+
 .splash-loader {
     width: 42px;
     height: 42px;
+
     margin-top: 20px;
+
     border: 3px solid rgba(255, 255, 255, 0.15);
+
     border-top-color: #ff3333;
     border-right-color: #00ff88;
+
     border-radius: 50%;
+
     animation: spin 0.9s linear infinite;
 }
 
+/* ============================================================
+   ANIMAÇÕES
+   ============================================================ */
+
 @keyframes pulseLogo {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50%      { transform: scale(1.04); opacity: 0.94; }
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.04);
+        opacity: 0.94;
+    }
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
+    from {
+        transform: rotate(0deg);
+    }
 
+    to {
+        transform: rotate(360deg);
+    }
+}
 /* ============================================================
    4. HEADER PRINCIPAL
    ============================================================ */
+
 #main-header {
-    position: relative;
-    flex: 0 0 auto;
-    height: var(--header-total);
-    padding: var(--safe-top) 12px 0 12px;
+    position: relative !important;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: var(--header-height);
+
+    background: var(--bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
     display: flex;
     align-items: center;
     justify-content: flex-start;
 
-    background: var(--bg-glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0 12px;
+
+    z-index: var(--z-header) !important;
+
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    z-index: var(--z-header);
+
+    box-sizing: border-box;
 }
+
+
+/* ============================================================
+   GRUPO ESQUERDO
+   MENU + INFORMAÇÕES DO CABEÇALHO
+   ============================================================ */
 
 .header-left-container {
     display: flex;
     flex-direction: row;
     align-items: center;
+
     gap: 8px;
+
     width: 100%;
     height: 100%;
+
     min-width: 0;
 }
 
-/* Botão hambúrguer */
-#btn-menu-toggle {
-    flex: 0 0 45px;
-    width: 45px;
-    height: 45px;
-    padding: 6px;
+
+/* ============================================================
+   BOTÃO MENU
+   ============================================================ */
+
+.btn-menu-toggle {
+    position: relative !important;
+
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    transform: none !important;
+
+    flex: 0 0 54px;
+
+    width: 54px;
+    height: 48px;
+
+    margin: 0;
+    padding: 4px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
 
-    background: rgba(20, 20, 20, 0.95);
-    border: 1.5px solid rgba(0, 255, 136, 0.4);
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
-#btn-menu-toggle:hover {
-    border-color: var(--accent-color);
-    background: rgba(0, 255, 136, 0.1);
-    transform: scale(1.05);
-}
 
-#btn-menu-toggle:active {
-    transform: scale(0.95);
-}
+/* ============================================================
+   BLOCO DAS INFORMAÇÕES
+   ============================================================ */
 
-#btn-menu-toggle .menu-hamburger {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    width: 18px;
-}
-
-#btn-menu-toggle .menu-hamburger span {
-    display: block;
-    height: 2px;
-    width: 100%;
-    background-color: var(--accent-color);
-    border-radius: 2px;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: center;
-}
-
-#btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
-    transform: translateY(5px) rotate(45deg);
-}
-
-#btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
-    opacity: 0;
-    transform: scaleX(0);
-}
-
-#btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
-    transform: translateY(-5px) rotate(-45deg);
-}
-
-#btn-menu-toggle .menu-label {
-    font-size: 0.5rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: var(--accent-color);
-    text-transform: uppercase;
-    line-height: 1;
-    margin-top: 2px;
-}
-
-/* Bloco de informações */
 .header-info-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
+
     min-width: 0;
     flex: 1 1 auto;
+
     height: 100%;
 }
 
-/* Linha 1: marca + GPS */
+
+/* ============================================================
+   LINHA 1
+   RADAR X9 + GPS
+   ============================================================ */
+
 .header-brand-section {
     display: flex;
     align-items: center;
+
     gap: 8px;
-    height: 32px;
+
+    height: 28px;
+
+    margin: 0;
+    padding: 0;
+
     white-space: nowrap;
 }
+
+
+/* ÍCONE DA MARCA */
 
 .app-icon {
     width: 32px;
     height: 32px;
+
     object-fit: contain;
+
     border-radius: 8px;
+
     flex-shrink: 0;
 }
+
+
+/* TÍTULO */
 
 .titulo-app {
     display: flex;
     flex-direction: column;
+
     flex: 0 1 auto;
+
     min-width: 0;
+
+    gap: 2px;
+
+    margin: 0;
+    padding: 0;
 }
+
+
+/* RADAR X9 + GPS */
 
 .titulo-linha {
     display: flex;
     align-items: center;
-    flex-wrap: nowrap;
+
     gap: 8px;
-    min-width: 0;
+
     white-space: nowrap;
+    flex-wrap: nowrap;
+
+    min-width: 0;
 }
+
 
 .titulo-linha h1 {
     font-size: 1rem;
+
     font-weight: 800;
+
     letter-spacing: 0.5px;
+
     text-transform: uppercase;
+
+    margin: 0;
+
     color: var(--text-main);
+
     line-height: 1;
+
     flex-shrink: 0;
 }
+
 
 .titulo-linha h1 span {
     color: var(--accent-color);
 }
 
-/* Linha 2: local + clima */
+
+/* ============================================================
+   LINHA 2
+   LOCAL + TEMPERATURA + UMIDADE + POLUIÇÃO
+   ============================================================ */
+
 .dados-clima-linha {
     display: flex;
     align-items: center;
+
     gap: 6px;
-    height: 22px;
-    min-width: 0;
+
+    height: 24px;
+
+    margin: 0;
+    padding: 0;
+
     font-size: 0.75rem;
+
     color: var(--text-muted);
+
     white-space: nowrap;
+
     overflow: hidden;
+
+    text-overflow: ellipsis;
 }
+
 
 .dados-clima-linha .separador {
     opacity: 0.4;
+
     font-size: 0.7rem;
+
     flex-shrink: 0;
 }
 
-.cidade-label,
-.temp-label,
-.umidade-label,
-.qualidade-ar-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    flex: 0 0 auto;
-    white-space: nowrap;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-main);
-}
+
+/* ============================================================
+   DADOS INDIVIDUAIS
+   ============================================================ */
 
 #nomeCidade,
 #temperaturaAtual,
@@ -407,302 +515,480 @@ button {
     color: var(--text-main);
 }
 
+
+.cidade-label,
+.temp-label,
+.umidade-label,
+.qualidade-ar-label {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 2px;
+
+    flex: 0 0 auto;
+
+    white-space: nowrap;
+
+    font-family: 'Rajdhani', sans-serif;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: var(--text-main);
+}
+
+
 #nomeCidade {
     display: inline-block;
+
     font-size: 12px;
-    min-width: 0;
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
     white-space: nowrap;
-    flex: 0 1 auto;
+
+    flex: 0 0 auto;
+
+    min-width: max-content;
 }
+
 
 #temperaturaAtual,
 #poluicaoAtual {
     min-width: 32px;
+
     text-align: left;
+
     transition: all 0.3s ease;
 }
+
 
 #umidadeAtual {
     min-width: 24px;
+
     text-align: left;
+
     transition: all 0.3s ease;
 }
 
+
 /* ============================================================
-   5. ÁREA DO MAPA
+   EVITA QUE O GRUPO DO MAPA ENTRE NO FLUXO DO HEADER
    ============================================================ */
-.map-wrapper {
-    position: relative;
-    flex: 1 1 auto;
-    min-height: 0;
-    width: 100%;
-    overflow: hidden;
-    background: #111;
-}
 
-#map {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #111;
-    z-index: var(--z-map);
-}
-
-/* Camada para widgets sobre o mapa (não captura cliques) */
-#app-container {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-}
-
-.leaflet-container {
-    background: #111;
-}
-
-/* Z-index internos do Leaflet (padrão da biblioteca - não alterar) */
-.leaflet-pane { position: absolute; }
-.leaflet-map-pane { z-index: auto; }
-.leaflet-tile-pane { z-index: 200; }
-.leaflet-overlay-pane { z-index: 400; }
-.leaflet-shadow-pane { z-index: 500; }
-.leaflet-marker-pane { z-index: 600; }
-.leaflet-tooltip-pane { z-index: 650; }
-.leaflet-popup-pane { z-index: 700; }
-.leaflet-control-pane { z-index: 800; }
-
-/* Controles nativos do Leaflet ocultos */
-.leaflet-control-zoom,
-.leaflet-control-attribution,
-.leaflet-routing-container,
-.leaflet-control-compass {
+#main-header > .header-right-container {
     display: none !important;
 }
 
 
 /* ============================================================
-   6. BOTÕES LATERAIS DO MAPA (CORRIGIDO PARA FICAR SOBRE O MAPA)
+   5. MAPA E WRAPPER
    ============================================================ */
-.header-right-container {
-    /* Mudado de 'fixed' para 'absolute' para ficar preso ao .map-wrapper (que é relative) */
+
+.map-wrapper {
+    position: relative !important;  /* ← ESSENCIAL para os filhos absolutos */
+    width: 100% !important;
+    /* Adicionei um fallback de 60px caso a variável --header-height não esteja definida no :root */
+    height: calc(100vh - var(--header-height, 60px)) !important; 
+    min-height: 400px !important; /* Garante uma altura mínima de segurança */
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+}
+
+/* 👇 ESTE É O TRECHO CRUCIAL QUE ESTAVA FALTANDO 👇 */
+#map {
+    width: 100% !important;
+    height: 100% !important; /* Obriga o mapa a ocupar 100% da altura do .map-wrapper */
+    position: absolute !important; /* Garante que preencha o wrapper sem margens ou buracos */
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1 !important; /* Mantém o mapa na camada base */
+}
+
+/* ============================================================
+   ÁREA PRINCIPAL DO MAPA
+   ============================================================ */
+
+#page-mapa {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    display: block !important;
+
+    background: #111 !important;
+
+    z-index: 1 !important;
+}
+
+/* ============================================================
+   LEAFLET
+   IMPORTANTE: NÃO ALTERAR OS Z-INDEX INTERNOS
+   ============================================================ */
+
+#page-mapa .leaflet-container {
+    position: absolute !important;
+
+    top: 0 !important;
+    left: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    background: #111 !important;
+}
+
+/* Deixe o próprio Leaflet controlar seus panes */
+
+.leaflet-pane {
     position: absolute;
-    top: 16px; /* Distância do topo do mapa, não da tela inteira */
-    right: 12px;
-    z-index: 9999 !important; /* Força máxima para ficar acima de QUALQUER camada do Leaflet */
-    pointer-events: auto; /* Garante que a área inteira aceite interações */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
 }
 
+.leaflet-map-pane {
+    z-index: auto;
+}
+
+.leaflet-tile-pane {
+    z-index: 200;
+}
+
+.leaflet-overlay-pane {
+    z-index: 400;
+}
+
+.leaflet-shadow-pane {
+    z-index: 500;
+}
+
+.leaflet-marker-pane {
+    z-index: 600;
+}
+
+.leaflet-tooltip-pane {
+    z-index: 650;
+}
+
+.leaflet-popup-pane {
+    z-index: 700;
+}
+
+.leaflet-control-pane {
+    z-index: 800;
+}
+
+/* ============================================================
+  6- CONTAINER DOS BOTÕES - CANTO SUPERIOR DIREITO
+   ============================================================ */
+
+.header-right-container {
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    z-index: 1000 !important;
+    pointer-events: none !important;
+}
+
+/* ============================================================
+   SIDEBAR CONTROLS - BOTÕES DO MAPA (VERTICAL)
+   ============================================================ */
 .sidebar-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 10px;
-    pointer-events: auto;
-
-    /* Limita a altura para não vazar da tela */
-    max-height: calc(100vh - 100px);
-    max-height: calc(100dvh - 100px);
-    overflow-y: auto;
-    padding: 2px;
-    scrollbar-width: none;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 10px !important;
+    pointer-events: auto !important;
 }
 
-.sidebar-controls::-webkit-scrollbar {
-    display: none;
+/* Botões do mapa */
+.sidebar-controls .map-btn {
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    background: rgba(20, 20, 20, 0.92) !important;
+    border: 1px solid rgba(0, 255, 136, 0.35) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6) !important;
+    transition: all 0.2s ease !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
-/* 
-   ATENÇÃO: Se o valor for 80px e o botão tem 44px de largura, ele some TOTALMENTE da tela.
-   Se você quiser que o primeiro botão fique parcialmente visível como uma "alça" para reabrir o menu, 
-   use um valor menor (ex: 30px ou 35px). Ajuste conforme sua preferência visual.
-*/
-.sidebar-controls.retracted {
-    transform: translateX(35px); 
+.sidebar-controls .map-btn:hover {
+    transform: scale(1.08) !important;
+    border-color: #00ff88 !important;
 }
+
+.sidebar-controls .map-btn img {
+    width: 22px !important;
+    height: 22px !important;
+    object-fit: contain !important;
+    pointer-events: none !important;
+}
+
+
+
+/* ============================================================
+   BOTÃO MENU TOGGLE (HAMBÚRGUER)
+   ============================================================ */
+
+#btn-menu-toggle {
+    width: 45px !important;
+    height: 45px !important;
+    background: rgba(20, 20, 20, 0.95) !important;
+    border: 1.5px solid rgba(0, 255, 136, 0.4) !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    padding: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    transition: all 0.3s ease !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+    z-index: 1001 !important;
+    flex-shrink: 0 !important;
+}
+
+#btn-menu-toggle:hover {
+    border-color: var(--accent-color, #00ff88) !important;
+    background: rgba(0, 255, 136, 0.1) !important;
+    transform: scale(1.05) !important;
+}
+
+#btn-menu-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+/* Ícone hambúrguer */
+#btn-menu-toggle .menu-hamburger {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    width: 18px !important;
+}
+
+#btn-menu-toggle .menu-hamburger span {
+    display: block !important;
+    height: 2px !important;
+    width: 100% !important;
+    background-color: var(--accent-color, #00ff88) !important;
+    border-radius: 2px !important;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transform-origin: center !important;
+}
+
+/* Animação quando ativo (vira X) */
+#btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+    transform: translateY(5px) rotate(45deg) !important;
+}
+
+#btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
+    opacity: 0 !important;
+    transform: scaleX(0) !important;
+}
+
+#btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+    transform: translateY(-5px) rotate(-45deg) !important;
+}
+
+/* Label "MENU" abaixo do ícone */
+#btn-menu-toggle .menu-label {
+    font-size: 0.5rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    color: var(--accent-color, #00ff88) !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+    margin-top: 2px !important;
+}
+
+/* ============================================================
+   OUTROS BOTÕES DO MAPA
+   ============================================================ */
 
 .map-btn {
-    flex-shrink: 0;
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    cursor: pointer;
-    background: rgba(20, 20, 20, 0.92);
-    border: 1px solid rgba(0, 255, 136, 0.35);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
-    transition: all 0.2s ease;
-    pointer-events: auto; /* Garante que o clique funcione */
+    width: 45px !important;
+    height: 45px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    background: rgba(20, 20, 20, 0.92) !important;
+    border: 1px solid rgba(0, 255, 136, 0.35) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6) !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0 !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
 .map-btn:hover {
-    transform: scale(1.08);
-    border-color: var(--accent-color);
+    transform: scale(1.08) !important;
+    border-color: var(--accent-color, #00ff88) !important;
 }
 
 .map-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.92) !important;
 }
 
 .map-btn img {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
-    pointer-events: none; /* A imagem não interfere no clique do botão */
-}
-
-/* Mantenha o restante do seu CSS de botões específicos (alert-toggle-btn, btn-rotate-map, etc.) aqui abaixo */
-
-/* ============================================================
-   7. BOTÃO ADICIONAR RADAR (+)
-   ============================================================ */
-.btn-add-radar {
-    position: fixed;
-    bottom: calc(20px + var(--safe-bottom));
-    right: 16px;
-    width: 60px;
-    height: 60px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #00cc66, #00994d);
-    border: 2px solid rgba(0, 255, 136, 0.5);
-    box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
-    cursor: pointer;
-    z-index: var(--z-floating);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-    animation: pulsePlus 2s ease-in-out infinite;
-}
-
-.btn-add-radar:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(0, 204, 102, 0.7);
-}
-
-.btn-add-radar:active {
-    transform: scale(0.92);
-}
-
-.btn-add-radar .plus-icon {
-    font-size: 38px;
-    font-weight: 300;
-    color: #fff;
-    line-height: 1;
-    margin-top: -2px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    pointer-events: none;
-}
-
-@keyframes pulsePlus {
-    0%, 100% { box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5); }
-    50%      { box-shadow: 0 4px 35px rgba(0, 204, 102, 0.8); }
+    width: 24px !important;
+    height: 24px !important;
+    object-fit: contain !important;
+    pointer-events: none !important;
 }
 
 /* ============================================================
-   8. MENU LATERAL (DRAWER)
-   Funciona com style.left via JS OU com as classes .open / .active
+   BOTÃO TOGGLE DE ALERTA
    ============================================================ */
+
+.alert-toggle-btn {
+    background: rgba(29, 28, 28, 0.9) !important;
+    border: 2px solid rgba(255, 255, 255, 0.08) !important;
+    transition: all 0.3s ease !important;
+}
+
+.alert-toggle-btn.alert-off {
+    background: rgba(222, 127, 127, 0.9) !important;
+    border-color: #888 !important;
+}
+
+.alert-toggle-btn.alert-off img {
+    filter: brightness(0.5) !important;
+}
+
+/* ============================================================
+   BOTÃO ROTACIONAR MAPA
+   ============================================================ */
+
+#btn-rotate-map {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease !important;
+}
+
+#btn-rotate-map.rotated {
+    border-color: var(--accent-color, #00ff88) !important;
+    box-shadow: 0 0 18px rgba(0, 255, 136, 0.35), inset 0 0 8px rgba(0, 255, 136, 0.1) !important;
+    background-color: rgba(0, 255, 136, 0.08) !important;
+}
+
+#btn-rotate-map.rotated img {
+    filter: brightness(1.2) drop-shadow(0 0 4px rgba(0, 255, 136, 0.5)) !important;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease !important;
+}
+
+/* ============================================================
+   MENU LATERAL DIREITO NO MAPA (DRAWER)
+   ============================================================ */
+
 #menu-lateral {
     position: fixed;
     top: 0;
     left: -300px;
     width: 280px;
-    max-width: 85vw;
     height: 100%;
     background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
-    z-index: var(--z-menu);
+    z-index: 2000 !important;
     transition: left 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
     overflow-y: auto;
-    padding-top: var(--safe-top);
-    padding-bottom: var(--safe-bottom);
-}
-
-#menu-lateral.open,
-#menu-lateral.active {
-    left: 0;
 }
 
 #menu-overlay {
     position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: var(--z-menu-overlay);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1999 !important;
     display: none;
 }
 
-#menu-overlay.open,
-#menu-overlay.active {
-    display: block;
+/* ============================================================
+   RESPONSIVIDADE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .header-right-container {
+        top: 70px !important;
+        right: 10px !important;
+    }
+    
+    .sidebar-controls {
+        gap: 8px !important;
+    }
+    
+    .map-btn,
+    #btn-menu-toggle {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    
+    .btn-add-radar {
+        width: 55px !important;
+        height: 55px !important;
+        bottom: 70px !important;
+        right: 15px !important;
+    }
+    
+    .map-btn img {
+        width: 20px !important;
+        height: 20px !important;
+    }
 }
 
-.menu-header {
-    padding: 20px;
-    color: #fff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.menu-header h2 {
-    margin: 0;
-    font-size: 24px;
-}
-
-.menu-header h2 span {
-    color: #ff6b35;
-}
-
-.menu-header p {
-    margin: 5px 0 0 0;
-    opacity: 0.8;
-    font-size: 14px;
-}
-
-.menu-nav {
-    padding: 10px 0;
-}
-
-.menu-link {
-    display: flex;
-    align-items: center;
-    padding: 15px 20px;
-    color: #fff;
-    text-decoration: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    transition: background 0.2s ease;
-}
-
-.menu-link:hover,
-.menu-link:active {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.menu-link .menu-icon {
-    font-size: 24px;
-    margin-right: 15px;
-    width: 30px;
-    text-align: center;
-}
-
-.menu-link.menu-link-danger {
-    background: rgba(255, 0, 0, 0.2);
-    border-bottom: none;
+@media (max-width: 600px) {
+    .header-right-container {
+        top: 65px !important;
+        right: 8px !important;
+    }
+    
+    .map-btn,
+    #btn-menu-toggle {
+        width: 38px !important;
+        height: 38px !important;
+    }
+    
+    .btn-add-radar {
+        width: 50px !important;
+        height: 50px !important;
+        bottom: 65px !important;
+        right: 12px !important;
+    }
+    
+    .map-btn img {
+        width: 18px !important;
+        height: 18px !important;
+    }
 }
 
 /* ============================================================
-   9. GPS STATUS
+   CONTROLES NATIVOS DO LEAFLET - OCULTAR
+   ============================================================ */
+
+
+.leaflet-control-zoom,
+.leaflet-control-attribution,
+.leaflet-routing-container {
+    display: none !important;
+}
+
+/* ============================================================
+   9. GPS STATUS WRAPPER
    ============================================================ */
 .gps-status-wrapper {
     display: flex;
@@ -716,6 +1002,7 @@ button {
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -741,7 +1028,7 @@ button {
 }
 
 @keyframes gpsPulse {
-    0%   { transform: scale(1); opacity: 0.6; }
+    0% { transform: scale(1); opacity: 0.6; }
     100% { transform: scale(2.8); opacity: 0; }
 }
 
@@ -755,6 +1042,7 @@ button {
     transition: color 0.4s ease;
 }
 
+/* Estados GPS */
 .gps-status-wrapper.gps-ok {
     border-color: rgba(0, 255, 136, 0.3);
     box-shadow: 0 4px 15px rgba(0, 255, 136, 0.15);
@@ -786,51 +1074,45 @@ button {
 }
 
 /* ============================================================
-   10. BARRAS DE BUSCA
-   (ficam dentro do .map-wrapper, logo abaixo do header;
-    padding à direita evita ficar embaixo dos botões laterais)
+   10. BARRA DE BUSCA
    ============================================================ */
 .search-container {
     position: absolute;
-    top: 0;
+    top: var(--header-height);
     left: 0;
     width: 100%;
+    background-color: rgba(26, 29, 36, 0.98);
+    backdrop-filter: blur(8px);
     display: flex;
-    align-items: center;
     gap: 12px;
+    z-index: 1000;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
-    padding: 0 75px 0 15px;
+    padding: 0 15px;
     border-bottom: 1px solid transparent;
-    background-color: rgba(26, 29, 36, 0.98);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: var(--z-alerts);
-    pointer-events: none;
     transition: all 0.3s ease;
+    align-items: center;
 }
 
 .search-container.active {
     max-height: 90px;
     opacity: 1;
-    padding: 15px 75px 15px 15px;
+    padding: 15px;
     border-bottom: 1px solid #333;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    pointer-events: auto;
 }
 
 .search-container input {
     flex: 1;
-    min-width: 0;
     padding: 14px 20px;
     border-radius: 30px;
     border: 1px solid #444;
     background-color: #000;
     color: #fff;
     font-size: 1rem;
-    font-family: 'Inter', sans-serif;
     outline: none;
+    font-family: 'Inter', sans-serif;
 }
 
 .search-container input:focus {
@@ -871,28 +1153,28 @@ button {
    ============================================================ */
 .compass-widget {
     position: absolute;
-    top: 5px;
+    top: calc(var(--header-height) + 5px);
     left: 5px;
     width: 65px;
     height: 65px;
-    z-index: var(--z-widgets);
+    z-index: var(--z-widgets) !important;
     transform: translateZ(0);
     will-change: transform;
     display: flex;
     align-items: center;
     justify-content: center;
     pointer-events: none;
-    opacity: 1;
     transition: opacity 0.3s ease, top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
 }
 
 .compass-widget.hidden {
     opacity: 0;
+    pointer-events: none;
 }
 
-/* Desce a bússola para não ficar escondida atrás da barra de busca */
 .compass-widget.busca-ativo {
-    top: 90px;
+    top: calc(var(--header-height) + 15px);
 }
 
 .compass-base {
@@ -916,21 +1198,25 @@ button {
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
+.leaflet-control-compass {
+    display: none !important;
+}
+
 /* ============================================================
-   12. VELOCÍMETRO
+   12. SPEED WIDGET
    ============================================================ */
 .speed-widget {
-    position: fixed;
+    position: fixed !important;
     bottom: -15px;
     left: -25px;
     width: 150px;
     height: 150px;
-    z-index: var(--z-widgets);
+    z-index: var(--z-widgets) !important;
     isolation: isolate;
 }
 
 .speed-widget.alerta-ativo {
-    bottom: 75px;
+    bottom: 75px !important;
 }
 
 .speed-bg {
@@ -970,15 +1256,14 @@ button {
 }
 
 /* ============================================================
-   13. ALERTAS (RADAR, RISCO, MOBILIDADE, DESTAQUE, SERVIÇO, CLIMA)
+   13. ALERTAS (RADAR, CLIMA, SERVIÇO)
    ============================================================ */
 #alert-container {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    padding-bottom: var(--safe-bottom);
-    z-index: var(--z-alerts);
+    z-index: var(--z-alerts) !important;
     display: none;
     animation: slideUp 0.3s ease-out;
     pointer-events: none;
@@ -986,22 +1271,21 @@ button {
 
 @keyframes slideUp {
     from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
+    to { transform: translateY(0); }
 }
 
 .alert-bar {
     display: flex;
     align-items: center;
     gap: 12px;
-    /* direita livre para o botão "+" */
-    padding: 6px 90px 6px 20px;
+    padding: 6px 70px 6px 20px;
 }
 
 .alert-bar img {
     width: 46px;
     height: 46px;
     flex-shrink: 0;
-    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.45));
+    filter: drop-shadow(0 0 4px rgba(0,0,0,.45));
 }
 
 .alert-info {
@@ -1012,7 +1296,7 @@ button {
 
 .alert-info h3 {
     margin: 0 0 2px;
-    font-size: 0.95rem;
+    font-size: .95rem;
     font-weight: 800;
     text-transform: uppercase;
     line-height: 1.1;
@@ -1023,12 +1307,12 @@ button {
 
 .alert-info p {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: .80rem;
     line-height: 1.2;
     text-align: center;
 }
 
-/* Tipos de alerta */
+/* Tipos de Alerta */
 .alert-bar-radar,
 .alert-bar:not([class*="-risco"]):not([class*="-mobilidade"]):not([class*="-destaque"]):not([class*="-servico"]) {
     background: linear-gradient(90deg, #cc0000, #990000);
@@ -1055,7 +1339,7 @@ button {
 }
 
 .alert-bar-destaque .alert-info h3 {
-    color: #fff;
+    color: #ffffff;
     text-shadow: 0 0 8px rgba(31, 199, 199, 0.8);
 }
 
@@ -1069,7 +1353,7 @@ button {
     box-shadow: 0 -5px 20px rgba(160, 0, 255, 0.5);
 }
 
-/* Críticos (!important necessário: a regra padrão acima tem alta especificidade) */
+/* Críticos */
 .alert-bar-critico,
 .alert-bar-risco-critico,
 .alert-bar-mobilidade-critico,
@@ -1105,10 +1389,10 @@ button {
 
 @keyframes pulseAlerta {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: 0.85; transform: scale(1.02); }
+    50% { opacity: 0.85; transform: scale(1.02); }
 }
 
-/* Alertas climáticos (cabeçalho) */
+/* Alertas Climáticos */
 .alerta-quente {
     background: rgba(255, 0, 0, 0.15);
     color: #ff4d4d;
@@ -1136,7 +1420,7 @@ button {
 
 @keyframes piscarAlerta {
     0%, 100% { opacity: 1; }
-    50%      { opacity: 0.5; }
+    50% { opacity: 0.5; }
 }
 
 .alerta-normalidade-label {
@@ -1147,7 +1431,8 @@ button {
     width: 100%;
     gap: 4px;
     margin-top: 2px;
-    padding: 0 4px;
+    padding: 0px 4px;
+    border-radius: 0px;
     font-size: 0.6rem;
     font-weight: 600;
     letter-spacing: 0.3px;
@@ -1155,13 +1440,13 @@ button {
     background: transparent;
     color: #00ff88;
     border: none;
-    white-space: nowrap;
     animation: fadeInNormal 0.5s ease-out;
+    white-space: nowrap;
 }
 
 @keyframes fadeInNormal {
     from { opacity: 0; transform: translateY(-5px); }
-    to   { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ============================================================
@@ -1170,33 +1455,33 @@ button {
 #nav-info {
     display: none;
     position: absolute;
-    top: 12px;
+    top: calc(var(--header-height) + 12px);
     left: 50%;
     transform: translateX(-50%);
-    z-index: var(--z-floating);
-    max-width: calc(100% - 140px);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 22px 8px 22px;
+    z-index: 9999 !important;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1.5px solid rgba(0, 255, 136, 0.35);
     border-radius: 14px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 255, 136, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    color: #fff;
+    padding: 10px 22px 8px 22px;
+    color: #ffffff;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
     white-space: nowrap;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 #nav-info.visible {
-    display: flex;
+    display: flex !important;
     animation: slideDownNav 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes slideDownNav {
-    0%   { opacity: 0; transform: translateX(-50%) translateY(-15px) scale(0.95); }
+    0% { opacity: 0; transform: translateX(-50%) translateY(-15px) scale(0.95); }
     100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 
@@ -1216,7 +1501,7 @@ button {
     gap: 10px;
     font-size: 13px;
     font-weight: 600;
-    color: #fff;
+    color: #ffffff;
 }
 
 .nav-separator {
@@ -1225,27 +1510,77 @@ button {
     font-size: 16px;
 }
 
-#nav-distance,
-#nav-time {
+#nav-distance, #nav-time {
     white-space: nowrap;
-    color: #fff;
+    color: #ffffff;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* ============================================================
-   15. MODAL ADICIONAR RADAR
+   15. BOTÃO ADICIONAR RADAR + MODAL
    ============================================================ */
+.btn-add-radar {
+    position: absolute;
+    bottom: 80px; /* Acima da barra mobile */
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00cc66, #00994d);
+    border: 2px solid rgba(0, 255, 136, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5);
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: pulsePlus 2s ease-in-out infinite;
+}
+
+@media (min-width: 601px) {
+    .btn-add-radar {
+        bottom: 20px;
+    }
+}
+
+
+@keyframes pulsePlus {
+    0%, 100% { box-shadow: 0 4px 20px rgba(0, 204, 102, 0.5); }
+    50% { box-shadow: 0 4px 35px rgba(0, 204, 102, 0.8); }
+}
+
+.btn-add-radar:hover {
+    transform: scale(1.12);
+    box-shadow: 0 4px 30px rgba(0, 204, 102, 0.7);
+}
+
+.btn-add-radar:active {
+    transform: scale(0.92);
+}
+
+.btn-add-radar .plus-icon {
+    font-size: 40px;
+    font-weight: 300;
+    color: white;
+    line-height: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    margin-top: -2px;
+}
+
 .modal-overlay {
-    position: fixed;
-    inset: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
     display: none;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: var(--z-modal);
 }
 
 .modal-overlay.active {
@@ -1255,7 +1590,7 @@ button {
 
 @keyframes modalFadeIn {
     from { opacity: 0; transform: scale(0.95); }
-    to   { opacity: 1; transform: scale(1); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 .modal-content {
@@ -1265,7 +1600,6 @@ button {
     max-width: 500px;
     width: 100%;
     max-height: 90vh;
-    max-height: 90dvh;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
 }
@@ -1318,12 +1652,7 @@ button {
     letter-spacing: 0.5px;
 }
 
-.label-icon {
-    margin-right: 4px;
-}
-
-.form-select,
-.form-input {
+.form-select, .form-input {
     width: 100%;
     padding: 12px 16px;
     border-radius: 12px;
@@ -1336,8 +1665,7 @@ button {
     outline: none;
 }
 
-.form-select:focus,
-.form-input:focus {
+.form-select:focus, .form-input:focus {
     border-color: var(--accent-color);
 }
 
@@ -1364,6 +1692,7 @@ button {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.25s ease;
+    font-family: 'Inter', sans-serif;
 }
 
 .speed-btn:hover {
@@ -1390,6 +1719,7 @@ button {
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
     margin-bottom: 4px;
     text-align: center;
 }
@@ -1410,43 +1740,13 @@ button {
     color: var(--text-main);
 }
 
-.coords-info {
-    margin-top: 10px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    background: rgba(0, 255, 136, 0.06);
-    border: 1px solid rgba(0, 255, 136, 0.2);
-}
-
-.coord-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 3px 0;
-    font-size: 0.85rem;
-}
-
-.coord-label {
-    color: var(--text-muted);
-}
-
-.coord-value {
-    font-family: 'Courier New', monospace;
-    color: var(--accent-color);
-}
-
-.form-hint {
-    margin-top: 6px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
 .btn-submit-radar {
     width: 100%;
     padding: 14px;
     border: none;
     border-radius: 14px;
     background: linear-gradient(135deg, #00cc66, #00994d);
-    color: #fff;
+    color: white;
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
@@ -1470,57 +1770,29 @@ button {
     transform: none;
 }
 
-.submit-status {
-    margin-top: 12px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-main);
-}
-
-.submit-status.success {
-    background: rgba(0, 255, 136, 0.12);
-    color: var(--accent-color);
-}
-
-.submit-status.error {
-    background: rgba(255, 51, 51, 0.12);
-    color: #ff6b6b;
-}
-
 /* ============================================================
-   16. PÁGINAS (INFO, RADARES, DOAR)
+   16. PÁGINAS (INFO, DOAR, RADARES)
    ============================================================ */
 .app-page {
-    position: fixed;
-    top: var(--header-total);
+    position: absolute;
+    top: var(--header-height);
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: var(--z-pages);
+    z-index: 50;
+    background-color: #f5f5f5;
     display: none;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: var(--safe-bottom);
-    background-color: #f5f5f5;
-    color: #333; /* corrige texto branco sobre fundo branco (herdava do body) */
-}
-
-.app-page button {
-    color: inherit;
 }
 
 .page-header {
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-    color: #fff;
+    color: white;
     padding: 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 .page-header h1 {
@@ -1530,19 +1802,18 @@ button {
 }
 
 .btn-back {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255,255,255,0.2);
     border: none;
-    color: #fff !important;
+    color: white;
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
-    white-space: nowrap;
     transition: all 0.3s ease;
 }
 
 .btn-back:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255,255,255,0.3);
     transform: translateX(-2px);
 }
 
@@ -1565,15 +1836,13 @@ button {
 }
 
 .info-card {
-    background: #fff;
+    background: white;
     padding: 20px;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    line-height: 1.5;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.feature-item,
-.step-item {
+.feature-item, .step-item {
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
@@ -1603,7 +1872,7 @@ button {
     position: relative;
 }
 
-.feature-item li::before {
+.feature-item li:before {
     content: "✓";
     color: #00cc66;
     position: absolute;
@@ -1615,7 +1884,7 @@ button {
     width: 40px;
     height: 40px;
     background: linear-gradient(135deg, #ff6b35, #f7931e);
-    color: #fff;
+    color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1682,20 +1951,27 @@ button {
     margin-bottom: 20px;
 }
 
-.author-avatar,
-.dev-avatar {
+.author-avatar, .dev-avatar {
     background: linear-gradient(135deg, #ff6b35, #f7931e);
-    color: #fff;
+    color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    flex-shrink: 0;
 }
 
-.author-avatar { width: 80px; height: 80px; font-size: 2rem; }
-.dev-avatar    { width: 60px; height: 60px; font-size: 1.5rem; }
+.author-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+}
+
+.dev-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+}
 
 .author-details h3 {
     margin: 0 0 5px 0;
@@ -1709,8 +1985,7 @@ button {
     margin: 0 0 5px 0;
 }
 
-.author-role,
-.developer-info p {
+.author-role, .developer-info p {
     margin: 0;
     color: #666;
 }
@@ -1753,28 +2028,28 @@ button {
 
 .tech-badge {
     background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: #fff;
+    color: white;
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 0.85rem;
     font-weight: 600;
 }
 
-/* Tipos de radares */
+/* Tipos de Radares */
 .radar-type-card {
-    background: #fff;
+    background: white;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     display: flex;
     gap: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 .radar-type-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
 .radar-icon {
@@ -1796,12 +2071,6 @@ button {
 
 .radar-emoji {
     font-size: 3rem;
-    line-height: 1;
-}
-
-/* Se existe imagem, o emoji só aparece quando a imagem falha (onerror) */
-.radar-icon img ~ .radar-emoji {
-    display: none;
 }
 
 .radar-info h3 {
@@ -1834,7 +2103,7 @@ button {
 
 .radar-features li {
     background: rgba(0, 255, 136, 0.1);
-    color: #00a352;
+    color: #00cc66;
     padding: 5px 10px;
     border-radius: 6px;
     font-size: 0.85rem;
@@ -1848,7 +2117,7 @@ button {
     padding: 30px 20px;
     background: linear-gradient(135deg, #1e3c72, #2a5298);
     border-radius: 16px;
-    color: #fff;
+    color: white;
 }
 
 .donate-icon {
@@ -1863,7 +2132,7 @@ button {
 
 @keyframes heartbeat {
     0%, 100% { transform: scale(1); }
-    50%      { transform: scale(1.1); }
+    50% { transform: scale(1.1); }
 }
 
 .donate-intro h2 {
@@ -1889,10 +2158,10 @@ button {
 }
 
 .donate-card {
-    background: #fff;
+    background: white;
     border-radius: 12px;
     padding: 25px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .pix-card {
@@ -1907,7 +2176,7 @@ button {
 
 .pix-key-value {
     background: rgba(0, 255, 136, 0.1);
-    color: #00a352;
+    color: #00cc66;
     padding: 15px;
     border-radius: 8px;
     font-family: 'Courier New', monospace;
@@ -1919,7 +2188,7 @@ button {
 
 .btn-copy-pix {
     background: linear-gradient(135deg, #00cc66, #00994d);
-    color: #fff !important;
+    color: white;
     border: none;
     padding: 12px 24px;
     border-radius: 8px;
@@ -1994,8 +2263,7 @@ button {
 }
 
 .amount-btn {
-    background: #fff;
-    color: #1e3c72 !important;
+    background: white;
     border: 2px solid #1e3c72;
     border-radius: 12px;
     padding: 20px 15px;
@@ -2012,7 +2280,7 @@ button {
 .amount-btn.selected {
     background: linear-gradient(135deg, #00cc66, #00994d);
     border-color: #00cc66;
-    color: #fff !important;
+    color: white;
 }
 
 .amount-value {
@@ -2070,7 +2338,7 @@ button {
 }
 
 .thanks-card h3 {
-    color: #00a352;
+    color: #00cc66;
     margin-bottom: 15px;
     font-size: 1.5rem;
 }
@@ -2089,7 +2357,6 @@ button {
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid rgba(0, 204, 102, 0.3);
-    text-align: left;
 }
 
 .developer-info strong {
@@ -2101,9 +2368,9 @@ button {
 .contact-info {
     text-align: center;
     padding: 30px 20px;
-    background: #fff;
+    background: white;
     border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .contact-info h3 {
@@ -2120,7 +2387,7 @@ button {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    color: #00a352;
+    color: #00cc66;
     text-decoration: none;
     font-weight: 600;
     font-size: 1.1rem;
@@ -2132,7 +2399,7 @@ button {
 
 .contact-email:hover {
     background: #00cc66;
-    color: #fff;
+    color: white;
     transform: translateY(-2px);
 }
 
@@ -2144,14 +2411,13 @@ button {
     top: 20px;
     left: 50%;
     transform: translateX(-50%) translateY(-20px);
-    max-width: calc(100% - 40px);
-    padding: 12px 25px;
     background-color: rgba(20, 20, 20, 0.95);
     color: var(--text-main);
+    padding: 12px 25px;
     border-radius: 50px;
     border: 1px solid #444;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-    z-index: var(--z-toast);
+    z-index: 2000;
     opacity: 0;
     font-size: 0.95rem;
     font-weight: 600;
@@ -2159,8 +2425,6 @@ button {
     pointer-events: none;
     transition: opacity 0.3s ease, transform 0.3s ease;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .toast-notification.show {
@@ -2178,7 +2442,7 @@ button {
     border-radius: 12px;
     border: 1px solid var(--accent-color);
     text-align: center;
-    z-index: var(--z-floating);
+    z-index: 1001;
     backdrop-filter: blur(5px);
 }
 
@@ -2240,7 +2504,7 @@ button {
 }
 
 @keyframes spinRing {
-    0%   { transform: rotate(0deg); }
+    0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
@@ -2264,7 +2528,7 @@ button {
 
 @keyframes pulseText {
     0%, 100% { opacity: 0.4; }
-    50%      { opacity: 1; }
+    50% { opacity: 1; }
 }
 
 /* ============================================================
@@ -2272,7 +2536,7 @@ button {
    ============================================================ */
 .matrix-day .leaflet-tile-pane .leaflet-tile {
     filter: grayscale(0.10) sepia(0.22) hue-rotate(72deg) saturate(2.05) brightness(0.90) contrast(1.85) drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35));
-    transition: filter 0.4s ease;
+    transition: filter .4s ease;
 }
 
 .matrix-day .leaflet-map-pane::after {
@@ -2280,14 +2544,14 @@ button {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: linear-gradient(180deg, rgba(0, 200, 80, 0.04) 0%, rgba(0, 180, 70, 0.08) 100%);
+    background: linear-gradient(180deg, rgba(0, 200, 80, .04) 0%, rgba(0, 180, 70, .08) 100%);
     mix-blend-mode: soft-light;
     z-index: 400;
 }
 
 .matrix-night .leaflet-tile-pane .leaflet-tile {
     filter: grayscale(1) sepia(1) hue-rotate(85deg) saturate(1.55) brightness(0.50) contrast(1.55) drop-shadow(0 0 0.8px rgba(0, 220, 80, 0.35));
-    transition: filter 0.4s ease;
+    transition: filter .4s ease;
 }
 
 .matrix-night .leaflet-map-pane::after {
@@ -2295,7 +2559,7 @@ button {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: linear-gradient(180deg, rgba(0, 120, 50, 0.28) 0%, rgba(0, 85, 40, 0.40) 100%);
+    background: linear-gradient(180deg, rgba(0, 120, 50, .28) 0%, rgba(0, 85, 40, .40) 100%);
     mix-blend-mode: multiply;
     z-index: 400;
 }
@@ -2303,20 +2567,20 @@ button {
 /* ============================================================
    19. MARCADORES DO MAPA
    ============================================================ */
-.user-gps-marker,
-.user-navigator-marker,
-.route-start-marker,
-.route-end-marker,
-.radar-marker-icon {
+.user-gps-marker, .user-navigator-marker {
     background: transparent !important;
     border: none !important;
 }
 
-.user-gps-marker img,
-.user-navigator-marker img {
+.user-gps-marker img, .user-navigator-marker img {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     transition: none !important;
     will-change: transform;
+}
+
+.route-start-marker, .route-end-marker {
+    background: transparent !important;
+    border: none !important;
 }
 
 .route-start-marker img {
@@ -2330,15 +2594,20 @@ button {
 }
 
 @keyframes pulseStart {
-    0%   { transform: scale(1); opacity: 1; }
-    50%  { transform: scale(1.1); opacity: 0.8; }
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
     100% { transform: scale(1); opacity: 1; }
 }
 
 @keyframes pulseEnd {
-    0%   { transform: scale(1); }
-    50%  { transform: scale(1.15); }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
     100% { transform: scale(1); }
+}
+
+.radar-marker-icon {
+    background: transparent !important;
+    border: none !important;
 }
 
 .radar-marker-icon img {
@@ -2364,7 +2633,7 @@ button {
     object-fit: contain;
     position: relative;
     z-index: 2;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
 }
 
 .nav-pulse-halo {
@@ -2387,54 +2656,43 @@ button {
 }
 
 @keyframes navPulse {
-    0%   { transform: scale(0.55); opacity: 0.95; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.65), 0 0 8px rgba(0, 255, 136, 0.45); }
-    45%  { transform: scale(1.45); opacity: 0.65; box-shadow: 0 0 0 8px rgba(0, 255, 136, 0.22), 0 0 14px rgba(0, 255, 136, 0.30); }
-    70%  { transform: scale(2.25); opacity: 0.20; box-shadow: 0 0 0 16px rgba(0, 255, 136, 0.06), 0 0 20px rgba(0, 255, 136, 0.12); }
+    0% { transform: scale(0.55); opacity: 0.95; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.65), 0 0 8px rgba(0, 255, 136, 0.45); }
+    45% { transform: scale(1.45); opacity: 0.65; box-shadow: 0 0 0 8px rgba(0, 255, 136, 0.22), 0 0 14px rgba(0, 255, 136, 0.30); }
+    70% { transform: scale(2.25); opacity: 0.20; box-shadow: 0 0 0 16px rgba(0, 255, 136, 0.06), 0 0 20px rgba(0, 255, 136, 0.12); }
     100% { transform: scale(2.55); opacity: 0; box-shadow: 0 0 0 20px rgba(0, 255, 136, 0), 0 0 25px rgba(0, 255, 136, 0); }
 }
 
 /* ============================================================
-   20. RESPONSIVIDADE (ÚNICO BLOCO POR BREAKPOINT)
+   20. RESPONSIVIDADE CONSOLIDADA
    ============================================================ */
 
-/* Telas grandes */
-@media (min-width: 601px) {
-    .cidade-label { font-size: 14px; gap: 6px; }
-    #nomeCidade { font-size: 14px; max-width: 200px; }
-    #temperaturaAtual { font-size: 13px; min-width: 45px; }
-    #umidadeAtual { font-size: 13px; min-width: 30px; }
-    #poluicaoAtual { font-size: 13px; min-width: 45px; }
-}
-
-/* Tablets */
+/* Tablets (até 768px) */
 @media (max-width: 768px) {
     .gps-status-wrapper {
         padding: 5px 10px;
         gap: 6px;
     }
-
     .gps-status-label {
         font-size: 0.7rem;
     }
 }
 
-/* Celulares */
+/* Celulares (até 600px) */
 @media (max-width: 600px) {
     :root {
-        --header-height: 60px;
+        --header-height: 56px;
     }
 
     #main-header {
-        padding-left: 8px;
-        padding-right: 8px;
+        padding: 0 8px;
+        gap: 8px;
+        min-height: 56px;
+        flex-wrap: wrap;
     }
 
     .header-left-container {
+        flex-wrap: wrap;
         gap: 6px;
-    }
-
-    .header-brand-section {
-        height: 30px;
     }
 
     .app-icon {
@@ -2448,19 +2706,19 @@ button {
     }
 
     .dados-clima-linha {
-        height: 20px;
-        gap: 4px;
         font-size: 0.7rem;
+        gap: 4px;
+        width: 100%;
+        order: 3;
+        padding-top: 4px;
+        border-top: 1px solid rgba(255,255,255,0.1);
     }
 
-    .cidade-label,
-    .temp-label,
-    .umidade-label,
-    .qualidade-ar-label {
+    .cidade-label, .temp-label, .umidade-label, .qualidade-ar-label {
         font-size: 11px;
     }
 
-    #nomeCidade { font-size: 11px; max-width: 105px; }
+    #nomeCidade { font-size: 11px; }
     #temperaturaAtual { font-size: 11px; min-width: 30px; }
     #umidadeAtual { font-size: 11px; min-width: 20px; }
     #poluicaoAtual { font-size: 11px; min-width: 30px; }
@@ -2480,12 +2738,13 @@ button {
         letter-spacing: 0.5px;
     }
 
-    .header-right-container {
-        right: 8px;
+    .sidebar-controls {
+        top: calc(var(--header-height) + 5px);
+        width: 60px;
     }
 
-    .sidebar-controls {
-        gap: 8px;
+    .sidebar-controls.retracted {
+        transform: translateX(75px);
     }
 
     .map-btn {
@@ -2494,39 +2753,24 @@ button {
     }
 
     .map-btn img {
-        width: 20px;
-        height: 20px;
-    }
-
-    .search-container,
-    .search-container.active {
-        padding-right: 65px;
+        width: 22px;
+        height: 22px;
     }
 
     .btn-add-radar {
-        right: 12px;
+        bottom: 20px;
+        right: 92px;
         width: 56px;
         height: 56px;
     }
 
     .btn-add-radar .plus-icon {
-        font-size: 34px;
-    }
-
-    .alert-bar {
-        padding-right: 80px;
-    }
-
-    #nav-info {
-        max-width: calc(100% - 120px);
-        padding: 8px 14px 6px 14px;
-    }
-
-    .modal-overlay {
-        padding: 10px;
+        font-size: 32px;
     }
 
     .modal-content {
+        max-width: 100%;
+        margin: 10px;
         border-radius: 16px;
     }
 
@@ -2534,13 +2778,13 @@ button {
         padding: 16px;
     }
 
-    .form-select,
-    .form-input {
+    .form-select, .form-input {
         padding: 10px 14px;
         font-size: 0.95rem;
     }
 
     .speed-buttons-container {
+        grid-template-columns: repeat(4, 1fr);
         gap: 6px;
     }
 
@@ -2553,8 +2797,7 @@ button {
         font-size: 1.2rem;
     }
 
-    .feature-item,
-    .radar-type-card {
+    .feature-item, .radar-type-card {
         flex-direction: column;
     }
 
@@ -2568,11 +2811,15 @@ button {
     }
 }
 
-/* Celulares muito pequenos */
+/* Celulares muito pequenos (até 400px) */
 @media (max-width: 400px) {
     #main-header {
-        padding-left: 6px;
-        padding-right: 6px;
+        padding: 0 6px;
+        gap: 5px;
+    }
+
+    .header-left-container {
+        gap: 5px;
     }
 
     .app-icon {
@@ -2584,19 +2831,20 @@ button {
         font-size: 0.78rem;
     }
 
-    #nomeCidade { font-size: 10px; max-width: 85px; }
-    .cidade-label,
-    .temp-label,
-    .umidade-label,
-    .qualidade-ar-label,
-    #temperaturaAtual,
-    #umidadeAtual,
-    #poluicaoAtual {
+    .cidade-label, #nomeCidade {
+        font-size: 10px;
+    }
+
+    .temp-label, .umidade-label, .qualidade-ar-label {
+        font-size: 10px;
+    }
+
+    #temperaturaAtual, #umidadeAtual, #poluicaoAtual {
         font-size: 10px;
     }
 
     .gps-status-label {
-        display: none;
+        display: none !important;
     }
 
     .dados-clima-linha {
@@ -2605,7 +2853,35 @@ button {
     }
 }
 
-/* Telas baixas (celular em paisagem / telas pequenas): splash compacta */
+/* Telas grandes (acima de 601px) */
+@media (min-width: 601px) {
+    .cidade-label {
+        font-size: 14px;
+        gap: 6px;
+    }
+
+    #nomeCidade {
+        max-width: 150px;
+        font-size: 14px;
+    }
+
+    #temperaturaAtual {
+        font-size: 13px;
+        min-width: 45px;
+    }
+
+    #umidadeAtual {
+        font-size: 13px;
+        min-width: 30px;
+    }
+
+    #poluicaoAtual {
+        font-size: 13px;
+        min-width: 45px;
+    }
+}
+
+/* Splash em telas pequenas */
 @media (max-height: 700px) {
     #splash-logo-principal {
         width: 190px;
@@ -2626,3 +2902,4 @@ button {
         margin-top: 18px;
     }
 }
+
