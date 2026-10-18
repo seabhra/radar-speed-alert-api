@@ -2519,6 +2519,16 @@ function abrirSidebar() {
     if (btnMenu) btnMenu.classList.remove('active');
 }
 
+function inicializarSidebarToggle() {
+    var sidebar = document.getElementById('sidebar-controls');
+    var btnToggle = document.getElementById('btn-sidebar-toggle');
+    if (!sidebar || !btnToggle) return;
+
+    btnToggle.addEventListener('click', function () {
+        sidebar.classList.toggle('retracted');
+        sidebarAberta = !sidebar.classList.contains('retracted');
+    });
+}
 // ===================================================================
 // BOTÕES DO MAPA (rota, busca, centralizar, refresh, zoom)
 // ===================================================================
@@ -2741,6 +2751,7 @@ async function initMap() {
     executarSeguro('botão de som', inicializarBotaoAlertaToggle);
     executarSeguro('botão adicionar radar', inicializarBotaoAddRadar);
     executarSeguro('menu', inicializarMenuToggle);
+    executarSeguro('sidebar recolhível', inicializarSidebarToggle); 
 
     // GPS não espera configuração nem radares
     executarSeguro('GPS', function () {
