@@ -884,20 +884,63 @@ body {
 }
 
 /* ============================================================
-   MENU LATERAL DIREITO NO MAPA (DRAWER)
+   MENU LATERAL  (DRAWER)
    ============================================================ */
 
+/* ===== CONTEÚDO DO MENU ESQUERDO ===== */
 #menu-lateral {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 280px;
-    height: 100%;
-    background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
-    z-index: 2000 !important;
-    transition: left 0.3s ease;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-    overflow-y: auto;
+    padding: 24px 0;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+}
+
+/* Título */
+#menu-lateral h1,
+#menu-lateral h2,
+#menu-lateral h3 {
+    margin: 0;
+    padding: 0 20px 4px;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #fff;
+}
+
+/* Subtítulo ("por Geraldo A. Seabra") */
+#menu-lateral p,
+#menu-lateral small,
+#menu-lateral > div:not([class]),
+#menu-lateral > span {
+    display: block;
+    margin: 0 0 12px;
+    padding: 0 20px 16px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+#menu-lateral ul,
+#menu-lateral nav { list-style: none; display: block; }
+#menu-lateral li { list-style: none; }
+
+/* Links como itens de menu, um por linha */
+#menu-lateral a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    border-left: 3px solid transparent;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+#menu-lateral a:hover,
+#menu-lateral a:active {
+    background: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--accent-color);
 }
 
 #menu-overlay {
@@ -3005,4 +3048,25 @@ body {
     .splash-loader {
         margin-top: 18px;
     }
+}
+
+/* ===== SIDEBAR ANCORADA ACIMA DO BOTÃO "+" ===== */
+.header-right-container {
+    top: auto !important;
+    bottom: 92px !important;     /* desktop: 20px (botão +) + 60px + folga */
+    right: 15px !important;
+}
+
+@media (max-width: 768px) {
+    .header-right-container {
+        top: auto !important;
+        bottom: 140px !important; /* celular: 65px + 50px do botão + folga */
+        right: 12px !important;
+    }
+}
+
+/* Alça no meio da altura da coluna, longe do header */
+.controls-handle {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
 }
