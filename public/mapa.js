@@ -2514,23 +2514,23 @@ function abrirSidebar() {
     var sidebar = document.getElementById('sidebar-controls');
     if (!sidebar) return;
     sidebarAberta = true;
-    sidebar.classList.remove('retracted');
-    // removido: if (btnMenu) btnMenu.classList.remove('active');
+    sidebar.classList.remove('controls-hidden');
 }
 
 function inicializarSidebarToggle() {
     var sidebar = document.getElementById('sidebar-controls');
-    var btnToggle = document.getElementById('btn-sidebar-toggle');
-    if (!sidebar || !btnToggle) return;
+    var handle = document.getElementById('btn-controls-handle');
+    if (!sidebar || !handle) return;
 
-    btnToggle.addEventListener('click', function (e) {
+    handle.addEventListener('click', function (e) {
         e.preventDefault();
-        e.stopPropagation();   // não deixa o clique chegar ao handler do menu esquerdo
-
-        sidebar.classList.toggle('retracted');
-        sidebarAberta = !sidebar.classList.contains('retracted');
+        e.stopPropagation();
+        sidebar.classList.toggle('controls-hidden');
+        sidebarAberta = !sidebar.classList.contains('controls-hidden');
     });
 }
+
+
 // ===================================================================
 // BOTÕES DO MAPA (rota, busca, centralizar, refresh, zoom)
 // ===================================================================
