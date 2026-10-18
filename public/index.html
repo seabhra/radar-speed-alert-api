@@ -125,7 +125,7 @@
 </header>
 
 <!-- ============================================ -->
-<!-- MENU LATERAL (DRAWER)                        -->
+<!-- MENU LATERAL ESQUERDO (DRAWER)               -->
 <!-- ============================================ -->
 <div id="menu-lateral">
     <div class="menu-header">
@@ -150,11 +150,13 @@
         </a>
     </nav>
 </div>
+
+<!-- ======================================================= -->
+<!-- ÁREA DO MAPA (fica sobre o mapa)    -->
+<!-- ======================================================== -->
+
 <div id="menu-overlay" onclick="toggleMenu()"></div>
 
-<!-- ============================================ -->
-<!-- ÁREA DO MAPA (tudo que fica sobre o mapa)    -->
-<!-- ============================================ -->
 <div class="map-wrapper" id="page-mapa">
 
     <!-- Único #map do documento -->
@@ -198,6 +200,10 @@
                  alt="Rota">
         </button>
     </div>
+
+<!-- ======================================================= -->
+<!-- MENU DIREITO NO MAPA (fica sobre o mapa)                 -->
+<!-- ======================================================== -->
 
     <!-- Botões laterais do mapa -->
     <div class="header-right-container" id="header-right-container">
@@ -335,34 +341,46 @@
                 <input type="hidden" id="radar-speed" value="">
             </div>
 
+    <!--COORDENADAS DO RADAR -->
+             <div class="form-group">
+            <label>Localização do Radar</label>
+
+            <button type="button" class="btn-capture-location" id="btn-capture-location">
+              📍 Capturar Posição Atual
+            </button>   
+
+            <!-- Lacunas de Latitude e Longitude -->
+            <div class="coords-inputs-container" id="coords-inputs-container">
+              <div class="coord-field">
+                <label class="coord-label">Latitude</label>
+                <input type="text" id="pos-lat" class="coord-input" readonly placeholder="-00.000000">
+              </div>
+
+              <div class="coord-field">
+                <label class="coord-label">Longitude</label>
+                <input type="text" id="pos-lng" class="coord-input" readonly placeholder="-00.000000">
+              </div>
+            </div>            
+            <div class="current-position-status" id="pos-status">Clique acima para inserir as coordenadas.</div>
+          </div>
+
             <!-- LOCALIZAÇÃO DO RADAR -->
-            <div class="form-group">
-                <label>
-                    <span class="label-icon">📍</span> LOCALIZAÇÃO DO RADAR
-                </label>
+ 
 
-                <button type="button" class="btn-capture-location" id="btn-capture-location">
-                    <span class="capture-icon">🎯</span>
-                    <span class="capture-text">Capturar Posição Atual</span>
-                </button>
+<div class="form-group">
+    <label for="radar-address"><span class="label-icon">🏠</span> Endereço</label>
+    <input type="text" id="radar-address" class="form-input" placeholder="Preenchido automaticamente">
+</div>
 
-                <div class="coords-info" id="coords-info" style="display: none;">
-                    <div class="coord-row">
-                        <span class="coord-label">Latitude:</span>
-                        <span class="coord-value" id="pos-lat">--</span>
-                    </div>
-                    <div class="coord-row">
-                        <span class="coord-label">Longitude:</span>
-                        <span class="coord-value" id="pos-lng">--</span>
-                    </div>
-                    <div class="coord-row">
-                        <span class="coord-label">Precisão:</span>
-                        <span class="coord-value" id="pos-accuracy">--</span>
-                    </div>
-                </div>
-
-                <p class="form-hint">Clique acima para inserir as coordenadas automaticamente.</p>
-            </div>
+<div class="form-group" id="icon-preview-group" style="display: none;">
+    <label>Ícone no mapa</label>
+    <div class="icon-preview">
+        <img id="icon-preview-img" alt="">
+        <span id="icon-preview-name"></span>
+    </div>
+</div>
+                
+           
 
             <!-- BOTÃO INCLUIR -->
             <button type="button" class="btn-submit-radar" id="btn-submit-radar">
