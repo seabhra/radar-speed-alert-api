@@ -2869,55 +2869,93 @@ async function obterEndereco(lat, lng) {
         return null;
     }
 }
-
 // ===================================================================
-// MENU TOGGLE
+// INICIALIZAÇÃO DOS MENUS E CONTROLES (HARMONIZADO)
 // ===================================================================
 function inicializarMenuToggle() {
-    var btnMenu = document.getElementById('btn-menu-toggle');
-    var sidebar = document.getElementById('sidebar-controls');
-    var menuDropdown = document.getElementById('menu-dropdown');
+    // 1. Captura dos elementos do Menu Lateral (Esquerda)
+    const btnMenu = document.getElementById('btn-menu-toggle');
+    const menuLateral = document.getElementById('menu-lateral');
+    const menuOverlay = document.getElementById('menu-overlay');
+    
+    // 2. Captura dos elementos da Sidebar de Controles (Direita)
+    const sidebarControls = document.getElementById('sidebar-controls');
+    const controlsHandle = document.querySelector('.controls-handle');
+    
+    // 3. Outros elementos
+    const menuDropdown = document.getElementById('menu-dropdown');
 
     if (!btnMenu) {
         console.warn('[Radar X9] ⚠️ #btn-menu-toggle não encontrado no HTML.');
         return;
     }
 
-    // Sincroniza o estado interno com o que realmente está no HTML
-    // ("active" no botão = barra lateral recolhida, igual ao resto do código)
-    if (sidebar) {
-        sidebarAberta = !sidebar.classList.contains('retracted');
-        btnMenu.classList.toggle('active', !sidebarAberta);
-    }
+    // =========================================================================
+    // A) LÓGICA DO MENU LATERAL ESQUERDO (HAMBÚRGUER)
+    // =========================================================================
+    function toggleMenuLateral() {
+        if (!menuLateral || !menuOverlay) return;
 
-    btnMenu.addEventListener('click', function (e) {
-        e.stopPropagation();
+        const estaAberto = menuLateral.classList.contains('aberto');
 
-        // Menu suspenso (GitHub/configurações)
-        if (menuDropdown) {
-            var isVisible = menuDropdown.style.display === 'block';
-            menuDropdown.style.display = isVisible ? 'none' : 'block';
-            if (!isVisible) atualizarStatusGitHub();
-        }
-
-        // Barra lateral com os botões do mapa
-        if (sidebar) {
-            sidebarAberta = !sidebar.classList.contains('retracted');
-            sidebarAberta = !sidebarAberta;
-
-            if (sidebarAberta) {
-                sidebar.classList.remove('retracted');
-                btnMenu.classList.remove('active');
-            } else {
-                sidebar.classList.add('retracted');
-                btnMenu.classList.add('active');
-                if (searchActive || routeActive) {
-                    fecharTodasBarras();
-                }
+        if (estaAberto) {
+            // FECHAR MENU
+            menuLateral.classList.remove('aberto');
+            menuOverlay.classList.remove('aberto');
+            btnMenu.classList.remove('active'); // O ícone volta a ser hambúrguer
+        } else {
+            // ABRIR MENU
+            menuLateral.classList.add('aberto');
+            menuOverlay.classList.add('aberto');
+            btnMenu.classList.add('active'); // O ícone vira um "X"
+            
+            // Fecha o dropdown de configurações se estiver aberto (evita sobreposição)
+            if (menuDropdown) {
+                menuDropdown.style.display = 'none';
             }
         }
+    }
+
+    // Evento de clique no botão hambúrguer
+    btnMenu.addEventListener('click', function (e) {
+        e.stopPropagation(); // Evita que o clique se propague e feche o menu imediatamente
+        toggleMenuLateral();
     });
 
+    // Evento de clique no overlay (fundo escuro) para fechar o menu
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', function () {
+            toggleMenuLateral();
+        });
+    }
+
+    // =========================================================================
+    // B) LÓGICA DA SIDEBAR DE CONTROLES DO MAPA (DIREITA)
+    // =========================================================================
+    // Nota: A sidebar direita agora é controlada exclusivamente pela sua alça (.controls-handle),
+    // e não pelo botão hambúrguer. Isso elimina o conflito da classe "active".
+    if (sidebarControls && controlsHandle) {
+        controlsHandle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            
+            const estaRecolhida = sidebarControls.classList.contains('controls-hidden');
+
+            if (estaRecolhida) {
+                // Mostrar sidebar
+                sidebarControls.classList.remove('controls-hidden');
+            } else {
+                // Esconder sidebar
+                sidebarControls.classList.add('controls-hidden');
+                
+                // Opcional: Se sua função fecharTodasBarras() existir no escopo global, 
+                // você pode chamá-la aqui para limpar a tela ao recolher os controles.
+                if (typeof fecharTodasBarras === 'function') {
+                    // fecharTodasBarras(); 
+                }
+            }
+        });
+    }
+    
     // Fechar menu suspenso ao clicar fora
     document.addEventListener('click', function (e) {
         if (menuDropdown && !menuDropdown.contains(e.target) && e.target !== btnMenu && !btnMenu.contains(e.target)) {
