@@ -1,6 +1,4 @@
-
-
- // ===================================================================
+// ===================================================================
 // VARIÁVEIS GLOBAIS
 // ===================================================================
 let map;
@@ -787,10 +785,6 @@ function hideFullscreenLoading() {
     if (el) { el.classList.add('fade-out'); setTimeout(function() { el.remove(); }, 600); }
 }
 
-//===============================
-// CALCULAR DISTANCIA COORDENADAS
-//===============================
-
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     var R = 6371e3;
     var p1 = lat1 * Math.PI / 180;
@@ -1015,7 +1009,7 @@ if (estaEmNavegacao && coordenadasRotaNavegacao.length >= 2) {
     }
 }
 //==================
-//MARCADOR PARA MOVER
+//MWRCADOR PARA MOVER
 //===================
 
 
@@ -2160,49 +2154,15 @@ function corCidade(nome){
     return `hsl(${hue},100%,68%)`;
 }
 
-//=============================
-// PRECISÃO ATUALIZAÇÃO DO GPS 
-//=============================
-navigator.geolocation.getCurrentPosition(
-  // 1. FUNÇÃO DE SUCESSO (Sua lógica original mantida)
-  async (pos) => {
+navigator.geolocation.getCurrentPosition(async(pos) => {
+
     userLat = pos.coords.latitude;
     userLng = pos.coords.longitude;
-    
-    console.log(`✅ GPS obtido com sucesso: ${userLat}, ${userLng}`);
-    
-    try {
-      await atualizarCidade(userLat, userLng);
-      await atualizarTemperatura();
-    } catch (err) {
-      console.error("Erro ao atualizar dados da cidade/temperatura:", err);
-    }
-  },
 
-  // 2. FUNÇÃO DE ERRO (CRUCIAL para mobile/PWA)
-  (error) => {
-    console.error("❌ Erro ao obter localização:", error.code, error.message);
-    
-    let mensagem = "Não foi possível obter sua localização.";
-    if (error.code === 1) {
-      mensagem = "Permissão de localização negada. Por favor, ative nas configurações do app.";
-    } else if (error.code === 2) {
-      mensagem = "Localização indisponível. Verifique se o GPS do celular está ligado.";
-    } else if (error.code === 3) {
-      mensagem = "Tempo esgotado ao buscar localização. Tente novamente em um local aberto.";
-    }
-    
-    // Dica: Em vez de alert(), você pode mostrar essa mensagem em um elemento HTML da sua UI
-    alert(mensagem); 
-  },
+    await atualizarCidade(userLat, userLng);''
+    await atualizarTemperatura();
 
-  // 3. OPÇÕES DE CONFIGURAÇÃO (O segredo para o GPS nativo funcionar bem)
-  {
-    enableHighAccuracy: true, // Força o uso do GPS real (satélite), não apenas triangulação de Wi-Fi/Célula
-    timeout: 15000,           // 15 segundos (GPS às vezes demora um pouco para dar o "fix" inicial no celular)
-    maximumAge: 0             // Força uma leitura nova do sensor, ignora posições salvas em cache
-  }
-);
+});
 
 // =============================================
 // ATUALIZAR TEMPERATURA, UMIDADE E POLUIÇÃO
@@ -5134,12 +5094,3 @@ window.addEventListener('resize', function() {
     ajustarTextosClima();
     ajustarHeaderResponsivo();
 });
-
- if ('serviceWorker' in navigator) {
-     window.addEventListener('load', () => {
-       navigator.serviceWorker.register('/sw.js')
-         .then(reg => console.log('SW registrado com sucesso:', reg.scope))
-         .catch(err => console.error('Falha no registro do SW:', err));
-     });
-   }
-
