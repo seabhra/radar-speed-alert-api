@@ -681,25 +681,127 @@ body {
     z-index: 800;
 }
 
+
+
 /* ============================================================
-  6- CONTAINER DOS BOTÕES - CANTO SUPERIOR DIREITO
+   BOTÃO MENU TOGGLE (HAMBÚRGUER) LATERAL ESQUERDO
    ============================================================ */
 
-.header-right-container {
-    position: absolute !important;
+#btn-menu-toggle {
+    position: fixed !important;          /* FIXO para não depender de pai */
     top: 15px !important;
-    right: 15px !important;
-    z-index: 1000 !important;
+    left: 15px !important;
+    width: 45px !important;
+    height: 45px !important;
+    background: rgba(20, 20, 20, 0.95) !important;
+    border: 1.5px solid rgba(0, 255, 136, 0.4) !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    padding: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    transition: all 0.3s ease !important;
+    pointer-events: auto !important;
+    opacity: 1 !important;
+
+    /* 🔑 CHAVE: z-index ACIMA do overlay (1999) e do menu (2001) */
+    z-index: 2002 !important;
+
+    flex-shrink: 0 !important;
+}
+
+#btn-menu-toggle:hover {
+    border-color: var(--accent-color, #00ff88) !important;
+    background: rgba(0, 255, 136, 0.1) !important;
+    transform: scale(1.05) !important;
+}
+
+#btn-menu-toggle:active {
+    transform: scale(0.95) !important;
+}
+
+/* Ícone hambúrguer */
+#btn-menu-toggle .menu-hamburger {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    width: 18px !important;
+    pointer-events: none !important;     /* deixa o clique passar pro botão */
+}
+
+#btn-menu-toggle .menu-hamburger span {
+    display: block !important;
+    height: 2px !important;
+    width: 100% !important;
+    background-color: var(--accent-color, #00ff88) !important;
+    border-radius: 2px !important;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transform-origin: center !important;
+}
+
+/* Animação quando ativo (vira X) */
+#btn-menu-toggle.active .menu-hamburger span:nth-child(1) {
+    transform: translateY(5px) rotate(45deg) !important;
+}
+#btn-menu-toggle.active .menu-hamburger span:nth-child(2) {
+    opacity: 0 !important;
+    transform: scaleX(0) !important;
+}
+#btn-menu-toggle.active .menu-hamburger span:nth-child(3) {
+    transform: translateY(-5px) rotate(-45deg) !important;
+}
+
+/* Label "MENU" abaixo do ícone */
+#btn-menu-toggle .menu-label {
+    font-size: 0.5rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    color: var(--accent-color, #00ff88) !important;
+    text-transform: uppercase !important;
+    line-height: 1 !important;
+    margin-top: 2px !important;
     pointer-events: none !important;
 }
 
 /* ============================================================
-   SIDEBAR CONTROLS - BOTÕES DO MAPA (VERTICAL)
+   6 - CONTAINER DOS BOTÕES - CANTO SUPERIOR DIREITO
+   ============================================================ */
+
+.header-right-container {
+    position: fixed !important;          /* FIXO (não absoluto) */
+    top: 15px !important;
+    right: 15px !important;
+    z-index: 1000 !important;
+    pointer-events: none !important;     /* container transparente a cliques */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
+/* Cada botão interno recebe cliques normalmente */
+.header-right-container > * {
+    pointer-events: auto !important;
+}
+
+/* 🔑 Quando o menu lateral está aberto, os botões da direita
+   continuam clicáveis, mas ficam visualmente "dim" (opcional) */
+body.menu-aberto .header-right-container {
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+/* ============================================================
+   SIDEBAR CONTROLS - BOTÕES DO MAPA (VERTICAL DIREITO)
    ============================================================ */
 
 .sidebar-controls {
     position: relative !important;
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    pointer-events: auto !important;
 }
 
 .sidebar-controls.controls-hidden {
@@ -727,11 +829,79 @@ body {
 }
 
 .controls-handle .arrow { transition: transform 0.35s ease; }
-.sidebar-controls.controls-hidden .controls-handle .arrow { transform: rotate(180deg); }
+.sidebar-controls.controls-hidden .controls-handle .arrow {
+    transform: rotate(180deg);
+}
+
+/* ============================================================
+   MENU LATERAL ESQUERDO (DRAWER)
+   ============================================================ */
+
+#menu-lateral {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    background: var(--panel-color, #1a1d24);
+    border-right: 1px solid rgba(0, 255, 136, 0.25);
+    box-shadow: 6px 0 30px rgba(0, 0, 0, 0.6);
+    overflow-y: auto;
+    z-index: 2001;
+    transform: translateX(-105%);
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
+    padding: 24px 0;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+}
+
+/* 🔑 Deixa espaço no topo do menu para o botão toggle não ficar colado */
+#menu-lateral::before {
+    content: "";
+    display: block;
+    height: 60px;                        /* altura > botão toggle */
+}
+
+#menu-lateral.aberto {
+    transform: translateX(0);
+    visibility: visible;
+}
+
+/* ============================================================
+   OVERLAY — deixa o canto superior esquerdo "vazado"
+   para o botão toggle continuar clicável
+   ============================================================ */
+
+#menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1999 !important;
+    display: none;
+
+    /* 🔑 CHAVE: recorta o overlay para NÃO cobrir o botão toggle */
+    clip-path: polygon(
+        0 0,
+        0 100%,
+        100% 100%,
+        100% 0,
+        70px 0,
+        70px 70px,
+        0 70px
+    );
+}
+
+#menu-overlay.aberto {
+    display: block;
+}
+
+
 
 
 /* ============================================================
-   BOTÃO MENU TOGGLE (HAMBÚRGUER)
+   BOTÃO MENU TOGGLE (HAMBÚRGUER) LATERAL ESQUERDO
    ============================================================ */
 
 #btn-menu-toggle {
@@ -872,10 +1042,9 @@ body {
 }
 
 /* Aberto: aceita as classes mais comuns, para combinar com o seu JS */
-#menu-lateral.open,
-#menu-lateral.active,
-#menu-lateral.aberto,
-#menu-lateral.show {
+
+#menu-lateral.aberto
+ {
     transform: translateX(0);
     visibility: visible;
 }
@@ -887,10 +1056,9 @@ body {
     z-index: 1999 !important;
     display: none;
 }
-#menu-overlay.open,
-#menu-overlay.active,
-#menu-overlay.aberto,
-#menu-overlay.show {
+
+#menu-overlay.aberto
+ {
     display: block;
 }
 
