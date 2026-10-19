@@ -2512,24 +2512,12 @@ function fecharTodasBarras() {
 
 function abrirSidebar() {
     var sidebar = document.getElementById('sidebar-controls');
+    var btnMenu = document.getElementById('btn-menu-toggle');
     if (!sidebar) return;
     sidebarAberta = true;
-    sidebar.classList.remove('controls-hidden');
+    sidebar.classList.remove('retracted');
+    if (btnMenu) btnMenu.classList.remove('active');
 }
-
-function inicializarSidebarToggle() {
-    var sidebar = document.getElementById('sidebar-controls');
-    var handle = document.getElementById('btn-controls-handle');
-    if (!sidebar || !handle) return;
-
-    handle.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        sidebar.classList.toggle('controls-hidden');
-        sidebarAberta = !sidebar.classList.contains('controls-hidden');
-    });
-}
-
 
 // ===================================================================
 // BOTÕES DO MAPA (rota, busca, centralizar, refresh, zoom)
@@ -2753,7 +2741,6 @@ async function initMap() {
     executarSeguro('botão de som', inicializarBotaoAlertaToggle);
     executarSeguro('botão adicionar radar', inicializarBotaoAddRadar);
     executarSeguro('menu', inicializarMenuToggle);
-    executarSeguro('sidebar recolhível', inicializarSidebarToggle); 
 
     // GPS não espera configuração nem radares
     executarSeguro('GPS', function () {
