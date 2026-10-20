@@ -892,7 +892,14 @@ body {
     padding: 24px 0;
     font-family: 'Inter', sans-serif;
     color: #fff;
-     z-index: 2000 !important;
+    position: fixed; 
+    top: 0;
+     left: -300px; 
+     width: 280px; 
+     height: 100%;
+    z-index: 2000; 
+    overflow-y: auto; 
+    transition: left .3s ease;
 }
 
 /* Título */
@@ -955,6 +962,8 @@ body {
     display: none;
 }
 
+#menu-lateral.open { left: 0; }
+#menu-overlay.open { display: block; }
 /* ============================================================
    RESPONSIVIDADE
    ============================================================ */
