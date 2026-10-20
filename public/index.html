@@ -68,18 +68,9 @@
 <header id="main-header">
     <div class="header-left-container">
 
-        <!-- MENU -->
-        <button type="button"
-                class="btn-menu-toggle"
-                id="btn-menu-toggle"
-                onclick="toggleMenu()"
-                aria-label="Abrir menu">
-            <div class="menu-hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            <div class="menu-label">MENU</div>
+        <!-- BOTÃO MENU ESQUERDO -->
+        <button type="button" class="btn-menu-toggle" id="btn-menu-toggle" onclick="toggleMenu()" aria-label="Abrir menu">
+            <div class="menu-hamburger"><span></span><span></span><span></span></div><div class="menu-label">MENU</div>
         </button>
 
         <!-- INFORMAÇÕES DO CABEÇALHO -->
@@ -151,9 +142,9 @@
     </nav>
 </div>
 
-<!-- ======================================================= -->
-<!-- ÁREA DO MAPA (fica sobre o mapa)    -->
-<!-- ======================================================== -->
+<!-- =============== -->
+<!-- ÁREA DO MAPA  -->
+<!-- ================ -->
 
 <div id="menu-overlay" onclick="toggleMenu()"></div>
 
@@ -204,10 +195,15 @@
 <!-- ======================================================= -->
 <!-- MENU DIREITO NO MAPA (fica sobre o mapa)                 -->
 <!-- ======================================================== -->
-
+<div class="map-controls-container" id="map-controls-container"></div>
     <!-- Botões laterais do mapa -->
-    <div class="header-right-container" id="header-right-container">
-        <div class="sidebar-controls" id="sidebar-controls">
+  <div class="header-right-container" id="header-right-container">
+    <div class="sidebar-controls" id="sidebar-controls">
+
+        <button type="button" class="controls-handle" id="btn-controls-handle" aria-label="Recolher botões do mapa">
+            <span class="arrow">›</span>
+        </button>
+
 
             <button type="button" class="map-btn" id="btn-rotate-map" onclick="rotateMap()" title="Rotacionar Mapa">
                 <img id="rotate-btn-icon" src="imagens_app/ic_girar_map.png" alt="Rotacionar">
