@@ -226,9 +226,15 @@ function verificarAlertaPoluicao(aqi) {
             alertaDiv.className = 'alerta-clima-label alerta-poluicao';
             const textoAlerta = aqi >= 5 ? 'ATENÇÃO: Qualidade do Ar PÉSSIMA!' : 'ATENÇÃO: Qualidade do Ar MUITO RUIM!';
             alertaDiv.innerHTML = `🌫️ ${textoAlerta}`;
-            
+
+            // em verificarAlertasClima, troque a condição:
+            if (window.somAlertaHabilitado !== false) {
+            somAlerta.play().catch(() => {});
+           }
+            // em verificarAlertasClima, troque a condição:
             if (alertaAtivoAtual !== 'poluicao') {
-                somAlerta.play().catch(e => console.log("Aguardando interação para áudio..."));
+                if (window.somAlertaHabilitado !== false) 
+                   if (window.somAlertaHabilitado !== false) somAlerta.play().catch(() => {});
                 alertaAtivoAtual = 'poluicao';
             }
         } else {
@@ -384,8 +390,7 @@ window.showPage = function(pageName) {
     const menu = document.getElementById('menu-lateral');
     const overlay = document.getElementById('menu-overlay');
     if (menu && overlay) {
-        menu.style.left = '-300px';
-        overlay.style.display = 'none';
+         setMenuAberto(false);
     }
 };
 
