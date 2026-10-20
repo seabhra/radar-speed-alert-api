@@ -892,6 +892,7 @@ body {
     padding: 24px 0;
     font-family: 'Inter', sans-serif;
     color: #fff;
+     z-index: 2000 !important;
 }
 
 /* Título */
@@ -2887,12 +2888,7 @@ body {
         letter-spacing: 0.5px;
     }
 
-    .sidebar-controls {
-        top: calc(var(--header-height) + 5px);
-        width: 60px;
-    }
-
-    
+      
 
     .map-btn {
         width: 40px;
