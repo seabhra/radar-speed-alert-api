@@ -2,8 +2,20 @@
   "framework": null,
   "rewrites": [
     {
-      "source": "/api/:path*",
+      "source": "/.well-known/assetlinks.json",
+      "destination": "/api/assetlinks"
+    },
+    {
+      "source": "/api/chat",
       "destination": "/api/chat.js"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/.well-known/assetlinks.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" }
+      ]
     }
   ]
 }
