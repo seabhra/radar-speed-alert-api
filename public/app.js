@@ -350,19 +350,29 @@ if (novoAlerta !== '') {
 // 4. FUNÇÕES DE INTERFACE (MENU E PÁGINAS)
 // ==========================================
 
-window.toggleMenu = function() {
+function setMenuAberto(aberto) {
     const menu = document.getElementById('menu-lateral');
     const overlay = document.getElementById('menu-overlay');
-    
-    if (menu && overlay) {
-        if (menu.style.left === '0px' || menu.style.left === '') {
-            menu.style.left = '-300px';
-            overlay.style.display = 'none';
-        } else {
-            menu.style.left = '0px';
-            overlay.style.display = 'block';
-        }
-    }
+    const btn = document.getElementById('btn-menu-toggle');
+    if (!menu || !overlay) return;
+    menu.classList.toggle('open', aberto);
+    overlay.classList.toggle('open', aberto);
+    if (btn) btn.classList.toggle('active', aberto);
+}
+window.setMenuAberto = setMenuAberto;
+
+window.toggleMenu = function () {
+    const menu = document.getElementById('menu-lateral');
+    setMenuAberto(!(menu && menu.classList.contains('open')));
+};
+
+// Alça e botão do menu do mapa (recolhe/expande a coluna de botões)
+window.toggleMapControls = function (e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    const sidebar = document.getElementById('sidebar-controls');
+    if (!sidebar) return;
+    sidebar.classList.toggle('controls-hidden');
+    window.sidebarAberta = !sidebar.classList.contains('controls-hidden');
 };
 
 // FUNÇÃO showPage UNIFICADA (Removida a duplicata)
