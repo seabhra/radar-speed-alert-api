@@ -731,4 +731,75 @@ window.setUserLocation = function(lat, lng) {
     else posicionarSidebar();
 })();
 
+// ===== FIX MENU DIREITO — independente do CSS =====
+(function () {
+    function S(el, props) {
+        Object.keys(props).forEach(function (k) {
+            el.style.setProperty(k, props[k], 'important');
+        });
+    }
+
+    function aplicarEstado(sidebar) {
+        var oculto = sidebar.classList.contains('controls-hidden');
+        S(sidebar, { transform: oculto ? 'translateX(calc(100% + 12px))' : 'none' });
+    }
+
+    function posicionarSidebar() {
+        var sidebar = document.getElementById('sidebar-controls');
+        if (!sidebar) return;
+
+        // Fora de qualquer contêiner, direto no body, para nada o esconder ou cortar
+        if (sidebar.parentElement !== document.body) document.body.appendChild(sidebar);
+        sidebar.classList.remove('retracted');
+
+        S(sidebar, {
+            position: 'fixed',
+            right: '12px',
+            bottom: '96px',
+            top: 'auto',
+            left: 'auto',
+            width: 'auto',
+            height: 'auto',
+            display: 'flex',
+            'flex-direction': 'column',
+            'align-items': 'center',
+            gap: '8px',
+            'z-index': '1500',
+            'pointer-events': 'auto',
+            visibility: 'visible',
+            opacity: '1',
+            transition: 'transform .3s ease'
+        });
+
+        sidebar.querySelectorAll('.map-btn').forEach(function (b) {
+            S(b, { display: 'flex', 'pointer-events': 'auto' });
+        });
+
+        var handle = document.getElementById('btn-controls-handle');
+        if (handle) {
+            S(handle, {
+                position: 'absolute',
+                left: '-26px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: '26px',
+                height: '52px',
+                display: 'flex',
+                'align-items': 'center',
+                'justify-content': 'center',
+                'pointer-events': 'auto',
+                'z-index': '1502'
+            });
+        }
+
+        // Sempre que a classe controls-hidden mudar (alça ou outro código), aplica o deslize
+        aplicarEstado(sidebar);
+        new MutationObserver(function () { aplicarEstado(sidebar); })
+            .observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', posicionarSidebar);
+    else posicionarSidebar();
+})();
+
 console.log('✅ [APP.JS] Carregado e funções exportadas para window com sucesso.');
