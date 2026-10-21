@@ -124,16 +124,20 @@
         <p>por Geraldo A. Seabra</p>
     </div>
     <nav class="menu-nav">
-        <a class="menu-link" href="javascript:void(0)" onclick="showPage('mapa'); toggleMenu();">
+
+
+       <a class="menu-link" href="javascript:void(0)" onclick="showPage('mapa');"></a>
             <span class="menu-icon">🗺️</span><span>Mapa</span>
         </a>
-        <a class="menu-link" href="javascript:void(0)" onclick="showPage('radares'); toggleMenu();">
+   <a class="menu-link" href="javascript:void(0)" onclick="showPage('radares');"></a>
             <span class="menu-icon">🚦</span><span>Tipos de Radares</span>
         </a>
-        <a class="menu-link" href="javascript:void(0)" onclick="showPage('info'); toggleMenu();">
+       
+<a class="menu-link" href="javascript:void(0)" onclick="showPage('info');">
             <span class="menu-icon">ℹ️</span><span>Informações</span>
         </a>
-        <a class="menu-link" href="javascript:void(0)" onclick="showPage('doar'); toggleMenu();">
+       
+<a class="menu-link" href="javascript:void(0)" onclick="showPage('doar');">    
             <span class="menu-icon">💚</span><span>Apoiar Projeto</span>
         </a>
         <a class="menu-link menu-link-danger" href="javascript:void(0)" onclick="fecharApp(); return false;">
@@ -197,43 +201,44 @@
 <!-- ======================================================== -->
 <div class="map-controls-container" id="map-controls-container"></div>
     <!-- Botões laterais do mapa -->
-  <div class="header-right-container" id="header-right-container">
+  
     <div class="sidebar-controls" id="sidebar-controls">
 
-        <button type="button" class="controls-handle" id="btn-controls-handle" aria-label="Recolher botões do mapa">
-            <span class="arrow">›</span>
-        </button>
+        <button type="button" class="controls-handle" id="btn-controls-handle"
+        onclick="toggleMapControls(event)" aria-label="Recolher botões do mapa">
+       <span class="arrow">›</span>
+       </button>
 
 
-            <button type="button" class="map-btn" id="btn-rotate-map" onclick="rotateMap()" title="Rotacionar Mapa">
+            <button type="button" class="map-btn" id="btn-rotate-map" title="Rotacionar Mapa">
                 <img id="rotate-btn-icon" src="imagens_app/ic_girar_map.png" alt="Rotacionar">
             </button>
 
-            <button type="button" class="map-btn alert-toggle-btn" id="btn-alert-toggle" onclick="toggleAlertSound()" title="Ligar/Desligar Alerta">
+            <button type="button" class="map-btn alert-toggle-btn" id="btn-alert-toggle" title="Ligar/Desligar Alerta">
                 <img id="alert-toggle-icon" src="imagens_app/ic_sound_on.png" alt="Alerta">
             </button>
 
-            <button type="button" class="map-btn" id="btn-search-bar" onclick="toggleSearchBar()" title="Buscar Radares">
+            <button type="button" class="map-btn" id="btn-search-bar" title="Buscar Radares">
                 <img src="imagens_app/ic_radar_busca.png" alt="Busca">
             </button>
 
-            <button type="button" class="map-btn" id="btn-route-bar" onclick="openRouteBar()" title="Navegar / Rota">
+            <button type="button" class="map-btn" id="btn-route-bar" title="Navegar / Rota">
                 <img src="imagens_app/ic_gps_busca.png" alt="Rota">
             </button>
 
-            <button type="button" class="map-btn" id="btn-center" onclick="centerMapOnUser()" title="Centralizar GPS">
+            <button type="button" class="map-btn" id="btn-center" title="Centralizar GPS">
                 <img src="imagens_app/ic_location_button.png" alt="Centro">
             </button>
 
-            <button type="button" class="map-btn" id="btn-refresh" onclick="refreshMap()" title="Resetar Mapa">
+            <button type="button" class="map-btn" id="btn-refresh" title="Resetar Mapa">
                 <img src="imagens_app/ic_refresh_button.png" alt="Refresh">
             </button>
 
-            <button type="button" class="map-btn" id="btn-zoom-in" onclick="zoomInMap()" title="Aumentar Zoom">
-                <img src="imagens_app/ic_zoom_in.png" alt="Zoom In">
-            </button>
+            <button type="button" class="map-btn" id="btn-zoom-in" title="Aumentar Zoom">
+              <img src="imagens_app/ic_zoom_in.png" alt="Zoom In">
+          </button>
 
-            <button type="button" class="map-btn" id="btn-zoom-out" onclick="zoomOutMap()" title="Diminuir Zoom">
+            <button type="button" class="map-btn" id="btn-zoom-out" title="Diminuir Zoom">
                 <img src="imagens_app/ic_zoom_out.png" alt="Zoom Out">
             </button>
 
