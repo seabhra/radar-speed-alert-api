@@ -654,6 +654,7 @@ window.setUserLocation = function(lat, lng) {
     window.atualizarCidade(lat, lng);
     window.atualizarTemperatura();
 };
+
 // ===== FIX MENUS (colar no FINAL do app.js) =====
 (function () {
     function setMenuAberto(aberto) {
@@ -715,6 +716,19 @@ window.setUserLocation = function(lat, lng) {
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);
     else iniciar();
+})();
+
+// ===== FIX MENU DIREITO DO MAPA =====
+(function () {
+    function posicionarSidebar() {
+        var sidebar = document.getElementById('sidebar-controls');
+        var mapaPage = document.getElementById('page-mapa');
+        if (!sidebar || !mapaPage) return;
+        if (sidebar.parentElement !== mapaPage) mapaPage.appendChild(sidebar);
+        sidebar.classList.remove('controls-hidden', 'retracted');
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', posicionarSidebar);
+    else posicionarSidebar();
 })();
 
 console.log('✅ [APP.JS] Carregado e funções exportadas para window com sucesso.');
