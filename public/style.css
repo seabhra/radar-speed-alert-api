@@ -3081,3 +3081,31 @@ body {
     top: 50% !important;
     transform: translateY(-50%) !important;
 }
+
+/* ===== FIX MENUS ===== */
+#menu-lateral { background: #1a1d24 !important; z-index: 3000 !important; }
+#menu-overlay { z-index: 2999 !important; }
+#menu-lateral.open { left: 0 !important; }
+#menu-overlay.open { display: block !important; }
+
+#btn-menu-toggle, #btn-controls-handle { touch-action: manipulation; cursor: pointer; }
+
+#header-right-container {
+    position: absolute !important;
+    top: auto !important;
+    bottom: 96px !important;
+    right: 12px !important;
+    z-index: 1500 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+#sidebar-controls {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform .3s ease;
+}
+#sidebar-controls .map-btn { display: flex !important; }
+#sidebar-controls.controls-hidden { transform: translateX(calc(100% + 12px)) !important; }
