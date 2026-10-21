@@ -699,6 +699,10 @@ body {
 
 .sidebar-controls {
     position: relative !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
@@ -892,13 +896,15 @@ body {
     padding: 24px 0;
     font-family: 'Inter', sans-serif;
     color: #fff;
-    position: fixed; 
+    background: #1a1d24;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.6);
+    position: fixed;
     top: 0;
-     left: -300px; 
-     width: 280px; 
-     height: 100%;
-    z-index: 2000; 
-    overflow-y: auto; 
+    left: -300px;
+    width: 280px;
+    height: 100%;
+    z-index: 2000;
+    overflow-y: auto;
     transition: left .3s ease;
 }
 
