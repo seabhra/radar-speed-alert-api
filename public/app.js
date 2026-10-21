@@ -654,5 +654,67 @@ window.setUserLocation = function(lat, lng) {
     window.atualizarCidade(lat, lng);
     window.atualizarTemperatura();
 };
+// ===== FIX MENUS (colar no FINAL do app.js) =====
+(function () {
+    function setMenuAberto(aberto) {
+        var menu = document.getElementById('menu-lateral');
+        var overlay = document.getElementById('menu-overlay');
+        var btn = document.getElementById('btn-menu-toggle');
+        if (!menu || !overlay) return;
+        menu.classList.toggle('open', aberto);
+        overlay.classList.toggle('open', aberto);
+        if (btn) btn.classList.toggle('active', aberto);
+    }
+    window.setMenuAberto = setMenuAberto;
+    window.toggleMenu = function () {
+        var menu = document.getElementById('menu-lateral');
+        setMenuAberto(!(menu && menu.classList.contains('open')));
+    };
+
+    function ligar(el, fn) {
+        if (!el) return;
+        el.removeAttribute('onclick');
+        el.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            fn();
+        }, true);
+    }
+
+    function iniciar() {
+        var menu = document.getElementById('menu-lateral');
+        var sidebar = document.getElementById('sidebar-controls');
+
+        // Menu esquerdo
+        ligar(document.getElementById('btn-menu-toggle'), window.toggleMenu);
+        ligar(document.getElementById('menu-overlay'), function () { setMenuAberto(false); });
+
+        // Links do menu: navega e fecha uma única vez
+        if (menu) menu.addEventListener('click', function (e) {
+            var a = e.target.closest ? e.target.closest('a.menu-link') : null;
+            if (!a) return;
+            var m = /showPage\('(\w+)'\)/.exec(a.getAttribute('onclick') || '');
+            if (!m) return;                       // ex.: "Fechar App" segue o fluxo normal
+            e.preventDefault();
+            e.stopPropagation();
+            window.showPage(m[1]);
+            setMenuAberto(false);
+        }, true);
+
+        // Menu direito do mapa
+        if (sidebar) sidebar.classList.remove('controls-hidden', 'retracted');
+        ligar(document.getElementById('btn-controls-handle'), function () {
+            if (sidebar) sidebar.classList.toggle('controls-hidden');
+        });
+        // Os botões já são tratados pelo mapa.js (por id); remove o onclick duplicado
+        document.querySelectorAll('#sidebar-controls .map-btn').forEach(function (b) {
+            b.removeAttribute('onclick');
+        });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);
+    else iniciar();
+})();
 
 console.log('✅ [APP.JS] Carregado e funções exportadas para window com sucesso.');
