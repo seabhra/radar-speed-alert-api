@@ -2108,6 +2108,7 @@ body {
     text-align: center;
 }
 
+
 .author-info {
     display: flex;
     align-items: center;
@@ -2116,44 +2117,63 @@ body {
     margin-bottom: 20px;
 }
 
-.author-avatar, .dev-avatar {
-    background: linear-gradient(135deg, #ff6b35, #f7931e);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
+/* Avatar do autor — NewsGames */
 .author-avatar {
     width: 80px;
     height: 80px;
-    font-size: 2rem;
+    flex: 0 0 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: #1a1d24;
 }
 
+/* Imagem do avatar */
+.author-avatar .author-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
+
+/* Avatar do desenvolvedor */
 .dev-avatar {
     width: 60px;
     height: 60px;
+    flex: 0 0 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: white;
     font-size: 1.5rem;
+    font-weight: bold;
 }
 
+/* Informações do autor */
 .author-details h3 {
-    margin: 0 0 5px 0;
+    margin: 0 0 5px;
     color: #1e3c72;
 }
 
 .author-name {
+    margin: 0 0 5px;
+    color: #ff6b35;
     font-size: 1.3rem;
     font-weight: bold;
-    color: #ff6b35;
-    margin: 0 0 5px 0;
 }
 
-.author-role, .developer-info p {
+.author-role,
+.developer-info p {
     margin: 0;
     color: #666;
 }
+
 
 .app-version {
     margin: 20px 0;
