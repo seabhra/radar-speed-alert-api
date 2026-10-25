@@ -2108,6 +2108,8 @@ body {
     text-align: center;
 }
 
+/* CSS INFO e IMG */
+
 .author-info {
     display: flex;
     align-items: center;
@@ -2124,18 +2126,21 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: bold;
+    flex-shrink: 0; /* evita deformação ao centralizar */
 }
 
+/* 🔽 Avatar do autor reduzido */
 .author-avatar {
-    width: 80px;
-    height: 80px;
-    font-size: 2rem;
-}
-
-.dev-avatar {
     width: 60px;
     height: 60px;
     font-size: 1.5rem;
+}
+
+/* 🔽 Avatar do desenvolvedor reduzido */
+.dev-avatar {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
 }
 
 .author-details h3 {
@@ -2160,6 +2165,7 @@ body {
     padding: 15px;
     background: rgba(0, 255, 136, 0.1);
     border-radius: 8px;
+    text-align: center; /* centraliza o conteúdo da versão */
 }
 
 .app-version span {
@@ -2177,11 +2183,13 @@ body {
     color: #666;
     font-size: 0.9rem;
     margin: 20px 0;
+    text-align: center;
 }
 
 .tech-stack h4 {
     color: #1e3c72;
     margin-bottom: 15px;
+    text-align: center;
 }
 
 .tech-list {
