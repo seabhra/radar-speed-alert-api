@@ -2164,9 +2164,6 @@ body {
     font-size: 1.1rem;
 }
 
-
-
-
 .author-name {
     font-size: 1.3rem;
     font-weight: bold;
@@ -2231,7 +2228,9 @@ body {
     font-weight: 600;
 }
 
-/* Tipos de Radares */
+/* ================================
+================Tipos de Radares 
+==================================*/
 .radar-type-card {
     background: white;
     border-radius: 12px;
@@ -2304,6 +2303,57 @@ body {
     border-radius: 6px;
     font-size: 0.85rem;
     font-weight: 600;
+}
+
+/* Container da grade de radares */
+.radar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 15px;
+    padding: 10px;
+}
+
+/* Card individual do radar */
+.radar-item-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 15px 10px;
+    text-align: center;
+    border: 1px solid #e8ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.radar-item-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    border-color: #ff6b35;
+}
+
+/* Imagem do radar */
+.radar-item-img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+/* Nome do radar */
+.radar-item-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.3;
+    word-wrap: break-word;
+}
+
+/* Ajuste no container de conteúdo para scroll suave se necessário */
+.page-content {
+    padding-bottom: 30px;
 }
 
 /* ===============================
