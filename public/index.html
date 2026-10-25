@@ -505,7 +505,9 @@
         <section class="info-section">
             <h2>👨‍💻 Créditos</h2>
             <div class="info-card credits-card">
-                <div class="author-avatar"><img src="/imagens_app/image_marca.png" alt="NewsGames"
+             
+                <div class="author-avatar">
+                    <img src="/imagens_app/image_marca.png" alt="NewsGames"
                     class="author-image">
             </div>
                     <div class="author-details">
@@ -538,6 +540,7 @@
     </div>
 </div>
 
+
 <!-- ============================================ -->
 <!-- PÁGINA DE TIPOS DE RADARES                   -->
 <!-- ============================================ -->
@@ -548,228 +551,313 @@
     </div>
 
     <div class="page-content">
+        <div class="radar-grid">
 
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <img src="/imagens_app/ic_radar_cev_v2.png" alt="Radar de Velocidade"
-                     onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-                <span class="radar-emoji">🚗</span>
+            <!-- RADARES DE VELOCIDADE E MISTOS -->
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_cev_v2.png" alt="CEV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Controlador Eletrônico de Velocidade</span>
             </div>
-            <div class="radar-info">
-                <h3>Radar de Velocidade (CEV)</h3>
-                <p class="radar-desc">Controlador Eletrônico de Velocidade</p>
-                <div class="radar-details">
-                    <p>Mede a velocidade do veículo e multa quem ultrapassa o limite permitido. Pode ser fixo, móvel ou eletrônico.</p>
-                    <ul class="radar-features">
-                        <li>✅ Fixo em postes</li>
-                        <li>✅ Móvel (carro ou moto)</li>
-                        <li>✅ Eletrônico (lombada)</li>
-                    </ul>
-                </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_cev_v2.png" alt="CEV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Controlador Eletrônico de Velocidade (CEV)</span>
             </div>
-        </section>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_cem_cev.png" alt="CEM + CEV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Controlador Eletrônico Misto (DAS) + (CEV)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_cem_dcp.png" alt="CEM + DCP" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Controlador Eletrônico Misto (DAS) + (DCP)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_cem_move.png" alt="CEM + DIF" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Controlador Eletrônico Misto (DAS) + (DIF)</span>
+            </div>
 
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <img src="/imagens_app/ic_semaforo_inteligente.png" alt="Semáforo"
-                     onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-                <span class="radar-emoji">🚦</span>
+            <!-- RADARES SINGULARES -->
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_das_v2.png" alt="DAS" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Avanço de Semáforo (DAS)</span>
             </div>
-            <div class="radar-info">
-                <h3>Detector de Avanço de Semáforo (DAS)</h3>
-                <p class="radar-desc">Radar de Semáforo</p>
-                <div class="radar-details">
-                    <p>Controla o fluxo de veículos e pedestres. Multa por avançar o sinal vermelho.</p>
-                    <ul class="radar-features">
-                        <li>✅ Sinal vermelho</li>
-                        <li>✅ Avanço de preferencial</li>
-                        <li>✅ Bloqueio de interseção</li>
-                    </ul>
-                </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_das_v2.png" alt="DAS" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Avanço de Semáforo</span>
             </div>
-        </section>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_dtlp_v2.png" alt="DTLP" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Tráfego em Local Proibido</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_dtlp_v2.png" alt="DTLP" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Tráfego em Local Proibido (DTLP)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_rcp_v2.png" alt="DCP" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Conversão em Local Proibido</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_rcp_v2.png" alt="DCP" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Conversão em Local Proibido (DCP)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_dife_v2.png" alt="MOVE" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Invasão de Faixa Exclusiva - MOVE</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_difex_v2.png" alt="DIFEX" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Invasão de Faixa Exclusiva (DIFEX)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_difex_v2.png" alt="DIFEX" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Invasão de Faixa Exclusiva</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_dpfp_v2.png" alt="DPFP" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Parada sobre Faixa de Pedestres (DPFP)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_dpfp_v2.png" alt="DPFP" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Parada sobre Faixa de Pedestres</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_fpref_v2.png" alt="BUS" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Faixa Preferencial de Ônibus (BUS)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_fpref_v2.png" alt="BUS" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Faixa Preferencial de Ônibus</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_zona_verde.png" alt="ZVT" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Zona Verde de Trânsito (ZVT)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_zona_verde.png" alt="ZVC" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Zona Verde de Trânsito (ZVC)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_zona_verde.png" alt="Zona Verde" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Zona Verde de Trânsito</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_zona_inunda.png" alt="ZIR" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Zona de Risco de Inundações Recorrentes (ZIR)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_zona_inunda.png" alt="ZIR" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Zona de Risco de Inundações Recorrentes</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_duc_v2.png" alt="DUC" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Uso de Celular</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_duc_v2.png" alt="DUC" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Detector de Uso de Celular (DUC)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_rev_v2.png" alt="CRV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Controle de Redução de Velocidade (CRV)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_rev_v2.png" alt="CRV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Controle de Redução de Velocidade</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_cinto_v2.png" alt="VCS" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Verificador de Cinto de Segurança (VCS)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_cinto_v2.png" alt="VCS" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Verificador de Cinto de Segurança</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_ocr_v2.png" alt="OCR-P" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Leitor Inteligente de Placas (OCR-P)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_ocr_v2.png" alt="OCR-P" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Leitor Inteligente de Placas</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_facial_v2.png" alt="OCR-F" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Leitor de Reconhecimento Facial (OCR-F)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_facial_v2.png" alt="OCR-F" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Leitor de Reconhecimento Facial</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_olho_v2.png" alt="COV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Câmera Olho Vivo (COV)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_olho_v2.png" alt="COV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Câmera Olho Vivo</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_perigo_v2.png" alt="ZPV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Zona de Perigo e Violência (ZPV)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_perigo_v2.png" alt="ZPV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Zona de Perigo e Violência</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_acidente_v2.png" alt="AIA" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Alerta de Alto Índice de Acidente (AIA)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_acidente_v2.png" alt="AIA" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Alerta de Alto Índice de Acidente</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_truck_v2.png" alt="CFE" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Alerta de Caminhão na Faixa Esquerda (CFE)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_nuclear_v2.png" alt="ZEN" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Zona de Estudo Nuclear (ZEN)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_area_escape.png" alt="ARE" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Área de Escape Caminhões (ARE)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_local_traffic_v2.png" alt="ATL" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Apenas Trânsito Local (ATL)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_cam_video_v2.png" alt="RIV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Radar Inteligente de Velocidade Média (RIV)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_cam_video_v2.png" alt="RIV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Radar Inteligente de Velocidade Média</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_tunel_v2.png" alt="TUV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Passagem Sob Túnel Viário (TUV)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_tunel_v2.png" alt="TUV" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Passagem Sob Túnel Viário</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_radar_poluido_v2.png" alt="APE" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Alerta de Poluição Elevada (APE)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_semaforo_inteligente.png" alt="SEI" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Semáforo Inteligente (SEI)</span>
+            </div>
 
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <img src="/imagens_app/ic_radar_das_v2.png" alt="Faixa de Ônibus"
-                     onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-                <span class="radar-emoji">🚌</span>
+            <!-- DESCUBRA A CIDADE (ALE) -->
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_mercado_central.png" alt="Mercado Central" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Mercado Central - Arte e Gastronomia</span>
             </div>
-            <div class="radar-info">
-                <h3>Faixa Exclusiva de Ônibus (DIFEX)</h3>
-                <p class="radar-desc">Detector de Invasão de Faixa Exclusiva</p>
-                <div class="radar-details">
-                    <p>Fiscaliza o uso indevido da faixa exclusiva de ônibus. Multa para carros particulares.</p>
-                    <ul class="radar-features">
-                        <li>✅ Faixa exclusiva</li>
-                        <li>✅ Horário de funcionamento</li>
-                        <li>✅ Fiscalização eletrônica</li>
-                    </ul>
-                </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_mirante_mangabeiras.png" alt="Mirante" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Mirante do Mangabeiras - Panorama</span>
             </div>
-        </section>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_parque_mangabeiras.png" alt="Parque Mangabeiras" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Parque Mangabeiras - Natureza</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_mercado_novo.png" alt="Mercado Novo" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Mercado Novo - Arte e Gastronomia</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_santa_tereza.png" alt="Santa Tereza" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Santa Tereza - Circuito Boêmio</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_rua_sapucai.png" alt="Rua Sapucaí" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Rua Sapucaí - Panorama e Gastronomia</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_praca_liberdade.png" alt="Praça da Liberdade" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Praça da Liberdade - Arte e Cultura</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_edificio_maletta.png" alt="Edifício Maletta" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Edifício Maletta - Arte e Gastronomia</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_praca_papa.png" alt="Praça do Papa" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Praça do Papa - Panorama</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_museu_futebol.png" alt="Museu do Futebol" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Museu do Futebol - Arte e Cultura</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_igreja_pampulha.png" alt="Igreja da Pampulha" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Igreja da Pampulha - Arte e Cultura</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_parque_ecologico_pampulha.png" alt="Parque Ecológico" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Parque Ecológico da Pampulha - Ecoturismo</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_parque_guanabara.png" alt="Parque Guanabara" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Parque de Diversões Guanabara - Diversão e Lazer</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_parque_serra_curral.png" alt="Parque Serra do Curral" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Parque da Serra do Curral - Ecoturismo</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_feira_afonso_pena.png" alt="Feira Afonso Pena" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Feira de Artesanato da Afonso Pena - Compra (Aos domingos)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_palacio_artes.png" alt="Palácio das Artes" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Palácio das Artes - Arte e Cultura</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_parque_municipal.png" alt="Parque Municipal" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Parque Municipal - Parque e Diversão</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_praca_savassi.png" alt="Praça da Savassi" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Praça da Savassi - Gastronomia</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_museu_artes_oficios.png" alt="Museu de Artes e Ofícios" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Museu de Artes e Ofícios - História</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_museu_abilio_barreto.png" alt="Museu Abílio Barreto" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Museu Abílio Barreto - História</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_polo_artesanato.png" alt="Polo de Artesanato" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Descubra a Cidade - Polo de Artesanato de Nações Unidas - Arte Mineira</span>
+            </div>
 
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">🔄</span>
+            <!-- REDE DE SERVIÇOS -->
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_recarga.png" alt="REC" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Rede de Serviços - Recarga Carro Elétrico (REC)</span>
             </div>
-            <div class="radar-info">
-                <h3>Conversão Proibida (DCP)</h3>
-                <p class="radar-desc">Detector de Conversão em Local Proibido</p>
-                <div class="radar-details">
-                    <p>Flagra veículos que fazem conversões proibidas (esquerda/direita) em locais sinalizados.</p>
-                    <ul class="radar-features">
-                        <li>✅ Conversão à esquerda</li>
-                        <li>✅ Conversão à direita</li>
-                        <li>✅ Retorno proibido</li>
-                    </ul>
-                </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_autolimpante.png" alt="AUT" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Rede de Serviços - WC Público Autolimpante (AUT)</span>
             </div>
-        </section>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_banheiro.png" alt="COM" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Rede de Serviços - WC Público Comum (COM)</span>
+            </div>
+            <div class="radar-item-card">
+                <img src="/imagens_app/ic_amigo.png" alt="PAA" class="radar-item-img" onerror="this.src='/imagens_app/ic_radar_cev_v2.png'">
+                <span class="radar-item-name">Rede de Serviços - Ponto Abrigo Amigo (PAA)</span>
+            </div>
 
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">⛔</span>
-            </div>
-            <div class="radar-info">
-                <h3>Tráfego Proibido (DTLP)</h3>
-                <p class="radar-desc">Detector de Tráfego em Local Proibido</p>
-                <div class="radar-details">
-                    <p>Monitora áreas de tráfego restrito como pedestres, ciclovias ou ruas fechadas.</p>
-                    <ul class="radar-features">
-                        <li>✅ Rua pedestre</li>
-                        <li>✅ Área restrita</li>
-                        <li>✅ Sentido proibido</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">📱</span>
-            </div>
-            <div class="radar-info">
-                <h3>Uso de Celular (DUC)</h3>
-                <p class="radar-desc">Detector de Uso de Celular</p>
-                <div class="radar-details">
-                    <p>Identifica motoristas utilizando celular ao volante sem dispositivo de mãos livres.</p>
-                    <ul class="radar-features">
-                        <li>✅ Uso de smartphone</li>
-                        <li>✅ Mãos livres obrigatório</li>
-                        <li>✅ Infração grave</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">🔒</span>
-            </div>
-            <div class="radar-info">
-                <h3>Cinto de Segurança (VCS)</h3>
-                <p class="radar-desc">Verificador de Cinto de Segurança</p>
-                <div class="radar-details">
-                    <p>Fiscaliza o uso obrigatório do cinto de segurança por todos os ocupantes do veículo.</p>
-                    <ul class="radar-features">
-                        <li>✅ Motorista</li>
-                        <li>✅ Passageiros</li>
-                        <li>✅ Bancos traseiros</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">🌊</span>
-            </div>
-            <div class="radar-info">
-                <h3>Risco de Inundação (ZIR)</h3>
-                <p class="radar-desc">Zona de Inundações Recorrentes</p>
-                <div class="radar-details">
-                    <p>Alerta sobre áreas sujeitas a alagamentos e inundações em períodos de chuva.</p>
-                    <ul class="radar-features">
-                        <li>✅ Pontos de alagamento</li>
-                        <li>✅ Alerta preventivo</li>
-                        <li>✅ Rotas alternativas</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">⚠️</span>
-            </div>
-            <div class="radar-info">
-                <h3>Zona de Perigo (ZPV)</h3>
-                <p class="radar-desc">Zona de Perigo e Violência</p>
-                <div class="radar-details">
-                    <p>Indica áreas com alto índice de criminalidade ou perigo para motoristas.</p>
-                    <ul class="radar-features">
-                        <li>✅ Área de risco</li>
-                        <li>✅ Alerta de segurança</li>
-                        <li>✅ Evitar trajeto</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">💥</span>
-            </div>
-            <div class="radar-info">
-                <h3>Alto Índice de Acidentes (AIA)</h3>
-                <p class="radar-desc">Alerta de Acidentes</p>
-                <div class="radar-details">
-                    <p>Sinaliza trechos com grande ocorrência de acidentes de trânsito.</p>
-                    <ul class="radar-features">
-                        <li>✅ Ponto crítico</li>
-                        <li>✅ Reduzir velocidade</li>
-                        <li>✅ Atenção redobrada</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">🔋</span>
-            </div>
-            <div class="radar-info">
-                <h3>Recarga para Carro Elétrico (REC)</h3>
-                <p class="radar-desc">Ponto de Recarga</p>
-                <div class="radar-details">
-                    <p>Indica locais com pontos de recarga para veículos elétricos.</p>
-                    <ul class="radar-features">
-                        <li>✅ Estacionamento</li>
-                        <li>✅ Tomada disponível</li>
-                        <li>✅ Acesso público</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="radar-type-card">
-            <div class="radar-icon">
-                <span class="radar-emoji">🚾</span>
-            </div>
-            <div class="radar-info">
-                <h3>WC Público</h3>
-                <p class="radar-desc">Banheiro Público</p>
-                <div class="radar-details">
-                    <p>Localiza banheiros públicos disponíveis na via.</p>
-                    <ul class="radar-features">
-                        <li>✅ Autolimpante</li>
-                        <li>✅ Convencional</li>
-                        <li>✅ Acesso gratuito</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+        </div>
     </div>
 </div>
 
