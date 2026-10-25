@@ -2111,7 +2111,38 @@ body {
 
 /* Avatar do autor — NewsGames */
 
-/* Alinhamento do bloco do autor */
+/* Avatar do autor — NewsGames */
+.author-info .author-avatar {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    flex: 0 0 80px;
+    box-sizing: border-box;
+    padding: 5px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+}
+
+/* Imagem contida dentro do círculo laranja */
+.author-info .author-avatar img.author-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+    padding: 0;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 50%;
+}
+
+/* Alinhamento das informações */
 .author-info {
     display: flex;
     align-items: center;
@@ -2120,37 +2151,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* Avatar circular */
-.author-info .author-avatar {
-    width: 80px;
-    height: 80px;
-    min-width: 80px;
-    flex: 0 0 80px;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 50%;
-    background: #1a1d24;
-    line-height: 0;
-}
-
-/* Imagem centralizada no avatar */
-.author-info .author-avatar img.author-image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-width: none;
-    max-height: none;
-    margin: 0;
-    padding: 0;
-    object-fit: cover;
-    object-position: center;
-    border-radius: 50%;
-}
 
 /* Avatar do desenvolvedor */
 .dev-avatar {
