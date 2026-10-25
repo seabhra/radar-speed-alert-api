@@ -2111,38 +2111,7 @@ body {
 
 /* Avatar do autor — NewsGames */
 
-/* Avatar do autor — NewsGames */
-.author-info .author-avatar {
-    width: 80px;
-    height: 80px;
-    min-width: 80px;
-    flex: 0 0 80px;
-    box-sizing: border-box;
-    padding: 5px;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ff6b35, #f7931e);
-}
-
-/* Imagem contida dentro do círculo laranja */
-.author-info .author-avatar img.author-image {
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    margin: 0;
-    padding: 0;
-    object-fit: contain;
-    object-position: center;
-    border-radius: 50%;
-}
-
-/* Alinhamento das informações */
+/* Alinhamento do bloco do autor */
 .author-info {
     display: flex;
     align-items: center;
@@ -2151,19 +2120,60 @@ body {
     margin-bottom: 20px;
 }
 
+/* Avatar circular */
+.author-info .author-avatar {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    flex: 0 0 80px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1d24;
+    line-height: 0;
+}
+
+/* Imagem centralizada no círculo */
+.author-info .author-avatar img.author-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    margin: 0;
+    object-fit: cover;
+    object-position: 50% 50%;
+    border-radius: 50%;
+}
+
+
+/* Imagem do avatar */
+.author-avatar .author-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 50%;
+}
 
 /* Avatar do desenvolvedor */
 .dev-avatar {
     width: 60px;
     height: 60px;
     flex: 0 0 60px;
-    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     background: linear-gradient(135deg, #ff6b35, #f7931e);
-    color: #fff;
+    color: white;
     font-size: 1.5rem;
     font-weight: bold;
 }
