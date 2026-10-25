@@ -2138,8 +2138,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 60px;
+    width: 120px;
+    height: 120px;
     flex-shrink: 0;
     overflow: hidden;
     padding: 10px;
