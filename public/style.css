@@ -2109,44 +2109,63 @@ body {
 }
 
 /* CSS INFO e IMG */
+/* Container principal dos créditos */
+.info-card.credits-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px 20px;
+}
 
+/* Container do autor - centralizado */
 .author-info {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.author-avatar, .dev-avatar {
+
+
+/* Avatar com tamanho controlado */
+.author-avatar {
     background: linear-gradient(135deg, #ff6b35, #f7931e);
-    color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    flex-shrink: 0; /* evita deformação ao centralizar */
-}
-
-/* 🔽 Avatar do autor reduzido */
-.author-avatar {
     width: 60px;
     height: 60px;
-    font-size: 1.5rem;
+    flex-shrink: 0;
+    overflow: hidden;
+    padding: 10px;
+}
+/*  IMAGEM REDUZIDA E CENTRALIZADA */
+.author-avatar img.author-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+    display: block;
 }
 
-/* 🔽 Avatar do desenvolvedor reduzido */
-.dev-avatar {
-    width: 45px;
-    height: 45px;
-    font-size: 1.1rem;
+/* Detalhes do autor */
+.author-details {
+    text-align: left;
 }
 
 .author-details h3 {
     margin: 0 0 5px 0;
     color: #1e3c72;
+    font-size: 1.1rem;
 }
+
+
+
 
 .author-name {
     font-size: 1.3rem;
@@ -2155,17 +2174,19 @@ body {
     margin: 0 0 5px 0;
 }
 
-.author-role, .developer-info p {
+.author-role {
     margin: 0;
     color: #666;
+    font-size: 0.95rem;
 }
 
+/* Versão do app */
 .app-version {
     margin: 20px 0;
     padding: 15px;
     background: rgba(0, 255, 136, 0.1);
     border-radius: 8px;
-    text-align: center; /* centraliza o conteúdo da versão */
+    text-align: center;
 }
 
 .app-version span {
@@ -2179,6 +2200,7 @@ body {
     color: #00cc66;
 }
 
+/* Copyright */
 .copyright {
     color: #666;
     font-size: 0.9rem;
@@ -2186,6 +2208,7 @@ body {
     text-align: center;
 }
 
+/* Stack de tecnologias */
 .tech-stack h4 {
     color: #1e3c72;
     margin-bottom: 15px;
