@@ -2109,6 +2109,9 @@ body {
 }
 
 
+/* Avatar do autor — NewsGames */
+
+/* Alinhamento do bloco do autor */
 .author-info {
     display: flex;
     align-items: center;
@@ -2117,18 +2120,38 @@ body {
     margin-bottom: 20px;
 }
 
-/* Avatar do autor — NewsGames */
-.author-avatar {
+/* Avatar circular */
+.author-info .author-avatar {
     width: 80px;
     height: 80px;
+    min-width: 80px;
     flex: 0 0 80px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    border-radius: 50%;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    border-radius: 50%;
     background: #1a1d24;
+    line-height: 0;
 }
+
+/* Imagem centralizada no círculo */
+.author-info .author-avatar img.author-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    margin: 0;
+    object-fit: cover;
+    object-position: 50% 50%;
+    border-radius: 50%;
+}
+
 
 /* Imagem do avatar */
 .author-avatar .author-image {
