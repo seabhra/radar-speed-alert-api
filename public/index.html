@@ -834,148 +834,106 @@
 </div>
 
 <!-- ============================================ -->
-<!-- PÁGINA DE DOAR                               -->
+<!-- PÁGINA DE DOAR (FUNCIONAL COM QR CODE)       -->
 <!-- ============================================ -->
+
+<!-- Importando biblioteca para gerar QR Code -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <div id="page-doar" class="app-page">
     <div class="page-header">
-        <h1>💚 Apoiar o Projeto</h1>
+        <h1>💝 Apoiar o Projeto</h1>
         <button type="button" class="btn-back" onclick="showPage('mapa')">← Voltar</button>
     </div>
 
     <div class="page-content">
 
+        <!-- INTRODUÇÃO -->
         <div class="donate-intro">
             <div class="donate-icon">
-                <span class="heart-icon">💚</span>
+                <span class="heart-icon">💝</span>
             </div>
             <h2>Ajude a manter o X9 Radar gratuito!</h2>
-            <p>Se você gosta do aplicativo e quer contribuir para sua manutenção e melhorias constantes, considere fazer uma doação. Qualquer valor é bem-vindo!</p>
+            <p>Sua contribuição mantém os servidores ativos e o app sem anúncios.</p>
         </div>
 
-        <!-- PIX -->
+        <!-- SELEÇÃO DE VALOR -->
         <section class="donate-section">
-            <h3>📱 Doação via PIX</h3>
-            <div class="donate-card pix-card">
-                <div class="pix-info">
-                    <div class="pix-key-label">Chave PIX (Email)</div>
-                    <div class="pix-key-value" id="pix-key">seabhra@gmail.com</div>
-                    <button type="button" class="btn-copy-pix" onclick="copiarChavePix()">
-                        <span class="copy-icon">📋</span>
-                        Copiar Chave
-                    </button>
-                </div>
-
-                <div class="pix-qr-placeholder">
-                    <div class="qr-placeholder">
-                        <span class="qr-icon">🔳</span>
-                        <p>QR Code PIX</p>
-                        <small>Em breve</small>
-                    </div>
-                </div>
-
-                <div class="pix-instructions">
-                    <h4>Como doar:</h4>
-                    <ol>
-                        <li>Abra o app do seu banco</li>
-                        <li>Escolha a opção PIX</li>
-                        <li>Escaneie o QR Code ou cole a chave</li>
-                        <li>Informe o valor da doação</li>
-                        <li>Confirme a transação</li>
-                    </ol>
-                </div>
-            </div>
-        </section>
-
-        <!-- VALORES SUGERIDOS -->
-        <section class="donate-section">
-            <h3>💰 Valores Sugeridos</h3>
+            <h3>1. Escolha um valor</h3>
             <div class="donate-amounts">
-                <button type="button" class="amount-btn" onclick="selecionarValor(5)">
+                <button type="button" class="amount-btn" onclick="selecionarValor(5, this)">
                     <span class="amount-value">R$ 5</span>
-                    <span class="amount-desc">Cafézinho</span>
+                    <span class="amount-desc">Café</span>
                 </button>
-                <button type="button" class="amount-btn" onclick="selecionarValor(10)">
+                <button type="button" class="amount-btn active" onclick="selecionarValor(10, this)">
                     <span class="amount-value">R$ 10</span>
                     <span class="amount-desc">Lanche</span>
                 </button>
-                <button type="button" class="amount-btn" onclick="selecionarValor(20)">
+                <button type="button" class="amount-btn" onclick="selecionarValor(20, this)">
                     <span class="amount-value">R$ 20</span>
                     <span class="amount-desc">Almoço</span>
                 </button>
-                <button type="button" class="amount-btn" onclick="selecionarValor(50)">
+                <button type="button" class="amount-btn" onclick="selecionarValor(50, this)">
                     <span class="amount-value">R$ 50</span>
                     <span class="amount-desc">Super</span>
                 </button>
-                <button type="button" class="amount-btn" onclick="selecionarValor(100)">
-                    <span class="amount-value">R$ 100</span>
-                    <span class="amount-desc">Premium</span>
-                </button>
-                <button type="button" class="amount-btn custom" onclick="selecionarValorCustom()">
-                    <span class="amount-value">Outro</span>
-                    <span class="amount-desc">Você escolhe</span>
-                </button>
+            </div>
+            <div style="text-align:center; margin-top:10px;">
+                <small>Ou digite outro valor:</small>
+                <input type="number" id="custom-amount" placeholder="R$ 0,00" class="custom-input" onchange="atualizarValorCustom(this.value)">
             </div>
         </section>
 
-        <!-- BENEFÍCIOS -->
+        <!-- ÁREA DO PIX (QR CODE DINÂMICO) -->
         <section class="donate-section">
-            <h3>❓ Por que doar?</h3>
-            <div class="donate-card benefits-card">
-                <ul class="benefits-list">
-                    <li>
-                        <span class="benefit-icon">✅</span>
-                        <div>
-                            <strong>App 100% Gratuito</strong>
-                            <p>Sem anúncios ou taxas escondidas</p>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="benefit-icon">✅</span>
-                        <div>
-                            <strong>Atualizações Constantes</strong>
-                            <p>Novos recursos e melhorias</p>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="benefit-icon">✅</span>
-                        <div>
-                            <strong>Servidores Ativos</strong>
-                            <p>Manutenção da infraestrutura</p>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="benefit-icon">✅</span>
-                        <div>
-                            <strong>Base de Dados Atualizada</strong>
-                            <p>Radares sempre atualizados</p>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="benefit-icon">✅</span>
-                        <div>
-                            <strong>Suporte Técnico</strong>
-                            <p>Atendimento aos usuários</p>
-                        </div>
-                    </li>
-                </ul>
+            <h3>2. Escaneie ou Copie</h3>
+            <div class="donate-card pix-card">
+                
+                <!-- Container do QR Code -->
+                <div class="pix-qr-container">
+                    <div id="qrcode-display" class="qr-box">
+                        <!-- O QR Code será gerado aqui via JS -->
+                        <div class="loading-qr">Gerando QR Code...</div>
+                    </div>
+                    <p class="scan-instruction">Abra o app do banco e escaneie</p>
+                </div>
+
+                <!-- Chave Pix Texto -->
+                <div class="pix-info-text">
+                    <div class="pix-key-label">Chave PIX (Email)</div>
+                    <div class="pix-key-wrapper">
+                        <code id="pix-key-text">seabhra@gmail.com</code>
+                        <button type="button" class="btn-copy-pix" onclick="copiarChavePix()">
+                            📋 Copiar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instruções Rápidas -->
+                <div class="pix-instructions-mini">
+                    <p>💡 <strong>Dica:</strong> Se o QR Code não funcionar, use a opção "Pix Copia e Cola" no seu banco e cole o código abaixo:</p>
+                    <textarea id="pix-copia-cola" readonly onclick="this.select()"></textarea>
+                    <button class="btn-secondary" onclick="copiarPayload()">Copiar Código Pix</button>
+                </div>
             </div>
         </section>
 
-        <!-- AGRADECIMENTO -->
+        <!-- AGRADECIMENTO / DEV -->
         <section class="donate-section">
             <div class="donate-card thanks-card">
-                <h3>🙏 Agradecimento</h3>
-                <p>Sua contribuição ajuda a manter o X9 Radar sempre atualizado e melhorando para todos os usuários. Muito obrigado pelo apoio!</p>
-
+                <h3>🙏 Obrigado pelo apoio!</h3>
                 <div class="developer-info">
-                    <div class="dev-avatar">GS</div>
+                    <img src="/imagens_app/image_marca.png" alt="Dev" class="author-image" onerror="this.src='https://via.placeholder.com/50'">
                     <div>
                         <strong>Geraldo A. Seabra</strong>
-                        <p>Desenvolvedor do X9 Radar</p>
+                        <p>Desenvolvedor X9 Radar</p>
                     </div>
                 </div>
             </div>
         </section>
+    </div>
+</div>
+
 
         <!-- CONTATO -->
         <section class="donate-section">
