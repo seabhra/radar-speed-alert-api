@@ -2359,297 +2359,90 @@ body {
 /* ===============================
 =========Página Doar ============
 ==================================*/
+
+
+.page-content { padding: 20px; }
+
+/* Intro */
 .donate-intro {
     text-align: center;
-    margin-bottom: 30px;
-    padding: 30px 20px;
+    margin-bottom: 25px;
+    padding: 25px;
     background: linear-gradient(135deg, #1e3c72, #2a5298);
     border-radius: 16px;
     color: white;
+    box-shadow: 0 4px 15px rgba(30, 60, 114, 0.3);
+}
+.heart-icon { font-size: 3rem; display: block; margin-bottom: 10px; animation: heartbeat 2s infinite; }
+@keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+/* Sections */
+.donate-section { margin-bottom: 25px; }
+.donate-section h3 { color: #1e3c72; font-size: 1.1rem; margin-bottom: 12px; }
+
+/* Amount Buttons */
+.donate-amounts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
+.amount-btn {
+    background: white; border: 2px solid #e0e0e0; border-radius: 10px;
+    padding: 10px 5px; cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.amount-btn:hover { border-color: #1e3c72; }
+.amount-btn.active { background: #1e3c72; border-color: #1e3c72; color: white; transform: translateY(-2px); }
+.amount-value { display: block; font-weight: bold; font-size: 1rem; }
+.amount-desc { display: block; font-size: 0.75rem; opacity: 0.8; }
+
+.custom-input {
+    width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 6px; text-align: center; margin-top: 5px;
 }
 
-.donate-icon {
-    margin-bottom: 20px;
-}
-
-.heart-icon {
-    font-size: 4rem;
-    display: inline-block;
-    animation: heartbeat 2s ease-in-out infinite;
-}
-
-@keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-
-.donate-intro h2 {
-    margin: 0 0 15px 0;
-    font-size: 1.8rem;
-}
-
-.donate-intro p {
-    margin: 0;
-    font-size: 1.1rem;
-    opacity: 0.9;
-    line-height: 1.6;
-}
-
-.donate-section {
-    margin-bottom: 30px;
-}
-
-.donate-section h3 {
-    color: #1e3c72;
-    margin-bottom: 15px;
-    font-size: 1.3rem;
-}
-
+/* Card Principal */
 .donate-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background: white; border-radius: 16px; padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
-.pix-card {
-    text-align: center;
+/* Área do QR Code */
+.pix-qr-container { text-align: center; margin-bottom: 20px; }
+.qr-box {
+    background: white; padding: 15px; border: 2px dashed #00cc66;
+    border-radius: 12px; display: inline-block; margin-bottom: 10px;
 }
+.scan-instruction { font-size: 0.85rem; color: #666; margin: 0; }
 
-.pix-key-label {
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
+/* Info Texto Pix */
+.pix-info-text { text-align: center; margin-bottom: 20px; }
+.pix-key-label { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
+.pix-key-wrapper {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: #f0fdf4; padding: 10px; border-radius: 8px; border: 1px solid #dcfce7;
 }
-
-.pix-key-value {
-    background: rgba(0, 255, 136, 0.1);
-    color: #00cc66;
-    padding: 15px;
-    border-radius: 8px;
-    font-family: 'Courier New', monospace;
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-    word-break: break-all;
-}
+#pix-key-text { font-family: monospace; font-weight: bold; color: #166534; word-break: break-all; }
 
 .btn-copy-pix {
-    background: linear-gradient(135deg, #00cc66, #00994d);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+    background: #00cc66; color: white; border: none; padding: 6px 12px;
+    border-radius: 6px; font-size: 0.8rem; cursor: pointer; font-weight: 600;
+}
+.btn-copy-pix:active { transform: scale(0.95); }
+
+/* Área Copia e Cola (Escondida visualmente mas útil) */
+.pix-instructions-mini { 
+    background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 0.85rem; 
+}
+#pix-copia-cola {
+    width: 100%; height: 50px; border: 1px solid #ddd; border-radius: 4px;
+    font-size: 0.7rem; color: #555; margin: 8px 0; padding: 5px; resize: none;
+}
+.btn-secondary {
+    background: white; border: 1px solid #ccc; padding: 5px 10px; 
+    border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: 100%;
 }
 
-.btn-copy-pix:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 204, 102, 0.4);
-}
-
-.pix-qr-placeholder {
-    margin: 20px 0;
-}
-
-.qr-placeholder {
-    background: #f5f5f5;
-    border: 2px dashed #ddd;
-    border-radius: 12px;
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.qr-icon {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.qr-placeholder p {
-    margin: 0 0 5px 0;
-    color: #666;
-    font-weight: 600;
-}
-
-.qr-placeholder small {
-    color: #999;
-}
-
-.pix-instructions {
-    text-align: left;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
-}
-
-.pix-instructions h4 {
-    color: #1e3c72;
-    margin-bottom: 10px;
-}
-
-.pix-instructions ol {
-    margin: 0;
-    padding-left: 20px;
-}
-
-.pix-instructions li {
-    margin-bottom: 8px;
-    color: #666;
-    line-height: 1.5;
-}
-
-.donate-amounts {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 15px;
-}
-
-.amount-btn {
-    background: white;
-    border: 2px solid #1e3c72;
-    border-radius: 12px;
-    padding: 20px 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-}
-
-.amount-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
-}
-
-.amount-btn.selected {
-    background: linear-gradient(135deg, #00cc66, #00994d);
-    border-color: #00cc66;
-    color: white;
-}
-
-.amount-value {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-.amount-desc {
-    display: block;
-    font-size: 0.85rem;
-    opacity: 0.8;
-}
-
-.benefits-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.benefits-list li {
-    display: flex;
-    gap: 15px;
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.benefits-list li:last-child {
-    border-bottom: none;
-}
-
-.benefit-icon {
-    color: #00cc66;
-    font-size: 1.5rem;
-    flex-shrink: 0;
-}
-
-.benefits-list strong {
-    display: block;
-    color: #1e3c72;
-    margin-bottom: 5px;
-}
-
-.benefits-list p {
-    margin: 0;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.thanks-card {
-    text-align: center;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 204, 102, 0.05));
-    border: 2px solid #00cc66;
-}
-
-.thanks-card h3 {
-    color: #00cc66;
-    margin-bottom: 15px;
-    font-size: 1.5rem;
-}
-
-.thanks-card p {
-    color: #666;
-    line-height: 1.6;
-    margin-bottom: 20px;
-}
-
-.developer-info {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid rgba(0, 204, 102, 0.3);
-}
-
-.developer-info strong {
-    display: block;
-    color: #1e3c72;
-    font-size: 1.1rem;
-}
-
-.contact-info {
-    text-align: center;
-    padding: 30px 20px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.contact-info h3 {
-    color: #1e3c72;
-    margin-bottom: 10px;
-}
-
-.contact-info p {
-    color: #666;
-    margin-bottom: 15px;
-}
-
-.contact-email {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: #00cc66;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1.1rem;
-    padding: 10px 20px;
-    border: 2px solid #00cc66;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.contact-email:hover {
-    background: #00cc66;
-    color: white;
-    transform: translateY(-2px);
-}
+/* Developer Info */
+.thanks-card { text-align: center; border-top: 4px solid #00cc66; }
+.developer-info { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 15px; }
+.author-image { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+.developer-info strong { display: block; color: #1e3c72; }
+.developer-info p { margin: 0; font-size: 0.85rem; color: #666; }
 
 /* ============================================================
    17. TOAST E LOADING
