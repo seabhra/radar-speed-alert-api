@@ -802,4 +802,151 @@ window.setUserLocation = function(lat, lng) {
     else posicionarSidebar();
 })();
 
+//==========================
+// CONFIGURAÇÕES QR CODE PIX
+//============================
+const CHAVE_PIX = "seabhra@gmail.com"; // Sua chave
+const NOME_BENEFICIARIO = "Geraldo A Seabra"; // Sem acentos idealmente para compatibilidade máxima
+const CIDADE = "Sabará - MG"; // Sem acentos
+
+let valorAtual = 10.00; // Valor padrão
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    gerarPix(valorAtual);
+});
+
+// Função para selecionar botões de valor
+function selecionarValor(valor, elementoBtn) {
+    valorAtual = parseFloat(valor);
+    
+    // Remove classe active de todos
+    document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+    // Adiciona ao clicado
+    if(elementoBtn) elementoBtn.classList.add('active');
+    
+    // Limpa input custom
+    document.getElementById('custom-amount').value = '';
+    
+    // Regenera QR Code
+    gerarPix(valorAtual);
+}
+
+// Função para valor customizado
+function atualizarValorCustom(valor) {
+    if(valor && valor > 0) {
+        valorAtual = parseFloat(valor);
+        document.querySelectorAll('.amount-btn').forEach(btn => btn.classList.remove('active'));
+        gerarPix(valorAtual);
+    }
+}
+
+// Lógica Principal: Gerar Payload PIX (BR Code)
+function gerarPix(valor) {
+    const payload = generatePixPayload(CHAVE_PIX, NOME_BENEFICIARIO, CIDADE, valor.toFixed(2), "X9RADAR");
+    
+    // Atualiza o texto do QR Code
+    document.getElementById('pix-copia-cola').value = payload;
+    
+    // Limpa QR Code anterior
+    const qrContainer = document.getElementById("qrcode-display");
+    qrContainer.innerHTML = "";
+    
+    // Gera novo QR Code visual
+    new QRCode(qrContainer, {
+        text: payload,
+        width: 180,
+        height: 180,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.M
+    });
+}
+
+// Função para copiar apenas a chave email
+function copiarChavePix() {
+    navigator.clipboard.writeText(CHAVE_PIX).then(() => {
+        alert("Chave Email copiada: " + CHAVE_PIX);
+    });
+}
+
+// Função para copiar o código "Copia e Cola" completo
+function copiarPayload() {
+    const copyText = document.getElementById("pix-copia-cola");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); 
+    navigator.clipboard.writeText(copyText.value).then(() => {
+        alert("Código Pix Copia e Cola copiado!");
+    });
+}
+
+/* --- ALGORITMO DE GERAÇÃO DO PADRÃO EMV CO-QR (PIX) --- */
+function generatePixPayload(key, name, city, amount, txid="***") {
+    // Helper para criar TLV (Tag-Length-Value)
+    const formatTLV = (id, value) => {
+        const len = value.length.toString().padStart(2, '0');
+        return `${id}${len}${value}`;
+    };
+
+    // 00: Payload Format Indicator
+    let payload = formatTLV("00", "01"); 
+    
+    // 26: Merchant Account Information
+    let merchantAccount = formatTLV("00", "br.gov.bcb.pix");
+    merchantAccount += formatTLV("01", key);
+    payload += formatTLV("26", merchantAccount);
+
+    // 52: Merchant Category Code
+    payload += formatTLV("52", "0000");
+
+    // 53: Transaction Currency (986 = BRL)
+    payload += formatTLV("53", "986");
+
+    // 54: Transaction Amount
+    if (amount) {
+        payload += formatTLV("54", amount);
+    }
+
+    // 58: Country Code
+    payload += formatTLV("58", "BR");
+
+    // 59: Merchant Name (Max 25 chars)
+    payload += formatTLV("59", name.substring(0, 25));
+
+    // 60: Merchant City (Max 15 chars)
+    payload += formatTLV("60", city.substring(0, 15));
+
+    // 62: Additional Data Field Template
+    let additionalData = formatTLV("05", txid); // TxID
+    payload += formatTLV("62", additionalData);
+
+    // 63: CRC16
+    payload += "6304"; // Tag + Length placeholder
+
+    // Calculate CRC16 (CCITT-FALSE)
+    const crc = calculateCRC16(payload);
+    payload += crc;
+
+    return payload;
+}
+
+// Algoritmo CRC16 necessário para o Pix funcionar
+function calculateCRC16(str) {
+    let crc = 0xFFFF;
+    const polynomial = 0x1021;
+
+    for (let i = 0; i < str.length; i++) {
+        crc ^= (str.charCodeAt(i) << 8);
+        for (let j = 0; j < 8; j++) {
+            if ((crc & 0x8000) !== 0) {
+                crc = ((crc << 1) ^ polynomial);
+            } else {
+                crc = (crc << 1);
+            }
+        }
+    }
+    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+}
+
+
 console.log('✅ [APP.JS] Carregado e funções exportadas para window com sucesso.');
